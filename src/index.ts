@@ -1,41 +1,19 @@
-import { Sequelize, DataTypes, Model } from 'sequelize';
+import { exchangeNamesAndUrls, Exchange } from "./exchange";
 
-async function main() {
-    const sequelize = new Sequelize('testdb', 'root', 'f9R#@hY82l', {
-        host: 'localhost',
-        dialect: 'mysql',
-    });
+async function main({
+    verbose = false
+}: {
+    verbose?: boolean
+} = {}) {
+    let exchanges = new Map<string, Exchange>();
 
-    try {
-        await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
-    } catch (error) {
-        console.error('Unable to connect to the database:', error);
+    for (const [key, value] of exchangeNamesAndUrls) {
+        let exchange = new Exchange({name: key, url: value});
+        await exchange.initialize({headless: false, verbose: verbose});
+        exchanges.set(key, exchange);
     }
 
-    const GameOdds = sequelize.define('gameOdds', {
-        awayTeam: DataTypes.STRING,
-        homeTeam: DataTypes.STRING,
-        date: DataTypes.DATEONLY,
-        fanDuelSpreadAwayPrice: DataTypes.INTEGER,
-        fanDuelSpreadHomePrice: DataTypes.INTEGER,
-        fanDuelSpreadAwaySpread: DataTypes.FLOAT,
-        fanDuelSpreadHomeSpread: DataTypes.FLOAT,
-        fanDuelMoneyAwayPrice: DataTypes.INTEGER,
-        fanDuelMoneyHomePrice: DataTypes.INTEGER,
-        fanDuelOverUnderAwayPrice: DataTypes.INTEGER,
-        fanDuelOverUnderHomePrice: DataTypes.INTEGER,
-        fanDuelOverUnderAwayOver: DataTypes.FLOAT,
-        fanDuelOverUnderHomeUnder: DataTypes.FLOAT,
-    }, {
-        timestamps: true,
-        updatedAt: false,
-        createdAt: 'savedToDatabase',
-    })
-
-    await sequelize.sync({ alter: true });
-
-    await sequelize.close();
+    
 }
 
-main();
+main({verbose: true});
