@@ -1,10 +1,43 @@
-import { ExchangePageUtility } from "./exchange-page-utilities";
-import { Game } from "./game";
+import { ExchangePageReader, ExchangePageParser, ExchangePageWriter } from "./exchange-page-utilities";
+import { Game } from "./games";
 import { ExchangeGameOdds } from "./odds";
+import { MySqlExchange, } from "./mysql";
 
-export let exchangeNamesAndUrls = new Map<string, string>([
-    ['FanDuel', 'https://sportsbook.fanduel.com/navigation/nfl'],
-    ['DraftKings', 'https://sportsbook.draftkings.com/leagues/football/nfl'],
+async function parseCaesars() {
+
+    console.log(`Parse Caesar\'s!`);
+
+}
+
+async function parseDraftKings() {
+
+    console.log(`Parse DraftKings!`);
+
+}
+
+async function parseFanDuel() {
+
+    console.log(`Parse FanDuel!`);
+
+}
+
+export let exchangeNamesAndUrls = new Map<string, any>([
+    
+    ['Caesar\'s', {
+        url: 'https://www.williamhill.com/us/ny/bet/americanfootball',
+        parseFunction: parseCaesars,
+    }],
+
+    ['DraftKings', {
+        url: 'https://sportsbook.draftkings.com/leagues/football/nfl',
+        parseFunction: parseDraftKings,
+    }],
+
+    ['FanDuel', {
+        url: 'https://sportsbook.fanduel.com/navigation/nfl',
+        parseFunction: parseFanDuel,
+    }],
+
 ]);
 
 export class Exchange {
@@ -12,28 +45,38 @@ export class Exchange {
     private name: string;
     private nameCamelCase: string;
     private url: string;
-    private pageReader: ExchangePageUtility;
-    private pageParser: ExchangePageUtility;
-    private pageWriter: ExchangePageUtility;
+    private pageReader: ExchangePageReader;
+    private pageParser: ExchangePageParser;
+    private pageWriter: ExchangePageWriter;
     private currentOdds: Map<Game, ExchangeGameOdds>;
     private lastSavedOdds: Map<Game, ExchangeGameOdds>;
+    private sequelizeModel: any;
 
     // Constructor
     constructor({
         name,
         url,
+        parseFunction,
     }: {
         name: string,
         url: string,
+        parseFunction: Function,
     }) {
         this.name = name;
-        this.nameCamelCase = this.toCamelCase({str: name});
+        this.nameCamelCase = this.setNameCamelCase();
         this.url = url;
-        this.pageReader = new ExchangePageUtility({exchange: this});
-        this.pageParser = new ExchangePageUtility({exchange: this});
-        this.pageWriter = new ExchangePageUtility({exchange: this});
+        this.pageReader = new ExchangePageReader({exchange: this});
+        this.pageParser = new ExchangePageParser({
+            exchange: this,
+            parseFunction: parseFunction,
+        });
+        this.pageWriter = new ExchangePageWriter({exchange: this});
         this.currentOdds = new Map<Game, ExchangeGameOdds>;
         this.lastSavedOdds = new Map<Game, ExchangeGameOdds>;
+        this.sequelizeModel = MySqlExchange.create({
+            name: this.getName(), 
+            url: this.getUrl()
+        });
     }
 
     // Public methods
@@ -53,16 +96,18 @@ export class Exchange {
         verbose ? console.log(`Exchange object for ${this.getName()} initialized succesfully.`) : null;
     }
 
-    public toCamelCase({
-        str,
+    public async close({
         verbose = false,
     }: {
-        str: string,
         verbose?: boolean,
-    }) {
-        let alphanumericString = str.replace(/[^a-zA-Z0-9]/g, '');
-        let firstCharLower = alphanumericString.charAt(0).toLowerCase() + alphanumericString.slice(1);
-        return firstCharLower;
+    } = {}) {
+        verbose ? console.log(`\nClosing Exchange object for ${this.getName()}.`) : null;
+
+        await this.pageReader.close({verbose: verbose});
+        await this.pageParser.close({verbose: verbose});
+        await this.pageWriter.close({verbose: verbose});
+
+        verbose ? console.log(`Exchange object for ${this.getName()} closed succesfully.`) : null;
     }
     
     // Getters
@@ -78,7 +123,7 @@ export class Exchange {
         verbose = false,
     }: {
         verbose?: boolean,
-    }) {
+    }= {}) {
         return this.nameCamelCase;
     }
 
@@ -86,7 +131,7 @@ export class Exchange {
         verbose = false,
     }: {
         verbose?: boolean,
-    }) {
+    } = {}) {
         return this.url;
     }
 
@@ -94,7 +139,7 @@ export class Exchange {
         verbose = false,
     }: {
         verbose?: boolean,
-    }) {
+    } = {}) {
         return this.pageReader;
     }
 
@@ -102,7 +147,7 @@ export class Exchange {
         verbose = false,
     }: {
         verbose?: boolean,
-    }) {
+    } = {}) {
         return this.pageParser;
     }
 
@@ -110,7 +155,7 @@ export class Exchange {
         verbose = false,
     }: {
         verbose?: boolean,
-    }) {
+    } = {}) {
         return this.pageWriter;
     }
 
@@ -118,7 +163,7 @@ export class Exchange {
         verbose = false,
     }: {
         verbose?: boolean,
-    }) {
+    } = {}) {
         return this.currentOdds;
     }
 
@@ -126,7 +171,7 @@ export class Exchange {
         verbose = false,
     }: {
         verbose?: boolean,
-    }) {
+    } = {}) {
         return this.lastSavedOdds;
     }
 
@@ -144,13 +189,22 @@ export class Exchange {
     }
 
     private setNameCamelCase({
-        nameCamelCase,
+        string,
         verbose = false,
     }: {
-        nameCamelCase: string,
+        string?: string,
         verbose?: boolean,
-    }) {
-        this.nameCamelCase = nameCamelCase;
+    } = {}) {
+        let str;
+        if (string == undefined) {
+            str = this.name;
+        } else {
+            str = string;
+        }
+        
+        let alphanumericString = str.replace(/[^a-zA-Z0-9]/g, '');
+        let firstCharLower = alphanumericString.charAt(0).toLowerCase() + alphanumericString.slice(1);
+        return firstCharLower;
     }
 
     private setUrl({
@@ -167,7 +221,7 @@ export class Exchange {
         pageReader,
         verbose = false,
     }: {
-        pageReader: ExchangePageUtility,
+        pageReader: ExchangePageReader,
         verbose?: boolean,
     }) {
         this.pageReader = pageReader;
@@ -177,7 +231,7 @@ export class Exchange {
         pageParser,
         verbose = false,
     }: {
-        pageParser: ExchangePageUtility,
+        pageParser: ExchangePageParser,
         verbose?: boolean,
     }) {
         this.pageParser = pageParser;
@@ -187,7 +241,7 @@ export class Exchange {
         pageWriter,
         verbose = false,
     }: {
-        pageWriter: ExchangePageUtility,
+        pageWriter: ExchangePageWriter,
         verbose?: boolean,
     }) {
         this.pageWriter = pageWriter;

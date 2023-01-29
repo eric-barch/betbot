@@ -12,18 +12,46 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = exports.exchangeNamesAndUrls = void 0;
 const exchange_page_utilities_1 = require("./exchange-page-utilities");
 const mysql_1 = require("./mysql");
+function parseCaesars() {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log(`Parse Caesar\'s!`);
+    });
+}
+function parseDraftKings() {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log(`Parse DraftKings!`);
+    });
+}
+function parseFanDuel() {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log(`Parse FanDuel!`);
+    });
+}
 exports.exchangeNamesAndUrls = new Map([
-    ['FanDuel', 'https://sportsbook.fanduel.com/navigation/nfl'],
-    ['DraftKings', 'https://sportsbook.draftkings.com/leagues/football/nfl'],
+    ['Caesar\'s', {
+            url: 'https://www.williamhill.com/us/ny/bet/americanfootball',
+            parseFunction: parseCaesars,
+        }],
+    ['DraftKings', {
+            url: 'https://sportsbook.draftkings.com/leagues/football/nfl',
+            parseFunction: parseDraftKings,
+        }],
+    ['FanDuel', {
+            url: 'https://sportsbook.fanduel.com/navigation/nfl',
+            parseFunction: parseFanDuel,
+        }],
 ]);
 class Exchange {
     // Constructor
-    constructor({ name, url, }) {
+    constructor({ name, url, parseFunction, }) {
         this.name = name;
         this.nameCamelCase = this.setNameCamelCase();
         this.url = url;
         this.pageReader = new exchange_page_utilities_1.ExchangePageReader({ exchange: this });
-        this.pageParser = new exchange_page_utilities_1.ExchangePageParser({ exchange: this });
+        this.pageParser = new exchange_page_utilities_1.ExchangePageParser({
+            exchange: this,
+            parseFunction: parseFunction,
+        });
         this.pageWriter = new exchange_page_utilities_1.ExchangePageWriter({ exchange: this });
         this.currentOdds = new Map;
         this.lastSavedOdds = new Map;
@@ -55,25 +83,25 @@ class Exchange {
     getName({ verbose = false, } = {}) {
         return this.name;
     }
-    getNameCamelCase({ verbose = false, }) {
+    getNameCamelCase({ verbose = false, } = {}) {
         return this.nameCamelCase;
     }
     getUrl({ verbose = false, } = {}) {
         return this.url;
     }
-    getPageReader({ verbose = false, }) {
+    getPageReader({ verbose = false, } = {}) {
         return this.pageReader;
     }
-    getPageParser({ verbose = false, }) {
+    getPageParser({ verbose = false, } = {}) {
         return this.pageParser;
     }
-    getPageWriter({ verbose = false, }) {
+    getPageWriter({ verbose = false, } = {}) {
         return this.pageWriter;
     }
-    getCurrentOdds({ verbose = false, }) {
+    getCurrentOdds({ verbose = false, } = {}) {
         return this.currentOdds;
     }
-    getLastSavedOdds({ verbose = false, }) {
+    getLastSavedOdds({ verbose = false, } = {}) {
         return this.lastSavedOdds;
     }
     // Private methods
