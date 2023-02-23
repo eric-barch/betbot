@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "build-and-run": "tsc && node dest/main.js",
+    "generate-barrels": "barrelsby --delete",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eric Barch",
@@ -12,6 +13,7 @@
   "devDependencies": {
     "@types/node": "^18.11.18",
     "@types/validator": "^13.7.10",
+    "barrelsby": "^2.5.1",
     "typescript": "^4.9.4"
   },
   "dependencies": {
