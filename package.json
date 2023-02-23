@@ -2,8 +2,9 @@
   "name": "iteration-5",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
+    "build-and-run": "tsc && node dest/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eric Barch",
