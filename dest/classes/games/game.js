@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
-const classes = __importStar(require(".."));
+const classes = __importStar(require("../../classes"));
 class Game {
     constructor({ awayTeam, homeTeam, startDate, exchanges, verbose, }) {
         this.awayTeam = awayTeam;
@@ -77,7 +77,7 @@ class Game {
                 for (let exchange of exchanges) {
                     let odds = this.odds.find(odds => odds.getExchange() === exchange);
                     if (odds === undefined) {
-                        odds = new classes.odds.Odds({
+                        odds = new classes.Odds({
                             game: this,
                             exchange: exchange,
                         });
@@ -90,7 +90,7 @@ class Game {
             else {
                 let odds = this.odds.find(odds => odds.getExchange() === exchanges);
                 if (odds === undefined) {
-                    odds = new classes.odds.Odds({
+                    odds = new classes.Odds({
                         game: this,
                         exchange: exchanges,
                     });

@@ -32,10 +32,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initiate = exports.instance = void 0;
+exports.close = exports.initiate = exports.instance = void 0;
 const sequelize = __importStar(require("sequelize"));
-const database = __importStar(require("."));
-const verbosity_1 = require("../_config/verbosity");
+const database = __importStar(require("../database"));
+const config = __importStar(require("../_config"));
 exports.instance = new sequelize.Sequelize('nba', 'root', 'f9R#@hY82l', {
     host: 'localhost',
     port: 3306,
@@ -45,18 +45,18 @@ exports.instance = new sequelize.Sequelize('nba', 'root', 'f9R#@hY82l', {
 console.log(`Initialized and imported database.instance.instance.`);
 function initiate() {
     return __awaiter(this, void 0, void 0, function* () {
-        const verbose = verbosity_1.verbosity.database.instance.initiate;
+        const verbose = config.verbosity.database.instance.initiate;
         verbose ? console.log(`\nInitiating Sequelize instance.`) : null;
-        database.classes.makeSqlAssociations();
+        database.makeSqlAssociations();
         verbose ? console.log(`Made sequelize class associations.`) : null;
         try {
-            yield database.instance.instance.authenticate();
+            yield database.instance.authenticate();
             verbose ? console.log(`MySQL connection established successfully.`) : null;
         }
         catch (error) {
             verbose ? console.log(`MySQL connection unsuccessful: ${error}`) : null;
         }
-        yield database.instance.instance.sync({
+        yield database.instance.sync({
             alter: true,
             logging: false,
         });
@@ -65,3 +65,9 @@ function initiate() {
 }
 exports.initiate = initiate;
 console.log(`Initialized and imported database.instance.initiate.`);
+function close() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exports.instance.close();
+    });
+}
+exports.close = close;

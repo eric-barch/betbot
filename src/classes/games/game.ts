@@ -1,11 +1,11 @@
-import * as classes from '..';
+import * as classes from '../../classes';
 
 export class Game {
-    private awayTeam: classes.teams.Team;
-    private homeTeam: classes.teams.Team;
+    private awayTeam: classes.Team;
+    private homeTeam: classes.Team;
     private startDate: Date;
-    private exchanges: Array<classes.exchanges.Exchange>;
-    private odds: Array<classes.odds.Odds>;
+    private exchanges: Array<classes.Exchange>;
+    private odds: Array<classes.Odds>;
 
     constructor({
         awayTeam,
@@ -14,10 +14,10 @@ export class Game {
         exchanges,
         verbose,
     }: {
-        awayTeam: classes.teams.Team,
-        homeTeam: classes.teams.Team,
+        awayTeam: classes.Team,
+        homeTeam: classes.Team,
         startDate: Date,
-        exchanges?: classes.exchanges.Exchange | Array<classes.exchanges.Exchange>,
+        exchanges?: classes.Exchange | Array<classes.Exchange>,
         verbose?: boolean,
     }) {
         this.awayTeam = awayTeam;
@@ -46,8 +46,8 @@ export class Game {
         startDate,
         verbose,
     }: {
-        awayTeam: classes.teams.Team,
-        homeTeam: classes.teams.Team,
+        awayTeam: classes.Team,
+        homeTeam: classes.Team,
         startDate?: Date,
         verbose?: boolean,
     }) {
@@ -104,16 +104,16 @@ export class Game {
         exchanges,
         verbose = false,
     }: {
-        exchanges?: classes.exchanges.Exchange | Array<classes.exchanges.Exchange>,
+        exchanges?: classes.Exchange | Array<classes.Exchange>,
         verbose?: boolean,
     } = {}) {
         if (exchanges) {
             if (Array.isArray(exchanges)) {
-                let oddsArray = new Array<classes.odds.Odds>;
+                let oddsArray = new Array<classes.Odds>;
                 for (let exchange of exchanges) {
                     let odds = this.odds.find(odds => odds.getExchange() === exchange);
                     if (odds === undefined) {
-                        odds = new classes.odds.Odds({
+                        odds = new classes.Odds({
                             game: this,
                             exchange: exchange,
                         });
@@ -125,7 +125,7 @@ export class Game {
             } else {
                 let odds = this.odds.find(odds => odds.getExchange() === exchanges);
                 if (odds === undefined) {
-                    odds = new classes.odds.Odds({
+                    odds = new classes.Odds({
                         game: this,
                         exchange: exchanges,
                     });

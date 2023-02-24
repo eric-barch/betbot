@@ -39,12 +39,12 @@ class Exchange {
     constructor({ name, url, parseFunction, verbose = false, }) {
         this.name = name;
         this.url = url;
-        this.pageReader = new classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageReader({ exchange: this });
-        this.pageParser = new classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageParser({
+        this.pageReader = new classes.ExchangePageReader({ exchange: this });
+        this.pageParser = new classes.ExchangePageParser({
             exchange: this,
             parseFunction: parseFunction,
         });
-        this.pageWriter = new classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageWriter({ exchange: this });
+        this.pageWriter = new classes.ExchangePageWriter({ exchange: this });
         this.games = [];
         this.odds = {
             current: [],
@@ -59,7 +59,7 @@ class Exchange {
             yield this.pageReader.initialize({ headless: headless, verbose: verbose });
             yield this.pageParser.initialize({ headless: headless, verbose: verbose });
             yield this.pageWriter.initialize({ headless: headless, verbose: verbose });
-            this.sequelizeModel = yield database.classes.SqlExchange.findOrCreate({
+            this.sequelizeModel = yield database.SqlExchange.findOrCreate({
                 where: {
                     name: this.getName(),
                 },
@@ -75,7 +75,7 @@ class Exchange {
                     verbose ? console.log("Exchange already exists:", exchange.get({ plain: true })) : null;
                     const rowData = exchange.get({ plain: true });
                     if (rowData.url !== this.getUrl()) {
-                        database.classes.SqlExchange.update({ url: this.getUrl() }, { where: {
+                        database.SqlExchange.update({ url: this.getUrl() }, { where: {
                                 name: this.getName(),
                             } }).then((updatedRows) => {
                             verbose ? console.log(`Database URL updated to match program URL.`) : null;

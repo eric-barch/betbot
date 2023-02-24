@@ -1,10 +1,10 @@
 import * as database from './database';
-import * as state from './state';
+// import * as state from './state';
 
 async function main() {
-    await database.instance.initiate();
+    await database.initiate();
     
-    await state.exchanges.initiate();
+    // await state.exchanges.initiate();
 
     // /** Web scraping. */
     // for (let exchange of state.exchanges) {
@@ -27,7 +27,7 @@ async function main() {
     // }
 
     /** Close connection with MySQL. */
-    await database.instance.instance.close();
+    await database.close();
 
     /** Close all exchange objects and their Puppeteer-based utilities. */
     // for (const exchange of state.exchanges) {

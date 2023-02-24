@@ -1,19 +1,19 @@
-import * as classes from '..';
+import * as classes from '../../classes';
 
 export class Odds {
-    private game: classes.games.Game | undefined;
-    private exchange: classes.exchanges.Exchange | undefined;
-    private spreadOdds: classes.odds.oddsComponents.SpreadOdds;
-    private moneyOdds: classes.odds.oddsComponents.MoneyOdds;
-    private overUnderOdds: classes.odds.oddsComponents.OverUnderOdds;
+    private game: classes.Game | undefined;
+    private exchange: classes.Exchange | undefined;
+    private spreadOdds: classes.SpreadOdds;
+    private moneyOdds: classes.MoneyOdds;
+    private overUnderOdds: classes.OverUnderOdds;
 
     constructor({
         game,
         exchange,
         verbose = false,
     }: {
-        game?: classes.games.Game,
-        exchange?: classes.exchanges.Exchange,
+        game?: classes.Game,
+        exchange?: classes.Exchange,
         verbose?: boolean,
     } = {}) {
         if (game) {
@@ -28,9 +28,9 @@ export class Odds {
             this.exchange = undefined;
         }
 
-        this.spreadOdds = new classes.odds.oddsComponents.SpreadOdds();
-        this.moneyOdds = new classes.odds.oddsComponents.MoneyOdds();
-        this.overUnderOdds = new classes.odds.oddsComponents.OverUnderOdds();
+        this.spreadOdds = new classes.SpreadOdds();
+        this.moneyOdds = new classes.MoneyOdds();
+        this.overUnderOdds = new classes.OverUnderOdds();
     }
 
     public getGame({

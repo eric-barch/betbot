@@ -33,11 +33,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database = __importStar(require("./database"));
-const state = __importStar(require("./state"));
+// import * as state from './state';
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield database.instance.initiate();
-        yield state.exchanges.initiate();
+        yield database.initiate();
+        // await state.exchanges.initiate();
         // /** Web scraping. */
         // for (let exchange of state.exchanges) {
         //     let pageReader = await exchange.getPageReader();
@@ -55,7 +55,7 @@ function main() {
         //     await pageParser.parse({verbose: verbosity.pageParser.parse});
         // }
         /** Close connection with MySQL. */
-        yield database.instance.instance.close();
+        yield database.close();
         /** Close all exchange objects and their Puppeteer-based utilities. */
         // for (const exchange of state.exchanges) {
         //     verbosity.exchangeObject.close ? console.log() : null;

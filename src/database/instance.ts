@@ -1,7 +1,7 @@
 import * as sequelize from 'sequelize';
 
-import * as database from '.';
-import { verbosity } from '../_config/verbosity';
+import * as database from '../database';
+import * as config from '../_config';
 
 export const instance = new sequelize.Sequelize('nba', 'root', 'f9R#@hY82l', {
     host: 'localhost',
@@ -12,24 +12,28 @@ export const instance = new sequelize.Sequelize('nba', 'root', 'f9R#@hY82l', {
 console.log(`Initialized and imported database.instance.instance.`);
 
 export async function initiate() {
-    const verbose = verbosity.database.instance.initiate;
+    const verbose = config.verbosity.database.instance.initiate;
 
     verbose ? console.log(`\nInitiating Sequelize instance.`) : null;
 
-    database.classes.makeSqlAssociations();
+    database.makeSqlAssociations();
     verbose ? console.log(`Made sequelize class associations.`) : null;
 
     try {
-        await database.instance.instance.authenticate();
+        await database.instance.authenticate();
         verbose ? console.log(`MySQL connection established successfully.`) : null;
     } catch (error) {
         verbose ? console.log(`MySQL connection unsuccessful: ${error}`) : null;
     }
 
-    await database.instance.instance.sync({
+    await database.instance.sync({
         alter: true,
         logging: false,
     });
     verbose ? console.log(`MySql synced to program model.`) : null;
 }
 console.log(`Initialized and imported database.instance.initiate.`);
+
+export async function close() {
+    await instance.close();
+}

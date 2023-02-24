@@ -4,13 +4,13 @@ import * as database from '../../database';
 export class Exchange {
     private name: string;
     private url: string;
-    private pageReader: classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageReader;
-    private pageParser: classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageParser;
-    private pageWriter: classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageWriter;
-    private games: Array<classes.games.Game>;
+    private pageReader: classes.ExchangePageReader;
+    private pageParser: classes.ExchangePageParser;
+    private pageWriter: classes.ExchangePageWriter;
+    private games: Array<classes.Game>;
     private odds: {
-        current: Array<classes.odds.Odds>, 
-        lastSaved: Array<classes.odds.Odds>,
+        current: Array<classes.Odds>, 
+        lastSaved: Array<classes.Odds>,
     };
     private sequelizeModel: any;
 
@@ -28,12 +28,12 @@ export class Exchange {
 
         this.name = name;
         this.url = url;
-        this.pageReader = new classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageReader({exchange: this});
-        this.pageParser = new classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageParser({
+        this.pageReader = new classes.ExchangePageReader({exchange: this});
+        this.pageParser = new classes.ExchangePageParser({
             exchange: this,
             parseFunction: parseFunction,
         });
-        this.pageWriter = new classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageWriter({exchange: this});
+        this.pageWriter = new classes.ExchangePageWriter({exchange: this});
         this.games = [];
         this.odds = {
             current: [],
@@ -56,7 +56,7 @@ export class Exchange {
         await this.pageParser.initialize({headless: headless, verbose: verbose});
         await this.pageWriter.initialize({headless: headless, verbose: verbose});
 
-        this.sequelizeModel = await database.classes.SqlExchange.findOrCreate({
+        this.sequelizeModel = await database.SqlExchange.findOrCreate({
             where: {
                 name: this.getName(),
             },
@@ -71,7 +71,7 @@ export class Exchange {
                 verbose ? console.log("Exchange already exists:", exchange.get({ plain: true })) : null;
                 const rowData = exchange.get({ plain: true });
                 if (rowData.url !== this.getUrl()) {
-                    database.classes.SqlExchange.update(
+                    database.SqlExchange.update(
                         { url: this.getUrl() },
                         { where: {
                             name: this.getName(),
@@ -231,7 +231,7 @@ export class Exchange {
         pageReader,
         verbose = false,
     }: {
-        pageReader: classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageReader,
+        pageReader: classes.ExchangePageReader,
         verbose?: boolean,
     }) {
         this.pageReader = pageReader;
@@ -241,7 +241,7 @@ export class Exchange {
         pageParser,
         verbose = false,
     }: {
-        pageParser: classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageParser,
+        pageParser: classes.ExchangePageParser,
         verbose?: boolean,
     }) {
         this.pageParser = pageParser;
@@ -251,7 +251,7 @@ export class Exchange {
         pageWriter,
         verbose = false,
     }: {
-        pageWriter: classes.exchanges.exchangePageUtilities.utilityImplementations.ExchangePageWriter,
+        pageWriter: classes.ExchangePageWriter,
         verbose?: boolean,
     }) {
         this.pageWriter = pageWriter;
@@ -261,7 +261,7 @@ export class Exchange {
         games,
         verbose = false,
     }: {
-        games: classes.games.Game | Array<classes.games.Game>,
+        games: classes.Game | Array<classes.Game>,
         verbose?: boolean,
     }) {
         if (Array.isArray(games)) {
@@ -279,8 +279,8 @@ export class Exchange {
         verbose = false,
     }: {
         odds: {
-            current: Array<classes.odds.Odds>,
-            lastSaved: Array<classes.odds.Odds>,
+            current: Array<classes.Odds>,
+            lastSaved: Array<classes.Odds>,
         },
         verbose?: boolean,
     }) {
@@ -291,7 +291,7 @@ export class Exchange {
         currentOdds,
         verbose = false,
     }: {
-        currentOdds: Array<classes.odds.Odds>,
+        currentOdds: Array<classes.Odds>,
         verbose?: boolean,
     }) {
         this.odds.current = currentOdds;
@@ -301,7 +301,7 @@ export class Exchange {
         lastSavedOdds,
         verbose = false,
     }: {
-        lastSavedOdds: Array<classes.odds.Odds>,
+        lastSavedOdds: Array<classes.Odds>,
         verbose?: boolean,
     }) {
         this.odds.lastSaved = lastSavedOdds;

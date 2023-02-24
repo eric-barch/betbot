@@ -25,13 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.teams = exports.odds = exports.games = exports.exchanges = void 0;
 const classes = __importStar(require("../classes"));
-const verbosity_1 = require("../_config/verbosity");
-const verbose = verbosity_1.verbosity.state;
-exports.exchanges = new classes.exchanges.AllExchanges();
-verbose ? console.log(`state.exchanges created.`) : null;
-exports.games = new classes.games.AllGames();
-verbose ? console.log(`state.games created.`) : null;
-exports.odds = new classes.odds.AllOdds();
-verbose ? console.log(`state.odds created.`) : null;
-exports.teams = new classes.teams.AllTeams();
-verbose ? console.log(`state.teams created.`) : null;
+exports.exchanges = new classes.AllExchanges();
+exports.games = new classes.AllGames();
+exports.odds = new classes.AllOdds();
+exports.teams = new classes.AllTeams();

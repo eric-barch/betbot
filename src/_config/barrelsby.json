@@ -1,0 +1,8 @@
+{
+    "delete": true,
+    "directory": "./src",
+    "exclude": ["/Users/ericbarch/Documents/Development/AutomaticSportsBetting/iteration-5/src/state"],
+    "location": "all",
+    "structure": "flat",
+    "singleQuotes": true
+}
