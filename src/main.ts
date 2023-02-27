@@ -1,10 +1,10 @@
 import * as database from './database';
-// import * as state from './state';
+import * as state from './state/global';
 
 async function main() {
     await database.initiate();
     
-    // await state.exchanges.initiate();
+    await state.allExchanges.initiate();
 
     // /** Web scraping. */
     // for (let exchange of state.exchanges) {

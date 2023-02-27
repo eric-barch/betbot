@@ -102,5 +102,5 @@
   },
   "include": [
     "src/**/*.ts"
-  ]
+, "src/_config/verbosity/generator3.js"  ]
 }

@@ -1,11 +1,14 @@
 {
   "name": "iteration-5",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build-and-run": "tsc && node dest/main.js",
+    "go": "tsc && node dest/main.js",
+    "generate-auto-files": "npm run generate-barrels && npm run generate-verbosity",
     "generate-barrels": "barrelsby --config \"./src/_config/barrelsby.json\"",
+    "generate-verbosity": "node --no-warnings src/_config/verbosity/generator.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eric Barch",

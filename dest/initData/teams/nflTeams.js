@@ -24,9 +24,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.nflTeams = void 0;
-const classes = __importStar(require("../../classes"));
+const state = __importStar(require("../../state"));
 exports.nflTeams = [
-    new classes.Team({
+    new state.Team({
         fullName: 'Arizona Cardinals',
         regionFullName: 'Arizona',
         regionAbbreviation: 'ARI',
@@ -34,7 +34,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Cards',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Atlanta Falcons',
         regionFullName: 'Atlanta',
         regionAbbreviation: 'ATL',
@@ -42,7 +42,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Falcs',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Baltimore Ravens',
         regionFullName: 'Baltimore',
         regionAbbreviation: 'BAL',
@@ -50,7 +50,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Raves',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Buffalo Bills',
         regionFullName: 'Buffalo',
         regionAbbreviation: 'BUF',
@@ -58,7 +58,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Bills',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Carolina Panthers',
         regionFullName: 'Carolina',
         regionAbbreviation: 'CAR',
@@ -66,7 +66,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Pants',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Chicago Bears',
         regionFullName: 'Chicago',
         regionAbbreviation: 'CHI',
@@ -74,7 +74,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Bears',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Cincinnati Bengals',
         regionFullName: 'Cincinnati',
         regionAbbreviation: 'CIN',
@@ -82,7 +82,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Bengs',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Cleveland Browns',
         regionFullName: 'Cleveland',
         regionAbbreviation: 'CLE',
@@ -90,7 +90,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Browns',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Dallas Cowboys',
         regionFullName: 'Dallas',
         regionAbbreviation: 'DAL',
@@ -98,7 +98,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Boys',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Denver Broncos',
         regionFullName: 'Denver',
         regionAbbreviation: 'DEN',
@@ -106,7 +106,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Broncs',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Detroit Lions',
         regionFullName: 'Detroit',
         regionAbbreviation: 'DET',
@@ -114,7 +114,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Lions',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Green Bay Packers',
         regionFullName: 'Green Bay',
         regionAbbreviation: 'GB',
@@ -122,7 +122,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Packs',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Houston Texans',
         regionFullName: 'Houston',
         regionAbbreviation: 'HOU',
@@ -130,7 +130,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Texns',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Indianapolis Colts',
         regionFullName: 'Indianapolis',
         regionAbbreviation: 'IND',
@@ -138,7 +138,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Colts',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Jacksonville Jaguars',
         regionFullName: 'Jacksonville',
         regionAbbreviation: 'JAX',
@@ -146,7 +146,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Jags',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Kansas City Chiefs',
         regionFullName: 'Kansas City',
         regionAbbreviation: 'KC',
@@ -154,7 +154,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Chiefs',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Las Vegas Raiders',
         regionFullName: 'Las Vegas',
         regionAbbreviation: 'LAV',
@@ -162,7 +162,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Raids',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Los Angeles Chargers',
         regionFullName: 'Los Angeles',
         regionAbbreviation: 'LAC',
@@ -170,7 +170,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Chargers',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Los Angeles Rams',
         regionFullName: 'Los Angeles',
         regionAbbreviation: 'LAR',
@@ -178,7 +178,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Rams',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Miami Dolphins',
         regionFullName: 'Miami',
         regionAbbreviation: 'MIA',
@@ -186,7 +186,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Fins',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Minnesota Vikings',
         regionFullName: 'Minnesota',
         regionAbbreviation: 'MIN',
@@ -194,7 +194,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Vikes',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'New England Patriots',
         regionFullName: 'New England',
         regionAbbreviation: 'NE',
@@ -202,7 +202,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Pats',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'New Orleans Saints',
         regionFullName: 'New Orleans',
         regionAbbreviation: 'NO',
@@ -210,7 +210,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Saints',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'New York Giants',
         regionFullName: 'New York',
         regionAbbreviation: 'NYG',
@@ -218,7 +218,7 @@ exports.nflTeams = [
         teamAbbreviation: 'G-Men',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'New York Jets',
         regionFullName: 'New York',
         regionAbbreviation: 'NYJ',
@@ -226,7 +226,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Jets',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Philadelphia Eagles',
         regionFullName: 'Philadelphia',
         regionAbbreviation: 'PHI',
@@ -234,7 +234,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Eags',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Pittsburgh Steelers',
         regionFullName: 'Pittsburgh',
         regionAbbreviation: 'PIT',
@@ -242,7 +242,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Steels',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'San Francisco 49ers',
         regionFullName: 'San Francisco',
         regionAbbreviation: 'SF',
@@ -250,7 +250,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Niners',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Seattle Seahawks',
         regionFullName: 'Seattle',
         regionAbbreviation: 'SEA',
@@ -258,7 +258,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Hawks',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Tampa Bay Buccaneers',
         regionFullName: 'Tampa Bay',
         regionAbbreviation: 'TB',
@@ -266,7 +266,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Bucs',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Tennessee Titans',
         regionFullName: 'Tennessee',
         regionAbbreviation: 'TEN',
@@ -274,7 +274,7 @@ exports.nflTeams = [
         teamAbbreviation: 'Titans',
         altNames: [],
     }),
-    new classes.Team({
+    new state.Team({
         fullName: 'Washington Commanders',
         regionFullName: 'Washington',
         regionAbbreviation: 'WAS',

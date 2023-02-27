@@ -33,11 +33,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database = __importStar(require("./database"));
-// import * as state from './state';
+const state = __importStar(require("./state/global"));
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield database.initiate();
-        // await state.exchanges.initiate();
+        yield state.allExchanges.initiate();
         // /** Web scraping. */
         // for (let exchange of state.exchanges) {
         //     let pageReader = await exchange.getPageReader();

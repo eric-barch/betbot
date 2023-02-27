@@ -17,7 +17,7 @@ export async function initiate() {
     verbose ? console.log(`\nInitiating Sequelize instance.`) : null;
 
     database.makeSqlAssociations();
-    verbose ? console.log(`Made sequelize class associations.`) : null;
+    verbose ? console.log(`Made sequelize cla*s associations.`) : null;
 
     try {
         await database.instance.authenticate();

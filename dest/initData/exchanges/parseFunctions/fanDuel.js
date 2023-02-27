@@ -47,17 +47,17 @@ function fanDuel({ verbose = false, } = {}) {
         for (let i = 0; i < gamesData.length; i++) {
             const gameData = gamesData[i];
             verbose ? console.log(`\nGame ${i + 1}:`) : null;
-            const awayTeam = state.teams.getTeam({
+            const awayTeam = state.allTeams.getTeam({
                 string: gameData.awayTeam.name,
             });
             verbose ? console.log(`Away team: ${awayTeam.getFullName()}`) : null;
-            const homeTeam = state.teams.getTeam({
+            const homeTeam = state.allTeams.getTeam({
                 string: gameData.homeTeam.name,
             });
             verbose ? console.log(`Home team: ${homeTeam.getFullName()}`) : null;
             const startDate = new Date(gameData.startDate);
             verbose ? console.log(`Start date: ${startDate}`) : null;
-            const game = state.games.getGame({
+            const game = state.allGames.getGame({
                 awayTeam: awayTeam,
                 homeTeam: homeTeam,
                 startDate: startDate,
@@ -66,7 +66,7 @@ function fanDuel({ verbose = false, } = {}) {
             exchangeGames.push(game);
         }
         verbose ? console.log(`\nexchangeGames.length: ${exchangeGames.length}`) : null;
-        verbose ? console.log(`allGames.length: ${state.games.getAllGames().length}`) : null;
+        verbose ? console.log(`allGames.length: ${state.allGames.getAllGames().length}`) : null;
         for (let exchangeGame of exchangeGames) {
             const awayTeam = exchangeGame.getAwayTeam();
             const spans = yield page.$x(`//span[text()='${awayTeam.getFullName()}' or text()='${awayTeam.getRegionAbbrIdentifierFull()}']`);

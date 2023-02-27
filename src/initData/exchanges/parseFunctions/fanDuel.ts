@@ -1,7 +1,6 @@
-import * as classes from '../../../classes';
 import * as state from '../../../state';
 
-export async function fanDuel(this: classes.ExchangePageParser, {
+export async function fanDuel(this: state.ExchangePageParser, {
     verbose = false,
 }: {
     verbose?: boolean,
@@ -16,19 +15,19 @@ export async function fanDuel(this: classes.ExchangePageParser, {
     verbose ? console.log(gamesData) : null;
     verbose ? console.log(`Number of games: ${gamesData.length}`) : null;
 
-    let exchangeGames = new Array<classes.Game>;
+    let exchangeGames = new Array<state.Game>;
 
     for (let i = 0; i < gamesData.length; i++) {
         const gameData = gamesData[i];
 
         verbose ? console.log(`\nGame ${i + 1}:`) : null;
         
-        const awayTeam = state.teams.getTeam({
+        const awayTeam = state.allTeams.getTeam({
             string: gameData.awayTeam.name,
         });
         verbose ? console.log(`Away team: ${awayTeam.getFullName()}`) : null;
     
-        const homeTeam = state.teams.getTeam({
+        const homeTeam = state.allTeams.getTeam({
             string: gameData.homeTeam.name,
         })
         verbose ? console.log(`Home team: ${homeTeam.getFullName()}`) : null;
@@ -36,7 +35,7 @@ export async function fanDuel(this: classes.ExchangePageParser, {
         const startDate = new Date(gameData.startDate);
         verbose ? console.log(`Start date: ${startDate}`) : null;
 
-        const game = state.games.getGame({
+        const game = state.allGames.getGame({
             awayTeam: awayTeam,
             homeTeam: homeTeam,
             startDate: startDate,
@@ -47,7 +46,7 @@ export async function fanDuel(this: classes.ExchangePageParser, {
     }
 
     verbose ? console.log(`\nexchangeGames.length: ${exchangeGames.length}`) : null;
-    verbose ? console.log(`allGames.length: ${state.games.getAllGames().length}`) : null;
+    verbose ? console.log(`allGames.length: ${state.allGames.getAllGames().length}`) : null;
 
     for (let exchangeGame of exchangeGames) {
         const awayTeam = exchangeGame.getAwayTeam();
@@ -119,7 +118,6 @@ export async function fanDuel(this: classes.ExchangePageParser, {
 //                     const nextSpanText = nextSpanDataItem.text;
 //                     verbose ? console.log(`Span text: ${nextSpanText}`) : null;
 
-//                     switch(i) {
 //                         case 2: {
 //                             // Set spreadOdds.awaySpread.
 //                             let odds = game.getOdds({
