@@ -1,6 +1,6 @@
-import * as state from '../../../state';
+import * as models from '../../../models';
 
-export async function fanDuel(this: state.ExchangePageParser, {
+export async function fanDuel(this: models.ExchangePageParser, {
     verbose = false,
 }: {
     verbose?: boolean,
@@ -15,19 +15,19 @@ export async function fanDuel(this: state.ExchangePageParser, {
     verbose ? console.log(gamesData) : null;
     verbose ? console.log(`Number of games: ${gamesData.length}`) : null;
 
-    let exchangeGames = new Array<state.Game>;
+    let exchangeGames = new Array<models.Game>;
 
     for (let i = 0; i < gamesData.length; i++) {
         const gameData = gamesData[i];
 
         verbose ? console.log(`\nGame ${i + 1}:`) : null;
         
-        const awayTeam = state.allTeams.getTeam({
+        const awayTeam = models.allTeams.getTeam({
             string: gameData.awayTeam.name,
         });
         verbose ? console.log(`Away team: ${awayTeam.getFullName()}`) : null;
     
-        const homeTeam = state.allTeams.getTeam({
+        const homeTeam = models.allTeams.getTeam({
             string: gameData.homeTeam.name,
         })
         verbose ? console.log(`Home team: ${homeTeam.getFullName()}`) : null;
@@ -35,7 +35,7 @@ export async function fanDuel(this: state.ExchangePageParser, {
         const startDate = new Date(gameData.startDate);
         verbose ? console.log(`Start date: ${startDate}`) : null;
 
-        const game = state.allGames.getGame({
+        const game = models.allGames.getGame({
             awayTeam: awayTeam,
             homeTeam: homeTeam,
             startDate: startDate,
@@ -46,7 +46,7 @@ export async function fanDuel(this: state.ExchangePageParser, {
     }
 
     verbose ? console.log(`\nexchangeGames.length: ${exchangeGames.length}`) : null;
-    verbose ? console.log(`allGames.length: ${state.allGames.getAllGames().length}`) : null;
+    verbose ? console.log(`allGames.length: ${models.allGames.getAllGames().length}`) : null;
 
     for (let exchangeGame of exchangeGames) {
         const awayTeam = exchangeGame.getAwayTeam();

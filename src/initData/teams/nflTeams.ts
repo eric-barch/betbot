@@ -1,7 +1,7 @@
-import * as state from '../../state';
+import * as models from '../../models';
 
-export let nflTeams: state.Team[] = [
-    new state.Team({
+export let nflTeams: models.Team[] = [
+    new models.Team({
         fullName: 'Arizona Cardinals',
         regionFullName: 'Arizona',
         regionAbbreviation: 'ARI',
@@ -9,7 +9,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Cards',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Atlanta Falcons',
         regionFullName: 'Atlanta',
         regionAbbreviation: 'ATL',
@@ -17,7 +17,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Falcs',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Baltimore Ravens',
         regionFullName: 'Baltimore',
         regionAbbreviation: 'BAL',
@@ -25,7 +25,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Raves',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Buffalo Bills',
         regionFullName: 'Buffalo',
         regionAbbreviation: 'BUF',
@@ -33,7 +33,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Bills',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Carolina Panthers',
         regionFullName: 'Carolina',
         regionAbbreviation: 'CAR',
@@ -41,7 +41,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Pants',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Chicago Bears',
         regionFullName: 'Chicago',
         regionAbbreviation: 'CHI',
@@ -49,7 +49,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Bears',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Cincinnati Bengals',
         regionFullName: 'Cincinnati',
         regionAbbreviation: 'CIN',
@@ -57,7 +57,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Bengs',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Cleveland Browns',
         regionFullName: 'Cleveland',
         regionAbbreviation: 'CLE',
@@ -65,7 +65,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Browns',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Dallas Cowboys',
         regionFullName: 'Dallas',
         regionAbbreviation: 'DAL',
@@ -73,7 +73,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Boys',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Denver Broncos',
         regionFullName: 'Denver',
         regionAbbreviation: 'DEN',
@@ -81,7 +81,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Broncs',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Detroit Lions',
         regionFullName: 'Detroit',
         regionAbbreviation: 'DET',
@@ -89,7 +89,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Lions',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Green Bay Packers',
         regionFullName: 'Green Bay',
         regionAbbreviation: 'GB',
@@ -97,7 +97,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Packs',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Houston Texans',
         regionFullName: 'Houston',
         regionAbbreviation: 'HOU',
@@ -105,7 +105,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Texns',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Indianapolis Colts',
         regionFullName: 'Indianapolis',
         regionAbbreviation: 'IND',
@@ -113,7 +113,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Colts',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Jacksonville Jaguars',
         regionFullName: 'Jacksonville',
         regionAbbreviation: 'JAX',
@@ -121,7 +121,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Jags',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Kansas City Chiefs',
         regionFullName: 'Kansas City',
         regionAbbreviation: 'KC',
@@ -129,7 +129,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Chiefs',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Las Vegas Raiders',
         regionFullName: 'Las Vegas',
         regionAbbreviation: 'LAV',
@@ -137,7 +137,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Raids',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Los Angeles Chargers',
         regionFullName: 'Los Angeles',
         regionAbbreviation: 'LAC',
@@ -145,7 +145,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Chargers',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Los Angeles Rams',
         regionFullName: 'Los Angeles',
         regionAbbreviation: 'LAR',
@@ -153,7 +153,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Rams',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Miami Dolphins',
         regionFullName: 'Miami',
         regionAbbreviation: 'MIA',
@@ -161,7 +161,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Fins',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Minnesota Vikings',
         regionFullName: 'Minnesota',
         regionAbbreviation: 'MIN',
@@ -169,7 +169,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Vikes',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'New England Patriots',
         regionFullName: 'New England',
         regionAbbreviation: 'NE',
@@ -177,7 +177,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Pats',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'New Orleans Saints',
         regionFullName: 'New Orleans',
         regionAbbreviation: 'NO',
@@ -185,7 +185,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Saints',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'New York Giants',
         regionFullName: 'New York',
         regionAbbreviation: 'NYG',
@@ -193,7 +193,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'G-Men',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'New York Jets',
         regionFullName: 'New York',
         regionAbbreviation: 'NYJ',
@@ -201,7 +201,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Jets',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Philadelphia Eagles',
         regionFullName: 'Philadelphia',
         regionAbbreviation: 'PHI',
@@ -209,7 +209,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Eags',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Pittsburgh Steelers',
         regionFullName: 'Pittsburgh',
         regionAbbreviation: 'PIT',
@@ -217,7 +217,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Steels',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'San Francisco 49ers',
         regionFullName: 'San Francisco',
         regionAbbreviation: 'SF',
@@ -225,7 +225,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Niners',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Seattle Seahawks',
         regionFullName: 'Seattle',
         regionAbbreviation: 'SEA',
@@ -233,7 +233,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Hawks',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Tampa Bay Buccaneers',
         regionFullName: 'Tampa Bay',
         regionAbbreviation: 'TB',
@@ -241,7 +241,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Bucs',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Tennessee Titans',
         regionFullName: 'Tennessee',
         regionAbbreviation: 'TEN',
@@ -249,7 +249,7 @@ export let nflTeams: state.Team[] = [
         teamAbbreviation: 'Titans',
         altNames: [],
     }),
-    new state.Team({
+    new models.Team({
         fullName: 'Washington Commanders',
         regionFullName: 'Washington',
         regionAbbreviation: 'WAS',
