@@ -40,7 +40,8 @@ export class AllExchanges {
     }
 
     public async initialize() {
-        const verbose = false;
+        const verbose = verbosity.AllExchanges.initialize;
+        verbose ? console.log(`\nRunning ${AllExchanges.name}.${this.initialize.name}.`) : null;
 
         for (const exchange of initData.exchanges) {
             let newExchange = new models.Exchange({
@@ -48,15 +49,22 @@ export class AllExchanges {
                 url: exchange.url,
                 parseFunction: exchange.parseFunction,
             });
+            verbose ? console.log(`Created new ${newExchange.constructor.name} ${newExchange.getName()}.`) : null;
 
             await newExchange.initialize();
+            verbose ? console.log(`Initialized ${newExchange.constructor.name} ${newExchange.getName()}.`) : null;
 
             const pageReader = newExchange.getPageReader();
+            verbose ? console.log(`Set ${newExchange.getName()} ${pageReader.constructor.name}.`) : null;
+            
             await pageReader.connect();
+            verbose ? console.log(`${newExchange.getName()} ${pageReader.constructor.name} connected.`) : null;
 
             await newExchange.analyze();
+            verbose ? console.log(`${newExchange.getName()} analyzed.`) : null;
     
             this.exchanges.push(newExchange);
+            verbose ? console.log(`${newExchange.constructor.name} ${newExchange.getName()} added to ${this.constructor.name}.`) : null;
         }
     }
 

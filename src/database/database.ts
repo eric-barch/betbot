@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as sequelize from 'sequelize';
 
 import * as config from '../config';
-import * as database from '../database';
+import * as database from '.';
 
 const exportVerbosity = false;
 const exportVerbosityBase = 'database.functions';

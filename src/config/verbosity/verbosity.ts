@@ -39,7 +39,7 @@ export const verbosity = {
       "index.ts": {},
       "parseFunctions": {
         "fanDuel.ts": {
-          "fanDuel": false
+          "fanDuel": true
         },
         "index.ts": {}
       }
@@ -60,7 +60,7 @@ export const verbosity = {
           "analyze": false,
           "close": false,
           "connect": false,
-          "initialize": false,
+          "initialize": true,
           "getExchanges": false
         }
       },
@@ -93,7 +93,7 @@ export const verbosity = {
         "exchange.ts": {
           "Exchange": {
             "constructor": false,
-            "analyze": false,
+            "analyze": true,
             "close": false,
             "connect": false,
             "initialize": false,
@@ -145,7 +145,7 @@ export const verbosity = {
           "utilImplementations": {
             "exchangePageParser.ts": {
               "constructor": false,
-              "parse": false
+              "parse": true
             },
             "exchangePageReader.ts": {
               "connect": false,

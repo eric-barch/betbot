@@ -3,7 +3,7 @@ import * as state from './state';
 
 (async () => {
     await database.initialize();
-    
+
     const allExchanges = state.allExchanges;
     await allExchanges.initialize();
 

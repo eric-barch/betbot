@@ -1,5 +1,9 @@
-import * as state from '../..';
+import * as config from '../../../config';
 import * as database from '../../../database';
+import * as state from '../..';
+import { HtmlScrape } from '../..';
+
+const verbosity = config.verbosity.models.individual.exchange['exchange.ts'];
 
 export class Exchange {
     private name: string;
@@ -43,9 +47,17 @@ export class Exchange {
     }
 
     public async analyze() {
+        const verbose = verbosity.Exchange.analyze;
+        verbose ? console.log() : null;
+
         await this.pageReader.scrape();
+        verbose ? console.log(`${this.constructor.name} ${this.getName()} scraped.`) : null;
+
         await this.pageParser.setPageContent({html: this.pageReader.getHtml()});
+        verbose ? console.log(`${this.getName()} ${this.pageParser.constructor.name} page content set.`) : null;
+
         await this.pageParser.parse();
+        verbose ? console.log(`${this.getName()} ${this.pageParser.constructor.name} parsed.`) : null;
     }
 
     public async close({
@@ -66,14 +78,11 @@ export class Exchange {
         await this.pageReader.connect();
     }
 
-    public async initialize({
-        headless = true,
-        verbose = false,
-    }: {
-        headless?: boolean,
-        verbose?: boolean,
-    } = {}) {
-        verbose ? console.log(`Initializing ${this.getName()} Exchange object.`) : null;
+    public async initialize() {
+        const headless = config.headless;
+        const verbose = verbosity.Exchange.initialize;
+
+        verbose ? console.log(`Initializing ${this.constructor.name} ${this.getName()}.`) : null;
 
         await this.pageReader.initialize({headless: headless, verbose: verbose});
         await this.pageParser.initialize({headless: headless, verbose: verbose});

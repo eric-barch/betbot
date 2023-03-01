@@ -1,10 +1,12 @@
+import * as config from '../../../config';
 import * as models from '../../../models';
 
-export async function fanDuel(this: models.ExchangePageParser, {
-    verbose = false,
-}: {
-    verbose?: boolean,
-} = {}) {
+const verbosity = config.verbosity.initData.exchanges.parseFunctions['fanDuel.ts'];
+
+export async function fanDuel(this: models.ExchangePageParser) {
+    const verbose = verbosity.fanDuel;
+    verbose ? console.log() : null;
+    
     verbose ? console.log('Parsing FanDuel.') : null;
 
     const page = this.getPage()!;
