@@ -120,4 +120,3 @@ export abstract class AbstractUtility {
     }
 
 }
-console.log(`\nInitialized and imported state.exchangePageUtilities.AbstractUtility.`);

@@ -34,4 +34,3 @@ export class HtmlScrape {
     }
 
 }
-console.log(`Initialized and imported classes.exchangePageUtilities.HtmlScrape.`);

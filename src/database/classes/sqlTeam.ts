@@ -1,7 +1,10 @@
 import * as sequelize from 'sequelize';
 import * as database from '../../database';
 
-export const SqlTeam = database.instance.define('Team', {
+const exportVerbosity = false;
+const exportVerbosityBase = 'database.classes';
+
+export const SqlTeam = database.instance.define('SqlTeam', {
     id: {
         type: sequelize.DataTypes.INTEGER,
         primaryKey: true,
@@ -9,4 +12,4 @@ export const SqlTeam = database.instance.define('Team', {
     },
 
 });
-console.log(`Initialized and imported database.classes.SqlTeam.`);
+exportVerbosity ? console.log(`Exported ${exportVerbosityBase}.${SqlTeam.name}.`) : null;

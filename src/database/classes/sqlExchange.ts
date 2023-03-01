@@ -1,7 +1,10 @@
 import * as sequelize from 'sequelize';
 import * as database from '../../database';
 
-export const SqlExchange = database.instance.define('Exchange', {
+const exportVerbosity = false;
+const exportVerbosityBase = 'database.classes';
+
+export const SqlExchange = database.instance.define('SqlExchange', {
     id: {
         type: sequelize.DataTypes.INTEGER,
         primaryKey: true,
@@ -10,4 +13,4 @@ export const SqlExchange = database.instance.define('Exchange', {
     name: sequelize.DataTypes.STRING,
     url: sequelize.DataTypes.STRING,
 });
-console.log(`Initialized and imported database.classes.SqlExchange.`);
+exportVerbosity ? console.log(`\nExported ${exportVerbosityBase}.${SqlExchange.name}.`) : null;

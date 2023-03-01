@@ -1,7 +1,10 @@
 import * as sequelize from 'sequelize';
 import * as database from '../../database';
 
-export const SqlGame = database.instance.define('Game', {
+const exportVerbosity = false;
+const exportVerbosityBase = 'database.classes';
+
+export const SqlGame = database.instance.define('SqlGame', {
     id: {
         type: sequelize.DataTypes.INTEGER,
         primaryKey: true,
@@ -11,4 +14,4 @@ export const SqlGame = database.instance.define('Game', {
     homeTeam: sequelize.DataTypes.STRING,
     dateTime: sequelize.DataTypes.DATE
 });
-console.log(`Initialized and imported database.classes.SqlGame.`);
+exportVerbosity ? console.log(`Exported ${exportVerbosityBase}.${SqlGame.name}.`) : null;

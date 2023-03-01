@@ -1,7 +1,10 @@
 import * as sequelize from 'sequelize';
 import * as database from '../../database';
 
-export const SqlOddsHistory = database.instance.define('OddsHistory', {
+const exportVerbosity = false;
+const exportVerbosityBase = 'database.classes';
+
+export const SqlOddsHistory = database.instance.define('SqlOddsHistory', {
     id: {
         type: sequelize.DataTypes.INTEGER,
         primaryKey: true,
@@ -19,4 +22,4 @@ export const SqlOddsHistory = database.instance.define('OddsHistory', {
         scrapedAt: sequelize.DataTypes.DATE(3),
         savedToDatabaseAt: sequelize.DataTypes.DATE(3),
 });
-console.log(`Initialized and imported database.classes.SqlOddsHistory.`);
+exportVerbosity ? console.log(`Exported ${exportVerbosityBase}.${SqlOddsHistory.name}.`) : null;

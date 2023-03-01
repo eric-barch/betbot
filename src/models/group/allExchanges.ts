@@ -1,5 +1,10 @@
-import * as models from '..';
+import * as config from '../../config';
+import * as models from '../../models';
 import * as initData from '../../initData';
+
+const exportVerbosity = false;
+const exportVerbosityBase = 'database.functions';
+const verbosity = config.verbosity.models.group['allExchanges.ts'];
 
 export class AllExchanges {
     private exchanges: Array<models.Exchange>;
@@ -59,3 +64,4 @@ export class AllExchanges {
         return this.exchanges;
     }
 }
+exportVerbosity ? console.log(`\nExported ${exportVerbosityBase}.${AllExchanges.name}.`) : null;

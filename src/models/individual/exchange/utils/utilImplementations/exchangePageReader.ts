@@ -1,6 +1,7 @@
-import * as models from '../../../../../models';
+import { AbstractUtility } from "../abstractUtil";
+import { HtmlScrape } from "../htmlScrape";
 
-export class ExchangePageReader extends models.AbstractUtility {
+export class ExchangePageReader extends AbstractUtility {
 
     async connect({
         headless = true,
@@ -35,7 +36,7 @@ export class ExchangePageReader extends models.AbstractUtility {
             const string = await this.page!.content();
             const scrapedAt = new Date();
     
-            this.html = new models.HtmlScrape({
+            this.html = new HtmlScrape({
                 string: string,
                 scrapedAt: scrapedAt,
             });

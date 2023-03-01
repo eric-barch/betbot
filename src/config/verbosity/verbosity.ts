@@ -27,7 +27,7 @@ export const verbosity = {
     },
     "functions.ts": {
       "close": false,
-      "initialize": false,
+      "initialize": true,
       "makeSqlAssociations": false
     },
     "index.ts": {}
