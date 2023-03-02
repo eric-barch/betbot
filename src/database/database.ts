@@ -6,7 +6,7 @@ import * as database from '.';
 
 const exportVerbosity = false;
 const exportVerbosityBase = 'database.functions';
-const verbosity = config.verbosity.database['functions.ts'];
+const verbosity = config.verbosity.database['database.ts'];
 
 export const instance = new sequelize.Sequelize('nba', 'root', 'f9R#@hY82l', {
     host: 'localhost',

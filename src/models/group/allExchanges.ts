@@ -1,5 +1,5 @@
 import * as config from '../../config';
-import * as models from '../../models';
+import * as models from '..';
 import * as initData from '../../initData';
 
 const exportVerbosity = false;
@@ -54,17 +54,11 @@ export class AllExchanges {
             await newExchange.initialize();
             verbose ? console.log(`Initialized ${newExchange.constructor.name} ${newExchange.getName()}.`) : null;
 
-            const pageReader = newExchange.getPageReader();
-            verbose ? console.log(`Set ${newExchange.getName()} ${pageReader.constructor.name}.`) : null;
-            
-            await pageReader.connect();
-            verbose ? console.log(`${newExchange.getName()} ${pageReader.constructor.name} connected.`) : null;
-
             await newExchange.analyze();
             verbose ? console.log(`${newExchange.getName()} analyzed.`) : null;
     
-            this.exchanges.push(newExchange);
-            verbose ? console.log(`${newExchange.constructor.name} ${newExchange.getName()} added to ${this.constructor.name}.`) : null;
+            // this.exchanges.push(newExchange);
+            // verbose ? console.log(`${newExchange.constructor.name} ${newExchange.getName()} added to ${this.constructor.name}.`) : null;
         }
     }
 

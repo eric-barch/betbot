@@ -1,33 +1,37 @@
-import * as state from '../../..';
 import * as puppeteer from 'puppeteer';
 import * as fs from 'fs';
 
+import * as config from '../../../../config';
+import * as models from '../../../../models';
+
+const verbosity = config.verbosity.models.individual.exchange.utils['abstractUtil.ts'];
+
 export abstract class AbstractUtility {
     
-    protected exchange: state.Exchange;
-    protected html: state.HtmlScrape;
+    protected exchange: models.Exchange;
+    protected html: models.HtmlScrape;
     protected browser: puppeteer.Browser | undefined;
     protected page: puppeteer.Page | undefined;
 
     constructor({
         exchange,
     }: {
-        exchange: state.Exchange,
+        exchange: models.Exchange,
     }) {
         this.exchange = exchange;
-        this.html = new state.HtmlScrape({string: ''});
+        this.html = new models.HtmlScrape({string: ''});
         this.browser = undefined;
         this.page = undefined;
     }
 
-    async initialize({
-        headless = true,
-        verbose = false,
-    }: {
-        headless?: boolean,
-        verbose?: boolean,
-    } = {}) {    
-        this.browser = await puppeteer.launch({headless: headless});
+    async initialize() {    
+        const headless = config.headless;
+        const verbose = verbosity.AbstractUtility.initialize;
+
+        this.browser = await puppeteer.launch({
+            executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            headless: headless
+        });
         this.page = await this.browser.newPage();
 
         let pages = await this.browser.pages();
@@ -100,7 +104,7 @@ export abstract class AbstractUtility {
         html,
         verbose = false,
     }: {
-        html: state.HtmlScrape,
+        html: models.HtmlScrape,
         verbose?: boolean,
     }) {
         this.html = html;
@@ -111,7 +115,7 @@ export abstract class AbstractUtility {
         html = this.html,
         verbose = false,
     }: {
-        html?: state.HtmlScrape,
+        html?: models.HtmlScrape,
         verbose?: boolean,
     } = {}) {
         html ? this.setHtml({html: html, verbose: verbose}) : null;

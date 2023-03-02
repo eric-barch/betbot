@@ -1,4 +1,5 @@
-import * as models from '../../models';
+import * as models from '..';
+import * as state from '../../state';
 
 export class AllGames {
     private games: Array<models.Game>;
@@ -47,7 +48,7 @@ export class AllGames {
                 homeTeam: homeTeam,
                 startDate: startDate,
             });
-            models.allGames.push({game: requestedGame});
+            state.allGames.push({game: requestedGame});
         }
 
         return requestedGame;

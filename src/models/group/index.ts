@@ -6,4 +6,3 @@ export * from './allExchanges';
 export * from './allGames';
 export * from './allOdds';
 export * from './allTeams';
-export * from './globalState';

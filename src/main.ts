@@ -11,10 +11,10 @@ import * as state from './state';
     //     allExchanges.analyze();
     // }
 
-    await database.close();
+    // await database.close();
     // await allExchanges.close();
 })();
 
 /** TODO: If possible, remove all '!'s and '?'s re: typing. 
  * Fix verbosity tags so that it matches granularity of object structure.
-*/
+ */

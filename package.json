@@ -4,10 +4,10 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "go": "tsc && node dest/main.js",
+    "go": "tsc && node out/main.js",
     "generate-auto-files": "npm run generate-barrels && npm run generate-verbosity",
     "generate-barrels": "barrelsby --config \"./src/config/barrelsby.json\"",
-    "generate-verbosity": "node --no-warnings src/config/verbosity/generator.js",
+    "generate-verbosity": "node src/config/verbosity/generator.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eric Barch",

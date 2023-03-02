@@ -50,14 +50,16 @@ export class Exchange {
         const verbose = verbosity.Exchange.analyze;
         verbose ? console.log() : null;
 
+        verbose ? console.log(`Running ${this.analyze.name} for ${this.getName()}.`) : null;
+
         await this.pageReader.scrape();
         verbose ? console.log(`${this.constructor.name} ${this.getName()} scraped.`) : null;
 
         await this.pageParser.setPageContent({html: this.pageReader.getHtml()});
         verbose ? console.log(`${this.getName()} ${this.pageParser.constructor.name} page content set.`) : null;
 
-        await this.pageParser.parse();
-        verbose ? console.log(`${this.getName()} ${this.pageParser.constructor.name} parsed.`) : null;
+        // await this.pageParser.parse();
+        // verbose ? console.log(`${this.getName()} ${this.pageParser.constructor.name} parsed.`) : null;
     }
 
     public async close({
@@ -75,18 +77,17 @@ export class Exchange {
     }
 
     public async connect() {
-        await this.pageReader.connect();
+        await this.pageReader.initializeNewPageAndConnect();
     }
 
     public async initialize() {
-        const headless = config.headless;
         const verbose = verbosity.Exchange.initialize;
-
+        verbose ? console.log() : null;
         verbose ? console.log(`Initializing ${this.constructor.name} ${this.getName()}.`) : null;
 
-        await this.pageReader.initialize({headless: headless, verbose: verbose});
-        await this.pageParser.initialize({headless: headless, verbose: verbose});
-        await this.pageWriter.initialize({headless: headless, verbose: verbose});
+        await this.pageReader.connectToExistingPage();
+        await this.pageParser.initialize();
+        // await this.pageWriter.initialize();
 
         this.sequelizeModel = await database.SqlExchange.findOrCreate({
             where: {

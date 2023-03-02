@@ -1,5 +1,6 @@
 import * as config from '../../../config';
 import * as models from '../../../models';
+import * as state from '../../../state';
 
 const verbosity = config.verbosity.initData.exchanges.parseFunctions['fanDuel.ts'];
 
@@ -24,12 +25,12 @@ export async function fanDuel(this: models.ExchangePageParser) {
 
         verbose ? console.log(`\nGame ${i + 1}:`) : null;
         
-        const awayTeam = models.allTeams.getTeam({
+        const awayTeam = state.allTeams.getTeam({
             string: gameData.awayTeam.name,
         });
         verbose ? console.log(`Away team: ${awayTeam.getFullName()}`) : null;
     
-        const homeTeam = models.allTeams.getTeam({
+        const homeTeam = state.allTeams.getTeam({
             string: gameData.homeTeam.name,
         })
         verbose ? console.log(`Home team: ${homeTeam.getFullName()}`) : null;
@@ -37,7 +38,7 @@ export async function fanDuel(this: models.ExchangePageParser) {
         const startDate = new Date(gameData.startDate);
         verbose ? console.log(`Start date: ${startDate}`) : null;
 
-        const game = models.allGames.getGame({
+        const game = state.allGames.getGame({
             awayTeam: awayTeam,
             homeTeam: homeTeam,
             startDate: startDate,
@@ -48,7 +49,7 @@ export async function fanDuel(this: models.ExchangePageParser) {
     }
 
     verbose ? console.log(`\nexchangeGames.length: ${exchangeGames.length}`) : null;
-    verbose ? console.log(`allGames.length: ${models.allGames.getAllGames().length}`) : null;
+    verbose ? console.log(`allGames.length: ${state.allGames.getAllGames().length}`) : null;
 
     for (let exchangeGame of exchangeGames) {
         const awayTeam = exchangeGame.getAwayTeam();

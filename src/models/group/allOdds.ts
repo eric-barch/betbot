@@ -1,4 +1,4 @@
-import * as models from '../../models';
+import * as models from '..';
 
 export class AllOdds {
     private odds: Array<models.Odds>;

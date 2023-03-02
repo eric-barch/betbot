@@ -25,9 +25,9 @@ export const verbosity = {
       "sqlOddsHistory.ts": {},
       "sqlTeam.ts": {}
     },
-    "functions.ts": {
+    "database.ts": {
       "close": false,
-      "initialize": true,
+      "initialize": false,
       "makeSqlAssociations": false
     },
     "index.ts": {}
@@ -39,7 +39,7 @@ export const verbosity = {
       "index.ts": {},
       "parseFunctions": {
         "fanDuel.ts": {
-          "fanDuel": true
+          "fanDuel": false
         },
         "index.ts": {}
       }
@@ -60,7 +60,7 @@ export const verbosity = {
           "analyze": false,
           "close": false,
           "connect": false,
-          "initialize": true,
+          "initialize": false,
           "getExchanges": false
         }
       },
@@ -84,7 +84,6 @@ export const verbosity = {
           "setTeams": false
         }
       },
-      "globalState.ts": {},
       "index.ts": {}
     },
     "index.ts": {},
@@ -93,7 +92,7 @@ export const verbosity = {
         "exchange.ts": {
           "Exchange": {
             "constructor": false,
-            "analyze": true,
+            "analyze": false,
             "close": false,
             "connect": false,
             "initialize": false,
@@ -145,10 +144,11 @@ export const verbosity = {
           "utilImplementations": {
             "exchangePageParser.ts": {
               "constructor": false,
-              "parse": true
+              "parse": false
             },
             "exchangePageReader.ts": {
-              "connect": false,
+              "connectToExistingPage": false,
+              "initializeNewPageAndConnect": false,
               "scrape": false
             },
             "exchangePageWriter.ts": {},
