@@ -1,9 +1,6 @@
 import * as sequelize from 'sequelize';
 import * as database from '../../database';
 
-const exportVerbosity = false;
-const exportVerbosityBase = 'database.classes';
-
 export const SqlOdds = database.instance.define('SqlOdds', {
     id: {
         type: sequelize.DataTypes.INTEGER,
@@ -22,4 +19,3 @@ export const SqlOdds = database.instance.define('SqlOdds', {
     scrapedAt: sequelize.DataTypes.DATE(3),
     savedToDatabaseAt: sequelize.DataTypes.DATE(3),
 });
-exportVerbosity ? console.log(`Exported ${exportVerbosityBase}.${SqlOdds.name}.`) : null;

@@ -7,14 +7,13 @@ import * as state from './state';
     const allExchanges = state.allExchanges;
     await allExchanges.initialize();
 
-    // for (let i = 0; i < 1; i++) {
-    //     allExchanges.analyze();
-    // }
+    for (let i = 0; i < 1; i++) {
+        allExchanges.analyze();
+    }
 
     // await database.close();
     // await allExchanges.close();
 })();
 
 /** TODO: If possible, remove all '!'s and '?'s re: typing. 
- * Fix verbosity tags so that it matches granularity of object structure.
  */

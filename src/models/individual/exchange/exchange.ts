@@ -3,8 +3,6 @@ import * as database from '../../../database';
 import * as state from '../..';
 import { HtmlScrape } from '../..';
 
-const verbosity = config.verbosity.models.individual.exchange['exchange.ts'];
-
 export class Exchange {
     private name: string;
     private url: string;
@@ -22,12 +20,10 @@ export class Exchange {
         name,
         url,
         parseFunction,
-        verbose = false,
     }: {
         name: string,
         url: string,
         parseFunction: Function,
-        verbose?: boolean,
     }) {
 
         this.name = name;
@@ -47,33 +43,15 @@ export class Exchange {
     }
 
     public async analyze() {
-        const verbose = verbosity.Exchange.analyze;
-        verbose ? console.log() : null;
-
-        verbose ? console.log(`Running ${this.analyze.name} for ${this.getName()}.`) : null;
-
         await this.pageReader.scrape();
-        verbose ? console.log(`${this.constructor.name} ${this.getName()} scraped.`) : null;
-
         await this.pageParser.setPageContent({html: this.pageReader.getHtml()});
-        verbose ? console.log(`${this.getName()} ${this.pageParser.constructor.name} page content set.`) : null;
-
         // await this.pageParser.parse();
-        // verbose ? console.log(`${this.getName()} ${this.pageParser.constructor.name} parsed.`) : null;
     }
 
-    public async close({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
-        verbose ? console.log(`Closing ${this.getName()} Exchange object.`) : null;
-
-        await this.pageReader.close({verbose: verbose});
-        await this.pageParser.close({verbose: verbose});
-        await this.pageWriter.close({verbose: verbose});
-
-        verbose ? console.log(`${this.getName()} Exchange object closed succesfully.`) : null;
+    public async close() {
+        await this.pageReader.close();
+        await this.pageParser.close();
+        await this.pageWriter.close();
     }
 
     public async connect() {
@@ -81,10 +59,6 @@ export class Exchange {
     }
 
     public async initialize() {
-        const verbose = verbosity.Exchange.initialize;
-        verbose ? console.log() : null;
-        verbose ? console.log(`Initializing ${this.constructor.name} ${this.getName()}.`) : null;
-
         await this.pageReader.connectToExistingPage();
         await this.pageParser.initialize();
         // await this.pageWriter.initialize();
@@ -99,9 +73,9 @@ export class Exchange {
             },
         }).then(([exchange, created]) => {
             if (created) {
-                verbose ? console.log("Exchange created: ", exchange.get({ plain: true })) : null;
+                console.log("Exchange created: ", exchange.get({ plain: true }));
             } else {
-                verbose ? console.log("Exchange already exists:", exchange.get({ plain: true })) : null;
+                console.log("Exchange already exists:", exchange.get({ plain: true }));
                 const rowData = exchange.get({ plain: true });
                 if (rowData.url !== this.getUrl()) {
                     database.SqlExchange.update(
@@ -110,15 +84,13 @@ export class Exchange {
                             name: this.getName(),
                         }}
                     ).then((updatedRows) => {
-                        verbose ? console.log(`Database URL updated to match program URL.`) : null;
+                        console.log(`Database URL updated to match program URL.`);
                     });
                 } else {
-                    verbose ? console.log(`Database URL matches program URL. No update necessary.`) : null;
+                    console.log(`Database URL matches program URL. No update necessary.`);
                 }
             }
         });
-
-        verbose ? console.log(`${this.getName()} Exchange object initialized succesfully.`) : null;
     }
 
     // Getters

@@ -10,11 +10,9 @@ export class Odds {
     constructor({
         game,
         exchange,
-        verbose = false,
     }: {
         game?: models.Game,
         exchange?: models.Exchange,
-        verbose?: boolean,
     } = {}) {
         if (game) {
             this.game = game;
@@ -33,43 +31,23 @@ export class Odds {
         this.overUnderOdds = new models.OverUnderOdds();
     }
 
-    public getGame({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getGame() {
         return this.game;
     }
 
-    public getExchange({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getExchange() {
         return this.exchange;
     }
 
-    public getSpreadOdds({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getSpreadOdds() {
         return this.spreadOdds;
     }
 
-    public getMoneyOdds({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getMoneyOdds() {
         return this.moneyOdds;
     }
 
-    public getOverUnderOdds({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getOverUnderOdds() {
         return this.overUnderOdds;
     }
 }

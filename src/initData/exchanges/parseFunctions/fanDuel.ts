@@ -2,60 +2,40 @@ import * as config from '../../../config';
 import * as models from '../../../models';
 import * as state from '../../../state';
 
-const verbosity = config.verbosity.initData.exchanges.parseFunctions['fanDuel.ts'];
-
 export async function fanDuel(this: models.ExchangePageParser) {
-    const verbose = verbosity.fanDuel;
-    verbose ? console.log() : null;
-    
-    verbose ? console.log('Parsing FanDuel.') : null;
-
     const page = this.getPage()!;
 
     const scriptElement = await page.$('script[type="application/ld+json"][data-react-helmet="true"]');
     const gamesData = await page.evaluate(element => JSON.parse(element!.textContent!), scriptElement);
-    verbose ? console.log(`\nParsing games.\nJSON data:`) : null;
-    verbose ? console.log(gamesData) : null;
-    verbose ? console.log(`Number of games: ${gamesData.length}`) : null;
 
     let exchangeGames = new Array<models.Game>;
 
     for (let i = 0; i < gamesData.length; i++) {
         const gameData = gamesData[i];
-
-        verbose ? console.log(`\nGame ${i + 1}:`) : null;
         
         const awayTeam = state.allTeams.getTeam({
             string: gameData.awayTeam.name,
         });
-        verbose ? console.log(`Away team: ${awayTeam.getFullName()}`) : null;
     
         const homeTeam = state.allTeams.getTeam({
             string: gameData.homeTeam.name,
         })
-        verbose ? console.log(`Home team: ${homeTeam.getFullName()}`) : null;
 
         const startDate = new Date(gameData.startDate);
-        verbose ? console.log(`Start date: ${startDate}`) : null;
 
         const game = state.allGames.getGame({
             awayTeam: awayTeam,
             homeTeam: homeTeam,
             startDate: startDate,
-            verbose: verbose,
         });
 
         exchangeGames.push(game);
     }
 
-    verbose ? console.log(`\nexchangeGames.length: ${exchangeGames.length}`) : null;
-    verbose ? console.log(`allGames.length: ${state.allGames.getAllGames().length}`) : null;
-
     for (let exchangeGame of exchangeGames) {
         const awayTeam = exchangeGame.getAwayTeam();
         const spans = await page.$x(`//span[text()='${awayTeam.getFullName()}' or text()='${awayTeam.getRegionAbbrIdentifierFull()}']`);
-        verbose ? console.log(`\n${spans.length} matching span(s) found for ${awayTeam.getFullName()}`) : null;
-
+        
         if (spans.length === 0) {
 
         } else if (spans.length === 1) {
@@ -79,7 +59,6 @@ export async function fanDuel(this: models.ExchangePageParser) {
         }
     }
 
-    verbose ? console.log('\nFanDuel parsed.') : null;
     return Promise.resolve();
 }
 
@@ -91,7 +70,6 @@ export async function fanDuel(this: models.ExchangePageParser) {
 //     for (const team of teams) {
 //         const teamAbbrName = team.getRegionAbbrIdentifierFull();
 //         if (spanText === teamAbbrName) {
-//             verbose ? console.log(`\n${spanText} === team.getAbbrName: ${teamAbbrName}`) : null;
 
 //             if (!spanDataItem.recorded) {
 //                 spanDataItem.recorded = true;
@@ -119,14 +97,13 @@ export async function fanDuel(this: models.ExchangePageParser) {
 //                     const nextSpanDataItem = spanData[spanData.indexOf(spanDataItem) + i];
 //                     nextSpanDataItem.recorded = true;
 //                     const nextSpanText = nextSpanDataItem.text;
-//                     verbose ? console.log(`Span text: ${nextSpanText}`) : null;
 
 //                         case 2: {
 //                             // Set spreadOdds.awaySpread.
 //                             let odds = game.getOdds({
 //                                 exchanges: this.getExchange(),
 //                             }) as Odds;
-//                             odds.getSpreadOdds().setAwaySpread({awaySpread: nextSpanText, verbose: verbose});
+//                             odds.getSpreadOdds().setAwaySpread({awaySpread: nextSpanText});
 //                             break;
 //                         }
 //                         case 3: {
@@ -134,7 +111,7 @@ export async function fanDuel(this: models.ExchangePageParser) {
 //                             let odds = game.getOdds({
 //                                 exchanges: this.getExchange(),
 //                             }) as Odds;
-//                             odds.getSpreadOdds().setAwayPrice({awayPrice: nextSpanText, verbose: verbose});
+//                             odds.getSpreadOdds().setAwayPrice({awayPrice: nextSpanText});
 //                             break;
 //                         }
 //                         case 4: {
@@ -172,24 +149,15 @@ export async function fanDuel(this: models.ExchangePageParser) {
 //                     }
 //                 }
 
-//                 verbose ? console.log(`\nGame exchanges: ${game.getExchanges().length}`) : null;
-//                 verbose ? console.log(`Game odds: ${(game.getOdds() as Array<Odds>).length}`) : null;
-
 //                 let exchange = this.getExchange();
 //                 exchange.setGames({
-//                     games: game, 
-//                     verbose: verbose
+//                     games: game,
 //                 });
 //                 exchange.setCurrentOdds({
 //                     currentOdds: game.getOdds({
 //                         exchanges: exchange,
-//                         verbose: verbose,
 //                     }) as Array<Odds>,
-//                     verbose: verbose,
 //                 });
-
-//                 verbose ? console.log(`\nExchange games: ${exchange.getGames().length}`) : null;
-//                 verbose ? console.log(`Exchange current odds: ${exchange.getCurrentOdds().length}`) : null;
 
 //             } else {
 //                 console.log(`${spanText} span already recorded.`)

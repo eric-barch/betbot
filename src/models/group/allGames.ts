@@ -6,10 +6,8 @@ export class AllGames {
 
     constructor({
         games,
-        verbose = false,
     }: {
         games?: Array<models.Game>,
-        verbose?: boolean,
     } = {}) {
         if (games) {
             this.games = games;
@@ -22,12 +20,10 @@ export class AllGames {
         awayTeam,
         homeTeam,
         startDate,
-        verbose = false,
     }: {
         awayTeam: models.Team,
         homeTeam: models.Team,
         startDate: Date,
-        verbose?: boolean,
     }) {
         let requestedGame = undefined;
         
@@ -54,20 +50,14 @@ export class AllGames {
         return requestedGame;
     }
 
-    public getAllGames({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getAllGames() {
         return this.games;
     }
 
     public push({
         game,
-        verbose = false,
     }: {
         game: models.Game,
-        verbose?: boolean,
     }) {
         this.games.push(game);
     }

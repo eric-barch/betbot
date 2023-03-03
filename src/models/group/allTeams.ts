@@ -5,10 +5,8 @@ export class AllTeams {
 
     constructor({
         teams,
-        verbose = false,
     }: {
         teams?: Array<models.Team>,
-        verbose?: boolean,
     } = {}) {
         if (teams) {
             this.teams = teams;
@@ -19,10 +17,8 @@ export class AllTeams {
 
     public getTeam({
         string,
-        verbose = false,
     }: {
         string: string,
-        verbose?: boolean,
     }) {
         for (const team of this.teams) {
             if (team.match({
@@ -36,10 +32,8 @@ export class AllTeams {
 
     public setTeams({
         teams,
-        verbose = false,
     }: {
         teams: Array<models.Team>,
-        verbose?: boolean,
     }) {
         this.teams = teams;
     }

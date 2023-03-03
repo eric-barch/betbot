@@ -4,8 +4,6 @@ import * as fs from 'fs';
 import * as config from '../../../../config';
 import * as models from '../../../../models';
 
-const verbosity = config.verbosity.models.individual.exchange.utils['abstractUtil.ts'];
-
 export abstract class AbstractUtility {
     
     protected exchange: models.Exchange;
@@ -26,7 +24,6 @@ export abstract class AbstractUtility {
 
     async initialize() {    
         const headless = config.headless;
-        const verbose = verbosity.AbstractUtility.initialize;
 
         this.browser = await puppeteer.launch({
             executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -37,16 +34,12 @@ export abstract class AbstractUtility {
         let pages = await this.browser.pages();
         let blankTab = pages.shift();
         await blankTab?.close();
-    
-        verbose ? console.log(`${this.getExchange().getName()} ${this.constructor.name} initialized succesfully.`) : null;
     }
 
     async saveHtml({
         filepath,
-        verbose = false,
     }: {
         filepath: string,
-        verbose?: boolean,
     }) {
         const scrapedAt = this.getHtml().getScrapedAt();
         const year = scrapedAt.getFullYear();
@@ -59,68 +52,40 @@ export abstract class AbstractUtility {
         const exchangeNameStripped = this.getExchange().getNameStripped();
         const filename = `${year}.${month}.${day} ${hour}.${minute}.${second}.${milliseconds} ${exchangeNameStripped}.html`;
         fs.writeFileSync(`${filepath}/${exchangeNameStripped}/${filename}`, this.getHtml().getString(), { encoding: 'utf8' });
-        verbose ? console.log(`${this.getExchange().getName()} HTML file saved as \'${filename}\'`) : null;
     }
 
-    async close({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    async close() {
         await this.browser?.close();
-        verbose ? console.log(`${this.getExchange().getName()} ${this.constructor.name} closed successfully.`) : null;
     }
-
-    // Public methods
-
     
     // Getters
-    public getExchange({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getExchange() {
         return this.exchange;
     }
 
-    public getHtml({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getHtml() {
         return this.html;
     }
 
-    public getPage({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getPage() {
         return this.page;
     }
 
     // Setters
     private setHtml({
         html,
-        verbose = false,
     }: {
         html: models.HtmlScrape,
-        verbose?: boolean,
     }) {
         this.html = html;
-        verbose ? console.log(`${this.getExchange().getName()} ${this.constructor.name} HtmlScrape set.`) : null;
     }
 
     public async setPageContent({
         html = this.html,
-        verbose = false,
     }: {
-        html?: models.HtmlScrape,
-        verbose?: boolean,
-    } = {}) {
-        html ? this.setHtml({html: html, verbose: verbose}) : null;
+        html: models.HtmlScrape,
+    }) {
+        this.setHtml({html: html});
         await this.page?.setContent(this.getHtml().getString());
-        verbose ? console.log(`${this.getExchange().getName()} ${this.constructor.name} Page content set.`) : null;
     }
-
 }

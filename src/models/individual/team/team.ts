@@ -32,10 +32,8 @@ export class Team {
     // Public methods
     public match({
         string,
-        verbose = false,
     }: {
         string: string,
-        verbose?: boolean,
     }) {
         if (
             string === this.getFullName() ||
@@ -48,64 +46,32 @@ export class Team {
     }
 
     // Getters
-    public getFullName({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getFullName() {
         return this.fullName;
     }
     
-    public getRegionFull({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getRegionFull() {
         return this.regionFull;
     }
 
-    public getRegionAbbr({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getRegionAbbr() {
         return this.regionAbbr;
     }
 
-    public getIdentifierFull({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getIdentifierFull() {
         return this.identifierFull;
     }
 
-    public getIdentifierAbbr({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getIdentifierAbbr() {
         return this.identifierAbbr;
     }
 
-    public getAltNames({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    }) {
+    public getAltNames() {
         return this.altNames;
     }
 
-    public getRegionAbbrIdentifierFull({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getRegionAbbrIdentifierFull() {
         const str = this.getRegionAbbr() + ' ' + this.getIdentifierFull();
         return str;
     }
-}
-
-export class Foo {
-    
 }

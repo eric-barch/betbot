@@ -17,19 +17,11 @@ export class HtmlScrape {
 
     
     // Getters
-    public getString({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getString() {
         return this.string;
     }
 
-    public getScrapedAt({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getScrapedAt() {
         return this.scrapedAt;
     }
 

@@ -12,13 +12,11 @@ export class Game {
         homeTeam,
         startDate,
         exchanges,
-        verbose,
     }: {
         awayTeam: models.Team,
         homeTeam: models.Team,
         startDate: Date,
         exchanges?: models.Exchange | Array<models.Exchange>,
-        verbose?: boolean,
     }) {
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;   
@@ -31,11 +29,7 @@ export class Game {
             } else {
                 this.exchanges.push(exchanges);
             }
-        } else {
-            verbose ? console.log(`\tNo exchanges passed to Game constructor.`) : null;
         }
-
-        verbose ? console.log(`\tgame.exchanges set to ${this.getExchanges()}`) : null;
 
         this.odds = [];
     }
@@ -44,12 +38,10 @@ export class Game {
         awayTeam,
         homeTeam,
         startDate,
-        verbose,
     }: {
         awayTeam: models.Team,
         homeTeam: models.Team,
         startDate?: Date,
-        verbose?: boolean,
     }) {
         if (startDate) {
             const timeDifference = Math.abs(startDate.getTime() - this.getStartDate().getTime());
@@ -68,44 +60,26 @@ export class Game {
         return false;
     }
 
-    public getAwayTeam({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getAwayTeam() {
         return this.awayTeam;
     }
 
-    public getHomeTeam({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getHomeTeam() {
         return this.homeTeam;
     }
 
-    public getStartDate({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getStartDate() {
         return this.startDate;
     }
 
-    public getExchanges({
-        verbose = false,
-    }: {
-        verbose?: boolean,
-    } = {}) {
+    public getExchanges() {
         return this.exchanges;
     }
 
     public getOdds({
         exchanges,
-        verbose = false,
     }: {
         exchanges?: models.Exchange | Array<models.Exchange>,
-        verbose?: boolean,
     } = {}) {
         if (exchanges) {
             if (Array.isArray(exchanges)) {
