@@ -21,26 +21,16 @@ class SpreadOdds {
         return this.homePrice;
     }
     setAwaySpread({ awaySpread, }) {
-        if (typeof awaySpread === 'number') {
-            this.awaySpread = awaySpread;
-        }
-        else if (typeof awaySpread === 'string') {
-            this.awaySpread = Number(awaySpread);
-        }
+        this.awaySpread = Number(awaySpread);
     }
     setAwayPrice({ awayPrice, }) {
-        if (typeof awayPrice === 'number') {
-            this.awayPrice = awayPrice;
-        }
-        else if (typeof awayPrice === 'string') {
-            this.awayPrice = Number(awayPrice);
-        }
+        this.awayPrice = Number(awayPrice);
     }
     setHomeSpread({ homeSpread, }) {
-        this.homeSpread = homeSpread;
+        this.homeSpread = Number(homeSpread);
     }
     setHomePrice({ homePrice, }) {
-        this.homePrice = homePrice;
+        this.homePrice = Number(homePrice);
     }
 }
 exports.SpreadOdds = SpreadOdds;

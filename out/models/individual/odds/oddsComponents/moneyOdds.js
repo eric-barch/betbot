@@ -13,10 +13,10 @@ class MoneyOdds {
         return this.homePrice;
     }
     setAwayPrice({ awayPrice, }) {
-        this.awayPrice = awayPrice;
+        this.awayPrice = Number(awayPrice);
     }
     setHomePrice({ homePrice, }) {
-        this.homePrice = homePrice;
+        this.homePrice = Number(homePrice);
     }
 }
 exports.MoneyOdds = MoneyOdds;

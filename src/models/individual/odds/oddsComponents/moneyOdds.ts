@@ -16,16 +16,16 @@ export class MoneyOdds {
     public setAwayPrice({
         awayPrice,
     }: {
-        awayPrice: number,
+        awayPrice: number | string,
     }) {
-        this.awayPrice = awayPrice;
+        this.awayPrice = Number(awayPrice);
     }
 
     public setHomePrice({
         homePrice,
     }: {
-        homePrice: number,
+        homePrice: number | string,
     }) {
-        this.homePrice = homePrice;
+        this.homePrice = Number(homePrice);
     }
 }

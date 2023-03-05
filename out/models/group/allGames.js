@@ -25,7 +25,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AllGames = void 0;
 const models = __importStar(require(".."));
-const state = __importStar(require("../../state"));
 class AllGames {
     constructor({ games, } = {}) {
         if (games) {
@@ -53,15 +52,12 @@ class AllGames {
                 homeTeam: homeTeam,
                 startDate: startDate,
             });
-            state.allGames.push({ game: requestedGame });
+            this.games.push(requestedGame);
         }
         return requestedGame;
     }
     getAllGames() {
         return this.games;
-    }
-    push({ game, }) {
-        this.games.push(game);
     }
 }
 exports.AllGames = AllGames;

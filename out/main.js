@@ -45,5 +45,6 @@ const state = __importStar(require("./state"));
     // await allExchanges.close();
 }))();
 /** TODO: If possible, remove all '!'s and '?'s re: typing.
+ * Probably should remove page parser altogether. Parsing should occur right on the main exchange page.
  */ 
 //# sourceMappingURL=main.js.map

@@ -17,13 +17,13 @@ class OverUnderOdds {
         return this.underPrice;
     }
     setOverUnder({ overUnder, }) {
-        this.overUnder = overUnder;
+        this.overUnder = Number(overUnder);
     }
     setOverPrice({ overPrice, }) {
-        this.overPrice = overPrice;
+        this.overPrice = Number(overPrice);
     }
     setUnderPrice({ underPrice, }) {
-        this.underPrice = underPrice;
+        this.underPrice = Number(underPrice);
     }
 }
 exports.OverUnderOdds = OverUnderOdds;

@@ -3,4 +3,3 @@
  */
 
 export * from './headless';
-export * from './verbosity/index';

@@ -1,6 +1,9 @@
+import * as puppeteer from 'puppeteer';
+
 import * as models from '../../../models';
 
 export class Game {
+    private baseHandle?: puppeteer.ElementHandle;
     private awayTeam: models.Team;
     private homeTeam: models.Team;
     private startDate: Date;
@@ -60,6 +63,10 @@ export class Game {
         return false;
     }
 
+    public getBaseHandle() {
+        return this.baseHandle;
+    }
+
     public getAwayTeam() {
         return this.awayTeam;
     }
@@ -81,35 +88,56 @@ export class Game {
     }: {
         exchanges?: models.Exchange | Array<models.Exchange>,
     } = {}) {
+        let requestedOdds;
+
         if (exchanges) {
-            if (Array.isArray(exchanges)) {
-                let oddsArray = new Array<models.Odds>;
-                for (let exchange of exchanges) {
-                    let odds = this.odds.find(odds => odds.getExchange() === exchange);
-                    if (odds === undefined) {
-                        odds = new models.Odds({
-                            game: this,
-                            exchange: exchange,
-                        });
-                        this.odds.push(odds);
-                    }
-                    oddsArray.push(odds);
-                }
-                return oddsArray;
-            } else {
-                let odds = this.odds.find(odds => odds.getExchange() === exchanges);
-                if (odds === undefined) {
-                    odds = new models.Odds({
+            if (exchanges instanceof models.Exchange) {
+                let exchangeOdds = this.odds.find(odds => odds.getExchange() === exchanges);
+                
+                if (exchangeOdds === undefined) {
+                    exchangeOdds = new models.Odds({
                         game: this,
                         exchange: exchanges,
                     });
-                    this.odds.push(odds);
+                    this.odds.push(exchangeOdds);
                 }
-                return odds;
+
+                requestedOdds = exchangeOdds;
+            } else {
+                requestedOdds = new Array<models.Odds>;
+
+                for (const exchange of exchanges) {
+                    let exchangeOdds = this.odds.find(odds => odds.getExchange() === exchange);
+                    
+                    if (exchangeOdds === undefined) {
+                        exchangeOdds = new models.Odds({
+                            game: this,
+                            exchange: exchange,
+                        });
+                        this.odds.push(exchangeOdds);
+                    }
+                    
+                    requestedOdds.push(exchangeOdds);
+                }
             }
         } else {
-            return this.odds;
+            requestedOdds = this.odds[0];
+
+            if (requestedOdds === undefined) {
+                this.odds.push(new models.Odds());
+                requestedOdds = this.odds[0];
+            }
         }
+
+        return requestedOdds;
+    }
+
+    public setBaseHandle({
+        baseHandle,
+    }: {
+        baseHandle: puppeteer.ElementHandle,
+    }) {
+        this.baseHandle = baseHandle;
     }
 
 }

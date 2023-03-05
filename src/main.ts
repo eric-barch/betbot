@@ -16,4 +16,5 @@ import * as state from './state';
 })();
 
 /** TODO: If possible, remove all '!'s and '?'s re: typing. 
+ * Probably should remove page parser altogether. Parsing should occur right on the main exchange page.
  */

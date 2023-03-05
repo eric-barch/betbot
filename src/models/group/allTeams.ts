@@ -1,4 +1,5 @@
-import * as models from '..';
+import * as initData from '../../initData';
+import * as models from '../../models';
 
 export class AllTeams {
     private teams: Array<models.Team>;
@@ -11,7 +12,7 @@ export class AllTeams {
         if (teams) {
             this.teams = teams;
         } else {
-            this.teams = [];
+            this.teams = initData.nbaTeams;
         }
     }
 

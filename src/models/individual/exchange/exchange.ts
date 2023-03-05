@@ -44,8 +44,9 @@ export class Exchange {
 
     public async analyze() {
         await this.pageReader.scrape();
+        await this.pageReader.saveHtml({filepath: '/Users/ericbarch/Documents/Development/AutomaticSportsBetting/iteration-6/html'});
         await this.pageParser.setPageContent({html: this.pageReader.getHtml()});
-        // await this.pageParser.parse();
+        await this.pageParser.parse();
     }
 
     public async close() {

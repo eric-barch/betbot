@@ -44,7 +44,7 @@ export class AllGames {
                 homeTeam: homeTeam,
                 startDate: startDate,
             });
-            state.allGames.push({game: requestedGame});
+            this.games.push(requestedGame);
         }
 
         return requestedGame;
@@ -54,11 +54,11 @@ export class AllGames {
         return this.games;
     }
 
-    public push({
-        game,
-    }: {
-        game: models.Game,
-    }) {
-        this.games.push(game);
-    }
+    // public push({
+    //     game,
+    // }: {
+    //     game: models.Game,
+    // }) {
+    //     this.games.push(game);
+    // }
 }

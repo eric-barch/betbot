@@ -32,11 +32,7 @@ export class SpreadOdds {
     }: {
         awaySpread: number | string,
     }) {
-        if (typeof awaySpread === 'number') {
-            this.awaySpread = awaySpread;
-        } else if (typeof awaySpread === 'string'){
-            this.awaySpread = Number(awaySpread);
-        }
+        this.awaySpread = Number(awaySpread);
     }
 
     public setAwayPrice({
@@ -44,26 +40,22 @@ export class SpreadOdds {
     }: {
         awayPrice: number | string,
     }) {
-        if (typeof awayPrice === 'number') {
-            this.awayPrice = awayPrice;
-        } else if (typeof awayPrice === 'string'){
-            this.awayPrice = Number(awayPrice);
-        }
+        this.awayPrice = Number(awayPrice);
     }
 
     public setHomeSpread({
         homeSpread,
     }: {
-        homeSpread: number,
+        homeSpread: number | string,
     }) {
-        this.homeSpread = homeSpread;
+        this.homeSpread = Number(homeSpread);
     }
 
     public setHomePrice({
         homePrice,
     }: {
-        homePrice: number,
+        homePrice: number | string,
     }) {
-        this.homePrice = homePrice;
+        this.homePrice = Number(homePrice);
     }    
 }

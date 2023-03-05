@@ -24,24 +24,24 @@ export class OverUnderOdds {
     public setOverUnder({
         overUnder,
     }: {
-        overUnder: number,
+        overUnder: number | string,
     }) {
-        this.overUnder = overUnder;
+        this.overUnder = Number(overUnder);
     }
 
     public setOverPrice({
         overPrice,
     }: {
-        overPrice: number,
+        overPrice: number | string,
     }) {
-        this.overPrice = overPrice;
+        this.overPrice = Number(overPrice);
     }
 
     public setUnderPrice({
         underPrice,
     }: {
-        underPrice: number,
+        underPrice: number | string,
     }) {
-        this.underPrice = underPrice;
+        this.underPrice = Number(underPrice);
     }
 }

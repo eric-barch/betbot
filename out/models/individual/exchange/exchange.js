@@ -55,8 +55,9 @@ class Exchange {
     analyze() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.pageReader.scrape();
+            yield this.pageReader.saveHtml({ filepath: '/Users/ericbarch/Documents/Development/AutomaticSportsBetting/iteration-6/html' });
             yield this.pageParser.setPageContent({ html: this.pageReader.getHtml() });
-            // await this.pageParser.parse();
+            yield this.pageParser.parse();
         });
     }
     close() {

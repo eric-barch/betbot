@@ -39,7 +39,7 @@ exports.exchanges = [
     {
         name: 'FanDuel',
         url: 'https://sportsbook.fanduel.com/navigation/nba',
-        parseFunction: parseFunctions.fanDuel,
+        parseFunction: parseFunctions.parseFanDuel,
     },
 ];
 //# sourceMappingURL=exchanges.js.map

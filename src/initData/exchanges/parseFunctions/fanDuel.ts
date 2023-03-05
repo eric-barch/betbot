@@ -1,170 +1,191 @@
-import * as config from '../../../config';
+import * as chrono from 'chrono-node';
+import * as puppeteer from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
+
 import * as models from '../../../models';
 import * as state from '../../../state';
 
-export async function fanDuel(this: models.ExchangePageParser) {
+//html/body/div[1]/div/div/div/div[2]/div[2]/main/div/div[1]/div/div[2]/div[3]/ul/li[3]/div/div
+//html/body/div[1]/div/div/div/div[2]/div[2]/main/div/div[1]/div/div[2]/div[3]/ul/li[3]/div/div/a/div/div[1]/div/div/div/span[1]
+
+const awayTeamXPath = './div[1]/a/div[1]/div/div/div/div[2]/span';
+const homeTeamXPath = './div[1]/a/div[3]/div/div/div/div[2]/span';
+const startDateXPath = './div[2]/div[1]/time';
+const awaySpreadXPath = './div[1]/div/div[1]/div[1]/span[1]';
+const awaySpreadPriceXPath = './div[1]/div/div[1]/div[1]/span[2]';
+const homeSpreadXPath = './div[1]/div/div[2]/div[1]/span[1]';
+const homeSpreadPriceXPath = './div[1]/div/div[2]/div[1]/span[2]';
+const awayMoneyPriceXPath = './div[1]/div/div[1]/div[2]/span';
+const homeMoneyPriceXPath = './div[1]/div/div[2]/div[2]/span';
+const overUnderXPath = './div[1]/div/div[1]/div[3]/span[1]';
+const overPriceXPath = './div[1]/div/div[1]/div[3]/span[2]';
+const underPriceXPath = './div[1]/div/div[2]/div[3]/span[2]';
+
+export async function parseFanDuel(this: models.ExchangePageParser) {
     const page = this.getPage()!;
 
-    const scriptElement = await page.$('script[type="application/ld+json"][data-react-helmet="true"]');
-    const gamesData = await page.evaluate(element => JSON.parse(element!.textContent!), scriptElement);
+    const gamesFromJson = await getGamesFromJson(page); // Returns an array of Game objects based on the JSON from the website.
+    const gamesFromJsonWithBaseHandles = await addBaseHandles(gamesFromJson, page); // Returns an array of ElementHandle objects for the Away Team element of every game in the visible HTML document.
+    const gamesFromDocument = await getGamesFromDocument(gamesFromJsonWithBaseHandles); // Returns an array of Game objects based on visible HTML document.
 
-    let exchangeGames = new Array<models.Game>;
+    return gamesFromDocument;
+}
 
-    for (let i = 0; i < gamesData.length; i++) {
-        const gameData = gamesData[i];
-        
+async function getGamesFromJson(page: puppeteer.Page) {
+    const jsonGamesScriptTag = await page.$('script[type="application/ld+json"][data-react-helmet="true"]');
+    const jsonGames = await page.evaluate(element => JSON.parse(element!.textContent!), jsonGamesScriptTag);
+
+    let currentExchangeGames = new Array<models.Game>;
+    for (const jsonGame of jsonGames) {
         const awayTeam = state.allTeams.getTeam({
-            string: gameData.awayTeam.name,
+            string: jsonGame.awayTeam.name,
         });
-    
+
         const homeTeam = state.allTeams.getTeam({
-            string: gameData.homeTeam.name,
-        })
+            string: jsonGame.homeTeam.name,
+        });
 
-        const startDate = new Date(gameData.startDate);
+        const startDate = new Date(jsonGame.startDate);
 
-        const game = state.allGames.getGame({
+        const currentExchangeGame = state.allGames.getGame({
             awayTeam: awayTeam,
             homeTeam: homeTeam,
             startDate: startDate,
-        });
+        })
 
-        exchangeGames.push(game);
+        currentExchangeGames.push(currentExchangeGame);
     }
 
-    for (let exchangeGame of exchangeGames) {
-        const awayTeam = exchangeGame.getAwayTeam();
-        const spans = await page.$x(`//span[text()='${awayTeam.getFullName()}' or text()='${awayTeam.getRegionAbbrIdentifierFull()}']`);
-        
-        if (spans.length === 0) {
+    return currentExchangeGames;
+}
 
-        } else if (spans.length === 1) {
-            const awayTeamSpanHandle = spans[0];
-            
-            const nextElementHandle = await page.evaluateHandle((element) => {
-                let nextNode = element.nextSibling;
-                while (nextNode) {
-                    if (nextNode.nodeType === Node.ELEMENT_NODE) {
-                        return nextNode;
-                    }
-                    nextNode = nextNode.nextSibling;
-                }
-                return null;
-            }, awayTeamSpanHandle);
+async function addBaseHandles(gamesFromJson: Array<models.Game>, page: puppeteer.Page) {
+    for (const gameFromJson of gamesFromJson) {
+        const jsonGameAwayTeam = gameFromJson.getAwayTeam();
+        const jsonGameHomeTeam = gameFromJson.getHomeTeam();
+        const jsonGameStartDate = gameFromJson.getStartDate();
 
+        const possibleAwayTeamHandles = await page.$x(`//span[text()='${jsonGameAwayTeam.getFullName()}' or text()='${jsonGameAwayTeam.getRegionAbbrIdentifierFull()}']`);
 
-            
+        if (possibleAwayTeamHandles.length < 1) {
+            console.log(`Did not find span with text ${jsonGameAwayTeam.getFullName()}.`);
         } else {
+            for (const possibleAwayTeamHandle of possibleAwayTeamHandles) {
+                const possibleGameBaseHandle = (await possibleAwayTeamHandle.$$('xpath/' + '../../../../../../../..'))[0];
+                
+                const expectedHomeTeamHandle = (await possibleGameBaseHandle.$$('xpath/' + homeTeamXPath))[0];
+                if (expectedHomeTeamHandle instanceof ElementHandle) {
+                    let expectedHomeTeamHandleTextContent;
+                    try {
+                        expectedHomeTeamHandleTextContent = await expectedHomeTeamHandle.getProperty('textContent').then(property => property.jsonValue());
+                    } catch (error) {
+                        console.log(error);
+                    }
 
+                    if (typeof expectedHomeTeamHandleTextContent === 'string') {
+                        if (jsonGameHomeTeam.match({string: expectedHomeTeamHandleTextContent})) {
+                            const expectedStartDateHandle = (await possibleGameBaseHandle.$$('xpath/' + startDateXPath))[0];
+
+                            if (expectedStartDateHandle !== undefined) {
+                                const expectedStartDateHandleTextContent = await expectedStartDateHandle.getProperty('textContent').then(property => property.jsonValue());
+                                
+                                if (typeof expectedStartDateHandleTextContent === 'string') {
+                                    const expectedTimeHandleStartDate = chrono.parseDate(expectedStartDateHandleTextContent);
+
+                                    const diff = Math.abs(expectedTimeHandleStartDate.getTime() - jsonGameStartDate.getTime());
+                                    const isWithin5Minutes = diff <= 300000;
+    
+                                    if (isWithin5Minutes) {
+                                        gameFromJson.setBaseHandle({baseHandle: possibleGameBaseHandle});
+                                        break;
+                                    }
+                                }
+                            } else {
+                                const currentTime = new Date();
+                                
+                                const diff = currentTime.getTime() - jsonGameStartDate.getTime();
+                                const isWithin8HoursBefore = diff <= 28800000;
+
+                                if (isWithin8HoursBefore) {
+                                    gameFromJson.setBaseHandle({baseHandle: possibleGameBaseHandle});
+                                    break;
+                                }
+                            }
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
     }
 
-    return Promise.resolve();
+    return gamesFromJson;
 }
 
+async function getGamesFromDocument(gamesFromJsonWithBaseHandles: Array<models.Game>) {
+    let gamesFromDocument: Array<models.Game> = [];
 
+    for (const gameFromJson of gamesFromJsonWithBaseHandles) {
+        const baseHandle = gameFromJson.getBaseHandle();
+        if (baseHandle !== undefined) {
+            // let className = await baseHandle.evaluate((node) => {
+            //     return node.getAttribute('class');
+            // });
 
+            const awaySpreadHandle = (await baseHandle.$$('xpath/' + awaySpreadXPath))[0];
+            const awaySpreadTextContent = await awaySpreadHandle.getProperty('textContent').then(property => property.jsonValue());
 
-// for (const spanDataItem of spanData) {
-//     const spanText = spanDataItem.text;
-//     for (const team of teams) {
-//         const teamAbbrName = team.getRegionAbbrIdentifierFull();
-//         if (spanText === teamAbbrName) {
+            const awaySpreadPriceHandle = (await baseHandle.$$('xpath/' + awaySpreadPriceXPath))[0];
+            const awaySpreadPriceTextContent = await awaySpreadPriceHandle.getProperty('textContent').then(property => property.jsonValue());
 
-//             if (!spanDataItem.recorded) {
-//                 spanDataItem.recorded = true;
+            const homeSpreadHandle = (await baseHandle.$$('xpath/' + homeSpreadXPath))[0];
+            const homeSpreadTextContent = await homeSpreadHandle.getProperty('textContent').then(property => property.jsonValue());
 
-//                 // Create new Odds and set away team.
-//                 let odds = new Odds();
-//                 odds.setExchange({exchange: this.getExchange()});
+            const homeSpreadPriceHandle = (await baseHandle.$$('xpath/' + homeSpreadPriceXPath))[0];
+            const homeSpreadPriceTextContent = await homeSpreadPriceHandle.getProperty('textContent').then(property => property.jsonValue());
 
-//                 let gameKey = new GameKey();
+            const awayMoneyPriceHandle = (await baseHandle.$$('xpath/' + awayMoneyPriceXPath))[0];
+            const awayMoneyPriceTextContent = await awayMoneyPriceHandle.getProperty('textContent').then(property => property.jsonValue());
 
-//                 gameKey.setAwayTeam({
-//                     awayTeam: team,
-//                 })
+            const homeMoneyPriceHandle = (await baseHandle.$$('xpath/' + homeMoneyPriceXPath))[0];
+            const homeMoneyPriceTextContent = await homeMoneyPriceHandle.getProperty('textContent').then(property => property.jsonValue());
 
-//                 const nextSpanText = spanData[spanData.indexOf(spanDataItem) + 1].text;
-//                 gameKey.setHomeTeam({
-//                     homeTeam: nextSpanText,
-//                 })
+            const overUnderHandle = (await baseHandle.$$('xpath/' + overUnderXPath))[0];
+            const overUnderTextContent = await overUnderHandle.getProperty('textContent').then(property => property.jsonValue());
 
-//                 //html/body/div[1]/div/div/div/div[2]/div[2]/main/div/div[1]/div/div/div[1]/div/div[3]/ul/li[3]/div/div/div[1]/a/div[1]/div/div/div/div[2]/span
+            const overPriceHandle = (await baseHandle.$$('xpath/' + overPriceXPath))[0];
+            const overPriceTextContent = await overPriceHandle.getProperty('textContent').then(property => property.jsonValue());
+            
+            const underPriceHandle = (await baseHandle.$$('xpath/' + underPriceXPath))[0];
+            const underPriceTextContent = await underPriceHandle.getProperty('textContent').then(property => property.jsonValue());
 
-//                 // TODO: Find and set game date and time.
+            const odds = gameFromJson.getOdds();
+            if (odds instanceof models.Odds) {
+                const spreadOdds = odds.getSpreadOdds();
+                const moneyOdds = odds.getMoneyOdds();
+                const overUnderOdds = odds.getOverUnderOdds();
 
-//                 for (let i = 2; i <= 11; i++) {
-//                     const nextSpanDataItem = spanData[spanData.indexOf(spanDataItem) + i];
-//                     nextSpanDataItem.recorded = true;
-//                     const nextSpanText = nextSpanDataItem.text;
+                spreadOdds.setAwaySpread({awaySpread: awaySpreadTextContent!});
+                spreadOdds.setAwayPrice({awayPrice: awaySpreadPriceTextContent!});
+                spreadOdds.setHomeSpread({homeSpread: homeSpreadTextContent!});
+                spreadOdds.setHomePrice({homePrice: homeSpreadPriceTextContent!});
 
-//                         case 2: {
-//                             // Set spreadOdds.awaySpread.
-//                             let odds = game.getOdds({
-//                                 exchanges: this.getExchange(),
-//                             }) as Odds;
-//                             odds.getSpreadOdds().setAwaySpread({awaySpread: nextSpanText});
-//                             break;
-//                         }
-//                         case 3: {
-//                             // Set spreadOdds.awayPrice.
-//                             let odds = game.getOdds({
-//                                 exchanges: this.getExchange(),
-//                             }) as Odds;
-//                             odds.getSpreadOdds().setAwayPrice({awayPrice: nextSpanText});
-//                             break;
-//                         }
-//                         case 4: {
-//                             // Set moneyOdds.awayPrice.
-//                             break;
-//                         }
-//                         case 5: {
-//                             // Set overUnderOdds.overUnder.
-//                             break;
-//                         }
-//                         case 6: {
-//                             // Set overUnderOdds.overPrice.
-//                             break;
-//                         }
-//                         case 7: {
-//                             // Set spreadOdds.homeSpread.
-//                             break;
-//                         }
-//                         case 8: {
-//                             // Set spreadOdds.homePrice.
-//                             break;
-//                         }
-//                         case 9: {
-//                             // Set moneyOdds.homePrice.
-//                             break;
-//                         }
-//                         case 10: {
-//                             // Do nothing or confirm overUnderOdds.overUnder.
-//                             break;
-//                         }
-//                         case 11: {
-//                             // Set overUnderOdds.underPrice.
-//                             break;
-//                         }
-//                     }
-//                 }
+                moneyOdds.setAwayPrice({awayPrice: awayMoneyPriceTextContent!});
+                moneyOdds.setHomePrice({homePrice: homeMoneyPriceTextContent!});
 
-//                 let exchange = this.getExchange();
-//                 exchange.setGames({
-//                     games: game,
-//                 });
-//                 exchange.setCurrentOdds({
-//                     currentOdds: game.getOdds({
-//                         exchanges: exchange,
-//                     }) as Array<Odds>,
-//                 });
+                overUnderOdds.setOverUnder({overUnder: overUnderTextContent!.substring(2)});
+                overUnderOdds.setOverPrice({overPrice: overPriceTextContent!});
+                overUnderOdds.setUnderPrice({underPrice: underPriceTextContent!});
+            } else {
+                throw new Error('Expected single instance of Odds.');
+            }
 
-//             } else {
-//                 console.log(`${spanText} span already recorded.`)
-//             }
+            gamesFromDocument.push(gameFromJson);
+        }
+    }
 
-//         } else {
-//             // console.log(`${spanText} != ${fullName} or ${abbrName}`);
-//         }
-//     }
-// }
+    return gamesFromDocument;
+}
