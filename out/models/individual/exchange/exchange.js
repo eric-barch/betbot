@@ -34,17 +34,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
 const database = __importStar(require("../../../database"));
-const state = __importStar(require("../.."));
+const models = __importStar(require("../../../models"));
+const state = __importStar(require("../../../state"));
 class Exchange {
     constructor({ name, url, parseFunction, }) {
         this.name = name;
         this.url = url;
-        this.pageReader = new state.ExchangePageReader({ exchange: this });
-        this.pageParser = new state.ExchangePageParser({
+        this.pageReader = new models.ExchangePageReader({ exchange: this });
+        this.pageParser = new models.ExchangePageParser({
             exchange: this,
             parseFunction: parseFunction,
         });
-        this.pageWriter = new state.ExchangePageWriter({ exchange: this });
+        this.pageWriter = new models.ExchangePageWriter({ exchange: this });
         this.games = [];
         this.odds = {
             current: [],
@@ -57,7 +58,11 @@ class Exchange {
             yield this.pageReader.scrape();
             yield this.pageReader.saveHtml({ filepath: '/Users/ericbarch/Documents/Development/AutomaticSportsBetting/iteration-6/html' });
             yield this.pageParser.setPageContent({ html: this.pageReader.getHtml() });
-            yield this.pageParser.parse();
+            console.log(`AllGames length: ${state.allGames.getLength()}`);
+            console.log(`AllOdds length: ${state.allOdds.getLength()}`);
+            const currentExchangeGames = yield this.pageParser.parse();
+            console.log(`AllGames length: ${state.allGames.getLength()}`);
+            console.log(`AllOdds length: ${state.allOdds.getLength()}`);
         });
     }
     close() {

@@ -50,4 +50,12 @@ export class Odds {
     public getOverUnderOdds() {
         return this.overUnderOdds;
     }
+
+    public setGame({
+        game,
+    }: {
+        game: models.Game,
+    }) {
+
+    }
 }

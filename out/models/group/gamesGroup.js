@@ -23,43 +23,45 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Odds = void 0;
-const models = __importStar(require("../../../models"));
-class Odds {
-    constructor({ game, exchange, } = {}) {
-        if (game) {
-            this.game = game;
+exports.GamesGroup = void 0;
+const models = __importStar(require(".."));
+class GamesGroup {
+    constructor({ games, } = {}) {
+        if (games) {
+            this.gamesArray = games;
         }
         else {
-            this.game = undefined;
+            this.gamesArray = [];
         }
-        if (exchange) {
-            this.exchange = exchange;
+    }
+    getGame({ awayTeam, homeTeam, startDate, }) {
+        let requestedGame = undefined;
+        for (const game of this.gamesArray) {
+            if (game.match({
+                awayTeam: awayTeam,
+                homeTeam: homeTeam,
+                startDate: startDate,
+            })) {
+                requestedGame = game;
+                break;
+            }
         }
-        else {
-            this.exchange = undefined;
+        if (requestedGame === undefined) {
+            requestedGame = new models.Game({
+                awayTeam: awayTeam,
+                homeTeam: homeTeam,
+                startDate: startDate,
+            });
+            this.gamesArray.push(requestedGame);
         }
-        this.spreadOdds = new models.SpreadOdds();
-        this.moneyOdds = new models.MoneyOdds();
-        this.overUnderOdds = new models.OverUnderOdds();
+        return requestedGame;
     }
-    getGame() {
-        return this.game;
+    getAllGames() {
+        return this.gamesArray;
     }
-    getExchange() {
-        return this.exchange;
-    }
-    getSpreadOdds() {
-        return this.spreadOdds;
-    }
-    getMoneyOdds() {
-        return this.moneyOdds;
-    }
-    getOverUnderOdds() {
-        return this.overUnderOdds;
-    }
-    setGame({ game, }) {
+    getLength() {
+        return this.gamesArray.length;
     }
 }
-exports.Odds = Odds;
-//# sourceMappingURL=odds.js.map
+exports.GamesGroup = GamesGroup;
+//# sourceMappingURL=gamesGroup.js.map

@@ -1,18 +1,17 @@
-import * as config from '../../../config';
 import * as database from '../../../database';
-import * as state from '../..';
-import { HtmlScrape } from '../..';
+import * as models from '../../../models';
+import * as state from '../../../state';
 
 export class Exchange {
     private name: string;
     private url: string;
-    private pageReader: state.ExchangePageReader;
-    private pageParser: state.ExchangePageParser;
-    private pageWriter: state.ExchangePageWriter;
-    private games: Array<state.Game>;
+    private pageReader: models.ExchangePageReader;
+    private pageParser: models.ExchangePageParser;
+    private pageWriter: models.ExchangePageWriter;
+    private games: Array<models.Game>;
     private odds: {
-        current: Array<state.Odds>, 
-        lastSaved: Array<state.Odds>,
+        current: Array<models.Odds>, 
+        lastSaved: Array<models.Odds>,
     };
     private sequelizeModel: any;
 
@@ -28,12 +27,12 @@ export class Exchange {
 
         this.name = name;
         this.url = url;
-        this.pageReader = new state.ExchangePageReader({exchange: this});
-        this.pageParser = new state.ExchangePageParser({
+        this.pageReader = new models.ExchangePageReader({exchange: this});
+        this.pageParser = new models.ExchangePageParser({
             exchange: this,
             parseFunction: parseFunction,
         });
-        this.pageWriter = new state.ExchangePageWriter({exchange: this});
+        this.pageWriter = new models.ExchangePageWriter({exchange: this});
         this.games = [];
         this.odds = {
             current: [],
@@ -46,7 +45,14 @@ export class Exchange {
         await this.pageReader.scrape();
         await this.pageReader.saveHtml({filepath: '/Users/ericbarch/Documents/Development/AutomaticSportsBetting/iteration-6/html'});
         await this.pageParser.setPageContent({html: this.pageReader.getHtml()});
-        await this.pageParser.parse();
+
+        console.log(`AllGames length: ${state.allGames.getLength()}`);
+        console.log(`AllOdds length: ${state.allOdds.getLength()}`);
+        
+        const currentExchangeGames = await this.pageParser.parse();
+        
+        console.log(`AllGames length: ${state.allGames.getLength()}`);
+        console.log(`AllOdds length: ${state.allOdds.getLength()}`);
     }
 
     public async close() {
@@ -176,7 +182,7 @@ export class Exchange {
     private setPageReader({
         pageReader,
     }: {
-        pageReader: state.ExchangePageReader,
+        pageReader: models.ExchangePageReader,
     }) {
         this.pageReader = pageReader;
     }
@@ -184,7 +190,7 @@ export class Exchange {
     private setPageParser({
         pageParser,
     }: {
-        pageParser: state.ExchangePageParser,
+        pageParser: models.ExchangePageParser,
     }) {
         this.pageParser = pageParser;
     }
@@ -192,7 +198,7 @@ export class Exchange {
     private setPageWriter({
         pageWriter,
     }: {
-        pageWriter: state.ExchangePageWriter,
+        pageWriter: models.ExchangePageWriter,
     }) {
         this.pageWriter = pageWriter;
     }
@@ -200,7 +206,7 @@ export class Exchange {
     public setGames({
         games,
     }: {
-        games: state.Game | Array<state.Game>,
+        games: models.Game | Array<models.Game>,
     }) {
         if (Array.isArray(games)) {
             for (let game of games) {
@@ -215,8 +221,8 @@ export class Exchange {
         odds,
     }: {
         odds: {
-            current: Array<state.Odds>,
-            lastSaved: Array<state.Odds>,
+            current: Array<models.Odds>,
+            lastSaved: Array<models.Odds>,
         },
     }) {
         this.odds = odds;
@@ -225,7 +231,7 @@ export class Exchange {
     public setCurrentOdds({
         currentOdds,
     }: {
-        currentOdds: Array<state.Odds>,
+        currentOdds: Array<models.Odds>,
     }) {
         this.odds.current = currentOdds;
     }
@@ -233,7 +239,7 @@ export class Exchange {
     private setLastSavedOdds({
         lastSavedOdds,
     }: {
-        lastSavedOdds: Array<state.Odds>,
+        lastSavedOdds: Array<models.Odds>,
     }) {
         this.odds.lastSaved = lastSavedOdds;
     }

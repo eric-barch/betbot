@@ -1,8 +1,8 @@
 import * as initData from '../../initData';
-import * as models from '../../models';
+import * as models from '..';
 
-export class AllTeams {
-    private teams: Array<models.Team>;
+export class TeamsGroup {
+    private teamsArray: Array<models.Team>;
 
     constructor({
         teams,
@@ -10,9 +10,9 @@ export class AllTeams {
         teams?: Array<models.Team>,
     } = {}) {
         if (teams) {
-            this.teams = teams;
+            this.teamsArray = teams;
         } else {
-            this.teams = initData.nbaTeams;
+            this.teamsArray = initData.nbaTeams;
         }
     }
 
@@ -21,14 +21,14 @@ export class AllTeams {
     }: {
         string: string,
     }) {
-        for (const team of this.teams) {
+        for (const team of this.teamsArray) {
             if (team.match({
                 string: string,
             })) {
                 return team;
             }
         }
-        return this.teams[0];
+        return this.teamsArray[0];
     }
 
     public setTeams({
@@ -36,7 +36,7 @@ export class AllTeams {
     }: {
         teams: Array<models.Team>,
     }) {
-        this.teams = teams;
+        this.teamsArray = teams;
     }
 
 }

@@ -7,34 +7,34 @@ export class Game {
     private awayTeam: models.Team;
     private homeTeam: models.Team;
     private startDate: Date;
-    private exchanges: Array<models.Exchange>;
-    private odds: Array<models.Odds>;
+    private exchangesGroup: models.ExchangesGroup;
+    private oddsGroup: models.OddsGroup;
 
     constructor({
         awayTeam,
         homeTeam,
         startDate,
-        exchanges,
+        exchanges: exchanges,
     }: {
         awayTeam: models.Team,
         homeTeam: models.Team,
         startDate: Date,
-        exchanges?: models.Exchange | Array<models.Exchange>,
+        exchanges?: models.Exchange | models.ExchangesGroup,
     }) {
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;   
         this.startDate = startDate;
 
-        this.exchanges = [];
+        this.exchangesGroup = new models.ExchangesGroup;
         if (exchanges) {
-            if (Array.isArray(exchanges)) {
+            if (exchanges instanceof models.ExchangesGroup) {
 
             } else {
-                this.exchanges.push(exchanges);
+                this.exchangesGroup.push({exchange: exchanges});
             }
         }
-
-        this.odds = [];
+        
+        this.oddsGroup = new models.OddsGroup();
     }
 
     public match({
@@ -80,57 +80,61 @@ export class Game {
     }
 
     public getExchanges() {
-        return this.exchanges;
+        return this.exchangesGroup;
     }
 
-    public getOdds({
-        exchanges,
-    }: {
-        exchanges?: models.Exchange | Array<models.Exchange>,
-    } = {}) {
-        let requestedOdds;
+    public getOddsGroup() {
+        return this.oddsGroup;
+    }
 
-        if (exchanges) {
-            if (exchanges instanceof models.Exchange) {
-                let exchangeOdds = this.odds.find(odds => odds.getExchange() === exchanges);
+    // public getOdds({
+    //     exchanges,
+    // }: {
+    //     exchanges?: models.Exchange | Array<models.Exchange>,
+    // } = {}) {
+    //     let requestedOdds;
+
+    //     if (exchanges) {
+    //         if (exchanges instanceof models.Exchange) {
+    //             let exchangeOdds = this.oddsGroup.find(odds => odds.getExchange() === exchanges);
                 
-                if (exchangeOdds === undefined) {
-                    exchangeOdds = new models.Odds({
-                        game: this,
-                        exchange: exchanges,
-                    });
-                    this.odds.push(exchangeOdds);
-                }
+    //             if (exchangeOdds === undefined) {
+    //                 exchangeOdds = new models.Odds({
+    //                     game: this,
+    //                     exchange: exchanges,
+    //                 });
+    //                 this.oddsGroup.push(exchangeOdds);
+    //             }
 
-                requestedOdds = exchangeOdds;
-            } else {
-                requestedOdds = new Array<models.Odds>;
+    //             requestedOdds = exchangeOdds;
+    //         } else {
+    //             requestedOdds = new Array<models.Odds>;
 
-                for (const exchange of exchanges) {
-                    let exchangeOdds = this.odds.find(odds => odds.getExchange() === exchange);
+    //             for (const exchange of exchanges) {
+    //                 let exchangeOdds = this.oddsGroup.find(odds => odds.getExchange() === exchange);
                     
-                    if (exchangeOdds === undefined) {
-                        exchangeOdds = new models.Odds({
-                            game: this,
-                            exchange: exchange,
-                        });
-                        this.odds.push(exchangeOdds);
-                    }
+    //                 if (exchangeOdds === undefined) {
+    //                     exchangeOdds = new models.Odds({
+    //                         game: this,
+    //                         exchange: exchange,
+    //                     });
+    //                     this.oddsGroup.push(exchangeOdds);
+    //                 }
                     
-                    requestedOdds.push(exchangeOdds);
-                }
-            }
-        } else {
-            requestedOdds = this.odds[0];
+    //                 requestedOdds.push(exchangeOdds);
+    //             }
+    //         }
+    //     } else {
+    //         requestedOdds = this.oddsGroup[0];
 
-            if (requestedOdds === undefined) {
-                this.odds.push(new models.Odds());
-                requestedOdds = this.odds[0];
-            }
-        }
+    //         if (requestedOdds === undefined) {
+    //             this.oddsGroup.push(new models.Odds());
+    //             requestedOdds = this.oddsGroup[0];
+    //         }
+    //     }
 
-        return requestedOdds;
-    }
+    //     return requestedOdds;
+    // }
 
     public setBaseHandle({
         baseHandle,

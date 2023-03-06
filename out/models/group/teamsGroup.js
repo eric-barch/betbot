@@ -23,10 +23,30 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allTeams = exports.allOdds = exports.allGames = exports.allExchanges = void 0;
-const models = __importStar(require("../models"));
-exports.allExchanges = new models.ExchangesGroup();
-exports.allGames = new models.GamesGroup();
-exports.allOdds = new models.OddsGroup();
-exports.allTeams = new models.TeamsGroup();
-//# sourceMappingURL=globalStateObjects.js.map
+exports.TeamsGroup = void 0;
+const initData = __importStar(require("../../initData"));
+class TeamsGroup {
+    constructor({ teams, } = {}) {
+        if (teams) {
+            this.teamsArray = teams;
+        }
+        else {
+            this.teamsArray = initData.nbaTeams;
+        }
+    }
+    getTeam({ string, }) {
+        for (const team of this.teamsArray) {
+            if (team.match({
+                string: string,
+            })) {
+                return team;
+            }
+        }
+        return this.teamsArray[0];
+    }
+    setTeams({ teams, }) {
+        this.teamsArray = teams;
+    }
+}
+exports.TeamsGroup = TeamsGroup;
+//# sourceMappingURL=teamsGroup.js.map

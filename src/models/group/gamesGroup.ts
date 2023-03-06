@@ -1,8 +1,8 @@
 import * as models from '..';
 import * as state from '../../state';
 
-export class AllGames {
-    private games: Array<models.Game>;
+export class GamesGroup {
+    private gamesArray: Array<models.Game>;
 
     constructor({
         games,
@@ -10,9 +10,9 @@ export class AllGames {
         games?: Array<models.Game>,
     } = {}) {
         if (games) {
-            this.games = games;
+            this.gamesArray = games;
         } else {
-            this.games = [];
+            this.gamesArray = [];
         }
     }
 
@@ -27,7 +27,7 @@ export class AllGames {
     }) {
         let requestedGame = undefined;
         
-        for (const game of this.games) {
+        for (const game of this.gamesArray) {
             if (game.match({
                 awayTeam: awayTeam,
                 homeTeam: homeTeam,
@@ -44,14 +44,18 @@ export class AllGames {
                 homeTeam: homeTeam,
                 startDate: startDate,
             });
-            this.games.push(requestedGame);
+            this.gamesArray.push(requestedGame);
         }
 
         return requestedGame;
     }
 
     public getAllGames() {
-        return this.games;
+        return this.gamesArray;
+    }
+
+    public getLength() {
+        return this.gamesArray.length;
     }
 
     // public push({

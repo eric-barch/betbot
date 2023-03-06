@@ -18,6 +18,7 @@ export class ExchangePageParser extends AbstractUtility {
     }
 
     async parse() {
-        await this.parseFunction();
+        const currentExchangeGames = await this.parseFunction();
+        return currentExchangeGames;
     }
 }

@@ -24,9 +24,9 @@ const underPriceXPath = './div[1]/div/div[2]/div[3]/span[2]';
 export async function parseFanDuel(this: models.ExchangePageParser) {
     const page = this.getPage()!;
 
-    const gamesFromJson = await getGamesFromJson(page); // Returns an array of Game objects based on the JSON from the website.
+    const gamesFromJson = await getGamesFromJson(page); // Returns an array of Game objects based on the JSON from the website. Those Game objects correspond back to the games in AllGames.
     const gamesFromJsonWithBaseHandles = await addBaseHandles(gamesFromJson, page); // Returns an array of ElementHandle objects for the Away Team element of every game in the visible HTML document.
-    const gamesFromDocument = await getGamesFromDocument(gamesFromJsonWithBaseHandles); // Returns an array of Game objects based on visible HTML document.
+    const gamesFromDocument = await getGamesFromDocument(this, gamesFromJsonWithBaseHandles); // Returns an array of Game objects based on visible HTML document.
 
     return gamesFromDocument;
 }
@@ -53,7 +53,7 @@ async function getGamesFromJson(page: puppeteer.Page) {
             startDate: startDate,
         })
 
-        currentExchangeGames.push(currentExchangeGame);
+        currentExchangeGames.push(currentExchangeGame); 
     }
 
     return currentExchangeGames;
@@ -125,7 +125,7 @@ async function addBaseHandles(gamesFromJson: Array<models.Game>, page: puppeteer
     return gamesFromJson;
 }
 
-async function getGamesFromDocument(gamesFromJsonWithBaseHandles: Array<models.Game>) {
+async function getGamesFromDocument(exchangePageParser: models.ExchangePageParser, gamesFromJsonWithBaseHandles: Array<models.Game>) {
     let gamesFromDocument: Array<models.Game> = [];
 
     for (const gameFromJson of gamesFromJsonWithBaseHandles) {
@@ -135,57 +135,56 @@ async function getGamesFromDocument(gamesFromJsonWithBaseHandles: Array<models.G
             //     return node.getAttribute('class');
             // });
 
-            const awaySpreadHandle = (await baseHandle.$$('xpath/' + awaySpreadXPath))[0];
-            const awaySpreadTextContent = await awaySpreadHandle.getProperty('textContent').then(property => property.jsonValue());
-
-            const awaySpreadPriceHandle = (await baseHandle.$$('xpath/' + awaySpreadPriceXPath))[0];
-            const awaySpreadPriceTextContent = await awaySpreadPriceHandle.getProperty('textContent').then(property => property.jsonValue());
-
-            const homeSpreadHandle = (await baseHandle.$$('xpath/' + homeSpreadXPath))[0];
-            const homeSpreadTextContent = await homeSpreadHandle.getProperty('textContent').then(property => property.jsonValue());
-
-            const homeSpreadPriceHandle = (await baseHandle.$$('xpath/' + homeSpreadPriceXPath))[0];
-            const homeSpreadPriceTextContent = await homeSpreadPriceHandle.getProperty('textContent').then(property => property.jsonValue());
-
-            const awayMoneyPriceHandle = (await baseHandle.$$('xpath/' + awayMoneyPriceXPath))[0];
-            const awayMoneyPriceTextContent = await awayMoneyPriceHandle.getProperty('textContent').then(property => property.jsonValue());
-
-            const homeMoneyPriceHandle = (await baseHandle.$$('xpath/' + homeMoneyPriceXPath))[0];
-            const homeMoneyPriceTextContent = await homeMoneyPriceHandle.getProperty('textContent').then(property => property.jsonValue());
-
-            const overUnderHandle = (await baseHandle.$$('xpath/' + overUnderXPath))[0];
-            const overUnderTextContent = await overUnderHandle.getProperty('textContent').then(property => property.jsonValue());
-
-            const overPriceHandle = (await baseHandle.$$('xpath/' + overPriceXPath))[0];
-            const overPriceTextContent = await overPriceHandle.getProperty('textContent').then(property => property.jsonValue());
+            const awaySpreadContent = await getOddsElementContent(baseHandle, awaySpreadXPath);
+            const awaySpreadPriceContent = await getOddsElementContent(baseHandle, awaySpreadPriceXPath);
+            const homeSpreadContent = await getOddsElementContent(baseHandle, homeSpreadXPath);
+            const homeSpreadPriceContent = await getOddsElementContent(baseHandle, homeSpreadPriceXPath);
             
-            const underPriceHandle = (await baseHandle.$$('xpath/' + underPriceXPath))[0];
-            const underPriceTextContent = await underPriceHandle.getProperty('textContent').then(property => property.jsonValue());
+            const awayMoneyPriceContent = await getOddsElementContent(baseHandle, awayMoneyPriceXPath);
+            const homeMoneyPriceContent = await getOddsElementContent(baseHandle, homeMoneyPriceXPath);
 
-            const odds = gameFromJson.getOdds();
-            if (odds instanceof models.Odds) {
-                const spreadOdds = odds.getSpreadOdds();
-                const moneyOdds = odds.getMoneyOdds();
-                const overUnderOdds = odds.getOverUnderOdds();
+            const overUnderContent = await getOddsElementContent(baseHandle, overUnderXPath);
+            const overPriceContent = await getOddsElementContent(baseHandle, overPriceXPath);
+            const underPriceContent = await getOddsElementContent(baseHandle, underPriceXPath);
 
-                spreadOdds.setAwaySpread({awaySpread: awaySpreadTextContent!});
-                spreadOdds.setAwayPrice({awayPrice: awaySpreadPriceTextContent!});
-                spreadOdds.setHomeSpread({homeSpread: homeSpreadTextContent!});
-                spreadOdds.setHomePrice({homePrice: homeSpreadPriceTextContent!});
+            const gameOddsGroup = gameFromJson.getOddsGroup();
+            const exchangeGameOdds = gameOddsGroup.getExchangeGameOdds({
+                exchange: exchangePageParser.getExchange(),
+                game: gameFromJson,
+            });
 
-                moneyOdds.setAwayPrice({awayPrice: awayMoneyPriceTextContent!});
-                moneyOdds.setHomePrice({homePrice: homeMoneyPriceTextContent!});
+            const spreadOdds = exchangeGameOdds.getSpreadOdds();
+            const moneyOdds = exchangeGameOdds.getMoneyOdds();
+            const overUnderOdds = exchangeGameOdds.getOverUnderOdds();
 
-                overUnderOdds.setOverUnder({overUnder: overUnderTextContent!.substring(2)});
-                overUnderOdds.setOverPrice({overPrice: overPriceTextContent!});
-                overUnderOdds.setUnderPrice({underPrice: underPriceTextContent!});
-            } else {
-                throw new Error('Expected single instance of Odds.');
-            }
+            spreadOdds.setAwaySpread({awaySpread: awaySpreadContent!});
+            spreadOdds.setAwayPrice({awayPrice: awaySpreadPriceContent!});
+            spreadOdds.setHomeSpread({homeSpread: homeSpreadContent!});
+            spreadOdds.setHomePrice({homePrice: homeSpreadPriceContent!});
+
+            moneyOdds.setAwayPrice({awayPrice: awayMoneyPriceContent!});
+            moneyOdds.setHomePrice({homePrice: homeMoneyPriceContent!});
+
+            overUnderOdds.setOverUnder({overUnder: overUnderContent!.substring(2)});
+            overUnderOdds.setOverPrice({overPrice: overPriceContent!});
+            overUnderOdds.setUnderPrice({underPrice: underPriceContent!});
 
             gamesFromDocument.push(gameFromJson);
         }
     }
 
     return gamesFromDocument;
+}
+
+async function getOddsElementContent(gameBaseHandle: puppeteer.ElementHandle, xPath: string) {
+    const oddsElementHandle = (await gameBaseHandle.$$('xpath/' + xPath))[0];
+    let oddsElementContent;
+
+    try {
+        oddsElementContent = await oddsElementHandle.getProperty('textContent').then(property => property.jsonValue());
+    } catch {
+        oddsElementContent = '0';
+    }
+
+    return oddsElementContent;
 }

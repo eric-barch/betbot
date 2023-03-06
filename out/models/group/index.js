@@ -17,8 +17,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./allExchanges"), exports);
-__exportStar(require("./allGames"), exports);
-__exportStar(require("./allOdds"), exports);
-__exportStar(require("./allTeams"), exports);
+__exportStar(require("./exchangesGroup"), exports);
+__exportStar(require("./gamesGroup"), exports);
+__exportStar(require("./oddsGroup"), exports);
+__exportStar(require("./teamsGroup"), exports);
 //# sourceMappingURL=index.js.map

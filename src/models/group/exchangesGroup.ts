@@ -2,8 +2,8 @@ import * as config from '../../config';
 import * as models from '..';
 import * as initData from '../../initData';
 
-export class AllExchanges {
-    private exchanges: Array<models.Exchange>;
+export class ExchangesGroup {
+    private exchangesArray: Array<models.Exchange>;
 
     constructor({
         exchanges,
@@ -11,26 +11,26 @@ export class AllExchanges {
         exchanges?: Array<models.Exchange>,
     } = {}) {
         if (exchanges) {
-            this.exchanges = exchanges;
+            this.exchangesArray = exchanges;
         } else {
-            this.exchanges = [];
+            this.exchangesArray = [];
         }
     }
 
     public async analyze() {
-        for (const exchange of this.exchanges) {
+        for (const exchange of this.exchangesArray) {
             await exchange.analyze();
         }
     }
 
     public async close() {
-        for (const exchange of this.exchanges) {
+        for (const exchange of this.exchangesArray) {
             await exchange.close();
         }
     }
     
     public async connect() {
-        for (const exchange of this.exchanges) {
+        for (const exchange of this.exchangesArray) {
             await exchange.connect();
         }
     }
@@ -45,11 +45,19 @@ export class AllExchanges {
 
             await newExchange.initialize();
     
-            this.exchanges.push(newExchange);
+            this.exchangesArray.push(newExchange);
         }
     }
 
     public getExchanges() {
-        return this.exchanges;
+        return this.exchangesArray;
+    }
+
+    public push({
+        exchange,
+    }: {
+        exchange: models.Exchange,
+    }) {
+        this.exchangesArray.push(exchange);
     }
 }

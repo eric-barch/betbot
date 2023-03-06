@@ -59,6 +59,9 @@ class AllGames {
     getAllGames() {
         return this.games;
     }
+    getLength() {
+        return this.games.length;
+    }
 }
 exports.AllGames = AllGames;
 //# sourceMappingURL=allGames.js.map

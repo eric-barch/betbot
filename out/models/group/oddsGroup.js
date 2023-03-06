@@ -23,43 +23,42 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Odds = void 0;
-const models = __importStar(require("../../../models"));
-class Odds {
-    constructor({ game, exchange, } = {}) {
-        if (game) {
-            this.game = game;
+exports.OddsGroup = void 0;
+const models = __importStar(require("../../models"));
+const state = __importStar(require("../../state"));
+class OddsGroup {
+    constructor({ odds, } = {}) {
+        if (odds) {
+            this.oddsArray = odds;
         }
         else {
-            this.game = undefined;
+            this.oddsArray = [];
         }
-        if (exchange) {
-            this.exchange = exchange;
+    }
+    getExchangeGameOdds({ exchange, game, }) {
+        let exchangeGameOdds;
+        const oddsFromGroup = this.oddsArray.find(oddsGroup => oddsGroup.getExchange() === exchange &&
+            oddsGroup.getGame() === game);
+        if (oddsFromGroup instanceof models.Odds) {
+            exchangeGameOdds = oddsFromGroup;
         }
         else {
-            this.exchange = undefined;
+            const newOdds = new models.Odds({
+                exchange: exchange,
+                game: game,
+            });
+            this.push({ odds: newOdds });
+            state.allOdds.push({ odds: newOdds });
+            exchangeGameOdds = newOdds;
         }
-        this.spreadOdds = new models.SpreadOdds();
-        this.moneyOdds = new models.MoneyOdds();
-        this.overUnderOdds = new models.OverUnderOdds();
+        return exchangeGameOdds;
     }
-    getGame() {
-        return this.game;
+    getLength() {
+        return this.oddsArray.length;
     }
-    getExchange() {
-        return this.exchange;
-    }
-    getSpreadOdds() {
-        return this.spreadOdds;
-    }
-    getMoneyOdds() {
-        return this.moneyOdds;
-    }
-    getOverUnderOdds() {
-        return this.overUnderOdds;
-    }
-    setGame({ game, }) {
+    push({ odds, }) {
+        this.oddsArray.push(odds);
     }
 }
-exports.Odds = Odds;
-//# sourceMappingURL=odds.js.map
+exports.OddsGroup = OddsGroup;
+//# sourceMappingURL=oddsGroup.js.map

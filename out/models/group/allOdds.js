@@ -10,6 +10,12 @@ class AllOdds {
             this.odds = [];
         }
     }
+    push({ odds, }) {
+        this.odds.push(odds);
+    }
+    getLength() {
+        return this.odds.length;
+    }
 }
 exports.AllOdds = AllOdds;
 //# sourceMappingURL=allOdds.js.map

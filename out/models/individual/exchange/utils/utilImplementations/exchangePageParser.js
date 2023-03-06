@@ -18,7 +18,8 @@ class ExchangePageParser extends abstractUtil_1.AbstractUtility {
     }
     parse() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.parseFunction();
+            const currentExchangeGames = yield this.parseFunction();
+            return currentExchangeGames;
         });
     }
 }
