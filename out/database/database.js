@@ -32,46 +32,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initialize = exports.close = exports.instance = void 0;
-const sequelize = __importStar(require("sequelize"));
-const database = __importStar(require("../database"));
-exports.instance = new sequelize.Sequelize('nba', 'root', 'f9R#@hY82l', {
-    host: 'localhost',
-    port: 3306,
-    dialect: 'mysql',
-    logging: false,
-});
-function close() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield exports.instance.close();
-    });
-}
-exports.close = close;
+exports.initialize = void 0;
+const databaseModels = __importStar(require("./models"));
 function initialize() {
     return __awaiter(this, void 0, void 0, function* () {
-        makeSqlAssociations();
-        try {
-            yield exports.instance.authenticate();
-        }
-        catch (error) {
-            console.log(`MySQL connection unsuccessful: ${error}`);
-        }
-        yield exports.instance.sync({
-            alter: true,
-            logging: false,
-        });
+        databaseModels.ExchangeSequelizeModel.belongsToMany(databaseModels.GameSequelizeModel, { through: 'ExchangeGames' });
+        databaseModels.GameSequelizeModel.belongsToMany(databaseModels.ExchangeSequelizeModel, { through: 'ExchangeGames' });
+        databaseModels.GameSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, { foreignKey: 'gameId' });
+        databaseModels.OddsSequelizeModel.belongsTo(databaseModels.GameSequelizeModel, { foreignKey: 'gameId' });
+        databaseModels.ExchangeSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, { foreignKey: 'exchangeId' });
+        databaseModels.OddsSequelizeModel.belongsTo(databaseModels.ExchangeSequelizeModel, { foreignKey: 'exchangeId' });
+        databaseModels.OddsSequelizeModel.hasMany(databaseModels.OddsOldSequelizeModel, { foreignKey: 'oddsId' });
+        databaseModels.OddsOldSequelizeModel.belongsTo(databaseModels.OddsSequelizeModel, { foreignKey: 'oddsId' });
+        // await instance.sync({
+        //     alter: true,
+        //     logging: false,
+        // });
     });
 }
 exports.initialize = initialize;
-function makeSqlAssociations() {
-    database.SqlExchange.belongsToMany(database.SqlGame, { through: 'SqlExchangeGames' });
-    database.SqlGame.belongsToMany(database.SqlExchange, { through: 'SqlExchangeGames' });
-    database.SqlGame.hasMany(database.SqlOdds, { foreignKey: 'gameId' });
-    database.SqlOdds.belongsTo(database.SqlGame, { foreignKey: 'gameId' });
-    database.SqlExchange.hasMany(database.SqlOdds, { foreignKey: 'exchangeId' });
-    database.SqlOdds.belongsTo(database.SqlExchange, { foreignKey: 'exchangeId' });
-    database.SqlOdds.hasMany(database.SqlOddsHistory, { foreignKey: 'oddsId' });
-    database.SqlOddsHistory.belongsTo(database.SqlOdds, { foreignKey: 'oddsId' });
-}
-;
 //# sourceMappingURL=database.js.map

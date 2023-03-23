@@ -20,7 +20,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./main"), exports);
 __exportStar(require("./config/index"), exports);
 __exportStar(require("./database/index"), exports);
-__exportStar(require("./initData/index"), exports);
 __exportStar(require("./models/index"), exports);
-__exportStar(require("./state/index"), exports);
 //# sourceMappingURL=index.js.map

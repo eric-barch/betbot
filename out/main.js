@@ -33,18 +33,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database = __importStar(require("./database"));
-const state = __importStar(require("./state"));
+const models = __importStar(require("./models"));
+const allExchanges = models.allExchanges;
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield database.initialize();
-    const allExchanges = state.allExchanges;
     yield allExchanges.initialize();
     for (let i = 0; i < 1; i++) {
         allExchanges.analyze();
     }
-    // await database.close();
-    // await allExchanges.close();
+    yield database.close();
+    yield allExchanges.close();
 }))();
 /** TODO: If possible, remove all '!'s and '?'s re: typing.
  * Probably should remove page parser altogether. Parsing should occur right on the main exchange page.
+ * Make sure that any time a startDate is being set, it is set to the closest 15 minute increment.
  */ 
 //# sourceMappingURL=main.js.map
