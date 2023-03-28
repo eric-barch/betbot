@@ -38,9 +38,9 @@ const allExchanges = models.allExchanges;
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield database.initialize();
     yield allExchanges.initialize();
-    for (let i = 0; i < 1; i++) {
-        allExchanges.analyze();
-    }
+    // for (let i = 0; i < 1; i++) {
+    //     allExchanges.analyze();
+    // }
     yield database.close();
     yield allExchanges.close();
 }))();

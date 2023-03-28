@@ -48,14 +48,15 @@ export class Exchange {
     }
 
     public async connectToExistingPage() {
-        this.browser = await puppeteer.connect({ browserURL: 'https://localhost:9222' });
+        this.browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222' });
 
         const targets = await this.browser.targets();
         if (!(targets instanceof Array<puppeteer.Target>)) {
             throw new Error('Expected Array<puppeteer.Target>.');
         }
 
-        const target = targets.find(target => target.url() === this.getUrl());
+        const url = this.getUrl();
+        const target = targets.find(target => target.url() === url);
         if (!(target instanceof puppeteer.Target)) {
             throw new Error('Expected Target.');
         }

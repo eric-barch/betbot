@@ -1,7 +1,7 @@
 # betbot
 
 Launch Chrome with: 
-Google\ Chrome --remote-debugging-port=9222
+Google\ Chrome --remote-debugging-port=9222 --no-first-run --no-default-browser-check
 
 Use this Terminal command to find MySQL config files:
 sudo find / -name my.cnf -print 2>/dev/null

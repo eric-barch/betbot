@@ -7,9 +7,9 @@ const allExchanges = models.allExchanges;
     await database.initialize();
     await allExchanges.initialize();
 
-    for (let i = 0; i < 1; i++) {
-        allExchanges.analyze();
-    }
+    // for (let i = 0; i < 1; i++) {
+    //     allExchanges.analyze();
+    // }
 
     await database.close();
     await allExchanges.close();

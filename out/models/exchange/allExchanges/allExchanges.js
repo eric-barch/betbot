@@ -28,16 +28,20 @@ const exchange_1 = require("../exchange");
 const exchangeSet_1 = require("../exchangeSet");
 const parseFunctions = __importStar(require("./parseFunctions"));
 exports.allExchanges = new exchangeSet_1.ExchangeSet();
-exports.allExchanges.add(new exchange_1.Exchange({
-    name: 'Caesar\'s',
-    url: 'https://www.williamhill.com/us/ny/bet/basketball',
-    parseFunction: parseFunctions.parseCaesars,
-}));
-exports.allExchanges.add(new exchange_1.Exchange({
-    name: 'DraftKings',
-    url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
-    parseFunction: parseFunctions.parseDraftKings,
-}));
+// allExchanges.add(
+//     new Exchange({
+//         name: 'Caesar\'s',
+//         url: 'https://www.williamhill.com/us/ny/bet/basketball',
+//         parseFunction: parseFunctions.parseCaesars,
+//     })
+// );
+// allExchanges.add(
+//     new Exchange({
+//         name: 'DraftKings',
+//         url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
+//         parseFunction: parseFunctions.parseDraftKings,
+//     })
+// );
 exports.allExchanges.add(new exchange_1.Exchange({
     name: 'FanDuel',
     url: 'https://sportsbook.fanduel.com/navigation/nba',

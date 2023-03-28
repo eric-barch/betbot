@@ -66,12 +66,13 @@ class Exchange {
     }
     connectToExistingPage() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.browser = yield puppeteer.connect({ browserURL: 'https://localhost:9222' });
+            this.browser = yield puppeteer.connect({ browserURL: 'http://127.0.0.1:9222' });
             const targets = yield this.browser.targets();
             if (!(targets instanceof (Array))) {
                 throw new Error('Expected Array<puppeteer.Target>.');
             }
-            const target = targets.find(target => target.url() === this.getUrl());
+            const url = this.getUrl();
+            const target = targets.find(target => target.url() === url);
             if (!(target instanceof puppeteer.Target)) {
                 throw new Error('Expected Target.');
             }
