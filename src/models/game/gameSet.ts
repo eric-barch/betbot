@@ -18,14 +18,14 @@ export class GameSet extends Set<models.Game> {
         awayTeam,
         homeTeam,
         startDate,
+        exchange,
     }: {
         awayTeam: models.Team,
         homeTeam: models.Team,
         startDate: Date,
+        exchange?: models.Exchange,
     }) {
         let requestedGame = undefined;
-
-        startDate = models.Game.roundToNearestInterval(startDate);
         
         for (const game of this) {
             if (game.matchesByTeamsAndStartDate({
@@ -44,8 +44,14 @@ export class GameSet extends Set<models.Game> {
                 homeTeam: homeTeam,
                 startDate: startDate,
             });
-
+            
+            // requestedGame.initialize();
             this.add(requestedGame);
+        }
+
+        if (exchange) {
+            requestedGame.getExchangesGroup().add(exchange);
+            exchange.getGamesGroup().add(requestedGame);
         }
 
         return requestedGame;

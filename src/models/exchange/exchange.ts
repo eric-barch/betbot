@@ -40,7 +40,7 @@ export class Exchange {
     }
 
     public async analyze() {
-        const currentOdds = await this.getCurrentOdds();
+        const currentOdds = await this.parseFunction();
         // Some method that compares the current odds with the odds saved in MySQL and updates them if necessary.
     }
 
@@ -88,11 +88,6 @@ export class Exchange {
         return global.allExchanges;
     }
 
-    public async getCurrentOdds() {
-        const currentOdds = await this.parseFunction();
-        return currentOdds;
-    }
-    
     public getGamesGroup() {
         return this.gamesGroup;
     }
@@ -116,7 +111,11 @@ export class Exchange {
     }
 
     public getPage() {
-        return this.page;
+        if (this.page) {
+            return this.page;
+        } else {
+            throw new Error(`${this.getName()} page is null.`);
+        }
     }
 
     public getSequelizeInstance() {

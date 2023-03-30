@@ -1,5 +1,4 @@
 import * as databaseModels from '../../database/models';
-import * as global from '../../global';
 import * as models from '../../models';
 
 export class Game {
@@ -21,7 +20,7 @@ export class Game {
     }) {
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;   
-        this.startDate = startDate;
+        this.startDate = Game.roundToNearestInterval(startDate);
 
         this.exchangesGroup = new models.ExchangeSet;
         this.oddsGroup = new models.OddsSet();
@@ -55,7 +54,8 @@ export class Game {
                 game: this,
             })
 
-            global.allOdds.add(requestedOdds);
+            exchange.getOddsGroup().add(requestedOdds);
+            this.getOddsGroup().add(requestedOdds);
         }
 
         return requestedOdds;
@@ -72,7 +72,11 @@ export class Game {
     }) {
         startDate = Game.roundToNearestInterval(startDate);
 
-        if (this.awayTeam === awayTeam && this.homeTeam === homeTeam && this.startDate === startDate) {
+        const awayTeamSame = (this.awayTeam === awayTeam);
+        const homeTeamSame = (this.homeTeam === homeTeam);
+        const startDateSame = (this.startDate.getTime() === startDate.getTime());
+
+        if (awayTeamSame && homeTeamSame && startDateSame) {
             return true;
         }
 

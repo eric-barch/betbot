@@ -36,13 +36,13 @@ export class Team {
     }
 
     public matchesByNameString({
-        string,
+        nameString,
     }: {
-        string: string,
+        nameString: string,
     }) {
         if (
-            string === this.getRegionFullIdentifierFull() ||
-            string === this.getRegionAbbrIdentifierFull()
+            nameString === this.getRegionFullIdentifierFull() ||
+            nameString === this.getRegionAbbrIdentifierFull()
         ) {
             return true;
         } else {

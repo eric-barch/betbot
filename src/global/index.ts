@@ -3,13 +3,6 @@
  */
 
 export * from './exchanges/index';
-console.log('1');
-
 export * from './games/index';
-console.log('2');
-
 export * from './odds/index';
-console.log('3');
-
 export * from './teams/index';
-console.log('4');

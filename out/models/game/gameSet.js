@@ -38,9 +38,8 @@ class GameSet extends Set {
         }
         return super.add(game);
     }
-    getGameByTeamsAndStartDate({ awayTeam, homeTeam, startDate, }) {
+    getGameByTeamsAndStartDate({ awayTeam, homeTeam, startDate, exchange, }) {
         let requestedGame = undefined;
-        startDate = models.Game.roundToNearestInterval(startDate);
         for (const game of this) {
             if (game.matchesByTeamsAndStartDate({
                 awayTeam: awayTeam,
@@ -57,7 +56,12 @@ class GameSet extends Set {
                 homeTeam: homeTeam,
                 startDate: startDate,
             });
+            // requestedGame.initialize();
             this.add(requestedGame);
+        }
+        if (exchange) {
+            requestedGame.getExchangesGroup().add(exchange);
+            exchange.getGamesGroup().add(requestedGame);
         }
         return requestedGame;
     }

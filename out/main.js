@@ -50,4 +50,5 @@ function main() {
     });
 }
 main();
+// TODO: Global add logic is not working for sets. It adds every iteration, regardless of whether the game is already in the set. Fix for at least Games and Odds. Probably others too.
 //# sourceMappingURL=main.js.map

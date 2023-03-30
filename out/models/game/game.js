@@ -34,13 +34,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
 const databaseModels = __importStar(require("../../database/models"));
-const global = __importStar(require("../../global"));
 const models = __importStar(require("../../models"));
 class Game {
     constructor({ awayTeam, homeTeam, startDate, }) {
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
-        this.startDate = startDate;
+        this.startDate = Game.roundToNearestInterval(startDate);
         this.exchangesGroup = new models.ExchangeSet;
         this.oddsGroup = new models.OddsSet();
         this.sequelizeInstance = null;
@@ -65,13 +64,17 @@ class Game {
                 exchange: exchange,
                 game: this,
             });
-            global.allOdds.add(requestedOdds);
+            exchange.getOddsGroup().add(requestedOdds);
+            this.getOddsGroup().add(requestedOdds);
         }
         return requestedOdds;
     }
     matchesByTeamsAndStartDate({ awayTeam, homeTeam, startDate, }) {
         startDate = Game.roundToNearestInterval(startDate);
-        if (this.awayTeam === awayTeam && this.homeTeam === homeTeam && this.startDate === startDate) {
+        const awayTeamSame = (this.awayTeam === awayTeam);
+        const homeTeamSame = (this.homeTeam === homeTeam);
+        const startDateSame = (this.startDate.getTime() === startDate.getTime());
+        if (awayTeamSame && homeTeamSame && startDateSame) {
             return true;
         }
         return false;

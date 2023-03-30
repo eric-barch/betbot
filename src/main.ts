@@ -1,6 +1,5 @@
 import * as database from './database';
 import * as global from './global';
-import * as models from './models';
 
 async function main() {
     const allExchanges = global.allExchanges;
@@ -21,3 +20,5 @@ async function main() {
 }
 
 main();
+
+// TODO: Global add logic is not working for sets. It adds every iteration, regardless of whether the game is already in the set. Fix for at least Games and Odds. Probably others too.

@@ -49,9 +49,9 @@ class Team {
             yield this.sequelizeInstance.initialize();
         });
     }
-    matchesByNameString({ string, }) {
-        if (string === this.getRegionFullIdentifierFull() ||
-            string === this.getRegionAbbrIdentifierFull()) {
+    matchesByNameString({ nameString, }) {
+        if (nameString === this.getRegionFullIdentifierFull() ||
+            nameString === this.getRegionAbbrIdentifierFull()) {
             return true;
         }
         else {

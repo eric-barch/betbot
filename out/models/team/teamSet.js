@@ -53,13 +53,13 @@ class TeamSet extends Set {
         }
         return super.add(team);
     }
-    getTeamByName({ string, }) {
+    getTeamByNameString({ nameString, }) {
         for (const team of this) {
-            if (team.matchesByNameString({ string: string, })) {
+            if (team.matchesByNameString({ nameString: nameString, })) {
                 return team;
             }
         }
-        throw new Error(`${this.constructor.name}.${this.getTeamByName.name} failed. Did not find team matching name string.`);
+        throw new Error(`${this.constructor.name}.${this.getTeamByNameString.name} failed. Did not find team matching name string.`);
     }
 }
 exports.TeamSet = TeamSet;

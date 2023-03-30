@@ -57,7 +57,7 @@ class Exchange {
     }
     analyze() {
         return __awaiter(this, void 0, void 0, function* () {
-            const currentOdds = yield this.getCurrentOdds();
+            const currentOdds = yield this.parseFunction();
             // Some method that compares the current odds with the odds saved in MySQL and updates them if necessary.
         });
     }
@@ -101,12 +101,6 @@ class Exchange {
     getAll() {
         return global.allExchanges;
     }
-    getCurrentOdds() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const currentOdds = yield this.parseFunction();
-            return currentOdds;
-        });
-    }
     getGamesGroup() {
         return this.gamesGroup;
     }
@@ -125,7 +119,12 @@ class Exchange {
         return this.oddsGroup;
     }
     getPage() {
-        return this.page;
+        if (this.page) {
+            return this.page;
+        }
+        else {
+            throw new Error(`${this.getName()} page is null.`);
+        }
     }
     getSequelizeInstance() {
         return this.sequelizeInstance;

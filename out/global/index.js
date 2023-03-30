@@ -18,11 +18,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./exchanges/index"), exports);
-console.log('1');
 __exportStar(require("./games/index"), exports);
-console.log('2');
 __exportStar(require("./odds/index"), exports);
-console.log('3');
 __exportStar(require("./teams/index"), exports);
-console.log('4');
 //# sourceMappingURL=index.js.map
