@@ -1,5 +1,6 @@
 import * as puppeteer from 'puppeteer';
 
+import * as databaseModels from '../../database/models';
 import * as models from '../../models';
 
 export class Odds {
@@ -9,7 +10,7 @@ export class Odds {
     private spreadOdds: SpreadOdds;
     private moneyOdds: MoneyOdds;
     private overUnderOdds: OverUnderOdds;
-    private sequelizeInstance: models.OddsSequelizeInstance | null;
+    private sequelizeInstance: databaseModels.OddsSequelizeInstance | null;
     private updatedAt: Date | null;
 
     constructor({
@@ -43,7 +44,7 @@ export class Odds {
     }
 
     public async initialize() {
-        this.sequelizeInstance = new models.OddsSequelizeInstance({odds: this});
+        this.sequelizeInstance = new databaseModels.OddsSequelizeInstance({odds: this});
         await this.sequelizeInstance.initialize();
     }
 

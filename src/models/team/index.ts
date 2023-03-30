@@ -3,6 +3,4 @@
  */
 
 export * from './team';
-export * from './teamSequelize';
 export * from './teamSet';
-export * from './allTeams/index';

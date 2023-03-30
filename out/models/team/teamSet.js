@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TeamSet = void 0;
-const models = __importStar(require("../../models"));
+const global = __importStar(require("../../global"));
 class TeamSet extends Set {
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -43,8 +43,13 @@ class TeamSet extends Set {
         });
     }
     add(team) {
-        if (this !== models.allTeams) {
-            models.allTeams.add(team);
+        if (global.allTeams !== undefined) {
+            if (this === global.allTeams) {
+                // Some code to add to or update MySQL.
+            }
+            else {
+                global.allTeams.add(team);
+            }
         }
         return super.add(team);
     }

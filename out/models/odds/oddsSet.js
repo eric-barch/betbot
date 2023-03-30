@@ -24,11 +24,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OddsSet = void 0;
+const global = __importStar(require("../../global"));
 const models = __importStar(require("../../models"));
 class OddsSet extends Set {
     add(odds) {
-        if (this !== models.allOdds) {
-            models.allOdds.add(odds);
+        if (global.allOdds !== undefined) {
+            if (this === global.allOdds) {
+                // Some code to add to or update MySQL.
+            }
+            else {
+                global.allOdds.add(odds);
+            }
         }
         return super.add(odds);
     }

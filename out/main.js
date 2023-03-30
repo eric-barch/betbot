@@ -33,11 +33,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database = __importStar(require("./database"));
-const models = __importStar(require("./models"));
+const global = __importStar(require("./global"));
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const allExchanges = models.allExchanges;
-        const allTeams = models.allTeams;
+        const allExchanges = global.allExchanges;
+        const allTeams = global.allTeams;
         yield database.initialize();
         yield allExchanges.initialize();
         yield allTeams.initialize();

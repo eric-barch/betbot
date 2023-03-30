@@ -1,3 +1,4 @@
+import * as databaseModels from '../../database/models';
 import * as models from '../../models';
 
 export class Team {
@@ -6,7 +7,7 @@ export class Team {
     private identifierFull: string;
     private identifierAbbr: string;
     private altNames: Set<string>;
-    private sequelizeInstance: models.TeamSequelizeInstance | null;
+    private sequelizeInstance: databaseModels.TeamSequelizeInstance | null;
 
     constructor({
         regionFull,
@@ -30,7 +31,7 @@ export class Team {
     }
 
     public async initialize() {
-        this.sequelizeInstance = new models.TeamSequelizeInstance({team: this});
+        this.sequelizeInstance = new databaseModels.TeamSequelizeInstance({team: this});
         await this.sequelizeInstance.initialize();
     }
 

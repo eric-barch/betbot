@@ -1,5 +1,7 @@
 import * as puppeteer from 'puppeteer';
 
+import * as databaseModels from '../../database/models';
+import * as global from '../../global';
 import * as models from '..';
 
 export class Exchange {
@@ -10,7 +12,7 @@ export class Exchange {
     private parseFunction: Function;
     private gamesGroup: models.GameSet;
     private oddsGroup: models.OddsSet;
-    private sequelizeInstance: models.ExchangeSequelizeInstance | null;
+    private sequelizeInstance: databaseModels.ExchangeSequelizeInstance | null;
 
     constructor({
         name,
@@ -33,7 +35,7 @@ export class Exchange {
 
     public async initialize() {
         await this.connectToExistingPage();
-        this.sequelizeInstance = new models.ExchangeSequelizeInstance({exchange: this});
+        this.sequelizeInstance = new databaseModels.ExchangeSequelizeInstance({exchange: this});
         await this.sequelizeInstance.initialize();
     }
 
@@ -83,7 +85,7 @@ export class Exchange {
     }
 
     public getAll() {
-        return models.allExchanges;
+        return global.allExchanges;
     }
 
     public async getCurrentOdds() {

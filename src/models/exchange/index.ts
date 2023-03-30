@@ -3,6 +3,4 @@
  */
 
 export * from './exchange';
-export * from './exchangeSequelize';
 export * from './exchangeSet';
-export * from './allExchanges/index';

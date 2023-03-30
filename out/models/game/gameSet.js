@@ -24,11 +24,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameSet = void 0;
+const global = __importStar(require("../../global"));
 const models = __importStar(require("../../models"));
 class GameSet extends Set {
     add(game) {
-        if (this !== models.allGames) {
-            models.allGames.add(game);
+        if (global.allGames !== undefined) {
+            if (this === global.allGames) {
+                // Some code to add to or update MySQL.
+            }
+            else {
+                global.allGames.add(game);
+            }
         }
         return super.add(game);
     }

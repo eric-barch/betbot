@@ -33,6 +33,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
+const databaseModels = __importStar(require("../../database/models"));
+const global = __importStar(require("../../global"));
 const models = __importStar(require("../../models"));
 class Game {
     constructor({ awayTeam, homeTeam, startDate, }) {
@@ -45,7 +47,7 @@ class Game {
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.sequelizeInstance = new models.GameSequelizeInstance({ game: this });
+            this.sequelizeInstance = new databaseModels.GameSequelizeInstance({ game: this });
             yield this.sequelizeInstance.initialize();
         });
     }
@@ -63,7 +65,7 @@ class Game {
                 exchange: exchange,
                 game: this,
             });
-            models.allOdds.add(requestedOdds);
+            global.allOdds.add(requestedOdds);
         }
         return requestedOdds;
     }

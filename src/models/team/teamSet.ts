@@ -1,3 +1,4 @@
+import * as global from '../../global';
 import * as models from '../../models';
 
 export class TeamSet extends Set<models.Team> {
@@ -8,8 +9,12 @@ export class TeamSet extends Set<models.Team> {
     }
 
     add(team: models.Team): this {
-        if (this !== models.allTeams) {
-            models.allTeams.add(team);
+        if (global.allTeams !== undefined) {
+            if (this === global.allTeams) {
+                // Some code to add to or update MySQL.
+            } else {
+                global.allTeams.add(team);
+            }
         }
 
         return super.add(team);

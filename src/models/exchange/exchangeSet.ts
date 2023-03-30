@@ -1,3 +1,4 @@
+import * as global from '../../global';
 import * as models from '../../models';
 
 // export class ExchangeSet extends ItemSet<Exchange> {
@@ -22,11 +23,11 @@ export class ExchangeSet extends Set<models.Exchange> {
     }
 
     add(exchange: models.Exchange): this {
-        if (models.allExchanges !== undefined) {
-            if (this === models.allExchanges) {
+        if (global.allExchanges !== undefined) {
+            if (this === global.allExchanges) {
                 // Some code to add to or update MySQL.
             } else {
-                models.allExchanges.add(exchange);
+                global.allExchanges.add(exchange);
             }
         }
 

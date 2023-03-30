@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExchangeSet = void 0;
-const models = __importStar(require("../../models"));
+const global = __importStar(require("../../global"));
 // export class ExchangeSet extends ItemSet<Exchange> {
 //     public async analyze() {
 //         for (const exchange of this) {
@@ -55,12 +55,12 @@ class ExchangeSet extends Set {
         });
     }
     add(exchange) {
-        if (models.allExchanges !== undefined) {
-            if (this === models.allExchanges) {
+        if (global.allExchanges !== undefined) {
+            if (this === global.allExchanges) {
                 // Some code to add to or update MySQL.
             }
             else {
-                models.allExchanges.add(exchange);
+                global.allExchanges.add(exchange);
             }
         }
         return super.add(exchange);

@@ -1,9 +1,14 @@
+import * as global from '../../global';
 import * as models from '../../models';
 
 export class OddsSet extends Set<models.Odds> {
     add(odds: models.Odds): this {
-        if (this !== models.allOdds) {
-            models.allOdds.add(odds);
+        if (global.allOdds !== undefined) {
+            if (this === global.allOdds) {
+                // Some code to add to or update MySQL.
+            } else {
+                global.allOdds.add(odds);
+            }
         }
 
         return super.add(odds);

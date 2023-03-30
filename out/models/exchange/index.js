@@ -18,7 +18,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./exchange"), exports);
-__exportStar(require("./exchangeSequelize"), exports);
 __exportStar(require("./exchangeSet"), exports);
-__exportStar(require("./allExchanges/index"), exports);
 //# sourceMappingURL=index.js.map

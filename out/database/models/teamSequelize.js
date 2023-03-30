@@ -41,7 +41,6 @@ const TeamSequelizeModel = instance_1.sequelizeInstance.define('Team', {
         primaryKey: true,
         autoIncrement: true
     },
-    fullName: sequelize.DataTypes.STRING,
     regionFull: sequelize.DataTypes.STRING,
     regionAbbr: sequelize.DataTypes.STRING,
     identifierFull: sequelize.DataTypes.STRING,
@@ -54,21 +53,30 @@ class TeamSequelizeInstance {
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
+            const localTeam = this.getTeam();
             this.sequelizeInstance = yield TeamSequelizeModel.findOrCreate({
                 where: {
-                    fullName: this.getTeam().getRegionFullIdentifierFull(),
+                    regionFull: localTeam.getRegionFull(),
+                    identifierFull: localTeam.getIdentifierFull(),
                 },
                 defaults: {
-                    fullName: this.getTeam().getRegionFullIdentifierFull(),
+                    regionFull: localTeam.getRegionFull(),
+                    regionAbbr: localTeam.getRegionAbbr(),
+                    identifierFull: localTeam.getIdentifierFull(),
+                    identifierAbbr: localTeam.getIdentifierAbbr(),
                 },
-            }).then(([team, created]) => {
+            }).then(([sqlTeam, created]) => __awaiter(this, void 0, void 0, function* () {
                 if (created) {
-                    console.log("Team created: ", team.get({ plain: true }));
+                    console.log(`Team created in MySQL: ${localTeam.getRegionFullIdentifierFull()}`);
                 }
                 else {
-                    console.log("Team already exists:", team.get({ plain: true }));
+                    console.log(`Team already exists in MySQL: ${localTeam.getRegionFullIdentifierFull()}`);
+                    yield sqlTeam.update({
+                        regionAbbr: localTeam.getRegionAbbr(),
+                        identifierAbbr: localTeam.getIdentifierAbbr(),
+                    });
                 }
-            });
+            }));
         });
     }
     getTeam() {

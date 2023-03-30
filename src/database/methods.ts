@@ -1,4 +1,4 @@
-import * as models from '../models';
+import * as databaseModels from './models';
 import { sequelizeInstance } from './instance';
 
 export async function close() {
@@ -13,17 +13,17 @@ export async function initialize() {
         console.log(`MySQL connection unsuccessful: ${error}`);
     }
     
-    models.ExchangeSequelizeModel.belongsToMany(models.GameSequelizeModel, {through: 'ExchangeGames'});
-    models.GameSequelizeModel.belongsToMany(models.ExchangeSequelizeModel, {through: 'ExchangeGames'});
+    databaseModels.ExchangeSequelizeModel.belongsToMany(databaseModels.GameSequelizeModel, {through: 'ExchangeGames'});
+    databaseModels.GameSequelizeModel.belongsToMany(databaseModels.ExchangeSequelizeModel, {through: 'ExchangeGames'});
 
-    models.GameSequelizeModel.hasMany(models.OddsSequelizeModel, {foreignKey: 'gameId'});
-    models.OddsSequelizeModel.belongsTo(models.GameSequelizeModel, {foreignKey: 'gameId'});
+    databaseModels.GameSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, {foreignKey: 'gameId'});
+    databaseModels.OddsSequelizeModel.belongsTo(databaseModels.GameSequelizeModel, {foreignKey: 'gameId'});
 
-    models.ExchangeSequelizeModel.hasMany(models.OddsSequelizeModel, {foreignKey: 'exchangeId'});
-    models.OddsSequelizeModel.belongsTo(models.ExchangeSequelizeModel, {foreignKey: 'exchangeId'});
+    databaseModels.ExchangeSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, {foreignKey: 'exchangeId'});
+    databaseModels.OddsSequelizeModel.belongsTo(databaseModels.ExchangeSequelizeModel, {foreignKey: 'exchangeId'});
 
-    models.OddsSequelizeModel.hasMany(models.oldOddsSequelizeModel, {foreignKey: 'oddsId'});
-    models.oldOddsSequelizeModel.belongsTo(models.OddsSequelizeModel, {foreignKey: 'oddsId'});
+    databaseModels.OddsSequelizeModel.hasMany(databaseModels.oldOddsSequelizeModel, {foreignKey: 'oddsId'});
+    databaseModels.oldOddsSequelizeModel.belongsTo(databaseModels.OddsSequelizeModel, {foreignKey: 'oddsId'});
 
     await sequelizeInstance.sync({
         alter: true,

@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OverUnderOdds = exports.Odds = void 0;
-const models = __importStar(require("../../models"));
+const databaseModels = __importStar(require("../../database/models"));
 class Odds {
     constructor({ exchange, game, } = {}) {
         if (exchange) {
@@ -57,7 +57,7 @@ class Odds {
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.sequelizeInstance = new models.OddsSequelizeInstance({ odds: this });
+            this.sequelizeInstance = new databaseModels.OddsSequelizeInstance({ odds: this });
             yield this.sequelizeInstance.initialize();
         });
     }

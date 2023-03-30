@@ -1,9 +1,10 @@
 import * as database from './database';
+import * as global from './global';
 import * as models from './models';
 
 async function main() {
-    const allExchanges = models.allExchanges;
-    const allTeams = models.allTeams;
+    const allExchanges = global.allExchanges;
+    const allTeams = global.allTeams;
 
     await database.initialize();
     await allExchanges.initialize();

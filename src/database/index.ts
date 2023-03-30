@@ -4,3 +4,4 @@
 
 export * from './instance';
 export * from './methods';
+export * from './models/index';

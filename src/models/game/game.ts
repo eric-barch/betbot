@@ -1,3 +1,5 @@
+import * as databaseModels from '../../database/models';
+import * as global from '../../global';
 import * as models from '../../models';
 
 export class Game {
@@ -6,7 +8,7 @@ export class Game {
     private startDate: Date;
     private exchangesGroup: models.ExchangeSet;
     private oddsGroup: models.OddsSet;
-    private sequelizeInstance: models.GameSequelizeInstance | null;
+    private sequelizeInstance: databaseModels.GameSequelizeInstance | null;
 
     constructor({
         awayTeam,
@@ -27,7 +29,7 @@ export class Game {
     }
 
     public async initialize() {
-        this.sequelizeInstance = new models.GameSequelizeInstance({game: this});
+        this.sequelizeInstance = new databaseModels.GameSequelizeInstance({game: this});
         await this.sequelizeInstance.initialize();
     }
 
@@ -53,7 +55,7 @@ export class Game {
                 game: this,
             })
 
-            models.allOdds.add(requestedOdds);
+            global.allOdds.add(requestedOdds);
         }
 
         return requestedOdds;

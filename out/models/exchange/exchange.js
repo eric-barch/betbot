@@ -34,6 +34,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
 const puppeteer = __importStar(require("puppeteer"));
+const databaseModels = __importStar(require("../../database/models"));
+const global = __importStar(require("../../global"));
 const models = __importStar(require(".."));
 class Exchange {
     constructor({ name, url, parseFunction, }) {
@@ -49,7 +51,7 @@ class Exchange {
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectToExistingPage();
-            this.sequelizeInstance = new models.ExchangeSequelizeInstance({ exchange: this });
+            this.sequelizeInstance = new databaseModels.ExchangeSequelizeInstance({ exchange: this });
             yield this.sequelizeInstance.initialize();
         });
     }
@@ -97,7 +99,7 @@ class Exchange {
         });
     }
     getAll() {
-        return models.allExchanges;
+        return global.allExchanges;
     }
     getCurrentOdds() {
         return __awaiter(this, void 0, void 0, function* () {

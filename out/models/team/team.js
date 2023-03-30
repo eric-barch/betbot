@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Team = void 0;
-const models = __importStar(require("../../models"));
+const databaseModels = __importStar(require("../../database/models"));
 class Team {
     constructor({ regionFull, regionAbbr, identifierFull, identifierAbbr, altNames, }) {
         this.regionFull = regionFull;
@@ -45,7 +45,7 @@ class Team {
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.sequelizeInstance = new models.TeamSequelizeInstance({ team: this });
+            this.sequelizeInstance = new databaseModels.TeamSequelizeInstance({ team: this });
             yield this.sequelizeInstance.initialize();
         });
     }

@@ -5,4 +5,5 @@
 export * from './main';
 export * from './config/index';
 export * from './database/index';
+export * from './global/index';
 export * from './models/index';

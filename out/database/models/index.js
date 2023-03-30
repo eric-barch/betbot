@@ -19,7 +19,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./exchangeSequelize"), exports);
 __exportStar(require("./gameSequelize"), exports);
-__exportStar(require("./oddsOldSequelize"), exports);
 __exportStar(require("./oddsSequelize"), exports);
+__exportStar(require("./oldOddsSequelize"), exports);
 __exportStar(require("./teamSequelize"), exports);
 //# sourceMappingURL=index.js.map

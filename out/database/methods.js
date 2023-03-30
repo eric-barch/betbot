@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initialize = exports.close = void 0;
-const models = __importStar(require("../models"));
+const databaseModels = __importStar(require("./models"));
 const instance_1 = require("./instance");
 function close() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -50,14 +50,14 @@ function initialize() {
         catch (error) {
             console.log(`MySQL connection unsuccessful: ${error}`);
         }
-        models.ExchangeSequelizeModel.belongsToMany(models.GameSequelizeModel, { through: 'ExchangeGames' });
-        models.GameSequelizeModel.belongsToMany(models.ExchangeSequelizeModel, { through: 'ExchangeGames' });
-        models.GameSequelizeModel.hasMany(models.OddsSequelizeModel, { foreignKey: 'gameId' });
-        models.OddsSequelizeModel.belongsTo(models.GameSequelizeModel, { foreignKey: 'gameId' });
-        models.ExchangeSequelizeModel.hasMany(models.OddsSequelizeModel, { foreignKey: 'exchangeId' });
-        models.OddsSequelizeModel.belongsTo(models.ExchangeSequelizeModel, { foreignKey: 'exchangeId' });
-        models.OddsSequelizeModel.hasMany(models.oldOddsSequelizeModel, { foreignKey: 'oddsId' });
-        models.oldOddsSequelizeModel.belongsTo(models.OddsSequelizeModel, { foreignKey: 'oddsId' });
+        databaseModels.ExchangeSequelizeModel.belongsToMany(databaseModels.GameSequelizeModel, { through: 'ExchangeGames' });
+        databaseModels.GameSequelizeModel.belongsToMany(databaseModels.ExchangeSequelizeModel, { through: 'ExchangeGames' });
+        databaseModels.GameSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, { foreignKey: 'gameId' });
+        databaseModels.OddsSequelizeModel.belongsTo(databaseModels.GameSequelizeModel, { foreignKey: 'gameId' });
+        databaseModels.ExchangeSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, { foreignKey: 'exchangeId' });
+        databaseModels.OddsSequelizeModel.belongsTo(databaseModels.ExchangeSequelizeModel, { foreignKey: 'exchangeId' });
+        databaseModels.OddsSequelizeModel.hasMany(databaseModels.oldOddsSequelizeModel, { foreignKey: 'oddsId' });
+        databaseModels.oldOddsSequelizeModel.belongsTo(databaseModels.OddsSequelizeModel, { foreignKey: 'oddsId' });
         yield instance_1.sequelizeInstance.sync({
             alter: true,
             logging: false,
