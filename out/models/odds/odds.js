@@ -53,6 +53,7 @@ class Odds {
         this.moneyOdds = new MoneyOdds();
         this.overUnderOdds = new OverUnderOdds();
         this.sequelizeInstance = null;
+        this.updatedAt = null;
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -87,7 +88,7 @@ class Odds {
             throw new Error(`${this.constructor.name}.${this.getExchange.name} failed. Exchange is null.`);
         }
         else {
-            return this.game;
+            return this.exchange;
         }
     }
     getSequelizeInstance() {
@@ -104,6 +105,9 @@ class Odds {
     }
     setBaseHandle({ baseHandle, }) {
         this.baseHandle = baseHandle;
+    }
+    setUpdatedAt({ updatedAt, }) {
+        this.updatedAt = updatedAt;
     }
 }
 exports.Odds = Odds;
@@ -127,16 +131,36 @@ class SpreadOdds {
         return this.homePrice;
     }
     setAwaySpread({ awaySpread, }) {
-        this.awaySpread = Number(awaySpread);
+        if (awaySpread === null) {
+            this.awaySpread = null;
+        }
+        else {
+            this.awaySpread = Number(awaySpread);
+        }
     }
     setAwayPrice({ awayPrice, }) {
-        this.awayPrice = Number(awayPrice);
+        if (awayPrice === null) {
+            this.awayPrice = null;
+        }
+        else {
+            this.awayPrice = Number(awayPrice);
+        }
     }
     setHomeSpread({ homeSpread, }) {
-        this.homeSpread = Number(homeSpread);
+        if (homeSpread === null) {
+            this.homeSpread = null;
+        }
+        else {
+            this.homeSpread = Number(homeSpread);
+        }
     }
     setHomePrice({ homePrice, }) {
-        this.homePrice = Number(homePrice);
+        if (homePrice === null) {
+            this.homePrice = null;
+        }
+        else {
+            this.homePrice = Number(homePrice);
+        }
     }
 }
 class MoneyOdds {
@@ -151,10 +175,20 @@ class MoneyOdds {
         return this.homePrice;
     }
     setAwayPrice({ awayPrice, }) {
-        this.awayPrice = Number(awayPrice);
+        if (awayPrice === null) {
+            this.awayPrice = null;
+        }
+        else {
+            this.awayPrice = Number(awayPrice);
+        }
     }
     setHomePrice({ homePrice, }) {
-        this.homePrice = Number(homePrice);
+        if (homePrice === null) {
+            this.homePrice = null;
+        }
+        else {
+            this.homePrice = Number(homePrice);
+        }
     }
 }
 class OverUnderOdds {
@@ -173,13 +207,28 @@ class OverUnderOdds {
         return this.underPrice;
     }
     setOverUnder({ overUnder, }) {
-        this.overUnder = Number(overUnder);
+        if (overUnder === null) {
+            this.overUnder = null;
+        }
+        else {
+            this.overUnder = Number(overUnder);
+        }
     }
     setOverPrice({ overPrice, }) {
-        this.overPrice = Number(overPrice);
+        if (overPrice === null) {
+            this.overPrice = null;
+        }
+        else {
+            this.overPrice = Number(overPrice);
+        }
     }
     setUnderPrice({ underPrice, }) {
-        this.underPrice = Number(underPrice);
+        if (underPrice === null) {
+            this.underPrice = null;
+        }
+        else {
+            this.underPrice = Number(underPrice);
+        }
     }
 }
 exports.OverUnderOdds = OverUnderOdds;

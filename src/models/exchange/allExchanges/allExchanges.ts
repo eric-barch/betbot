@@ -1,9 +1,7 @@
-import { Exchange } from '../exchange';
-import { ExchangeSet } from '../exchangeSet';
-
+import * as models from '../../../models';
 import * as parseFunctions from './parseFunctions';
 
-export const allExchanges = new ExchangeSet();
+export const allExchanges = new models.ExchangeSet();
 
 // allExchanges.add(
 //     new Exchange({
@@ -21,10 +19,10 @@ export const allExchanges = new ExchangeSet();
 //     })
 // );
 
-allExchanges.add(
-    new Exchange({
-        name: 'FanDuel',
-        url: 'https://sportsbook.fanduel.com/navigation/nba',
-        parseFunction: parseFunctions.parseFanDuel,
-    })
-);
+const exchange = new models.Exchange({
+    name: 'FanDuel',
+    url: 'https://sportsbook.fanduel.com/navigation/nba',
+    parseFunction: parseFunctions.parseFanDuel,
+})
+
+allExchanges.add(exchange);

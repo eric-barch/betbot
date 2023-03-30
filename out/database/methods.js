@@ -56,8 +56,8 @@ function initialize() {
         models.OddsSequelizeModel.belongsTo(models.GameSequelizeModel, { foreignKey: 'gameId' });
         models.ExchangeSequelizeModel.hasMany(models.OddsSequelizeModel, { foreignKey: 'exchangeId' });
         models.OddsSequelizeModel.belongsTo(models.ExchangeSequelizeModel, { foreignKey: 'exchangeId' });
-        models.OddsSequelizeModel.hasMany(models.OddsOldSequelizeModel, { foreignKey: 'oddsId' });
-        models.OddsOldSequelizeModel.belongsTo(models.OddsSequelizeModel, { foreignKey: 'oddsId' });
+        models.OddsSequelizeModel.hasMany(models.oldOddsSequelizeModel, { foreignKey: 'oddsId' });
+        models.oldOddsSequelizeModel.belongsTo(models.OddsSequelizeModel, { foreignKey: 'oddsId' });
         yield instance_1.sequelizeInstance.sync({
             alter: true,
             logging: false,

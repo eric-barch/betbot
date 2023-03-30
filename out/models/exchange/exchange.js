@@ -34,9 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
 const puppeteer = __importStar(require("puppeteer"));
-const game_1 = require("../game");
-const odds_1 = require("../odds");
-const models = __importStar(require("../../models"));
+const models = __importStar(require(".."));
 class Exchange {
     constructor({ name, url, parseFunction, }) {
         this.name = name;
@@ -44,14 +42,21 @@ class Exchange {
         this.browser = null;
         this.page = null;
         this.parseFunction = parseFunction;
-        this.gamesGroup = new game_1.GameSet();
-        this.oddsGroup = new odds_1.OddsSet();
+        this.gamesGroup = new models.GameSet();
+        this.oddsGroup = new models.OddsSet();
         this.sequelizeInstance = null;
+    }
+    initialize() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectToExistingPage();
+            this.sequelizeInstance = new models.ExchangeSequelizeInstance({ exchange: this });
+            yield this.sequelizeInstance.initialize();
+        });
     }
     analyze() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.scrape();
-            yield this.parse();
+            const currentOdds = yield this.getCurrentOdds();
+            // Some method that compares the current odds with the odds saved in MySQL and updates them if necessary.
         });
     }
     close() {
@@ -80,30 +85,24 @@ class Exchange {
             if (!(targetPage instanceof puppeteer.Page)) {
                 throw new Error('Expected page.');
             }
-            this.page = targetPage;
-            this.page.setViewport({
-                // width: 1920,
-                // height: 975,
-                width: 1280,
-                height: 800,
+            // Get the window size in pixels
+            const windowSize = yield targetPage.evaluate(() => {
+                return {
+                    width: window.outerWidth,
+                    height: window.outerHeight - 75 // This seems to be roughly the height of the Chrome navigation bar. Find a less hacky way to do this.
+                };
             });
+            this.page = targetPage;
+            this.page.setViewport(windowSize);
         });
     }
-    initialize() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.connectToExistingPage();
-            this.sequelizeInstance = new models.ExchangeSequelizeInstance({ exchange: this });
-            yield this.sequelizeInstance.initialize();
-        });
+    getAll() {
+        return models.allExchanges;
     }
-    parse() {
+    getCurrentOdds() {
         return __awaiter(this, void 0, void 0, function* () {
-            const currentExchangeGames = yield this.parseFunction();
-            return currentExchangeGames;
-        });
-    }
-    scrape() {
-        return __awaiter(this, void 0, void 0, function* () {
+            const currentOdds = yield this.parseFunction();
+            return currentOdds;
         });
     }
     getGamesGroup() {
@@ -125,6 +124,9 @@ class Exchange {
     }
     getPage() {
         return this.page;
+    }
+    getSequelizeInstance() {
+        return this.sequelizeInstance;
     }
     getUrl() {
         return this.url;

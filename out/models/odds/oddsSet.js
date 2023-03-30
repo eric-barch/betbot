@@ -24,9 +24,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OddsSet = void 0;
-const models = __importStar(require(".."));
+const models = __importStar(require("../../models"));
 class OddsSet extends Set {
     add(odds) {
+        if (this !== models.allOdds) {
+            models.allOdds.add(odds);
+        }
         return super.add(odds);
     }
     getOddsByExchangeAndGame({ exchange, game, }) {

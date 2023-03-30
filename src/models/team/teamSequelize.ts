@@ -1,6 +1,6 @@
 import * as sequelize from 'sequelize';
 
-import * as models from '..';
+import * as models from '../../models';
 import { sequelizeInstance } from '../../database/instance';
 
 const TeamSequelizeModel = sequelizeInstance.define('Team', {
@@ -9,7 +9,6 @@ const TeamSequelizeModel = sequelizeInstance.define('Team', {
         primaryKey: true,
         autoIncrement: true
     },
-    fullName: sequelize.DataTypes.STRING,
     regionFull: sequelize.DataTypes.STRING,
     regionAbbr: sequelize.DataTypes.STRING,
     identifierFull: sequelize.DataTypes.STRING,
@@ -30,18 +29,28 @@ export class TeamSequelizeInstance {
     }
 
     public async initialize() {
+        const localTeam = this.getTeam();
+
         this.sequelizeInstance = await TeamSequelizeModel.findOrCreate({
             where: {
-                fullName: this.getTeam().getRegionFullIdentifierFull(),
+                regionFull: localTeam.getRegionFull(),
+                identifierFull: localTeam.getIdentifierFull(),
             },
             defaults: {
-                fullName: this.getTeam().getRegionFullIdentifierFull(),
+                regionFull: localTeam.getRegionFull(),
+                regionAbbr: localTeam.getRegionAbbr(),
+                identifierFull: localTeam.getIdentifierFull(),
+                identifierAbbr: localTeam.getIdentifierAbbr(),
             },
-        }).then(([team, created]) => {
+        }).then(async ([sqlTeam, created]) => {
             if (created) {
-                console.log("Team created: ", team.get({ plain: true }));
+                console.log(`Team created in MySQL: ${localTeam.getRegionFullIdentifierFull()}`);
             } else {
-                console.log("Team already exists:", team.get({ plain: true }));
+                console.log(`Team already exists in MySQL: ${localTeam.getRegionFullIdentifierFull()}`);
+                await sqlTeam.update({
+                    regionAbbr: localTeam.getRegionAbbr(),
+                    identifierAbbr: localTeam.getIdentifierAbbr(),
+                });
             }
         });
     }

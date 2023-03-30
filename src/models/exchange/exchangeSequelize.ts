@@ -1,5 +1,6 @@
 import * as sequelize from 'sequelize';
 
+import * as models from '../../models';
 import { sequelizeInstance } from '../../database/instance';
 
 export const ExchangeSequelizeModel = sequelizeInstance.define('Exchange', {
@@ -11,8 +12,6 @@ export const ExchangeSequelizeModel = sequelizeInstance.define('Exchange', {
     name: sequelize.DataTypes.STRING,
     url: sequelize.DataTypes.STRING,
 });
-
-import * as models from '..';
 
 export class ExchangeSequelizeInstance {
     private exchange: models.Exchange;
@@ -28,32 +27,24 @@ export class ExchangeSequelizeInstance {
     }
 
     public async initialize() {
+        const localExchange = this.getExchange();
+
         this.sequelizeInstance = await ExchangeSequelizeModel.findOrCreate({
             where: {
-                name: this.exchange.getName(),
+                name: localExchange.getName(),
             },
             defaults: {
-                name: this.getExchange().getName(),
-                url: this.getExchange().getUrl(),
+                name: localExchange.getName(),
+                url: localExchange.getUrl(),
             },
-        }).then(([exchange, created]) => {
+        }).then(async ([sqlExchange, created]) => {
             if (created) {
-                console.log("Exchange created: ", exchange.get({ plain: true }));
+                console.log(`Exchange created in MySQL: ${localExchange.getName()}`);
             } else {
-                console.log("Exchange already exists:", exchange.get({ plain: true }));
-                const rowData = exchange.get({ plain: true });
-                if (rowData.url !== this.getExchange().getUrl()) {
-                    ExchangeSequelizeModel.update(
-                        { url: this.getExchange().getUrl() },
-                        { where: {
-                            name: this.getExchange().getName(),
-                        }}
-                    ).then(() => {
-                        console.log(`Database URL updated to match program URL.`);
-                    });
-                } else {
-                    console.log(`Database URL matches program URL. No update necessary.`);
-                }
+                console.log(`Exchange already exists in MySQL: ${localExchange.getName()}`);
+                await sqlExchange.update({
+                    url: localExchange.getUrl(),
+                });
             }
         });
     }

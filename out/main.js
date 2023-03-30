@@ -34,18 +34,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const database = __importStar(require("./database"));
 const models = __importStar(require("./models"));
-const allExchanges = models.allExchanges;
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield database.initialize();
-    yield allExchanges.initialize();
-    // for (let i = 0; i < 1; i++) {
-    //     allExchanges.analyze();
-    // }
-    yield database.close();
-    yield allExchanges.close();
-}))();
-/** TODO: If possible, remove all '!'s and '?'s re: typing.
- * Probably should remove page parser altogether. Parsing should occur right on the main exchange page.
- * Make sure that any time a startDate is being set, it is set to the closest 15 minute increment.
- */ 
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const allExchanges = models.allExchanges;
+        const allTeams = models.allTeams;
+        yield database.initialize();
+        yield allExchanges.initialize();
+        yield allTeams.initialize();
+        let shouldContinue = true;
+        while (shouldContinue) {
+            yield allExchanges.analyze();
+        }
+        yield database.close();
+        process.exit(0);
+    });
+}
+main();
 //# sourceMappingURL=main.js.map

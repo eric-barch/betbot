@@ -63,6 +63,11 @@ export class Team {
         const regionAbbrIdentifierFull = `${this.getRegionAbbr()} ${this.getIdentifierFull}`;
         return regionAbbrIdentifierFull;
     }
+
+    public getRegionAbbrIdentifierAbbr() {
+        const regionAbbrIdentifierAbbr = `${this.getRegionAbbr()} ${this.getIdentifierAbbr()}`;
+        return regionAbbrIdentifierAbbr;
+    }
     
     public getRegionFull() {
         return this.regionFull;

@@ -24,14 +24,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameSet = void 0;
-const models = __importStar(require(".."));
+const models = __importStar(require("../../models"));
 class GameSet extends Set {
     add(game) {
+        if (this !== models.allGames) {
+            models.allGames.add(game);
+        }
         return super.add(game);
     }
     getGameByTeamsAndStartDate({ awayTeam, homeTeam, startDate, }) {
         let requestedGame = undefined;
-        startDate = this.roundToNearest15Minute(startDate);
+        startDate = models.Game.roundToNearestInterval(startDate);
         for (const game of this) {
             if (game.matchesByTeamsAndStartDate({
                 awayTeam: awayTeam,
@@ -51,12 +54,6 @@ class GameSet extends Set {
             this.add(requestedGame);
         }
         return requestedGame;
-    }
-    roundToNearest15Minute(date) {
-        const ROUND_TO_MINUTES = 15;
-        const roundedMinutes = Math.round(date.getMinutes() / ROUND_TO_MINUTES) * ROUND_TO_MINUTES;
-        const roundedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), roundedMinutes, 0);
-        return roundedDate;
     }
 }
 exports.GameSet = GameSet;

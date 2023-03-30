@@ -1,9 +1,6 @@
 import * as puppeteer from 'puppeteer';
 
-import { GameSet } from '../game';
-import { OddsSet } from '../odds';
-
-import * as models from '../../models';
+import * as models from '..';
 
 export class Exchange {
     private name: string;
@@ -11,8 +8,8 @@ export class Exchange {
     private browser: puppeteer.Browser | null;
     private page: puppeteer.Page | null;
     private parseFunction: Function;
-    private gamesGroup: GameSet;
-    private oddsGroup: OddsSet;
+    private gamesGroup: models.GameSet;
+    private oddsGroup: models.OddsSet;
     private sequelizeInstance: models.ExchangeSequelizeInstance | null;
 
     constructor({
@@ -29,14 +26,20 @@ export class Exchange {
         this.browser = null;
         this.page = null;
         this.parseFunction = parseFunction;
-        this.gamesGroup = new GameSet();
-        this.oddsGroup = new OddsSet();
+        this.gamesGroup = new models.GameSet();
+        this.oddsGroup = new models.OddsSet();
         this.sequelizeInstance = null;
     }
 
+    public async initialize() {
+        await this.connectToExistingPage();
+        this.sequelizeInstance = new models.ExchangeSequelizeInstance({exchange: this});
+        await this.sequelizeInstance.initialize();
+    }
+
     public async analyze() {
-        await this.scrape();
-        await this.parse();
+        const currentOdds = await this.getCurrentOdds();
+        // Some method that compares the current odds with the odds saved in MySQL and updates them if necessary.
     }
 
     public async close() {
@@ -66,29 +69,26 @@ export class Exchange {
             throw new Error('Expected page.');
         }
 
+        // Get the window size in pixels
+        const windowSize = await targetPage.evaluate(() => {
+            return {
+                width: window.outerWidth,
+                height: window.outerHeight - 75 // This seems to be roughly the height of the Chrome navigation bar. Find a less hacky way to do this.
+            };
+        });
+
         this.page = targetPage;
 
-        this.page.setViewport({
-            // width: 1920,
-            // height: 975,
-            width: 1280,
-            height: 800,
-        });
+        this.page.setViewport(windowSize);
     }
 
-    public async initialize() {
-        await this.connectToExistingPage();
-        this.sequelizeInstance = new models.ExchangeSequelizeInstance({exchange: this});
-        await this.sequelizeInstance.initialize();
+    public getAll() {
+        return models.allExchanges;
     }
 
-    public async parse() {
-        const currentExchangeGames = await this.parseFunction();
-        return currentExchangeGames;
-    }
-
-    public async scrape() {
-
+    public async getCurrentOdds() {
+        const currentOdds = await this.parseFunction();
+        return currentOdds;
     }
     
     public getGamesGroup() {
@@ -115,6 +115,10 @@ export class Exchange {
 
     public getPage() {
         return this.page;
+    }
+
+    public getSequelizeInstance() {
+        return this.sequelizeInstance;
     }
 
     public getUrl() {

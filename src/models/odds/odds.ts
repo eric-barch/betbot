@@ -10,6 +10,7 @@ export class Odds {
     private moneyOdds: MoneyOdds;
     private overUnderOdds: OverUnderOdds;
     private sequelizeInstance: models.OddsSequelizeInstance | null;
+    private updatedAt: Date | null;
 
     constructor({
         exchange,
@@ -37,6 +38,8 @@ export class Odds {
         this.overUnderOdds = new OverUnderOdds();
 
         this.sequelizeInstance = null;
+
+        this.updatedAt = null;
     }
 
     public async initialize() {
@@ -78,7 +81,7 @@ export class Odds {
         if (this.exchange === null) {
             throw new Error(`${this.constructor.name}.${this.getExchange.name} failed. Exchange is null.`);
         } else {
-            return this.game;
+            return this.exchange;
         }
     }
 
@@ -105,13 +108,21 @@ export class Odds {
     }) {
         this.baseHandle = baseHandle;
     }
+
+    public setUpdatedAt({
+        updatedAt,
+    }: {
+        updatedAt: Date,
+    }) {
+        this.updatedAt = updatedAt;
+    }
 }
 
 class SpreadOdds {
-    private awaySpread: number;
-    private awayPrice: number;
-    private homeSpread: number;
-    private homePrice: number;
+    private awaySpread: number | null;
+    private awayPrice: number | null;
+    private homeSpread: number | null;
+    private homePrice: number | null;
 
     constructor() {
         this.awaySpread = 0;
@@ -139,39 +150,55 @@ class SpreadOdds {
     public setAwaySpread({
         awaySpread,
     }: {
-        awaySpread: number | string,
+        awaySpread: number | string | null,
     }) {
-        this.awaySpread = Number(awaySpread);
+        if (awaySpread === null) {
+            this.awaySpread = null;
+        } else {
+            this.awaySpread = Number(awaySpread);
+        }
     }
 
     public setAwayPrice({
         awayPrice,
     }: {
-        awayPrice: number | string,
+        awayPrice: number | string | null,
     }) {
-        this.awayPrice = Number(awayPrice);
+        if (awayPrice === null) {
+            this.awayPrice = null;
+        } else {
+            this.awayPrice = Number(awayPrice);
+        }
     }
 
     public setHomeSpread({
         homeSpread,
     }: {
-        homeSpread: number | string,
+        homeSpread: number | string | null,
     }) {
-        this.homeSpread = Number(homeSpread);
+        if (homeSpread === null) {
+            this.homeSpread = null;
+        } else {
+            this.homeSpread = Number(homeSpread);
+        }
     }
 
     public setHomePrice({
         homePrice,
     }: {
-        homePrice: number | string,
+        homePrice: number | string | null,
     }) {
-        this.homePrice = Number(homePrice);
+        if (homePrice === null) {
+            this.homePrice = null;
+        } else {
+            this.homePrice = Number(homePrice);
+        }
     }    
 }
 
 class MoneyOdds {
-    private awayPrice: number;
-    private homePrice: number;
+    private awayPrice: number | null;
+    private homePrice: number | null;
 
     constructor() {
         this.awayPrice = 0;
@@ -187,24 +214,32 @@ class MoneyOdds {
     public setAwayPrice({
         awayPrice,
     }: {
-        awayPrice: number | string,
+        awayPrice: number | string | null,
     }) {
-        this.awayPrice = Number(awayPrice);
+        if (awayPrice === null) {
+            this.awayPrice = null;
+        } else {
+            this.awayPrice = Number(awayPrice);
+        }
     }
 
     public setHomePrice({
         homePrice,
     }: {
-        homePrice: number | string,
+        homePrice: number | string | null,
     }) {
-        this.homePrice = Number(homePrice);
+        if (homePrice === null) {
+            this.homePrice = null;
+        } else {
+            this.homePrice = Number(homePrice);
+        }
     }
 }
 
 export class OverUnderOdds {
-    private overUnder: number;
-    private overPrice: number;
-    private underPrice: number;
+    private overUnder: number | null;
+    private overPrice: number | null;
+    private underPrice: number | null;
 
     constructor() {
         this.overUnder = 0;
@@ -227,24 +262,36 @@ export class OverUnderOdds {
     public setOverUnder({
         overUnder,
     }: {
-        overUnder: number | string,
+        overUnder: number | string | null,
     }) {
-        this.overUnder = Number(overUnder);
+        if (overUnder === null) {
+            this.overUnder = null;
+        } else {
+            this.overUnder = Number(overUnder);
+        }
     }
 
     public setOverPrice({
         overPrice,
     }: {
-        overPrice: number | string,
+        overPrice: number | string | null,
     }) {
-        this.overPrice = Number(overPrice);
+        if (overPrice === null) {
+            this.overPrice = null;
+        } else {
+            this.overPrice = Number(overPrice);
+        }
     }
 
     public setUnderPrice({
         underPrice,
     }: {
-        underPrice: number | string,
+        underPrice: number | string | null,
     }) {
-        this.underPrice = Number(underPrice);
+        if (underPrice === null) {
+            this.underPrice = null;
+        } else {
+            this.underPrice = Number(underPrice);
+        }
     }
 }

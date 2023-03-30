@@ -48,25 +48,13 @@ const overPriceXPath = './div[1]/div/div[1]/div[3]/span[2]';
 const underPriceXPath = './div[1]/div/div[2]/div[3]/span[2]';
 let exchange;
 let page;
-let gamesFromJson;
-let oddsFromDocument;
+let baseHandle;
 function parseFanDuel() {
     return __awaiter(this, void 0, void 0, function* () {
         exchange = this;
         page = this.getPage();
-        gamesFromJson = yield getGamesFromJson();
-        /**Returns a GameSet based on the JSON from the website.
-         * If the Game already exists in AllGames, it pulls that game. If it
-         * doesn't, it creates a new game in AllGames and adds the reference
-         * to the set. */
-        oddsFromDocument = yield getOddsFromDocument();
-        /**Returns a set of odds for the games visibly listed on the actual
-         * FanDuel page. It uses the JsonGames set as a starting point for
-         * which games it should search for in the visible document. If the
-         * Odds already exist in AllOdds and the OddsSets for the relevant
-         * game and exchange, it pulls that Odds instance and adds it to the
-         * return set. If not, it creates the Odds instance and adds it to
-         * all three sets and the return set. */
+        const gamesFromJson = yield getGamesFromJson();
+        const oddsFromDocument = yield getOddsFromDocument(gamesFromJson);
         return oddsFromDocument;
     });
 }
@@ -77,10 +65,10 @@ function getGamesFromJson() {
         const jsonGamesScriptTag = yield page.$('script[type="application/ld+json"][data-react-helmet="true"]');
         const jsonGames = yield page.evaluate(element => JSON.parse(element.textContent), jsonGamesScriptTag);
         for (const jsonGame of jsonGames) {
-            const awayTeam = models.allTeams.getTeamByNameString({
+            const awayTeam = models.allTeams.getTeamByName({
                 string: jsonGame.awayTeam.name,
             });
-            const homeTeam = models.allTeams.getTeamByNameString({
+            const homeTeam = models.allTeams.getTeamByName({
                 string: jsonGame.homeTeam.name,
             });
             const startDate = new Date(jsonGame.startDate);
@@ -94,99 +82,96 @@ function getGamesFromJson() {
         return gamesFromJson;
     });
 }
-function getOddsFromDocument() {
+function getOddsFromDocument(gamesFromJson) {
     return __awaiter(this, void 0, void 0, function* () {
         let oddsFromDocument = new models.OddsSet;
-        for (const gameFromJson of gamesFromJson) {
-            let exchangeGameBaseHandle;
-            const possibleAwayTeamHandles = yield page.$x(`//span[text()='${gameFromJson.getAwayTeam().getRegionFullIdentifierFull()}' or text()='${gameFromJson.getAwayTeam().getRegionAbbrIdentifierFull()}']`);
-            if (possibleAwayTeamHandles.length < 1) {
-                console.log(`Did not find span with text ${gameFromJson.getAwayTeam().getRegionFullIdentifierFull()}.`);
+        let gamesFromDocument = gamesFromJson;
+        for (const game of gamesFromDocument) {
+            const baseHandle = yield getBaseHandle({ game: game });
+            if (baseHandle === null) {
+                console.log(`Did not find visible document object for ${game.getAwayTeam().getRegionFullIdentifierFull()} @ ${game.getHomeTeam().getRegionFullIdentifierFull()}.`);
+                gamesFromDocument.delete(game);
             }
             else {
-                exchangeGameBaseHandle = getExchangeGameBaseHandle(possibleAwayTeamHandles, gameFromJson);
-                if (exchangeGameBaseHandle !== null) {
-                    const requestedOdds = models.allOdds.getOddsByExchangeAndGame({
-                        exchange: exchange,
-                        game: gameFromJson,
-                    });
-                    // Populate odds, check for changes, etc.
-                    oddsFromDocument.add(requestedOdds);
-                }
+                const odds = game.getOddsByExchange({
+                    exchange: exchange,
+                });
+                odds.setBaseHandle({
+                    baseHandle: baseHandle,
+                });
+                oddsFromDocument.add(odds);
             }
+        }
+        for (const odds of oddsFromDocument) {
+            baseHandle = odds.getBaseHandle();
+            const awaySpread = yield getElementValue({ xPath: awaySpreadXPath });
+            const awaySpreadPrice = yield getElementValue({ xPath: awaySpreadPriceXPath });
+            const homeSpread = yield getElementValue({ xPath: homeSpreadPriceXPath });
+            const homeSpreadPrice = yield getElementValue({ xPath: homeSpreadPriceXPath });
+            const awayMoneyPrice = yield getElementValue({ xPath: awayMoneyPriceXPath });
+            const homeMoneyPrice = yield getElementValue({ xPath: homeMoneyPriceXPath });
+            const overUnder = yield getElementValue({ xPath: overUnderXPath });
+            const overPrice = yield getElementValue({ xPath: overPriceXPath });
+            const underPrice = yield getElementValue({ xPath: underPriceXPath });
+            const spreadOdds = odds.getSpreadOdds();
+            const moneyOdds = odds.getMoneyOdds();
+            const overUnderOdds = odds.getOverUnderOdds();
+            spreadOdds.setAwaySpread({ awaySpread: awaySpread });
+            spreadOdds.setAwayPrice({ awayPrice: awaySpreadPrice });
+            spreadOdds.setHomeSpread({ homeSpread: homeSpread });
+            spreadOdds.setHomePrice({ homePrice: homeSpreadPrice });
+            moneyOdds.setAwayPrice({ awayPrice: awayMoneyPrice });
+            moneyOdds.setHomePrice({ homePrice: homeMoneyPrice });
+            overUnderOdds.setOverUnder({ overUnder: overUnder });
+            overUnderOdds.setOverPrice({ overPrice: overPrice });
+            overUnderOdds.setUnderPrice({ underPrice: underPrice });
+            odds.setUpdatedAt({ updatedAt: new Date() });
         }
         return oddsFromDocument;
     });
 }
-function getExchangeGameBaseHandle(possibleAwayTeamHandles, gameFromJson) {
+function getBaseHandle({ game }) {
     return __awaiter(this, void 0, void 0, function* () {
-        let exchangeGameBaseHandle;
+        let baseHandle;
+        const possibleAwayTeamHandles = yield page.$x(`//span[text()='${game.getAwayTeam().getRegionFullIdentifierFull()}' or text()='${game.getAwayTeam().getRegionAbbrIdentifierFull()}']`);
         for (const possibleAwayTeamHandle of possibleAwayTeamHandles) {
-            const expectedExchangeGameBaseHandle = (yield possibleAwayTeamHandle.$$('xpath/' + '../../../../../../../..'))[0];
-            const expectedHomeTeamHandle = (yield expectedExchangeGameBaseHandle.$$('xpath/' + homeTeamXPath))[0];
-            const expectedStartDateHandle = (yield expectedExchangeGameBaseHandle.$$('xpath/' + startDateXPath))[0];
-            if (!(yield homeTeamMatches(expectedHomeTeamHandle, gameFromJson))) {
-                break;
+            const expectedBaseHandle = (yield possibleAwayTeamHandle.$$('xpath/' + '../../../../../../../..'))[0];
+            const expectedHomeTeamHandle = (yield expectedBaseHandle.$$('xpath/' + homeTeamXPath))[0];
+            const expectedStartDateHandle = (yield expectedBaseHandle.$$('xpath/' + startDateXPath))[0];
+            const awayTeamText = yield possibleAwayTeamHandle.getProperty('textContent').then(property => property.jsonValue());
+            const homeTeamText = yield expectedHomeTeamHandle.getProperty('textContent').then(property => property.jsonValue());
+            let startDateText = yield expectedStartDateHandle.getProperty('textContent').then(property => property.jsonValue());
+            const awayTeam = game.getAwayTeam();
+            let homeTeam = game.getHomeTeam();
+            let startDate = game.getStartDate();
+            if (typeof awayTeamText === 'string' && awayTeam.matchesByNameString({ string: awayTeamText }) &&
+                typeof homeTeamText === 'string' && homeTeam.matchesByNameString({ string: homeTeamText }) &&
+                typeof startDateText === 'string') {
+                startDateText = startDateText.slice(0, -3);
+                const startDateParsed = chrono.parseDate(startDateText);
+                const startDateParsedRounded = models.Game.roundToNearestInterval(startDateParsed);
+                if (startDateParsedRounded.getTime() === startDate.getTime()) {
+                    baseHandle = expectedBaseHandle;
+                    return baseHandle;
+                }
             }
-            if (!(yield startDateMatches(expectedStartDateHandle, gameFromJson))) {
-                break;
-            }
-            exchangeGameBaseHandle = expectedExchangeGameBaseHandle;
-            return exchangeGameBaseHandle;
         }
         return null;
     });
 }
-function homeTeamMatches(expectedHomeTeamHandle, gameFromJson) {
+function getElementValue({ xPath, }) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const textContent = yield expectedHomeTeamHandle.getProperty('textContent').then(property => property.jsonValue());
-            if (typeof textContent === 'string' &&
-                gameFromJson.getHomeTeam().matchesByNameString({ string: textContent })) {
-                return true;
-            }
-        }
-        catch (error) {
-            console.log(error);
-        }
-        return false;
-    });
-}
-function startDateMatches(expectedStartDateHandle, gameFromJson) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (expectedStartDateHandle !== undefined) {
-            const expectedStartDateHandleTextContent = yield expectedStartDateHandle.getProperty('textContent').then(property => property.jsonValue());
-            if (typeof expectedStartDateHandleTextContent === 'string') {
-                const expectedTimeHandleStartDate = chrono.parseDate(expectedStartDateHandleTextContent);
-                const diff = Math.abs(expectedTimeHandleStartDate.getTime() - gameFromJson.getStartDate().getTime());
-                const isWithin5Minutes = diff <= 300000;
-                if (isWithin5Minutes) {
-                    return true;
-                }
-            }
-        }
-        else {
-            const currentTime = new Date();
-            const diff = currentTime.getTime() - gameFromJson.getStartDate().getTime();
-            const isWithin8HoursBefore = diff <= 28800000;
-            if (isWithin8HoursBefore) {
-                return true;
-            }
-        }
-        return false;
-    });
-}
-function getOddsElementContent(gameBaseHandle, xPath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const oddsElementHandle = (yield gameBaseHandle.$$('xpath/' + xPath))[0];
-        let oddsElementContent;
-        try {
-            oddsElementContent = yield oddsElementHandle.getProperty('textContent').then(property => property.jsonValue());
+            const elementHandle = (yield baseHandle.$$('xpath/' + xPath))[0];
+            const elementTextContent = yield elementHandle.getProperty('textContent').then(property => property.jsonValue());
+            const numericTextContent = elementTextContent.replace(/[^\d.-]/g, '');
+            const elementValue = Number(numericTextContent);
+            return elementValue;
         }
         catch (_a) {
-            oddsElementContent = '0';
+            console.log('Could not find element value.');
         }
-        return oddsElementContent;
+        return null;
     });
 }
 //# sourceMappingURL=fanDuel.js.map

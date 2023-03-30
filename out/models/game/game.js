@@ -49,14 +49,28 @@ class Game {
             yield this.sequelizeInstance.initialize();
         });
     }
-    matchesByTeamsAndStartDate({ awayTeam, homeTeam, startDate, }) {
-        if (this.awayTeam === awayTeam && this.homeTeam === homeTeam) {
-            const timeDifference = Math.abs(startDate.getTime() - this.getStartDate().getTime());
-            const minutesDifference = timeDifference / 1000 / 60;
-            const within15Minutes = minutesDifference <= 15;
-            if (within15Minutes) {
-                return true;
+    getOddsByExchange({ exchange, }) {
+        let requestedOdds = undefined;
+        const gameOdds = this.oddsGroup;
+        for (const odds of gameOdds) {
+            if (odds.getExchange() === exchange) {
+                requestedOdds = odds;
+                break;
             }
+        }
+        if (requestedOdds === undefined) {
+            requestedOdds = new models.Odds({
+                exchange: exchange,
+                game: this,
+            });
+            models.allOdds.add(requestedOdds);
+        }
+        return requestedOdds;
+    }
+    matchesByTeamsAndStartDate({ awayTeam, homeTeam, startDate, }) {
+        startDate = Game.roundToNearestInterval(startDate);
+        if (this.awayTeam === awayTeam && this.homeTeam === homeTeam && this.startDate === startDate) {
+            return true;
         }
         return false;
     }
@@ -65,6 +79,10 @@ class Game {
     }
     getHomeTeam() {
         return this.homeTeam;
+    }
+    getName() {
+        const name = `${this.getAwayTeam().getRegionAbbrIdentifierAbbr()} @ ${this.getHomeTeam().getRegionAbbrIdentifierAbbr()}`;
+        return name;
     }
     getSequelizeInstance() {
         return this.sequelizeInstance;
@@ -77,6 +95,12 @@ class Game {
     }
     getOddsGroup() {
         return this.oddsGroup;
+    }
+    static roundToNearestInterval(date) {
+        const ROUND_INTERVAL = 15;
+        const roundedMinutes = Math.round(date.getMinutes() / ROUND_INTERVAL) * ROUND_INTERVAL;
+        const roundedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), roundedMinutes, 0);
+        return roundedDate;
     }
 }
 exports.Game = Game;

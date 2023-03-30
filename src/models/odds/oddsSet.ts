@@ -1,8 +1,11 @@
-import * as models from '..';
+import * as models from '../../models';
 
 export class OddsSet extends Set<models.Odds> {
-    
     add(odds: models.Odds): this {
+        if (this !== models.allOdds) {
+            models.allOdds.add(odds);
+        }
+
         return super.add(odds);
     }
 
@@ -35,5 +38,4 @@ export class OddsSet extends Set<models.Odds> {
 
         return requestedOdds;
     }
-
 }

@@ -1,4 +1,4 @@
-import { TeamSet } from '../teamSet';
+import * as models from '../../../models';
 import * as leagueTeams from './leagueTeams';
 
-export const allTeams = new TeamSet(leagueTeams.nba)
+export const allTeams = new models.TeamSet(leagueTeams.nba)

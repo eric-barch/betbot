@@ -24,10 +24,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allExchanges = void 0;
-const exchange_1 = require("../exchange");
-const exchangeSet_1 = require("../exchangeSet");
+const models = __importStar(require("../../../models"));
 const parseFunctions = __importStar(require("./parseFunctions"));
-exports.allExchanges = new exchangeSet_1.ExchangeSet();
+exports.allExchanges = new models.ExchangeSet();
 // allExchanges.add(
 //     new Exchange({
 //         name: 'Caesar\'s',
@@ -42,9 +41,10 @@ exports.allExchanges = new exchangeSet_1.ExchangeSet();
 //         parseFunction: parseFunctions.parseDraftKings,
 //     })
 // );
-exports.allExchanges.add(new exchange_1.Exchange({
+const exchange = new models.Exchange({
     name: 'FanDuel',
     url: 'https://sportsbook.fanduel.com/navigation/nba',
     parseFunction: parseFunctions.parseFanDuel,
-}));
+});
+exports.allExchanges.add(exchange);
 //# sourceMappingURL=allExchanges.js.map

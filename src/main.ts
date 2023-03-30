@@ -1,21 +1,22 @@
 import * as database from './database';
 import * as models from './models';
 
-const allExchanges = models.allExchanges;
+async function main() {
+    const allExchanges = models.allExchanges;
+    const allTeams = models.allTeams;
 
-(async () => {
     await database.initialize();
     await allExchanges.initialize();
+    await allTeams.initialize();
 
-    // for (let i = 0; i < 1; i++) {
-    //     allExchanges.analyze();
-    // }
+    let shouldContinue = true;
+
+    while (shouldContinue) {
+        await allExchanges.analyze();
+    }
 
     await database.close();
-    await allExchanges.close();
-})();
+    process.exit(0);
+}
 
-/** TODO: If possible, remove all '!'s and '?'s re: typing. 
- * Probably should remove page parser altogether. Parsing should occur right on the main exchange page.
- * Make sure that any time a startDate is being set, it is set to the closest 15 minute increment.
- */
+main();

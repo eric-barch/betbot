@@ -1,3 +1,3 @@
-import { OddsSet } from "./oddsSet";
+import * as models from '../../models';
 
-export const allOdds = new OddsSet();
+export const allOdds = new models.OddsSet();

@@ -70,6 +70,10 @@ class Team {
         const regionAbbrIdentifierFull = `${this.getRegionAbbr()} ${this.getIdentifierFull}`;
         return regionAbbrIdentifierFull;
     }
+    getRegionAbbrIdentifierAbbr() {
+        const regionAbbrIdentifierAbbr = `${this.getRegionAbbr()} ${this.getIdentifierAbbr()}`;
+        return regionAbbrIdentifierAbbr;
+    }
     getRegionFull() {
         return this.regionFull;
     }

@@ -1,1 +1,1 @@
-{"version":3,"file":"allTeams.js","sourceRoot":"","sources":["../../../../src/models/team/allTeams/allTeams.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,wCAAqC;AACrC,2DAA6C;AAEhC,QAAA,QAAQ,GAAG,IAAI,iBAAO,CAAC,WAAW,CAAC,GAAG,CAAC,CAAA"}
+{"version":3,"file":"allTeams.js","sourceRoot":"","sources":["../../../../src/models/team/allTeams/allTeams.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,wDAA0C;AAC1C,2DAA6C;AAEhC,QAAA,QAAQ,GAAG,IAAI,MAAM,CAAC,OAAO,CAAC,WAAW,CAAC,GAAG,CAAC,CAAA"}

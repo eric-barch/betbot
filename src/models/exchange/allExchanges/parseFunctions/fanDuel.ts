@@ -17,27 +17,14 @@ const underPriceXPath = './div[1]/div/div[2]/div[3]/span[2]';
 
 let exchange: models.Exchange;
 let page: puppeteer.Page;
-let gamesFromJson: models.GameSet;
-let oddsFromDocument: models.OddsSet;
+let baseHandle: puppeteer.ElementHandle;
 
 export async function parseFanDuel(this: models.Exchange) {
     exchange = this;
     page = this.getPage()!;
 
-    gamesFromJson = await getGamesFromJson(); 
-    /**Returns a GameSet based on the JSON from the website. 
-     * If the Game already exists in AllGames, it pulls that game. If it 
-     * doesn't, it creates a new game in AllGames and adds the reference
-     * to the set. */
-    
-    oddsFromDocument = await getOddsFromDocument();
-    /**Returns a set of odds for the games visibly listed on the actual
-     * FanDuel page. It uses the JsonGames set as a starting point for 
-     * which games it should search for in the visible document. If the
-     * Odds already exist in AllOdds and the OddsSets for the relevant 
-     * game and exchange, it pulls that Odds instance and adds it to the
-     * return set. If not, it creates the Odds instance and adds it to 
-     * all three sets and the return set. */
+    const gamesFromJson = await getGamesFromJson();
+    const oddsFromDocument = await getOddsFromDocument(gamesFromJson);
 
     return oddsFromDocument;
 }
@@ -49,11 +36,11 @@ async function getGamesFromJson() {
     const jsonGames = await page.evaluate(element => JSON.parse(element!.textContent!), jsonGamesScriptTag);
 
     for (const jsonGame of jsonGames) {
-        const awayTeam = models.allTeams.getTeamByNameString({
+        const awayTeam = models.allTeams.getTeamByName({
             string: jsonGame.awayTeam.name,
         });
 
-        const homeTeam = models.allTeams.getTeamByNameString({
+        const homeTeam = models.allTeams.getTeamByName({
             string: jsonGame.homeTeam.name,
         });
 
@@ -71,119 +58,122 @@ async function getGamesFromJson() {
     return gamesFromJson;
 }
 
-async function getOddsFromDocument() {
+async function getOddsFromDocument(gamesFromJson: models.GameSet) {
     let oddsFromDocument = new models.OddsSet;
 
-    for (const gameFromJson of gamesFromJson) {
-        let exchangeGameBaseHandle;
-        const possibleAwayTeamHandles = await page.$x(`//span[text()='${gameFromJson.getAwayTeam().getRegionFullIdentifierFull()}' or text()='${gameFromJson.getAwayTeam().getRegionAbbrIdentifierFull()}']`);
-        
-        if (possibleAwayTeamHandles.length < 1) {
-            console.log(`Did not find span with text ${gameFromJson.getAwayTeam().getRegionFullIdentifierFull()}.`);
+    let gamesFromDocument = gamesFromJson;
+
+    for (const game of gamesFromDocument) {
+        const baseHandle = await getBaseHandle({game: game});
+
+        if (baseHandle === null) {
+            console.log(`Did not find visible document object for ${game.getAwayTeam().getRegionFullIdentifierFull()} @ ${game.getHomeTeam().getRegionFullIdentifierFull()}.`);
+            gamesFromDocument.delete(game);
         } else {
-            exchangeGameBaseHandle = getExchangeGameBaseHandle(possibleAwayTeamHandles, gameFromJson);
+            const odds = game.getOddsByExchange({
+                exchange: exchange,
+            });
+    
+            odds.setBaseHandle({
+                baseHandle: baseHandle,
+            });
 
-            if (exchangeGameBaseHandle !== null) {
-                const requestedOdds = models.allOdds.getOddsByExchangeAndGame({
-                    exchange: exchange,
-                    game: gameFromJson,
-                });
-
-                // Populate odds, check for changes, etc.
-
-                oddsFromDocument.add(requestedOdds);
-            }
+            oddsFromDocument.add(odds)
         }
+    }
+
+    for (const odds of oddsFromDocument) {
+        baseHandle = odds.getBaseHandle();
+
+        const awaySpread = await getElementValue({ xPath: awaySpreadXPath });
+        const awaySpreadPrice = await getElementValue({ xPath: awaySpreadPriceXPath });
+        const homeSpread = await getElementValue({ xPath: homeSpreadPriceXPath });
+        const homeSpreadPrice = await getElementValue({ xPath: homeSpreadPriceXPath });
+
+        const awayMoneyPrice = await getElementValue({ xPath: awayMoneyPriceXPath });
+        const homeMoneyPrice = await getElementValue({ xPath: homeMoneyPriceXPath });
+
+        const overUnder = await getElementValue({ xPath: overUnderXPath });
+        const overPrice = await getElementValue({ xPath: overPriceXPath });
+        const underPrice = await getElementValue({ xPath: underPriceXPath });
+
+        const spreadOdds = odds.getSpreadOdds();
+        const moneyOdds = odds.getMoneyOdds();
+        const overUnderOdds = odds.getOverUnderOdds();
+
+        spreadOdds.setAwaySpread({awaySpread: awaySpread});
+        spreadOdds.setAwayPrice({awayPrice: awaySpreadPrice});
+        spreadOdds.setHomeSpread({homeSpread: homeSpread});
+        spreadOdds.setHomePrice({homePrice: homeSpreadPrice});
+
+        moneyOdds.setAwayPrice({awayPrice: awayMoneyPrice});
+        moneyOdds.setHomePrice({homePrice: homeMoneyPrice});
+
+        overUnderOdds.setOverUnder({overUnder: overUnder});
+        overUnderOdds.setOverPrice({overPrice: overPrice});
+        overUnderOdds.setUnderPrice({underPrice: underPrice});
+
+        odds.setUpdatedAt({ updatedAt: new Date()});
     }
 
     return oddsFromDocument;
 }
 
-async function getExchangeGameBaseHandle(
-    possibleAwayTeamHandles: puppeteer.ElementHandle<Node>[],
-    gameFromJson: models.Game
-): Promise<puppeteer.ElementHandle | null> {
-    let exchangeGameBaseHandle;
+async function getBaseHandle({
+    game
+}: {
+    game: models.Game,
+}): Promise<puppeteer.ElementHandle | null> {
+    let baseHandle;
+
+    const possibleAwayTeamHandles = await page.$x(`//span[text()='${game.getAwayTeam().getRegionFullIdentifierFull()}' or text()='${game.getAwayTeam().getRegionAbbrIdentifierFull()}']`);
 
     for (const possibleAwayTeamHandle of possibleAwayTeamHandles) {
-        const expectedExchangeGameBaseHandle = (await possibleAwayTeamHandle.$$('xpath/' + '../../../../../../../..'))[0];
-        const expectedHomeTeamHandle = (await expectedExchangeGameBaseHandle.$$('xpath/' + homeTeamXPath))[0];
-        const expectedStartDateHandle = (await expectedExchangeGameBaseHandle.$$('xpath/' + startDateXPath))[0];
+        const expectedBaseHandle = (await possibleAwayTeamHandle.$$('xpath/' + '../../../../../../../..'))[0];
+        const expectedHomeTeamHandle = (await expectedBaseHandle.$$('xpath/' + homeTeamXPath))[0];
+        const expectedStartDateHandle = (await expectedBaseHandle.$$('xpath/' + startDateXPath))[0];
 
-        if (! await homeTeamMatches(expectedHomeTeamHandle, gameFromJson)) {
-            break;
+        const awayTeamText = await possibleAwayTeamHandle.getProperty('textContent').then(property => property.jsonValue());
+        const homeTeamText = await expectedHomeTeamHandle.getProperty('textContent').then(property => property.jsonValue());
+        let startDateText = await expectedStartDateHandle.getProperty('textContent').then(property => property.jsonValue());
+
+        const awayTeam = game.getAwayTeam();
+        let homeTeam = game.getHomeTeam();
+        let startDate = game.getStartDate();
+
+        if (typeof awayTeamText === 'string' && awayTeam.matchesByNameString({string: awayTeamText}) &&
+                typeof homeTeamText === 'string' && homeTeam.matchesByNameString({string: homeTeamText}) &&
+                typeof startDateText === 'string') {
+            startDateText = startDateText.slice(0, -3);
+            
+            const startDateParsed = chrono.parseDate(startDateText);
+            const startDateParsedRounded = models.Game.roundToNearestInterval(startDateParsed);
+
+            if (startDateParsedRounded.getTime() === startDate.getTime()) {
+                baseHandle = expectedBaseHandle;
+                return baseHandle;
+            }
         }
-
-        if (! await startDateMatches(expectedStartDateHandle, gameFromJson)) {
-            break;
-        }
-
-        exchangeGameBaseHandle = expectedExchangeGameBaseHandle;
-        return exchangeGameBaseHandle;
     }
 
     return null;
 }
 
-async function homeTeamMatches(
-    expectedHomeTeamHandle: puppeteer.ElementHandle,
-    gameFromJson: models.Game,
-): Promise<boolean> {
+async function getElementValue({
+    xPath,
+}: {
+    xPath: string,
+}): Promise<number | null> {
     try {
-        const textContent = await expectedHomeTeamHandle.getProperty('textContent').then(property => property.jsonValue());
+        const elementHandle = (await baseHandle.$$('xpath/' + xPath))[0];
+        const elementTextContent = await elementHandle.getProperty('textContent').then(property => property.jsonValue());
+        const numericTextContent = elementTextContent!.replace(/[^\d.-]/g, '');
+        const elementValue = Number(numericTextContent);
         
-        if (typeof textContent === 'string' &&
-            gameFromJson.getHomeTeam().matchesByNameString({string: textContent})) {
-            return true;
-        }
-    } catch (error) {
-        console.log(error);
-    }
-
-    return false;
-}
-
-async function startDateMatches(
-    expectedStartDateHandle: puppeteer.ElementHandle,
-    gameFromJson: models.Game,
-): Promise<boolean> {
-
-    if (expectedStartDateHandle !== undefined) {
-        const expectedStartDateHandleTextContent = await expectedStartDateHandle.getProperty('textContent').then(property => property.jsonValue());
-        
-        if (typeof expectedStartDateHandleTextContent === 'string') {
-            const expectedTimeHandleStartDate = chrono.parseDate(expectedStartDateHandleTextContent);
-
-            const diff = Math.abs(expectedTimeHandleStartDate.getTime() - gameFromJson.getStartDate().getTime());
-            const isWithin5Minutes = diff <= 300000;
-
-            if (isWithin5Minutes) {
-                return true;
-            }
-        }
-    } else {
-        const currentTime = new Date();
-        
-        const diff = currentTime.getTime() - gameFromJson.getStartDate().getTime();
-        const isWithin8HoursBefore = diff <= 28800000;
-
-        if (isWithin8HoursBefore) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-async function getOddsElementContent(gameBaseHandle: puppeteer.ElementHandle, xPath: string) {
-    const oddsElementHandle = (await gameBaseHandle.$$('xpath/' + xPath))[0];
-    let oddsElementContent;
-
-    try {
-        oddsElementContent = await oddsElementHandle.getProperty('textContent').then(property => property.jsonValue());
+        return elementValue;
     } catch {
-        oddsElementContent = '0';
+        console.log('Could not find element value.');
     }
 
-    return oddsElementContent;
+    return null;
 }

@@ -1,12 +1,21 @@
-import * as models from '..';
+import * as models from '../../models';
 
 export class TeamSet extends Set<models.Team> {
+    public async initialize() {
+        for (const team of this) {
+            await team.initialize();
+        }
+    }
 
     add(team: models.Team): this {
+        if (this !== models.allTeams) {
+            models.allTeams.add(team);
+        }
+
         return super.add(team);
     }
 
-    public getTeamByNameString({
+    public getTeamByName({
         string,
     }: {
         string: string,
@@ -17,7 +26,6 @@ export class TeamSet extends Set<models.Team> {
             }
         }
 
-        throw new Error(`${this.constructor.name}.${this.getTeamByNameString.name} failed. Did not find team matching name string.`);
+        throw new Error(`${this.constructor.name}.${this.getTeamByName.name} failed. Did not find team matching name string.`);
     }
-    
 }

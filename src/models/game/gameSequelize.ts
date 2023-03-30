@@ -1,6 +1,6 @@
 import * as sequelize from 'sequelize';
 
-import * as models from '..';
+import * as models from '../../models';
 import { sequelizeInstance } from '../../database/instance';
 
 export const GameSequelizeModel = sequelizeInstance.define('Game', {

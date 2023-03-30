@@ -31,6 +31,34 @@ export class Game {
         await this.sequelizeInstance.initialize();
     }
 
+    public getOddsByExchange({
+        exchange,
+    }: {
+        exchange: models.Exchange,
+    }) {
+        let requestedOdds = undefined;
+
+        const gameOdds = this.oddsGroup;
+
+        for (const odds of gameOdds) {
+            if (odds.getExchange() === exchange) {
+                requestedOdds = odds;
+                break;
+            }
+        }
+
+        if (requestedOdds === undefined) {
+            requestedOdds = new models.Odds({
+                exchange: exchange,
+                game: this,
+            })
+
+            models.allOdds.add(requestedOdds);
+        }
+
+        return requestedOdds;
+    }
+
     public matchesByTeamsAndStartDate({
         awayTeam,
         homeTeam,
@@ -40,14 +68,10 @@ export class Game {
         homeTeam: models.Team,
         startDate: Date,
     }) {
-        if (this.awayTeam === awayTeam && this.homeTeam === homeTeam) {
-            const timeDifference = Math.abs(startDate.getTime() - this.getStartDate().getTime());
-            const minutesDifference = timeDifference / 1000 / 60;
-            const within15Minutes = minutesDifference <= 15;
+        startDate = Game.roundToNearestInterval(startDate);
 
-            if (within15Minutes) {
-                return true;
-            }
+        if (this.awayTeam === awayTeam && this.homeTeam === homeTeam && this.startDate === startDate) {
+            return true;
         }
 
         return false;
@@ -59,6 +83,11 @@ export class Game {
 
     public getHomeTeam() {
         return this.homeTeam;
+    }
+
+    public getName() {
+        const name = `${this.getAwayTeam().getRegionAbbrIdentifierAbbr()} @ ${this.getHomeTeam().getRegionAbbrIdentifierAbbr()}`;
+        return name;
     }
 
     public getSequelizeInstance() {
@@ -77,4 +106,12 @@ export class Game {
         return this.oddsGroup;
     }
 
+    public static roundToNearestInterval(date: Date) {
+        const ROUND_INTERVAL = 15;
+        
+        const roundedMinutes = Math.round(date.getMinutes() / ROUND_INTERVAL) * ROUND_INTERVAL;
+        const roundedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), roundedMinutes, 0);
+
+        return roundedDate;
+    }
 }

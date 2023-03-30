@@ -51,33 +51,26 @@ class ExchangeSequelizeInstance {
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
+            const localExchange = this.getExchange();
             this.sequelizeInstance = yield exports.ExchangeSequelizeModel.findOrCreate({
                 where: {
-                    name: this.exchange.getName(),
+                    name: localExchange.getName(),
                 },
                 defaults: {
-                    name: this.getExchange().getName(),
-                    url: this.getExchange().getUrl(),
+                    name: localExchange.getName(),
+                    url: localExchange.getUrl(),
                 },
-            }).then(([exchange, created]) => {
+            }).then(([sqlExchange, created]) => __awaiter(this, void 0, void 0, function* () {
                 if (created) {
-                    console.log("Exchange created: ", exchange.get({ plain: true }));
+                    console.log(`Exchange created in MySQL: ${localExchange.getName()}`);
                 }
                 else {
-                    console.log("Exchange already exists:", exchange.get({ plain: true }));
-                    const rowData = exchange.get({ plain: true });
-                    if (rowData.url !== this.getExchange().getUrl()) {
-                        exports.ExchangeSequelizeModel.update({ url: this.getExchange().getUrl() }, { where: {
-                                name: this.getExchange().getName(),
-                            } }).then(() => {
-                            console.log(`Database URL updated to match program URL.`);
-                        });
-                    }
-                    else {
-                        console.log(`Database URL matches program URL. No update necessary.`);
-                    }
+                    console.log(`Exchange already exists in MySQL: ${localExchange.getName()}`);
+                    yield sqlExchange.update({
+                        url: localExchange.getUrl(),
+                    });
                 }
-            });
+            }));
         });
     }
     getExchange() {

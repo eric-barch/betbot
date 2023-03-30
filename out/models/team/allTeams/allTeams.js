@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allTeams = void 0;
-const teamSet_1 = require("../teamSet");
+const models = __importStar(require("../../../models"));
 const leagueTeams = __importStar(require("./leagueTeams"));
-exports.allTeams = new teamSet_1.TeamSet(leagueTeams.nba);
+exports.allTeams = new models.TeamSet(leagueTeams.nba);
 //# sourceMappingURL=allTeams.js.map

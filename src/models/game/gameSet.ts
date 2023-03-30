@@ -1,8 +1,11 @@
-import * as models from '..';
+import * as models from '../../models';
 
 export class GameSet extends Set<models.Game> {
-
     add(game: models.Game): this {
+        if (this !== models.allGames) {
+            models.allGames.add(game);
+        }
+
         return super.add(game);
     }
 
@@ -17,7 +20,7 @@ export class GameSet extends Set<models.Game> {
     }) {
         let requestedGame = undefined;
 
-        startDate = this.roundToNearest15Minute(startDate);
+        startDate = models.Game.roundToNearestInterval(startDate);
         
         for (const game of this) {
             if (game.matchesByTeamsAndStartDate({
@@ -36,19 +39,10 @@ export class GameSet extends Set<models.Game> {
                 homeTeam: homeTeam,
                 startDate: startDate,
             });
+
             this.add(requestedGame);
         }
 
         return requestedGame;
     }
-
-    private roundToNearest15Minute(date: Date) {
-        const ROUND_TO_MINUTES = 15;
-        
-        const roundedMinutes = Math.round(date.getMinutes() / ROUND_TO_MINUTES) * ROUND_TO_MINUTES;
-        const roundedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), roundedMinutes, 0);
-
-        return roundedDate;
-    }
-
 }
