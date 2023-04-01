@@ -3,7 +3,7 @@ import * as sequelize from 'sequelize';
 import * as models from '../../models';
 import { sequelizeInstance } from '../instance';
 
-const TeamSequelizeModel = sequelizeInstance.define('Team', {
+export const TeamSequelizeModel = sequelizeInstance.define('Team', {
     id: {
         type: sequelize.DataTypes.INTEGER,
         primaryKey: true,
@@ -17,7 +17,7 @@ const TeamSequelizeModel = sequelizeInstance.define('Team', {
 
 export class TeamSequelizeInstance {
     private team: models.Team;
-    private sequelizeInstance: void | sequelize.ModelCtor<sequelize.Model<any, any>> | null;
+    private sequelizeInstance: sequelize.Model<any, any> | null;
 
     constructor({
         team,
@@ -31,7 +31,7 @@ export class TeamSequelizeInstance {
     public async initialize() {
         const localTeam = this.getTeam();
 
-        this.sequelizeInstance = await TeamSequelizeModel.findOrCreate({
+        await TeamSequelizeModel.findOrCreate({
             where: {
                 regionFull: localTeam.getRegionFull(),
                 identifierFull: localTeam.getIdentifierFull(),
@@ -43,15 +43,13 @@ export class TeamSequelizeInstance {
                 identifierAbbr: localTeam.getIdentifierAbbr(),
             },
         }).then(async ([sqlTeam, created]) => {
-            if (created) {
-                console.log(`Team created in MySQL: ${localTeam.getRegionFullIdentifierFull()}`);
-            } else {
-                console.log(`Team already exists in MySQL: ${localTeam.getRegionFullIdentifierFull()}`);
+            if (!created) {
                 await sqlTeam.update({
                     regionAbbr: localTeam.getRegionAbbr(),
                     identifierAbbr: localTeam.getIdentifierAbbr(),
                 });
             }
+            this.sequelizeInstance = sqlTeam;
         });
     }
 

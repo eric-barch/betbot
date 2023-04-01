@@ -22,6 +22,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameSet = void 0;
 const global = __importStar(require("../../global"));
@@ -39,31 +48,33 @@ class GameSet extends Set {
         return super.add(game);
     }
     getGameByTeamsAndStartDate({ awayTeam, homeTeam, startDate, exchange, }) {
-        let requestedGame = undefined;
-        for (const game of this) {
-            if (game.matchesByTeamsAndStartDate({
-                awayTeam: awayTeam,
-                homeTeam: homeTeam,
-                startDate: startDate,
-            })) {
-                requestedGame = game;
-                break;
+        return __awaiter(this, void 0, void 0, function* () {
+            let requestedGame = undefined;
+            for (const game of this) {
+                if (game.matchesByTeamsAndStartDate({
+                    awayTeam: awayTeam,
+                    homeTeam: homeTeam,
+                    startDate: startDate,
+                })) {
+                    requestedGame = game;
+                    break;
+                }
             }
-        }
-        if (requestedGame === undefined) {
-            requestedGame = new models.Game({
-                awayTeam: awayTeam,
-                homeTeam: homeTeam,
-                startDate: startDate,
-            });
-            // requestedGame.initialize();
-            this.add(requestedGame);
-        }
-        if (exchange) {
-            requestedGame.getExchangesGroup().add(exchange);
-            exchange.getGamesGroup().add(requestedGame);
-        }
-        return requestedGame;
+            if (requestedGame === undefined) {
+                requestedGame = new models.Game({
+                    awayTeam: awayTeam,
+                    homeTeam: homeTeam,
+                    startDate: startDate,
+                });
+                yield requestedGame.initialize();
+                this.add(requestedGame);
+            }
+            if (exchange) {
+                requestedGame.getExchangesGroup().add(exchange);
+                exchange.getGamesGroup().add(requestedGame);
+            }
+            return requestedGame;
+        });
     }
 }
 exports.GameSet = GameSet;

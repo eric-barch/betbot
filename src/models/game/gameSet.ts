@@ -14,7 +14,7 @@ export class GameSet extends Set<models.Game> {
         return super.add(game);
     }
 
-    public getGameByTeamsAndStartDate({
+    public async getGameByTeamsAndStartDate({
         awayTeam,
         homeTeam,
         startDate,
@@ -45,7 +45,7 @@ export class GameSet extends Set<models.Game> {
                 startDate: startDate,
             });
             
-            // requestedGame.initialize();
+            await requestedGame.initialize();
             this.add(requestedGame);
         }
 

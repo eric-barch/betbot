@@ -68,7 +68,7 @@ function getGameInstancesFromJson({ exchange, }) {
             const awayTeamInstance = global.allTeams.getTeamByNameString({ nameString: awayTeamNameString });
             const homeTeamInstance = global.allTeams.getTeamByNameString({ nameString: homeTeamNameString });
             const startDate = new Date(jsonGame.startDate);
-            const correspondingGameInstance = global.allGames.getGameByTeamsAndStartDate({
+            const correspondingGameInstance = yield global.allGames.getGameByTeamsAndStartDate({
                 awayTeam: awayTeamInstance,
                 homeTeam: homeTeamInstance,
                 startDate: startDate,

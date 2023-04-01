@@ -9,14 +9,14 @@ export const GameSequelizeModel = sequelizeInstance.define('Game', {
         primaryKey: true,
         autoIncrement: true
     },
-    awayTeam: sequelize.DataTypes.STRING,
-    homeTeam: sequelize.DataTypes.STRING,
-    startDate: sequelize.DataTypes.DATE
+    awayTeamName: sequelize.DataTypes.STRING,
+    homeTeamName: sequelize.DataTypes.STRING,
+    startDate: sequelize.DataTypes.DATE,
 });
 
 export class GameSequelizeInstance {
     private game: models.Game;
-    private sequelizeInstance: void | sequelize.ModelCtor<sequelize.Model<any, any>> | null;
+    private sequelizeInstance: sequelize.Model<any, any> | null;
 
     constructor({
         game,
@@ -28,23 +28,38 @@ export class GameSequelizeInstance {
     }
 
     public async initialize() {
-        this.sequelizeInstance = await GameSequelizeModel.findOrCreate({
+        const game = this.getGame();
+
+        const awayTeam = game.getAwayTeam();
+        const homeTeam = game.getHomeTeam();
+        const startDate = game.getStartDate();
+
+        const awayTeamId = awayTeam.getSequelizeInstance()!.getSequelizeInstance()!.get('id');
+        const homeTeamId = homeTeam.getSequelizeInstance()!.getSequelizeInstance()!.get('id');
+
+        const awayTeamName = awayTeam.getRegionAbbrIdentifierAbbr();
+        const homeTeamName = homeTeam.getRegionAbbrIdentifierAbbr();
+        
+        await GameSequelizeModel.findOrCreate({
             where: {
-                awayTeam: this.getGame().getAwayTeam(),
-                homeTeam: this.getGame().getHomeTeam(),
-                startDate: this.getGame().getStartDate(),
+                awayTeamId: awayTeamId,
+                homeTeamId: homeTeamId,
+                startDate: startDate,
             },
             defaults: {
-                awayTeam: this.getGame().getAwayTeam(),
-                homeTeam: this.getGame().getHomeTeam(),
-                startDate: this.getGame().getStartDate(),
+                awayTeamId: awayTeamId,
+                homeTeamId: homeTeamId,
+                awayTeamName: awayTeamName,
+                homeTeamName: homeTeamName,
+                startDate: startDate,
             },
-        }).then(([game, created]) => {
+        }).then(([sqlGame, created]) => {
             if (created) {
-                console.log("Game created: ", game.get({ plain: true }));
+                console.log(`Game created: ${game.getName()}`);
             } else {
-                console.log("Game already exists:", game.get({ plain: true }));
+                console.log(`Game already exists in MySQL: ${game.getName()}`);
             }
+            this.sequelizeInstance = sqlGame;
         });
     }
 

@@ -32,10 +32,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TeamSequelizeInstance = void 0;
+exports.TeamSequelizeInstance = exports.TeamSequelizeModel = void 0;
 const sequelize = __importStar(require("sequelize"));
 const instance_1 = require("../instance");
-const TeamSequelizeModel = instance_1.sequelizeInstance.define('Team', {
+exports.TeamSequelizeModel = instance_1.sequelizeInstance.define('Team', {
     id: {
         type: sequelize.DataTypes.INTEGER,
         primaryKey: true,
@@ -54,7 +54,7 @@ class TeamSequelizeInstance {
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
             const localTeam = this.getTeam();
-            this.sequelizeInstance = yield TeamSequelizeModel.findOrCreate({
+            yield exports.TeamSequelizeModel.findOrCreate({
                 where: {
                     regionFull: localTeam.getRegionFull(),
                     identifierFull: localTeam.getIdentifierFull(),
@@ -66,16 +66,13 @@ class TeamSequelizeInstance {
                     identifierAbbr: localTeam.getIdentifierAbbr(),
                 },
             }).then(([sqlTeam, created]) => __awaiter(this, void 0, void 0, function* () {
-                if (created) {
-                    console.log(`Team created in MySQL: ${localTeam.getRegionFullIdentifierFull()}`);
-                }
-                else {
-                    console.log(`Team already exists in MySQL: ${localTeam.getRegionFullIdentifierFull()}`);
+                if (!created) {
                     yield sqlTeam.update({
                         regionAbbr: localTeam.getRegionAbbr(),
                         identifierAbbr: localTeam.getIdentifierAbbr(),
                     });
                 }
+                this.sequelizeInstance = sqlTeam;
             }));
         });
     }

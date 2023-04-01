@@ -54,6 +54,8 @@ function initialize() {
         databaseModels.GameSequelizeModel.belongsToMany(databaseModels.ExchangeSequelizeModel, { through: 'ExchangeGames' });
         databaseModels.GameSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, { foreignKey: 'gameId' });
         databaseModels.OddsSequelizeModel.belongsTo(databaseModels.GameSequelizeModel, { foreignKey: 'gameId' });
+        databaseModels.GameSequelizeModel.belongsTo(databaseModels.TeamSequelizeModel, { as: 'awayTeam', foreignKey: 'awayTeamId' });
+        databaseModels.GameSequelizeModel.belongsTo(databaseModels.TeamSequelizeModel, { as: 'homeTeam', foreignKey: 'homeTeamId' });
         databaseModels.ExchangeSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, { foreignKey: 'exchangeId' });
         databaseModels.OddsSequelizeModel.belongsTo(databaseModels.ExchangeSequelizeModel, { foreignKey: 'exchangeId' });
         databaseModels.OddsSequelizeModel.hasMany(databaseModels.oldOddsSequelizeModel, { foreignKey: 'oddsId' });

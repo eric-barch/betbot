@@ -43,7 +43,7 @@ async function getGameInstancesFromJson({
         const homeTeamInstance = global.allTeams.getTeamByNameString({ nameString: homeTeamNameString });
         const startDate = new Date(jsonGame.startDate);
 
-        const correspondingGameInstance = global.allGames.getGameByTeamsAndStartDate({
+        const correspondingGameInstance = await global.allGames.getGameByTeamsAndStartDate({
             awayTeam: awayTeamInstance,
             homeTeam: homeTeamInstance,
             startDate: startDate,

@@ -52,7 +52,7 @@ class ExchangeSequelizeInstance {
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
             const localExchange = this.getExchange();
-            this.sequelizeInstance = yield exports.ExchangeSequelizeModel.findOrCreate({
+            yield exports.ExchangeSequelizeModel.findOrCreate({
                 where: {
                     name: localExchange.getName(),
                 },
@@ -70,6 +70,7 @@ class ExchangeSequelizeInstance {
                         url: localExchange.getUrl(),
                     });
                 }
+                this.sequelizeInstance = sqlExchange;
             }));
         });
     }
