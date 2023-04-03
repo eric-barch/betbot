@@ -91,7 +91,7 @@ function getOddsInstancesFromDocument({ exchange, gamesFromJson, }) {
                 console.log(`${gameFromJson.getName()} exists in the JSON games for ${exchange.getName()} but not in the visible document.`);
             }
             else {
-                const odds = gameFromJson.getOddsByExchange({ exchange: exchange });
+                const odds = yield gameFromJson.getOddsByExchange({ exchange: exchange });
                 odds.setBaseHandle({ baseHandle: baseHandle });
                 const awaySpread = yield getElementNumericalValue({ elementHandle: yield getElementHandleByXPath({ xPath: awaySpreadXPath, odds: odds }) });
                 const awaySpreadPrice = yield getElementNumericalValue({ elementHandle: yield getElementHandleByXPath({ xPath: awaySpreadPriceXPath, odds: odds }) });
@@ -115,6 +115,7 @@ function getOddsInstancesFromDocument({ exchange, gamesFromJson, }) {
                 overUnderOdds.setOverPrice({ overPrice: overPrice });
                 overUnderOdds.setUnderPrice({ underPrice: underPrice });
                 odds.setUpdatedAt({ updatedAt: new Date() });
+                yield odds.initialize();
                 oddsFromDocument.add(odds);
             }
         }

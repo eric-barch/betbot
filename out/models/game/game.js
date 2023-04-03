@@ -42,32 +42,52 @@ class Game {
         this.startDate = Game.roundToNearestInterval(startDate);
         this.exchangesGroup = new models.ExchangeSet;
         this.oddsGroup = new models.OddsSet();
-        this.sequelizeInstance = null;
+        this.sqlGame = null;
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.sequelizeInstance = new databaseModels.GameSequelizeInstance({ game: this });
-            yield this.sequelizeInstance.initialize();
+            const awayTeam = this.getAwayTeam();
+            const homeTeam = this.getHomeTeam();
+            const startDate = this.getStartDate();
+            const awayTeamId = awayTeam.getSqlTeam().get('id');
+            const homeTeamId = homeTeam.getSqlTeam().get('id');
+            yield databaseModels.Game.findOrCreate({
+                where: {
+                    awayTeamId: awayTeamId,
+                    homeTeamId: homeTeamId,
+                    startDate: startDate,
+                },
+                defaults: {
+                    awayTeamId: awayTeamId,
+                    homeTeamId: homeTeamId,
+                    startDate: startDate,
+                },
+            }).then(([sqlGame, created]) => {
+                this.sqlGame = sqlGame;
+            });
         });
     }
     getOddsByExchange({ exchange, }) {
-        let requestedOdds = undefined;
-        const gameOdds = this.oddsGroup;
-        for (const odds of gameOdds) {
-            if (odds.getExchange() === exchange) {
-                requestedOdds = odds;
-                break;
+        return __awaiter(this, void 0, void 0, function* () {
+            let requestedOdds = undefined;
+            const gameOdds = this.oddsGroup;
+            for (const odds of gameOdds) {
+                if (odds.getExchange() === exchange) {
+                    requestedOdds = odds;
+                    break;
+                }
             }
-        }
-        if (requestedOdds === undefined) {
-            requestedOdds = new models.Odds({
-                exchange: exchange,
-                game: this,
-            });
-            exchange.getOddsGroup().add(requestedOdds);
-            this.getOddsGroup().add(requestedOdds);
-        }
-        return requestedOdds;
+            if (requestedOdds === undefined) {
+                requestedOdds = new models.Odds({
+                    exchange: exchange,
+                    game: this,
+                });
+                yield requestedOdds.initialize();
+                exchange.getOddsGroup().add(requestedOdds);
+                this.getOddsGroup().add(requestedOdds);
+            }
+            return requestedOdds;
+        });
     }
     matchesByTeamsAndStartDate({ awayTeam, homeTeam, startDate, }) {
         startDate = Game.roundToNearestInterval(startDate);
@@ -89,8 +109,8 @@ class Game {
         const name = `${this.getAwayTeam().getRegionAbbrIdentifierAbbr()} @ ${this.getHomeTeam().getRegionAbbrIdentifierAbbr()}`;
         return name;
     }
-    getSequelizeInstance() {
-        return this.sequelizeInstance;
+    getSqlGame() {
+        return this.sqlGame;
     }
     getStartDate() {
         return this.startDate;

@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -32,23 +9,71 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initialize = void 0;
-const databaseModels = __importStar(require("./models"));
-function initialize() {
+exports.close = exports.init = exports.sequelize = void 0;
+const sequelize_1 = require("sequelize");
+exports.sequelize = new sequelize_1.Sequelize('nba', 'root', 'f9R#@hY82l', {
+    host: 'localhost',
+    port: 3306,
+    dialect: 'mysql',
+    logging: false,
+});
+const models_1 = require("../database/models");
+function init() {
     return __awaiter(this, void 0, void 0, function* () {
-        databaseModels.ExchangeSequelizeModel.belongsToMany(databaseModels.GameSequelizeModel, { through: 'ExchangeGames' });
-        databaseModels.GameSequelizeModel.belongsToMany(databaseModels.ExchangeSequelizeModel, { through: 'ExchangeGames' });
-        databaseModels.GameSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, { foreignKey: 'gameId' });
-        databaseModels.OddsSequelizeModel.belongsTo(databaseModels.GameSequelizeModel, { foreignKey: 'gameId' });
-        databaseModels.ExchangeSequelizeModel.hasMany(databaseModels.OddsSequelizeModel, { foreignKey: 'exchangeId' });
-        databaseModels.OddsSequelizeModel.belongsTo(databaseModels.ExchangeSequelizeModel, { foreignKey: 'exchangeId' });
-        databaseModels.OddsSequelizeModel.hasMany(databaseModels.OddsOldSequelizeModel, { foreignKey: 'oddsId' });
-        databaseModels.OddsOldSequelizeModel.belongsTo(databaseModels.OddsSequelizeModel, { foreignKey: 'oddsId' });
-        // await instance.sync({
-        //     alter: true,
-        //     logging: false,
-        // });
+        try {
+            yield exports.sequelize.authenticate();
+            console.log('MySQL connection successful.');
+        }
+        catch (error) {
+            console.log(`MySQL connection unsuccessful: ${error}`);
+        }
+        // Exchange associations
+        models_1.Exchange.belongsToMany(models_1.Game, {
+            through: 'exchange_games',
+            foreignKey: 'exchangeId',
+            otherKey: 'gameId',
+        });
+        models_1.Exchange.hasMany(models_1.Odd, { foreignKey: 'exchangeId' });
+        models_1.Exchange.belongsToMany(models_1.Team, {
+            through: 'exchange_teams',
+            foreignKey: 'exchangeId',
+            otherKey: 'teamId',
+        });
+        // Game associations 
+        models_1.Game.belongsToMany(models_1.Exchange, {
+            through: 'exchange_games',
+            foreignKey: 'gameId',
+            otherKey: 'exchangeId',
+        });
+        models_1.Game.hasMany(models_1.Odd, { foreignKey: 'gameId' });
+        models_1.Game.belongsTo(models_1.Team, { as: 'gameAwayTeam', foreignKey: 'awayTeamId' });
+        models_1.Game.belongsTo(models_1.Team, { as: 'gameHomeTeam', foreignKey: 'homeTeamId' });
+        // Odd associations
+        models_1.Odd.belongsTo(models_1.Exchange, { foreignKey: 'exchangeId' });
+        models_1.Odd.belongsTo(models_1.Game, { foreignKey: 'gameId' });
+        models_1.Odd.belongsTo(models_1.Team, { as: 'oddAwayTeam', foreignKey: 'awayTeamId' });
+        models_1.Odd.belongsTo(models_1.Team, { as: 'oddHomeTeam', foreignKey: 'homeTeamId' });
+        // Team associations
+        models_1.Team.belongsToMany(models_1.Exchange, {
+            through: 'exchange_teams',
+            foreignKey: 'teamId',
+            otherKey: 'exchangeId',
+        });
+        models_1.Team.hasMany(models_1.Game, { as: 'gameAwayTeam', foreignKey: 'awayTeamId' });
+        models_1.Team.hasMany(models_1.Game, { as: 'gameHomeTeam', foreignKey: 'homeTeamId' });
+        models_1.Team.hasMany(models_1.Odd, { as: 'oddAwayTeam', foreignKey: 'awayTeamId' });
+        models_1.Team.hasMany(models_1.Odd, { as: 'oddHomeTeam', foreignKey: 'homeTeamId' });
+        yield exports.sequelize.sync({
+            alter: true,
+            logging: false,
+        });
     });
 }
-exports.initialize = initialize;
+exports.init = init;
+function close() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exports.sequelize.close();
+    });
+}
+exports.close = close;
 //# sourceMappingURL=database.js.map

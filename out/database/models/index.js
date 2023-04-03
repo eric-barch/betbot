@@ -17,9 +17,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./exchangeSequelize"), exports);
-__exportStar(require("./gameSequelize"), exports);
-__exportStar(require("./oddsSequelize"), exports);
-__exportStar(require("./oldOddsSequelize"), exports);
-__exportStar(require("./teamSequelize"), exports);
+__exportStar(require("./exchange"), exports);
+__exportStar(require("./game"), exports);
+__exportStar(require("./odd"), exports);
+__exportStar(require("./team"), exports);
 //# sourceMappingURL=index.js.map

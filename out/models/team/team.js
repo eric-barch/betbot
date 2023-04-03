@@ -41,12 +41,30 @@ class Team {
         this.identifierFull = identifierFull;
         this.identifierAbbr = identifierAbbr;
         this.altNames = altNames;
-        this.sequelizeInstance = null;
+        this.sqlTeam = null;
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.sequelizeInstance = new databaseModels.TeamSequelizeInstance({ team: this });
-            yield this.sequelizeInstance.initialize();
+            yield databaseModels.Team.findOrCreate({
+                where: {
+                    regionFull: this.getRegionFull(),
+                    identifierFull: this.getIdentifierFull(),
+                },
+                defaults: {
+                    regionFull: this.getRegionFull(),
+                    regionAbbr: this.getRegionAbbr(),
+                    identifierFull: this.getIdentifierFull(),
+                    identifierAbbr: this.getIdentifierAbbr(),
+                },
+            }).then(([sqlTeam, created]) => __awaiter(this, void 0, void 0, function* () {
+                if (!created) {
+                    yield sqlTeam.update({
+                        regionAbbr: this.getRegionAbbr(),
+                        identifierAbbr: this.getIdentifierAbbr(),
+                    });
+                }
+                this.sqlTeam = sqlTeam;
+            }));
         });
     }
     matchesByNameString({ nameString, }) {
@@ -59,8 +77,8 @@ class Team {
         }
     }
     // Getters
-    getSequelizeInstance() {
-        return this.sequelizeInstance;
+    getSqlTeam() {
+        return this.sqlTeam;
     }
     getRegionFullIdentifierFull() {
         const regionFullIdentifierFull = `${this.getRegionFull()} ${this.getIdentifierFull()}`;

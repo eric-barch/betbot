@@ -57,8 +57,7 @@ class Odds {
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.sequelizeInstance = new databaseModels.OddsSequelizeInstance({ odds: this });
-            yield this.sequelizeInstance.initialize();
+            this.sequelizeInstance = new databaseModels.Odd();
         });
     }
     matchesByExchangeAndGame({ exchange, game, }) {

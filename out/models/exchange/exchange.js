@@ -46,13 +46,27 @@ class Exchange {
         this.parseFunction = parseFunction;
         this.gamesGroup = new models.GameSet();
         this.oddsGroup = new models.OddsSet();
-        this.sequelizeInstance = null;
+        this.sqlExchange = null;
     }
     initialize() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.connectToExistingPage();
-            this.sequelizeInstance = new databaseModels.ExchangeSequelizeInstance({ exchange: this });
-            yield this.sequelizeInstance.initialize();
+            yield databaseModels.Exchange.findOrCreate({
+                where: {
+                    name: this.getName(),
+                },
+                defaults: {
+                    name: this.getName(),
+                    url: this.getUrl(),
+                },
+            }).then(([sqlExchange, created]) => __awaiter(this, void 0, void 0, function* () {
+                if (!created) {
+                    yield sqlExchange.update({
+                        url: this.getUrl(),
+                    });
+                }
+                this.sqlExchange = sqlExchange;
+            }));
         });
     }
     analyze() {
@@ -126,8 +140,8 @@ class Exchange {
             throw new Error(`${this.getName()} page is null.`);
         }
     }
-    getSequelizeInstance() {
-        return this.sequelizeInstance;
+    getSqlExchange() {
+        return this.sqlExchange;
     }
     getUrl() {
         return this.url;
