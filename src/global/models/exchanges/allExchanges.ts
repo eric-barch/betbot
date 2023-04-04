@@ -1,5 +1,4 @@
 import * as localModels from '../../../local/models';
-import * as parseFunctions from './parseFunctions';
 
 export const allExchanges = new localModels.ExchangeSet();
 
@@ -23,8 +22,7 @@ export async function allExchangesInit(): Promise<void> {
     allExchanges.add(
         await localModels.Exchange.create({
             name: 'FanDuel',
-            url: 'https://sportsbook.fanduel.com/navigation/nba',
-            parseFunction: parseFunctions.parseFanDuel,
+            url: 'sportsbook.fanduel.com/navigation/nba',
         })
     );
 }

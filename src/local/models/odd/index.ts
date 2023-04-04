@@ -4,3 +4,4 @@
 
 export * from './odd';
 export * from './oddSet';
+export * from './updateElementFunctions/index';

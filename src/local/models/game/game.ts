@@ -46,6 +46,7 @@ export class Game {
             homeTeam: homeTeam,
             startDate: startDate,
         })
+
         if (exchange) {
             newGame.exchangeSet.add(exchange);
             exchange.gameSet.add(newGame);

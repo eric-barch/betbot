@@ -22,15 +22,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
 const databaseModels = __importStar(require("../../../database/models"));
@@ -46,64 +37,58 @@ class Game {
         this.wrappedSqlGame = null;
     }
     // async construction methods
-    static create({ awayTeam, homeTeam, exchange, startDate, }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const newGame = new Game({
-                awayTeam: awayTeam,
-                homeTeam: homeTeam,
-                startDate: startDate,
-            });
-            if (exchange) {
-                newGame.exchangeSet.add(exchange);
-                exchange.gameSet.add(newGame);
-            }
-            yield newGame.init();
-            globalModels.allGames.add(newGame);
-            return newGame;
+    static async create({ awayTeam, homeTeam, exchange, startDate, }) {
+        const newGame = new Game({
+            awayTeam: awayTeam,
+            homeTeam: homeTeam,
+            startDate: startDate,
         });
+        if (exchange) {
+            newGame.exchangeSet.add(exchange);
+            exchange.gameSet.add(newGame);
+        }
+        await newGame.init();
+        globalModels.allGames.add(newGame);
+        return newGame;
     }
-    init() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const awayTeam = this.awayTeam;
-            const homeTeam = this.homeTeam;
-            const startDate = this.startDate;
-            const awayTeamId = awayTeam.sqlTeam.get('id');
-            const homeTeamId = homeTeam.sqlTeam.get('id');
-            yield databaseModels.Game.findOrCreate({
-                where: {
-                    awayTeamId: awayTeamId,
-                    homeTeamId: homeTeamId,
-                    startDate: startDate,
-                },
-                defaults: {
-                    awayTeamId: awayTeamId,
-                    homeTeamId: homeTeamId,
-                    startDate: startDate,
-                },
-            }).then(([sqlGame, created]) => {
-                this.wrappedSqlGame = sqlGame;
-            });
+    async init() {
+        const awayTeam = this.awayTeam;
+        const homeTeam = this.homeTeam;
+        const startDate = this.startDate;
+        const awayTeamId = awayTeam.sqlTeam.get('id');
+        const homeTeamId = homeTeam.sqlTeam.get('id');
+        await databaseModels.Game.findOrCreate({
+            where: {
+                awayTeamId: awayTeamId,
+                homeTeamId: homeTeamId,
+                startDate: startDate,
+            },
+            defaults: {
+                awayTeamId: awayTeamId,
+                homeTeamId: homeTeamId,
+                startDate: startDate,
+            },
+        }).then(([sqlGame, created]) => {
+            this.wrappedSqlGame = sqlGame;
         });
     }
     // instance methods
-    getOddByExchange({ exchange, }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let requestedOdd = undefined;
-            const gameOdds = this.oddSet;
-            for (const odd of gameOdds) {
-                if (odd.exchange === exchange) {
-                    requestedOdd = odd;
-                    break;
-                }
+    async getOddByExchange({ exchange, }) {
+        let requestedOdd = undefined;
+        const gameOdds = this.oddSet;
+        for (const odd of gameOdds) {
+            if (odd.exchange === exchange) {
+                requestedOdd = odd;
+                break;
             }
-            if (requestedOdd === undefined) {
-                requestedOdd = yield localModels.Odd.create({
-                    exchange: exchange,
-                    game: this,
-                });
-            }
-            return requestedOdd;
-        });
+        }
+        if (requestedOdd === undefined) {
+            requestedOdd = await localModels.Odd.create({
+                exchange: exchange,
+                game: this,
+            });
+        }
+        return requestedOdd;
     }
     matchesByTeamsAndStartDate({ awayTeam, homeTeam, exchange, startDate, }) {
         startDate = Game.roundDateToNearestInterval(startDate);

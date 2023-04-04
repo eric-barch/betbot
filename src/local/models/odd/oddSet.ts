@@ -31,4 +31,10 @@ export class OddSet extends Set<localModels.Odd> {
 
         return requestedOdd;
     }
+
+    public async updateValues() {
+        for (const odd of this) {
+            await odd.updateValues();
+        }
+    }
 }

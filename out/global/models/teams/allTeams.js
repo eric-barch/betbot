@@ -22,32 +22,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allTeamsInit = exports.allTeams = void 0;
 const leagues = __importStar(require("./leagues"));
 const localModels = __importStar(require("../../../local/models"));
 exports.allTeams = new localModels.TeamSet();
-function allTeamsInit() {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const team of leagues.nbaTeams) {
-            const newTeam = yield localModels.Team.create({
-                regionFull: team.regionFull,
-                regionAbbr: team.regionAbbr,
-                identifierFull: team.identifierFull,
-                identifierAbbr: team.identifierAbbr,
-            });
-            exports.allTeams.add(newTeam);
-        }
-    });
+async function allTeamsInit() {
+    for (const team of leagues.nbaTeams) {
+        const newTeam = await localModels.Team.create({
+            regionFull: team.regionFull,
+            regionAbbr: team.regionAbbr,
+            identifierFull: team.identifierFull,
+            identifierAbbr: team.identifierAbbr,
+        });
+        exports.allTeams.add(newTeam);
+    }
 }
 exports.allTeamsInit = allTeamsInit;
 //# sourceMappingURL=allTeams.js.map

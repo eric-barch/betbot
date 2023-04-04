@@ -9,7 +9,6 @@ export class Exchange {
     public url: string;
     public gameSet: localModels.GameSet;
     public oddSet: localModels.OddSet;
-    public parseFunction: Function;
     
     private wrappedBrowser: Browser | null;
     private wrappedPage: Page | null;
@@ -18,17 +17,14 @@ export class Exchange {
     constructor({
         name,
         url,
-        parseFunction,
     }: {
         name: string,
         url: string,
-        parseFunction: Function,
     }) {
         this.name = name;
         this.url = url;
         this.gameSet = new localModels.GameSet();
         this.oddSet = new localModels.OddSet();
-        this.parseFunction = parseFunction;
 
         this.wrappedBrowser = null;
         this.wrappedPage = null;
@@ -39,16 +35,13 @@ export class Exchange {
     static async create({
         name,
         url,
-        parseFunction,
     }: {
         name: string,
         url: string,
-        parseFunction: Function,
     }): Promise<Exchange> {
         const newExchange = new Exchange({
             name: name,
             url: url,
-            parseFunction: parseFunction,
         })
 
         await newExchange.init();
@@ -81,7 +74,16 @@ export class Exchange {
 
     // instance methods
     public async analyze(): Promise<void> {
-        await this.parseFunction();
+        await this.updateGameSet();
+        await this.updateOddSet();
+        await this.oddSet.updateValues();
+    }
+
+    public async updateOddSet() {
+        for (const game of this.gameSet) {
+            const odd = await game.getOddByExchange({ exchange: this });
+            this.oddSet.add(odd);
+        }
     }
 
     public async close(): Promise<void> {
@@ -92,12 +94,14 @@ export class Exchange {
         this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
 
         const targets = this.browser.targets();
-        const target = targets.find(target => target.url() === this.url);
+        const target = targets.find(target => target.url().includes(this.url));
+        
         if (!target) {
             throw new Error('Expected Target.');
         }
 
         const targetPage = await target.page();
+        
         if (!targetPage) {
             throw new Error('Expected page.');
         }
@@ -111,6 +115,41 @@ export class Exchange {
 
         this.page = targetPage;
         this.page.setViewport(windowSize);
+    }
+
+    public async updateGameSet() {    
+        // Rewrite this in a more readable way.
+        const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
+        const jsonGames = await this.page.evaluate(element => JSON.parse(element!.textContent!), jsonGamesScriptTag);
+        //
+        
+        for (const jsonGame of jsonGames) {
+            const awayTeamNameString = jsonGame.awayTeam.name;
+            const homeTeamNameString = jsonGame.homeTeam.name;
+    
+            const awayTeamInstance = globalModels.allTeams.getTeamByNameString({ nameString: awayTeamNameString });
+            const homeTeamInstance = globalModels.allTeams.getTeamByNameString({ nameString: homeTeamNameString });
+            const startDate = new Date(jsonGame.startDate);
+    
+            await globalModels.allGames.getGameByTeamsAndStartDate({
+                awayTeam: awayTeamInstance,
+                homeTeam: homeTeamInstance,
+                startDate: startDate,
+                exchange: this,
+            });
+        }
+    }
+
+    public async getOddsFromDocument({
+        gamesFromJson,
+    }: {
+        gamesFromJson: localModels.GameSet,
+    }) {
+        for (const game of gamesFromJson) {
+            const odd = await game.getOddByExchange({ exchange: this });
+            await odd.updateComponentElements();
+            await odd.updateValues();
+        }
     }
 
     // getters and setters

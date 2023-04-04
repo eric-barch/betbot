@@ -22,40 +22,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OddSet = void 0;
 const localModels = __importStar(require("../../../local/models"));
 class OddSet extends Set {
-    getOddByExchangeAndGame({ exchange, game, }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let requestedOdd = undefined;
-            for (const odd of this) {
-                if (odd.matchesByExchangeAndGame({
-                    exchange: exchange,
-                    game: game,
-                })) {
-                    requestedOdd = odd;
-                    break;
-                }
+    async getOddByExchangeAndGame({ exchange, game, }) {
+        let requestedOdd = undefined;
+        for (const odd of this) {
+            if (odd.matchesByExchangeAndGame({
+                exchange: exchange,
+                game: game,
+            })) {
+                requestedOdd = odd;
+                break;
             }
-            if (requestedOdd === undefined) {
-                requestedOdd = yield localModels.Odd.create({
-                    exchange: exchange,
-                    game: game,
-                });
-                this.add(requestedOdd);
-            }
-            return requestedOdd;
-        });
+        }
+        if (requestedOdd === undefined) {
+            requestedOdd = await localModels.Odd.create({
+                exchange: exchange,
+                game: game,
+            });
+            this.add(requestedOdd);
+        }
+        return requestedOdd;
+    }
+    async updateValues() {
+        for (const odd of this) {
+            await odd.updateValues();
+        }
     }
 }
 exports.OddSet = OddSet;
