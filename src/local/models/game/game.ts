@@ -59,7 +59,7 @@ export class Game {
         return newGame;
     }
 
-    private async init(): Promise<void> {
+    private async init(): Promise<Game> {
         const awayTeam = this.awayTeam;
         const homeTeam = this.homeTeam;
         const startDate = this.startDate;
@@ -81,13 +81,17 @@ export class Game {
         }).then(([sqlGame, created]) => {
             this.wrappedSqlGame = sqlGame;
         });
+
+        return this;
     }
 
     // instance methods
     public async getOddByExchange({
         exchange,
+        game,
     }: {
         exchange: localModels.Exchange,
+        game?: localModels.Game,
     }): Promise<localModels.Odd> {
         let requestedOdd = undefined;
 
@@ -104,6 +108,10 @@ export class Game {
                 exchange: exchange,
                 game: this,
             });
+        }
+
+        if (game) {
+            game.oddSet.add(requestedOdd);
         }
 
         return requestedOdd;
@@ -149,10 +157,6 @@ export class Game {
     }
 
     // getters and setters
-    get name(): string {
-        return this.regionAbbrIdentifierAbbr;
-    }
-
     get regionAbbrIdentifierAbbr(): string {
         const regionAbbrIdentifierAbbr = `${this.awayTeam.regionAbbrIdentifierAbbr} @ ${this.homeTeam.regionAbbrIdentifierAbbr}`;
         return regionAbbrIdentifierAbbr;
@@ -172,7 +176,7 @@ export class Game {
         if (this.wrappedSqlGame) {
             return this.wrappedSqlGame;
         } else {
-            throw new Error(`${this.name} sqlGame is null.`);
+            throw new Error(`${this.regionAbbrIdentifierAbbr} sqlGame is null.`);
         }
     }
 

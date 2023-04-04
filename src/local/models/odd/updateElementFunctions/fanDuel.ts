@@ -1,8 +1,9 @@
 import { ElementHandle } from 'puppeteer';
 
-import { ElementWrapper, ElementWrapperWithValue, MoneyOdd, Odd, SpreadOdd, TotalOdd } from '../odd';
+import { ElementWrapper, ElementWrapperWithValue } from '../elementWrappers';
+import { Odd, SpreadOdd, MoneyOdd, TotalOdd } from '../odd';
 
-export async function odd(this: Odd) {
+export async function odd(this: Odd): Promise<ElementHandle | null> {
     const exchange = this.exchange;
     const game = this.game;
     const page = exchange.page;
@@ -13,25 +14,28 @@ export async function odd(this: Odd) {
     if (gameTitleElements.length === 0) {
         console.log(`${gameName} exists in ${exchange.name} JSON but not in the visible document.`);
         this.element = null;
-        return;
+        return null;
     }else if (gameTitleElements.length > 2) {
         throw new Error(`Did not expect more than 2 game element handles for ${gameName}.`);
     }
 
     const oddElement = await (await gameTitleElements[0].getProperty('parentElement')).getProperty('parentElement');
 
-    if (oddElement instanceof ElementHandle) {
-        this.element = oddElement;
-    } else {
+    if (!(oddElement instanceof ElementHandle)) {
         this.element = null;
+        return null;
     }
+
+    this.element = oddElement;
+    return oddElement;
 }
 
-export async function spreadOdd(this: SpreadOdd) {
+export async function spreadOdd(this: SpreadOdd): Promise<null> {
     this.element = null;
+    return null;
 }
 
-export async function awaySpread(this: ElementWrapperWithValue) {
+export async function awaySpread(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const spreadAwaySpreadParent = await getParentElement({
         element: this,
         selectors: [
@@ -42,16 +46,17 @@ export async function awaySpread(this: ElementWrapperWithValue) {
 
     if (!spreadAwaySpreadParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const spreadAwaySpreadElement = (await spreadAwaySpreadParent.$$('span'))[0];
 
     const spreadAwaySpreadJson = await (await spreadAwaySpreadElement.getProperty('textContent')).jsonValue();
     this.element = spreadAwaySpreadElement;
+    return spreadAwaySpreadElement;
 }
 
-export async function awaySpreadPrice(this: ElementWrapperWithValue) {
+export async function awaySpreadPrice(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const spreadAwayPriceParent = await getParentElement({
         element: this,
         selectors: [
@@ -62,16 +67,17 @@ export async function awaySpreadPrice(this: ElementWrapperWithValue) {
 
     if (!spreadAwayPriceParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const spreadAwayPriceElement = (await spreadAwayPriceParent.$$('span'))[1];
 
     const spreadAwayPriceJson = await (await spreadAwayPriceElement.getProperty('textContent')).jsonValue();
     this.element = spreadAwayPriceElement;
+    return spreadAwayPriceElement;
 }
 
-export async function homeSpread(this: ElementWrapperWithValue) {
+export async function homeSpread(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const spreadHomeSpreadParent = await getParentElement({
         element: this,
         selectors: [
@@ -82,16 +88,17 @@ export async function homeSpread(this: ElementWrapperWithValue) {
 
     if (!spreadHomeSpreadParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const spreadHomeSpreadElement = (await spreadHomeSpreadParent.$$('span'))[0];
 
     const spreadHomeSpreadJson = await (await spreadHomeSpreadElement.getProperty('textContent')).jsonValue();
     this.element = spreadHomeSpreadElement;
+    return spreadHomeSpreadElement;
 }
 
-export async function homeSpreadPrice(this: ElementWrapperWithValue) {
+export async function homeSpreadPrice(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const spreadHomePriceParent = await getParentElement({
         element: this,
         selectors: [
@@ -102,20 +109,22 @@ export async function homeSpreadPrice(this: ElementWrapperWithValue) {
 
     if (!spreadHomePriceParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const spreadHomePriceElement = (await spreadHomePriceParent.$$('span'))[1];
 
     const spreadHomePriceJson = await (await spreadHomePriceElement.getProperty('textContent')).jsonValue();
     this.element = spreadHomePriceElement;
+    return spreadHomePriceElement;
 }
 
-export async function moneyOdd(this: MoneyOdd) {
+export async function moneyOdd(this: MoneyOdd): Promise<null> {
     this.element = null;
+    return null;
 }
 
-export async function awayMoneyPrice(this: ElementWrapperWithValue) {
+export async function awayMoneyPrice(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const moneyAwayPriceParent = await getParentElement({
         element: this,
         selectors: [
@@ -126,21 +135,22 @@ export async function awayMoneyPrice(this: ElementWrapperWithValue) {
 
     if (!moneyAwayPriceParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const moneyAwayPriceElement = await moneyAwayPriceParent.$('span');
 
     if (!(moneyAwayPriceElement instanceof ElementHandle)) {
         this.element = null;
-        return;
+        return null;
     }
 
     const moneyAwayPriceJson = await (await moneyAwayPriceElement.getProperty('textContent')).jsonValue();
     this.element = moneyAwayPriceElement;
+    return moneyAwayPriceElement;
 }
 
-export async function homeMoneyPrice(this: ElementWrapperWithValue) {
+export async function homeMoneyPrice(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const moneyHomePriceParent = await getParentElement({
         element: this,
         selectors: [
@@ -151,25 +161,27 @@ export async function homeMoneyPrice(this: ElementWrapperWithValue) {
 
     if (!moneyHomePriceParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const moneyHomePriceElement = await moneyHomePriceParent.$('span');
 
     if (!(moneyHomePriceElement instanceof ElementHandle)) {
         this.element = null;
-        return;
+        return null;
     }
 
     const moneyHomePriceJson = await (await moneyHomePriceElement.getProperty('textContent')).jsonValue();
     this.element = moneyHomePriceElement;
+    return moneyHomePriceElement;
 }
 
-export async function totalOdd(this: TotalOdd) {
+export async function totalOdd(this: TotalOdd): Promise<null> {
     this.element = null;
+    return null;
 }
 
-export async function overTotal(this: ElementWrapperWithValue) {
+export async function overTotal(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const totalOverTotalParent = await getParentElement({
         element: this,
         selectors: [
@@ -180,16 +192,17 @@ export async function overTotal(this: ElementWrapperWithValue) {
 
     if (!totalOverTotalParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const totalOverTotalElement = (await totalOverTotalParent.$$('span'))[0];
 
     const totalOverTotalJson = await (await totalOverTotalElement.getProperty('textContent')).jsonValue();
     this.element = totalOverTotalElement;
+    return totalOverTotalElement;
 }
 
-export async function overTotalPrice(this: ElementWrapperWithValue) {
+export async function overTotalPrice(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const totalOverPriceParent = await getParentElement({
         element: this,
         selectors: [
@@ -200,16 +213,17 @@ export async function overTotalPrice(this: ElementWrapperWithValue) {
 
     if (!totalOverPriceParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const totalOverPriceElement = (await totalOverPriceParent.$$('span'))[1];
 
     const totalOverPriceJson = await (await totalOverPriceElement.getProperty('textContent')).jsonValue();
     this.element = totalOverPriceElement;
+    return totalOverPriceElement;
 }
 
-export async function underTotal(this: ElementWrapperWithValue) {
+export async function underTotal(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const totalUnderTotalParent = await getParentElement({
         element: this,
         selectors: [
@@ -220,16 +234,17 @@ export async function underTotal(this: ElementWrapperWithValue) {
 
     if (!totalUnderTotalParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const totalUnderTotalElement = (await totalUnderTotalParent.$$('span'))[0];
 
     const totalUnderTotalJson = await (await totalUnderTotalElement.getProperty('textContent')).jsonValue();
     this.element = totalUnderTotalElement;
+    return totalUnderTotalElement;
 }
 
-export async function underTotalPrice(this: ElementWrapperWithValue) {
+export async function underTotalPrice(this: ElementWrapperWithValue): Promise<ElementHandle | null> {
     const totalUnderPriceParent = await getParentElement({
         element: this,
         selectors: [
@@ -240,13 +255,14 @@ export async function underTotalPrice(this: ElementWrapperWithValue) {
 
     if (!totalUnderPriceParent) {
         this.element = null;
-        return;
+        return null;
     }
 
     const totalUnderPriceElement = (await totalUnderPriceParent.$$('span'))[1];
 
     const totalUnderPriceJson = await (await totalUnderPriceElement.getProperty('textContent')).jsonValue();
     this.element = totalUnderPriceElement;
+    return totalUnderPriceElement;
 }
 
 async function getParentElement({
@@ -256,7 +272,7 @@ async function getParentElement({
     element: ElementWrapper,
     selectors: Array<string>,
 }) {
-    const oddElement = await element.parent.parent.element;
+    const oddElement = await element.odd.element;
 
     if (!oddElement) {
         return null;

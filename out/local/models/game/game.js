@@ -71,9 +71,10 @@ class Game {
         }).then(([sqlGame, created]) => {
             this.wrappedSqlGame = sqlGame;
         });
+        return this;
     }
     // instance methods
-    async getOddByExchange({ exchange, }) {
+    async getOddByExchange({ exchange, game, }) {
         let requestedOdd = undefined;
         const gameOdds = this.oddSet;
         for (const odd of gameOdds) {
@@ -87,6 +88,9 @@ class Game {
                 exchange: exchange,
                 game: this,
             });
+        }
+        if (game) {
+            game.oddSet.add(requestedOdd);
         }
         return requestedOdd;
     }
@@ -112,9 +116,6 @@ class Game {
         return roundedDate;
     }
     // getters and setters
-    get name() {
-        return this.regionAbbrIdentifierAbbr;
-    }
     get regionAbbrIdentifierAbbr() {
         const regionAbbrIdentifierAbbr = `${this.awayTeam.regionAbbrIdentifierAbbr} @ ${this.homeTeam.regionAbbrIdentifierAbbr}`;
         return regionAbbrIdentifierAbbr;
@@ -132,7 +133,7 @@ class Game {
             return this.wrappedSqlGame;
         }
         else {
-            throw new Error(`${this.name} sqlGame is null.`);
+            throw new Error(`${this.regionAbbrIdentifierAbbr} sqlGame is null.`);
         }
     }
     set sqlGame(sqlGame) {

@@ -11,22 +11,23 @@ async function odd() {
     if (gameTitleElements.length === 0) {
         console.log(`${gameName} exists in ${exchange.name} JSON but not in the visible document.`);
         this.element = null;
-        return;
+        return null;
     }
     else if (gameTitleElements.length > 2) {
         throw new Error(`Did not expect more than 2 game element handles for ${gameName}.`);
     }
     const oddElement = await (await gameTitleElements[0].getProperty('parentElement')).getProperty('parentElement');
-    if (oddElement instanceof puppeteer_1.ElementHandle) {
-        this.element = oddElement;
-    }
-    else {
+    if (!(oddElement instanceof puppeteer_1.ElementHandle)) {
         this.element = null;
+        return null;
     }
+    this.element = oddElement;
+    return oddElement;
 }
 exports.odd = odd;
 async function spreadOdd() {
     this.element = null;
+    return null;
 }
 exports.spreadOdd = spreadOdd;
 async function awaySpread() {
@@ -39,11 +40,12 @@ async function awaySpread() {
     });
     if (!spreadAwaySpreadParent) {
         this.element = null;
-        return;
+        return null;
     }
     const spreadAwaySpreadElement = (await spreadAwaySpreadParent.$$('span'))[0];
     const spreadAwaySpreadJson = await (await spreadAwaySpreadElement.getProperty('textContent')).jsonValue();
     this.element = spreadAwaySpreadElement;
+    return spreadAwaySpreadElement;
 }
 exports.awaySpread = awaySpread;
 async function awaySpreadPrice() {
@@ -56,11 +58,12 @@ async function awaySpreadPrice() {
     });
     if (!spreadAwayPriceParent) {
         this.element = null;
-        return;
+        return null;
     }
     const spreadAwayPriceElement = (await spreadAwayPriceParent.$$('span'))[1];
     const spreadAwayPriceJson = await (await spreadAwayPriceElement.getProperty('textContent')).jsonValue();
     this.element = spreadAwayPriceElement;
+    return spreadAwayPriceElement;
 }
 exports.awaySpreadPrice = awaySpreadPrice;
 async function homeSpread() {
@@ -73,11 +76,12 @@ async function homeSpread() {
     });
     if (!spreadHomeSpreadParent) {
         this.element = null;
-        return;
+        return null;
     }
     const spreadHomeSpreadElement = (await spreadHomeSpreadParent.$$('span'))[0];
     const spreadHomeSpreadJson = await (await spreadHomeSpreadElement.getProperty('textContent')).jsonValue();
     this.element = spreadHomeSpreadElement;
+    return spreadHomeSpreadElement;
 }
 exports.homeSpread = homeSpread;
 async function homeSpreadPrice() {
@@ -90,15 +94,17 @@ async function homeSpreadPrice() {
     });
     if (!spreadHomePriceParent) {
         this.element = null;
-        return;
+        return null;
     }
     const spreadHomePriceElement = (await spreadHomePriceParent.$$('span'))[1];
     const spreadHomePriceJson = await (await spreadHomePriceElement.getProperty('textContent')).jsonValue();
     this.element = spreadHomePriceElement;
+    return spreadHomePriceElement;
 }
 exports.homeSpreadPrice = homeSpreadPrice;
 async function moneyOdd() {
     this.element = null;
+    return null;
 }
 exports.moneyOdd = moneyOdd;
 async function awayMoneyPrice() {
@@ -111,15 +117,16 @@ async function awayMoneyPrice() {
     });
     if (!moneyAwayPriceParent) {
         this.element = null;
-        return;
+        return null;
     }
     const moneyAwayPriceElement = await moneyAwayPriceParent.$('span');
     if (!(moneyAwayPriceElement instanceof puppeteer_1.ElementHandle)) {
         this.element = null;
-        return;
+        return null;
     }
     const moneyAwayPriceJson = await (await moneyAwayPriceElement.getProperty('textContent')).jsonValue();
     this.element = moneyAwayPriceElement;
+    return moneyAwayPriceElement;
 }
 exports.awayMoneyPrice = awayMoneyPrice;
 async function homeMoneyPrice() {
@@ -132,19 +139,21 @@ async function homeMoneyPrice() {
     });
     if (!moneyHomePriceParent) {
         this.element = null;
-        return;
+        return null;
     }
     const moneyHomePriceElement = await moneyHomePriceParent.$('span');
     if (!(moneyHomePriceElement instanceof puppeteer_1.ElementHandle)) {
         this.element = null;
-        return;
+        return null;
     }
     const moneyHomePriceJson = await (await moneyHomePriceElement.getProperty('textContent')).jsonValue();
     this.element = moneyHomePriceElement;
+    return moneyHomePriceElement;
 }
 exports.homeMoneyPrice = homeMoneyPrice;
 async function totalOdd() {
     this.element = null;
+    return null;
 }
 exports.totalOdd = totalOdd;
 async function overTotal() {
@@ -157,11 +166,12 @@ async function overTotal() {
     });
     if (!totalOverTotalParent) {
         this.element = null;
-        return;
+        return null;
     }
     const totalOverTotalElement = (await totalOverTotalParent.$$('span'))[0];
     const totalOverTotalJson = await (await totalOverTotalElement.getProperty('textContent')).jsonValue();
     this.element = totalOverTotalElement;
+    return totalOverTotalElement;
 }
 exports.overTotal = overTotal;
 async function overTotalPrice() {
@@ -174,11 +184,12 @@ async function overTotalPrice() {
     });
     if (!totalOverPriceParent) {
         this.element = null;
-        return;
+        return null;
     }
     const totalOverPriceElement = (await totalOverPriceParent.$$('span'))[1];
     const totalOverPriceJson = await (await totalOverPriceElement.getProperty('textContent')).jsonValue();
     this.element = totalOverPriceElement;
+    return totalOverPriceElement;
 }
 exports.overTotalPrice = overTotalPrice;
 async function underTotal() {
@@ -191,11 +202,12 @@ async function underTotal() {
     });
     if (!totalUnderTotalParent) {
         this.element = null;
-        return;
+        return null;
     }
     const totalUnderTotalElement = (await totalUnderTotalParent.$$('span'))[0];
     const totalUnderTotalJson = await (await totalUnderTotalElement.getProperty('textContent')).jsonValue();
     this.element = totalUnderTotalElement;
+    return totalUnderTotalElement;
 }
 exports.underTotal = underTotal;
 async function underTotalPrice() {
@@ -208,15 +220,16 @@ async function underTotalPrice() {
     });
     if (!totalUnderPriceParent) {
         this.element = null;
-        return;
+        return null;
     }
     const totalUnderPriceElement = (await totalUnderPriceParent.$$('span'))[1];
     const totalUnderPriceJson = await (await totalUnderPriceElement.getProperty('textContent')).jsonValue();
     this.element = totalUnderPriceElement;
+    return totalUnderPriceElement;
 }
 exports.underTotalPrice = underTotalPrice;
 async function getParentElement({ element, selectors, }) {
-    const oddElement = await element.parent.parent.element;
+    const oddElement = await element.odd.element;
     if (!oddElement) {
         return null;
     }

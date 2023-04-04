@@ -66,18 +66,13 @@ class Exchange {
             }
             this.wrappedSqlExchange = sqlExchange;
         });
+        return this;
     }
     // instance methods
     async analyze() {
-        await this.readJsonGames();
+        await this.updateGameSet();
         await this.updateOddSet();
         await this.oddSet.updateValues();
-    }
-    async updateOddSet() {
-        for (const game of this.gameSet) {
-            const odd = await game.getOddByExchange({ exchange: this });
-            this.oddSet.add(odd);
-        }
     }
     async close() {
         this.browser.close();
@@ -102,7 +97,7 @@ class Exchange {
         this.page = targetPage;
         this.page.setViewport(windowSize);
     }
-    async readJsonGames() {
+    async updateGameSet() {
         // Rewrite this in a more readable way.
         const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
         const jsonGames = await this.page.evaluate(element => JSON.parse(element.textContent), jsonGamesScriptTag);
@@ -120,13 +115,17 @@ class Exchange {
                 exchange: this,
             });
         }
+        return this.gameSet;
     }
-    async getOddsFromDocument({ gamesFromJson, }) {
-        for (const game of gamesFromJson) {
-            const odd = await game.getOddByExchange({ exchange: this });
-            await odd.updateComponentElements();
-            await odd.updateValues();
+    async updateOddSet() {
+        for (const game of this.gameSet) {
+            const odd = await game.getOddByExchange({
+                exchange: this,
+                game: game,
+            });
+            this.oddSet.add(odd);
         }
+        return this.oddSet;
     }
     // getters and setters
     get browser() {

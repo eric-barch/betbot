@@ -51,7 +51,7 @@ export class Exchange {
         return newExchange;
     }
 
-    private async init(): Promise<void> {
+    private async init(): Promise<Exchange> {
         await this.connectToExistingPage();
         
         await databaseModels.Exchange.findOrCreate({
@@ -70,6 +70,8 @@ export class Exchange {
             }
             this.wrappedSqlExchange = sqlExchange;
         });
+
+        return this;
     }
 
     // instance methods
@@ -77,13 +79,6 @@ export class Exchange {
         await this.updateGameSet();
         await this.updateOddSet();
         await this.oddSet.updateValues();
-    }
-
-    public async updateOddSet() {
-        for (const game of this.gameSet) {
-            const odd = await game.getOddByExchange({ exchange: this });
-            this.oddSet.add(odd);
-        }
     }
 
     public async close(): Promise<void> {
@@ -117,7 +112,7 @@ export class Exchange {
         this.page.setViewport(windowSize);
     }
 
-    public async updateGameSet() {    
+    public async updateGameSet(): Promise<localModels.GameSet> {    
         // Rewrite this in a more readable way.
         const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
         const jsonGames = await this.page.evaluate(element => JSON.parse(element!.textContent!), jsonGamesScriptTag);
@@ -138,18 +133,21 @@ export class Exchange {
                 exchange: this,
             });
         }
+
+        return this.gameSet;
     }
 
-    public async getOddsFromDocument({
-        gamesFromJson,
-    }: {
-        gamesFromJson: localModels.GameSet,
-    }) {
-        for (const game of gamesFromJson) {
-            const odd = await game.getOddByExchange({ exchange: this });
-            await odd.updateComponentElements();
-            await odd.updateValues();
+    public async updateOddSet(): Promise<localModels.OddSet> {
+        for (const game of this.gameSet) {
+            const odd = await game.getOddByExchange({
+                exchange: this,
+                game: game,
+            });
+
+            this.oddSet.add(odd);
         }
+
+        return this.oddSet;
     }
 
     // getters and setters

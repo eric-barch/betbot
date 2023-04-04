@@ -29,7 +29,9 @@ const allExchanges = globalModels.allExchanges;
 async function main() {
     await database.init();
     await globalModels.init();
-    await allExchanges.analyze();
+    while (true) {
+        await allExchanges.analyze();
+    }
     await database.close();
     process.exit(0);
 }
