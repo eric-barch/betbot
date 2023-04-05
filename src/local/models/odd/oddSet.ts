@@ -34,7 +34,7 @@ export class OddSet extends Set<localModels.Odd> {
 
     public async updateValues() {
         for (const odd of this) {
-            const updatesMade = await odd.updateValues();
+            await odd.updateValues();
         }
     }
 }

@@ -24,11 +24,6 @@ export async function init(): Promise<void> {
         otherKey: 'gameId',
     });
     Exchange.hasMany(Odd, { foreignKey: 'exchangeId'} );
-    Exchange.belongsToMany(Team, {
-        through: 'exchange_teams',
-        foreignKey: 'exchangeId',
-        otherKey: 'teamId',
-    });
     
     // Game associations 
     Game.belongsToMany(Exchange, {
@@ -43,19 +38,10 @@ export async function init(): Promise<void> {
     // Odd associations
     Odd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
     Odd.belongsTo(Game, { foreignKey: 'gameId' });
-    Odd.belongsTo(Team, { as: 'oddAwayTeam', foreignKey: 'awayTeamId' });
-    Odd.belongsTo(Team, { as: 'oddHomeTeam', foreignKey: 'homeTeamId' });
     
     // Team associations
-    Team.belongsToMany(Exchange, {
-        through: 'exchange_teams',
-        foreignKey: 'teamId',
-        otherKey: 'exchangeId',
-    })
     Team.hasMany(Game, { as: 'gameAwayTeam', foreignKey: 'awayTeamId' });
     Team.hasMany(Game, { as: 'gameHomeTeam', foreignKey: 'homeTeamId' });
-    Team.hasMany(Odd, { as: 'oddAwayTeam', foreignKey: 'awayTeamId' });
-    Team.hasMany(Odd, { as: 'oddHomeTeam', foreignKey: 'homeTeamId' });
 
     await sequelize.sync({
         alter: true,

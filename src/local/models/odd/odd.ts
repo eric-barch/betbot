@@ -26,6 +26,9 @@ export class Odd extends elementWrappers.ElementWrapper {
             updateElementFunction: fanDuel.odd,
         });
 
+        this.exchange.oddSet.add(this);
+        this.game.oddSet.add(this);
+
         this.spreadOdd = new SpreadOdd({
             exchange: exchange,
             game: game,
@@ -69,13 +72,8 @@ export class Odd extends elementWrappers.ElementWrapper {
         const exchange = this.exchange;
         const game = this.game;
 
-        const awayTeam = game.awayTeam;
-        const homeTeam = game.homeTeam;
-
         const exchangeId = exchange.sqlExchange.get('id');
-        const gameId = game.sqlGame.get('id');  // 
-        const awayTeamId = awayTeam.sqlTeam.get('id');
-        const homeTeamId = homeTeam.sqlTeam.get('id');
+        const gameId = game.sqlGame.get('id');
 
         const spreadOdd = this.spreadOdd;
         const moneyOdd = this.moneyOdd;
@@ -98,8 +96,6 @@ export class Odd extends elementWrappers.ElementWrapper {
                 totalUnderPrice: totalOdd.underTotalPrice.value,
                 exchangeId: exchangeId,
                 gameId: gameId,
-                awayTeamId: awayTeamId,
-                homeTeamId: homeTeamId,
             },
         }).then(async ([sqlOdd, created]) => {
             if (!created) {
@@ -116,8 +112,6 @@ export class Odd extends elementWrappers.ElementWrapper {
                     totalTotal: totalOdd.overTotal.value,
                     totalOverPrice: totalOdd.overTotalPrice.value,
                     totalUnderPrice: totalOdd.underTotalPrice.value,
-                    awayTeamId: awayTeamId,
-                    homeTeamId: homeTeamId,
                 });
             }
             
@@ -159,6 +153,8 @@ export class Odd extends elementWrappers.ElementWrapper {
                 totalOverPrice: this.totalOdd.overTotalPrice.value,
                 totalUnderPrice: this.totalOdd.underTotalPrice.value,
             });
+
+            console.log(`UPDATED: ${this.exchange.name} ${this.game.regionAbbrIdentifierAbbr}`);
         }
     }
 

@@ -22,7 +22,7 @@ export async function allExchangesInit(): Promise<void> {
     allExchanges.add(
         await localModels.Exchange.create({
             name: 'FanDuel',
-            url: 'sportsbook.fanduel.com/navigation/nba',
+            url: 'file:///Users/ericbarch/Documents/Development/AutomaticSportsBetting/iteration-6/tests/test6.html',
         })
     );
 }

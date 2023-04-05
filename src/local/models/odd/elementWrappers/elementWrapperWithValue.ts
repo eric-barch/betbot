@@ -50,7 +50,6 @@ export class ElementWrapperWithValue extends ElementWrapper {
         }
 
         if (elementValue !== this.value) {
-            console.log(`NEW: ${this.exchange.name} ${this.game.regionAbbrIdentifierAbbr}: ${elementValue}`);
             this.value = elementValue;
             return true;
         }

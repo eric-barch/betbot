@@ -47,12 +47,15 @@ export class Game {
             startDate: startDate,
         })
 
+        await newGame.init();
+
         if (exchange) {
             newGame.exchangeSet.add(exchange);
-            exchange.gameSet.add(newGame);
-        }
+            newGame.sqlGame.addExchange(exchange.sqlExchange);
 
-        await newGame.init();
+            exchange.gameSet.add(newGame);
+            //exchange.sqlExchange.addGame(newGame.sqlGame);
+        }
 
         globalModels.allGames.add(newGame);
 
@@ -102,6 +105,8 @@ export class Game {
                 break;
             }
         }
+        // If it retrieves an odd where the exchange is exchange, the odd should 
+        // already be in exchange's oddSet.
 
         if (requestedOdd === undefined) {
             requestedOdd = await localModels.Odd.create({

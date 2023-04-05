@@ -48,7 +48,7 @@ class OddSet extends Set {
     }
     async updateValues() {
         for (const odd of this) {
-            const updatesMade = await odd.updateValues();
+            await odd.updateValues();
         }
     }
 }

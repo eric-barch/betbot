@@ -24,11 +24,6 @@ async function init() {
         otherKey: 'gameId',
     });
     models_1.Exchange.hasMany(models_1.Odd, { foreignKey: 'exchangeId' });
-    models_1.Exchange.belongsToMany(models_1.Team, {
-        through: 'exchange_teams',
-        foreignKey: 'exchangeId',
-        otherKey: 'teamId',
-    });
     // Game associations 
     models_1.Game.belongsToMany(models_1.Exchange, {
         through: 'exchange_games',
@@ -41,18 +36,9 @@ async function init() {
     // Odd associations
     models_1.Odd.belongsTo(models_1.Exchange, { foreignKey: 'exchangeId' });
     models_1.Odd.belongsTo(models_1.Game, { foreignKey: 'gameId' });
-    models_1.Odd.belongsTo(models_1.Team, { as: 'oddAwayTeam', foreignKey: 'awayTeamId' });
-    models_1.Odd.belongsTo(models_1.Team, { as: 'oddHomeTeam', foreignKey: 'homeTeamId' });
     // Team associations
-    models_1.Team.belongsToMany(models_1.Exchange, {
-        through: 'exchange_teams',
-        foreignKey: 'teamId',
-        otherKey: 'exchangeId',
-    });
     models_1.Team.hasMany(models_1.Game, { as: 'gameAwayTeam', foreignKey: 'awayTeamId' });
     models_1.Team.hasMany(models_1.Game, { as: 'gameHomeTeam', foreignKey: 'homeTeamId' });
-    models_1.Team.hasMany(models_1.Odd, { as: 'oddAwayTeam', foreignKey: 'awayTeamId' });
-    models_1.Team.hasMany(models_1.Odd, { as: 'oddHomeTeam', foreignKey: 'homeTeamId' });
     await exports.sequelize.sync({
         alter: true,
         logging: false,

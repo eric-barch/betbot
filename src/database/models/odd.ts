@@ -13,11 +13,10 @@ import { sequelize } from '../database';
 
 import { Exchange } from './exchange';
 import { Game } from './game';
-import { Team } from './team';
 
 export class Odd extends Model<
-    InferAttributes<Odd, {omit: 'exchange' | 'game' | 'awayTeam' | 'homeTeam'}>,
-    InferCreationAttributes<Odd, {omit: 'exchange' | 'game' | 'awayTeam' | 'homeTeam'}>
+    InferAttributes<Odd, {omit: 'exchange' | 'game'}>,
+    InferCreationAttributes<Odd, {omit: 'exchange' | 'game'}>
 > {
     // id
     declare id: CreationOptional<number>;
@@ -40,14 +39,10 @@ export class Odd extends Model<
     // foreign keys
     declare exchangeId: ForeignKey<Exchange['id']>;
     declare gameId: ForeignKey<Game['id']>;
-    declare awayTeamId: ForeignKey<Team['id']>;
-    declare homeTeamId: ForeignKey<Team['id']>;
 
     // associated sequelize model(s)
     declare exchange?: NonAttribute<Exchange>;
     declare game?: NonAttribute<Game>;
-    declare awayTeam?: NonAttribute<Team>;
-    declare homeTeam?: NonAttribute<Team>;
 
     // virtual model associations
     // belongsTo(Exchange)
@@ -59,11 +54,6 @@ export class Odd extends Model<
     declare createGame: BelongsToCreateAssociationMixin<Game>;
     declare getGame: BelongsToGetAssociationMixin<Game>;
     declare setGame: BelongsToSetAssociationMixin<Game, number>;
-
-    // belongsTo(Team)
-    declare createTeam: BelongsToCreateAssociationMixin<Team>;
-    declare getTeam: BelongsToGetAssociationMixin<Team>;
-    declare setTeam: BelongsToSetAssociationMixin<Team, number>;
 
     // associated local model
     // none

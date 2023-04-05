@@ -139,12 +139,13 @@ export class Exchange {
 
     public async updateOddSet(): Promise<localModels.OddSet> {
         for (const game of this.gameSet) {
-            const odd = await game.getOddByExchange({
+            await game.getOddByExchange({
                 exchange: this,
                 game: game,
             });
 
-            this.oddSet.add(odd);
+            //the below should not be necessary here. this = exchange
+            //this.oddSet.add(odd);
         }
 
         return this.oddSet;

@@ -27,8 +27,8 @@ import { Odd } from './odd';
 import { Team } from './team';
 
 export class Exchange extends Model<
-  InferAttributes<Exchange, { omit: 'games' | 'odds' | 'teams'}>,
-  InferCreationAttributes<Exchange, { omit: 'games' | 'odds' | 'teams'}>
+  InferAttributes<Exchange, { omit: 'games' | 'odds'}>,
+  InferCreationAttributes<Exchange, { omit: 'games' | 'odds'}>
 > {
   // id
   declare id: CreationOptional<number>;
@@ -47,7 +47,6 @@ export class Exchange extends Model<
   // associated sequelize model(s)
   declare games?: NonAttribute<Game[]>;
   declare odds?: NonAttribute<Odd[]>;
-  declare teams?: NonAttribute<Team[]>;
 
   // virtual model associations
   // belongsToMany(Game)
@@ -73,18 +72,6 @@ export class Exchange extends Model<
   declare hasOdds: HasManyHasAssociationsMixin<Odd, number>;
   declare countOdds: HasManyCountAssociationsMixin;
   declare createOdd: HasManyCreateAssociationMixin<Odd, 'exchangeId'>;
-
-  // belongsToMany(Team)
-  declare getTeams: BelongsToManyGetAssociationsMixin<Team>;
-  declare addTeam: BelongsToManyAddAssociationMixin<Team, number>;
-  declare addTeams: BelongsToManyAddAssociationsMixin<Team, number>;
-  declare setTeams: BelongsToManySetAssociationsMixin<Team, number>;
-  declare removeTeam: BelongsToManyRemoveAssociationMixin<Team, number>;
-  declare removeTeams: BelongsToManyRemoveAssociationsMixin<Team, number>;
-  declare hasTeam: BelongsToManyHasAssociationMixin<Team, number>;
-  declare hasTeams: BelongsToManyHasAssociationsMixin<Team, number>;
-  declare countTeams: BelongsToManyCountAssociationsMixin;
-  declare createTeam: BelongsToManyCreateAssociationMixin<Team>;
 
   // associated local model
   // none
