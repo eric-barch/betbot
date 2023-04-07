@@ -1,8 +1,9 @@
 import * as sqlz from 'sequelize';
 
-import { sequelize } from '../database';
+import { sequelize } from '../../database';
 
-import * as databaseModels from '../../database/models';
+import { Exchange } from './exchange';
+import { Statistic } from './statistic';
 
 export class Odd extends sqlz.Model<
     sqlz.InferAttributes<Odd, {omit: 'exchange' | 'statistic' | 'opposite'}>,
@@ -22,30 +23,30 @@ export class Odd extends sqlz.Model<
     declare updatedAt: sqlz.CreationOptional<Date>;
 
     // foreign keys
-    declare exchangeId: sqlz.ForeignKey<databaseModels.Exchange['id']>;
-    declare oppositeId: sqlz.ForeignKey<databaseModels.Odd['id']>;
-    declare statisticId: sqlz.ForeignKey<databaseModels.Statistic['id']>;
+    declare exchangeId: sqlz.ForeignKey<Exchange['id']>;
+    declare oppositeId: sqlz.ForeignKey<Odd['id']>;
+    declare statisticId: sqlz.ForeignKey<Statistic['id']>;
 
     // associated sequelize model(s)
-    declare exchange?: sqlz.NonAttribute<databaseModels.Exchange>;
-    declare opposite?: sqlz.NonAttribute<databaseModels.Odd>;
-    declare statistic?: sqlz.NonAttribute<databaseModels.Statistic>;
+    declare exchange?: sqlz.NonAttribute<Exchange>;
+    declare opposite?: sqlz.NonAttribute<Odd>;
+    declare statistic?: sqlz.NonAttribute<Statistic>;
 
     // virtual model associations
     // belongsTo(Exchange)
-    declare createExchange: sqlz.BelongsToCreateAssociationMixin<databaseModels.Exchange>;
-    declare getExchange: sqlz.BelongsToGetAssociationMixin<databaseModels.Exchange>;
-    declare setExchange: sqlz.BelongsToSetAssociationMixin<databaseModels.Exchange, number>;
+    declare createExchange: sqlz.BelongsToCreateAssociationMixin<Exchange>;
+    declare getExchange: sqlz.BelongsToGetAssociationMixin<Exchange>;
+    declare setExchange: sqlz.BelongsToSetAssociationMixin<Exchange, number>;
 
     // belongsTo(Odd)
-    declare createOdd: sqlz.BelongsToCreateAssociationMixin<databaseModels.Odd>;
-    declare getOdd: sqlz.BelongsToGetAssociationMixin<databaseModels.Odd>;
-    declare setOdd: sqlz.BelongsToSetAssociationMixin<databaseModels.Odd, number>;
+    declare createOdd: sqlz.BelongsToCreateAssociationMixin<Odd>;
+    declare getOdd: sqlz.BelongsToGetAssociationMixin<Odd>;
+    declare setOdd: sqlz.BelongsToSetAssociationMixin<Odd, number>;
 
     // belongsTo(Statistic)
-    declare createStatistic: sqlz.BelongsToCreateAssociationMixin<databaseModels.Statistic>;
-    declare getStatistic: sqlz.BelongsToGetAssociationMixin<databaseModels.Statistic>;
-    declare setStatistic: sqlz.BelongsToSetAssociationMixin<databaseModels.Statistic, number>;
+    declare createStatistic: sqlz.BelongsToCreateAssociationMixin<Statistic>;
+    declare getStatistic: sqlz.BelongsToGetAssociationMixin<Statistic>;
+    declare setStatistic: sqlz.BelongsToSetAssociationMixin<Statistic, number>;
 
     // associated local model
     // none

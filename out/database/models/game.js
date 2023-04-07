@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
 const sqlz = __importStar(require("sequelize"));
-const database_1 = require("../database");
+const database_1 = require("../../database");
 class Game extends sqlz.Model {
 }
 exports.Game = Game;

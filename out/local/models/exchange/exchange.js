@@ -25,9 +25,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
 const puppeteer = __importStar(require("puppeteer"));
-const databaseModels = __importStar(require("../../../database/models"));
-const globalModels = __importStar(require("../../../global/models"));
-const localModels = __importStar(require("../../../local/models"));
+const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
+const localModels = __importStar(require("../../../local"));
 class Exchange {
     // private constructor
     constructor({ name, url, }) {
@@ -75,7 +75,7 @@ class Exchange {
     // public instance methods
     async analyze() {
         await this.updateGameSet();
-        // await this.updateOddSet();
+        await this.updateOddSet();
         // await this.oddSet.updateValues();
     }
     async close() {
@@ -113,22 +113,23 @@ class Exchange {
             const awayTeamInstance = globalModels.allTeams.find({ name: awayTeamNameString });
             const homeTeamInstance = globalModels.allTeams.find({ name: homeTeamNameString });
             const startDate = new Date(jsonGame.startDate);
-            await globalModels.allGames.findOrCreate({
+            const requestedGame = await globalModels.allGames.findOrCreate({
                 awayTeam: awayTeamInstance,
                 homeTeam: homeTeamInstance,
                 startDate: startDate,
             });
+            await requestedGame.updateStatisticSet();
         }
         return this.gameSet;
     }
     async updateOddSet() {
         for (const game of this.gameSet) {
-            // await game.getOddByExchange({
-            //     exchange: this,
-            //     game: game,
-            // });
-            //the below should not be necessary here. this = exchange
-            //this.oddSet.add(odd);
+            for (const statistic of game.statisticSet) {
+                await statistic.oddSet.findOrCreate({
+                    exchange: this,
+                    statistic: statistic,
+                });
+            }
         }
         return this.oddSet;
     }

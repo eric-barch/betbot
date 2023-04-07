@@ -24,9 +24,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
-const databaseModels = __importStar(require("../../../database/models"));
-const globalModels = __importStar(require("../../../global/models"));
-const localModels = __importStar(require("../../../local/models"));
+const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
+const localModels = __importStar(require("../../../local"));
 class Game {
     // private constructor
     constructor({ awayTeam, homeTeam, startDate, }) {
@@ -83,6 +83,20 @@ class Game {
             return true;
         }
         return false;
+    }
+    async updateStatisticSet() {
+        await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'spread',
+        });
+        await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'money',
+        });
+        await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'total',
+        });
     }
     // public static methods
     static roundDateToNearestInterval(date) {

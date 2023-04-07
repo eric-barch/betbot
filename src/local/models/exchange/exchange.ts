@@ -1,8 +1,8 @@
 import * as puppeteer from 'puppeteer';
 
-import * as databaseModels from '../../../database/models';
-import * as globalModels from '../../../global/models';
-import * as localModels from '../../../local/models';
+import * as databaseModels from '../../../database';
+import * as globalModels from '../../../global';
+import * as localModels from '../../../local';
 
 export class Exchange {
     // public properties
@@ -93,7 +93,7 @@ export class Exchange {
     // public instance methods
     public async analyze(): Promise<void> {
         await this.updateGameSet();
-        // await this.updateOddSet();
+        await this.updateOddSet();
         // await this.oddSet.updateValues();
     }
 
@@ -144,11 +144,13 @@ export class Exchange {
             const homeTeamInstance = globalModels.allTeams.find({ name: homeTeamNameString });
             const startDate = new Date(jsonGame.startDate);
     
-            await globalModels.allGames.findOrCreate({
+            const requestedGame = await globalModels.allGames.findOrCreate({
                 awayTeam: awayTeamInstance,
                 homeTeam: homeTeamInstance,
                 startDate: startDate,
             });
+
+            await requestedGame.updateStatisticSet();
         }
 
         return this.gameSet;
@@ -156,13 +158,12 @@ export class Exchange {
 
     public async updateOddSet(): Promise<localModels.OddSet> {
         for (const game of this.gameSet) {
-            // await game.getOddByExchange({
-            //     exchange: this,
-            //     game: game,
-            // });
-
-            //the below should not be necessary here. this = exchange
-            //this.oddSet.add(odd);
+            for (const statistic of game.statisticSet) {
+                await statistic.oddSet.findOrCreate({
+                    exchange: this,
+                    statistic: statistic,
+                })
+            }
         }
 
         return this.oddSet;

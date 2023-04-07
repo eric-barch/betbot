@@ -1,8 +1,8 @@
 import * as puppeteer from 'puppeteer';
 
-import * as databaseModels from '../../../database/models';
-import * as globalModels from '../../../global/models';
-import * as localModels from '../../../local/models';
+import * as databaseModels from '../../../database';
+import * as globalModels from '../../../global';
+import * as localModels from '../../../local';
 
 export enum Inequality {
     GreaterThan,
@@ -12,11 +12,11 @@ export enum Inequality {
 
 export class Odd {
     // public properties
-    public inequality: Inequality;
-    public price: number;
-    public value: number | string;
 
     // private properties
+    private wrappedInequality: Inequality | null;
+    private wrappedPrice: number | null;
+    private wrappedValue: number | string | null;
 
     // public linked objects
     public exchange: localModels.Exchange;
@@ -31,21 +31,15 @@ export class Odd {
 
     // private constructor
     private constructor({
-        inequality,
-        price,
-        value,
         exchange,
         statistic,
     }: {
-        inequality: Inequality,
-        price: number,
-        value: number | string,
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
     }) {
-        this.inequality = inequality;
-        this.price = price;
-        this.value = value;
+        this.wrappedInequality = null;
+        this.wrappedPrice = null;
+        this.wrappedValue = null;
 
         this.exchange = exchange;
         this.statistic = statistic;
@@ -61,22 +55,13 @@ export class Odd {
 
     // public async constructor
     public static async create({
-        inequality,
-        value,
-        price,
         exchange,
         statistic,
     }: {
-        inequality: Inequality,
-        value: number | string,
-        price: number,
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
     }): Promise<Odd> {
         const newOdd = new Odd({
-            inequality: inequality,
-            value: value,
-            price: price,
             exchange: exchange,
             statistic: statistic,
         });
@@ -116,7 +101,20 @@ export class Odd {
     }
 
     // public instance methods
-    public matches(): boolean {
+    public matches({
+        exchange,
+        statistic,
+    }: {
+        exchange: localModels.Exchange,
+        statistic: localModels.Statistic,
+    }): boolean {
+        const exchangeMatches = (this.exchange === exchange);
+        const statisticMatches = (this.statistic === statistic);
+
+        if (exchangeMatches && statisticMatches) {
+            return true;
+        }
+
         return false;
     }
 

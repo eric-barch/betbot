@@ -24,8 +24,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Odd = exports.Inequality = void 0;
-const databaseModels = __importStar(require("../../../database/models"));
-const globalModels = __importStar(require("../../../global/models"));
+const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
 var Inequality;
 (function (Inequality) {
     Inequality[Inequality["GreaterThan"] = 0] = "GreaterThan";
@@ -34,10 +34,10 @@ var Inequality;
 })(Inequality = exports.Inequality || (exports.Inequality = {}));
 class Odd {
     // private constructor
-    constructor({ inequality, price, value, exchange, statistic, }) {
-        this.inequality = inequality;
-        this.price = price;
-        this.value = value;
+    constructor({ exchange, statistic, }) {
+        this.wrappedInequality = null;
+        this.wrappedPrice = null;
+        this.wrappedValue = null;
         this.exchange = exchange;
         this.statistic = statistic;
         this.exchange.oddSet.add(this);
@@ -47,11 +47,8 @@ class Odd {
         this.wrappedSqlOdd = null;
     }
     // public async constructor
-    static async create({ inequality, value, price, exchange, statistic, }) {
+    static async create({ exchange, statistic, }) {
         const newOdd = new Odd({
-            inequality: inequality,
-            value: value,
-            price: price,
             exchange: exchange,
             statistic: statistic,
         });
@@ -80,7 +77,12 @@ class Odd {
         return this.sqlOdd;
     }
     // public instance methods
-    matches() {
+    matches({ exchange, statistic, }) {
+        const exchangeMatches = (this.exchange === exchange);
+        const statisticMatches = (this.statistic === statistic);
+        if (exchangeMatches && statisticMatches) {
+            return true;
+        }
         return false;
     }
     // public static methods

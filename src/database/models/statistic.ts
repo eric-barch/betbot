@@ -1,8 +1,9 @@
 import * as sqlz from 'sequelize';
 
-import { sequelize } from '../database';
+import { sequelize } from '../../database';
 
-import * as databaseModels from '../../database/models';
+import { Game } from './game';
+import { Odd } from './odd';
 
 export class Statistic extends sqlz.Model<
     sqlz.InferAttributes<Statistic, {omit: 'game'}>,
@@ -19,28 +20,28 @@ export class Statistic extends sqlz.Model<
     declare updatedAt: sqlz.CreationOptional<Date>;
 
     // foreign keys
-    declare gameId: sqlz.ForeignKey<databaseModels.Game['id']>;
+    declare gameId: sqlz.ForeignKey<Game['id']>;
 
     // associated sequelize models
-    declare game?: sqlz.NonAttribute<databaseModels.Game>;
+    declare game?: sqlz.NonAttribute<Game>;
 
     // virtual model associations
     // belongsTo(Game)
-    declare createGame: sqlz.BelongsToCreateAssociationMixin<databaseModels.Game>;
-    declare getGame: sqlz.BelongsToGetAssociationMixin<databaseModels.Game>;
-    declare setGame: sqlz.BelongsToSetAssociationMixin<databaseModels.Game, number>;
+    declare createGame: sqlz.BelongsToCreateAssociationMixin<Game>;
+    declare getGame: sqlz.BelongsToGetAssociationMixin<Game>;
+    declare setGame: sqlz.BelongsToSetAssociationMixin<Game, number>;
 
     // hasMany(Odd)
-    declare getOdds: sqlz.HasManyGetAssociationsMixin<databaseModels.Odd>;
-    declare addOdd: sqlz.HasManyAddAssociationMixin<databaseModels.Odd, number>;
-    declare addOdds: sqlz.HasManyAddAssociationsMixin<databaseModels.Odd, number>;
-    declare setOdds: sqlz.HasManySetAssociationsMixin<databaseModels.Odd, number>;
-    declare removeOdd: sqlz.HasManyRemoveAssociationMixin<databaseModels.Odd, number>;
-    declare removeOdds: sqlz.HasManyRemoveAssociationsMixin<databaseModels.Odd, number>;
-    declare hasOdd: sqlz.HasManyHasAssociationMixin<databaseModels.Odd, number>;
-    declare hasOdds: sqlz.HasManyHasAssociationsMixin<databaseModels.Odd, number>;
+    declare getOdds: sqlz.HasManyGetAssociationsMixin<Odd>;
+    declare addOdd: sqlz.HasManyAddAssociationMixin<Odd, number>;
+    declare addOdds: sqlz.HasManyAddAssociationsMixin<Odd, number>;
+    declare setOdds: sqlz.HasManySetAssociationsMixin<Odd, number>;
+    declare removeOdd: sqlz.HasManyRemoveAssociationMixin<Odd, number>;
+    declare removeOdds: sqlz.HasManyRemoveAssociationsMixin<Odd, number>;
+    declare hasOdd: sqlz.HasManyHasAssociationMixin<Odd, number>;
+    declare hasOdds: sqlz.HasManyHasAssociationsMixin<Odd, number>;
     declare countOdds: sqlz.HasManyCountAssociationsMixin;
-    declare createOdd: sqlz.HasManyCreateAssociationMixin<databaseModels.Odd, 'exchangeId'>;
+    declare createOdd: sqlz.HasManyCreateAssociationMixin<Odd, 'exchangeId'>;
 
     // associated local model
     // none

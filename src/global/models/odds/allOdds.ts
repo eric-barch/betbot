@@ -1,3 +1,3 @@
-import * as models from '../../../local/models';
+import { OddSet } from '../../../local/models/odd';
 
-export const allOdds = new models.OddSet();
+export const allOdds = new OddSet();

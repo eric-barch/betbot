@@ -1,6 +1,6 @@
-import * as localModels from '../../../local/models';
+import { Exchange } from './exchange';
 
-export class ExchangeSet extends Set<localModels.Exchange> {
+export class ExchangeSet extends Set<Exchange> {
     public async analyze(): Promise<void> {
         for (const exchange of this) {
             await exchange.analyze();

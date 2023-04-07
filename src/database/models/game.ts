@@ -1,8 +1,10 @@
 import * as sqlz from 'sequelize';
   
-  import { sequelize } from '../database';
+import { sequelize } from '../../database';
   
-  import * as databaseModels from '../../database/models';
+  import { Exchange } from './exchange';
+  import { Statistic } from './statistic';
+  import { Team } from './team';
   
   export class Game extends sqlz.Model<
     sqlz.InferAttributes<Game, {omit: 'exchanges' | 'statistics' | 'awayTeam' | 'homeTeam'}>,
@@ -19,44 +21,44 @@ import * as sqlz from 'sequelize';
     declare updatedAt: sqlz.CreationOptional<Date>;
     
     // foreign keys
-    declare awayTeamId: sqlz.ForeignKey<databaseModels.Team['id']>;
-    declare homeTeamId: sqlz.ForeignKey<databaseModels.Team['id']>;
+    declare awayTeamId: sqlz.ForeignKey<Team['id']>;
+    declare homeTeamId: sqlz.ForeignKey<Team['id']>;
   
     // associated sequelize models
-    declare exchanges?: sqlz.NonAttribute<databaseModels.Exchange[]>;
-    declare statistics?: sqlz.NonAttribute<databaseModels.Statistic[]>;
-    declare awayTeam?: sqlz.NonAttribute<databaseModels.Team>;
-    declare homeTeam?: sqlz.NonAttribute<databaseModels.Team>;
+    declare exchanges?: sqlz.NonAttribute<Exchange[]>;
+    declare statistics?: sqlz.NonAttribute<Statistic[]>;
+    declare awayTeam?: sqlz.NonAttribute<Team>;
+    declare homeTeam?: sqlz.NonAttribute<Team>;
   
     // virtual model associations
     // belongsToMany(Exchange)
-    declare getExchanges: sqlz.BelongsToManyGetAssociationsMixin<databaseModels.Exchange>;
-    declare addExchange: sqlz.BelongsToManyAddAssociationMixin<databaseModels.Exchange, number>;
-    declare addExchanges: sqlz.BelongsToManyAddAssociationsMixin<databaseModels.Exchange, number>;
-    declare setExchanges: sqlz.BelongsToManySetAssociationsMixin<databaseModels.Exchange, number>;
-    declare removeExchange: sqlz.BelongsToManyRemoveAssociationMixin<databaseModels.Exchange, number>;
-    declare removeExchanges: sqlz.BelongsToManyRemoveAssociationsMixin<databaseModels.Exchange, number>;
-    declare hasExchange: sqlz.BelongsToManyHasAssociationMixin<databaseModels.Exchange, number>;
-    declare hasExchanges: sqlz.BelongsToManyHasAssociationsMixin<databaseModels.Exchange, number>;
+    declare getExchanges: sqlz.BelongsToManyGetAssociationsMixin<Exchange>;
+    declare addExchange: sqlz.BelongsToManyAddAssociationMixin<Exchange, number>;
+    declare addExchanges: sqlz.BelongsToManyAddAssociationsMixin<Exchange, number>;
+    declare setExchanges: sqlz.BelongsToManySetAssociationsMixin<Exchange, number>;
+    declare removeExchange: sqlz.BelongsToManyRemoveAssociationMixin<Exchange, number>;
+    declare removeExchanges: sqlz.BelongsToManyRemoveAssociationsMixin<Exchange, number>;
+    declare hasExchange: sqlz.BelongsToManyHasAssociationMixin<Exchange, number>;
+    declare hasExchanges: sqlz.BelongsToManyHasAssociationsMixin<Exchange, number>;
     declare countExchanges: sqlz.BelongsToManyCountAssociationsMixin;
-    declare createExchange: sqlz.BelongsToManyCreateAssociationMixin<databaseModels.Exchange>;
+    declare createExchange: sqlz.BelongsToManyCreateAssociationMixin<Exchange>;
   
     // hasMany(Statistic)
-    declare getStatistics: sqlz.HasManyGetAssociationsMixin<databaseModels.Statistic>;
-    declare addStatistic: sqlz.HasManyAddAssociationMixin<databaseModels.Statistic, number>;
-    declare addStatistics: sqlz.HasManyAddAssociationsMixin<databaseModels.Statistic, number>;
-    declare setStatistics: sqlz.HasManySetAssociationsMixin<databaseModels.Statistic, number>;
-    declare removeStatistic: sqlz.HasManyRemoveAssociationMixin<databaseModels.Statistic, number>;
-    declare removeStatistics: sqlz.HasManyRemoveAssociationsMixin<databaseModels.Statistic, number>;
-    declare hasStatistic: sqlz.HasManyHasAssociationMixin<databaseModels.Statistic, number>;
-    declare hasStatistics: sqlz.HasManyHasAssociationsMixin<databaseModels.Statistic, number>;
+    declare getStatistics: sqlz.HasManyGetAssociationsMixin<Statistic>;
+    declare addStatistic: sqlz.HasManyAddAssociationMixin<Statistic, number>;
+    declare addStatistics: sqlz.HasManyAddAssociationsMixin<Statistic, number>;
+    declare setStatistics: sqlz.HasManySetAssociationsMixin<Statistic, number>;
+    declare removeStatistic: sqlz.HasManyRemoveAssociationMixin<Statistic, number>;
+    declare removeStatistics: sqlz.HasManyRemoveAssociationsMixin<Statistic, number>;
+    declare hasStatistic: sqlz.HasManyHasAssociationMixin<Statistic, number>;
+    declare hasStatistics: sqlz.HasManyHasAssociationsMixin<Statistic, number>;
     declare countStatistics: sqlz.HasManyCountAssociationsMixin;
-    declare createStatistic: sqlz.HasManyCreateAssociationMixin<databaseModels.Statistic, 'gameId'>;
+    declare createStatistic: sqlz.HasManyCreateAssociationMixin<Statistic, 'gameId'>;
   
     // belongsTo(Team)
-    declare createTeam: sqlz.BelongsToCreateAssociationMixin<databaseModels.Team>;
-    declare getTeam: sqlz.BelongsToGetAssociationMixin<databaseModels.Team>;
-    declare setTeam: sqlz.BelongsToSetAssociationMixin<databaseModels.Team, number>;
+    declare createTeam: sqlz.BelongsToCreateAssociationMixin<Team>;
+    declare getTeam: sqlz.BelongsToGetAssociationMixin<Team>;
+    declare setTeam: sqlz.BelongsToSetAssociationMixin<Team, number>;
   
     // associated local model
     // none

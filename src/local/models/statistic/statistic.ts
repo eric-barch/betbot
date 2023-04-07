@@ -78,6 +78,22 @@ export class Statistic {
     }
 
     // public instance methods
+    public matches({
+        name,
+        game,
+    }: {
+        name: string,
+        game: localModels.Game,
+    }) {
+        const nameMatches = (this.name === name);
+        const gameMatches = (this.game === game);
+
+        if (nameMatches && gameMatches) {
+            return true;
+        }
+
+        return false;
+    }
 
     // public static methods
 

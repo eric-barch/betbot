@@ -1,6 +1,7 @@
-import * as localModels from '../../../local/models';
+import { Game } from './game';
+import * as localModels from '../../../local';
 
-export class GameSet extends Set<localModels.Game> {
+export class GameSet extends Set<Game> {
     public async findOrCreate({
         awayTeam,
         homeTeam,
@@ -9,7 +10,7 @@ export class GameSet extends Set<localModels.Game> {
         awayTeam: localModels.Team,
         homeTeam: localModels.Team,
         startDate: Date,
-    }): Promise<localModels.Game> {
+    }): Promise<Game> {
         let requestedGame = undefined;
         
         for (const game of this) {
@@ -24,7 +25,7 @@ export class GameSet extends Set<localModels.Game> {
         }
 
         if (!requestedGame) {
-            requestedGame = await localModels.Game.create({
+            requestedGame = await Game.create({
                 awayTeam: awayTeam,
                 homeTeam: homeTeam,
                 startDate: startDate,

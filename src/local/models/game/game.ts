@@ -1,6 +1,6 @@
-import * as databaseModels from '../../../database/models';
-import * as globalModels from '../../../global/models';
-import * as localModels from '../../../local/models';
+import * as databaseModels from '../../../database';
+import * as globalModels from '../../../global';
+import * as localModels from '../../../local';
 
 export class Game {
     // public properties
@@ -115,6 +115,23 @@ export class Game {
         }
 
         return false;
+    }
+
+    public async updateStatisticSet() {
+        await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'spread',
+        });
+        
+        await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'money',
+        });
+
+        await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'total',
+        })
     }
 
     // public static methods

@@ -1,8 +1,8 @@
 import * as sqlz from 'sequelize';
 
-import { sequelize } from '../database';
+import { sequelize } from '../../database';
 
-import * as databaseModels from '../../database/models';
+import { Game } from './game';
 
 export class Team extends sqlz.Model<
     sqlz.InferAttributes<Team, {omit: 'games'}>,
@@ -25,20 +25,20 @@ export class Team extends sqlz.Model<
     // none, all associated sequelize models are plural
 
     // associated sequelize models
-    declare games?: sqlz.NonAttribute<databaseModels.Game[]>;
+    declare games?: sqlz.NonAttribute<Game[]>;
 
     // virtual model associations
     // hasMany(Game)
-    declare getGames: sqlz.HasManyGetAssociationsMixin<databaseModels.Game>;
-    declare addGame: sqlz.HasManyAddAssociationMixin<databaseModels.Game, number>;
-    declare addGames: sqlz.HasManyAddAssociationsMixin<databaseModels.Game, number>;
-    declare setGames: sqlz.HasManySetAssociationsMixin<databaseModels.Game, number>;
-    declare removeGame: sqlz.HasManyRemoveAssociationMixin<databaseModels.Game, number>;
-    declare removeGames: sqlz.HasManyRemoveAssociationsMixin<databaseModels.Game, number>;
-    declare hasGame: sqlz.HasManyHasAssociationMixin<databaseModels.Game, number>;
-    declare hasGames: sqlz.HasManyHasAssociationsMixin<databaseModels.Game, number>;
+    declare getGames: sqlz.HasManyGetAssociationsMixin<Game>;
+    declare addGame: sqlz.HasManyAddAssociationMixin<Game, number>;
+    declare addGames: sqlz.HasManyAddAssociationsMixin<Game, number>;
+    declare setGames: sqlz.HasManySetAssociationsMixin<Game, number>;
+    declare removeGame: sqlz.HasManyRemoveAssociationMixin<Game, number>;
+    declare removeGames: sqlz.HasManyRemoveAssociationsMixin<Game, number>;
+    declare hasGame: sqlz.HasManyHasAssociationMixin<Game, number>;
+    declare hasGames: sqlz.HasManyHasAssociationsMixin<Game, number>;
     declare countGames: sqlz.HasManyCountAssociationsMixin;
-    declare createGame: sqlz.HasManyCreateAssociationMixin<databaseModels.Game, 'awayTeamId' | 'homeTeamId'>;
+    declare createGame: sqlz.HasManyCreateAssociationMixin<Game, 'awayTeamId' | 'homeTeamId'>;
 
     // associated local model
     // none

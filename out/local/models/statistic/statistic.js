@@ -63,6 +63,14 @@ class Statistic {
         return this.sqlStatistic;
     }
     // public instance methods
+    matches({ name, game, }) {
+        const nameMatches = (this.name === name);
+        const gameMatches = (this.game === game);
+        if (nameMatches && gameMatches) {
+            return true;
+        }
+        return false;
+    }
     // public static methods
     // getters and setters
     get sqlStatistic() {

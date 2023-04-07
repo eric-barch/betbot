@@ -1,1 +1,1 @@
-{"version":3,"file":"allOdds.js","sourceRoot":"","sources":["../../../../src/global/models/odds/allOdds.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,8DAAgD;AAEnC,QAAA,OAAO,GAAG,IAAI,MAAM,CAAC,MAAM,EAAE,CAAC"}
+{"version":3,"file":"allOdds.js","sourceRoot":"","sources":["../../../../src/global/models/odds/allOdds.ts"],"names":[],"mappings":";;;AAAA,mDAAmD;AAEtC,QAAA,OAAO,GAAG,IAAI,YAAM,EAAE,CAAC"}

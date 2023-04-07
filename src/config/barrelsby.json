@@ -1,9 +1,0 @@
-{
-    "delete": true,
-    "directory": "./src",
-    "location": "all",
-    "mode": "all",
-    "structure": "flat",
-    "singleQuotes": true
-  }
-  

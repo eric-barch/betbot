@@ -1,6 +1,6 @@
-import * as localModels from '../../../local/models';
+import { Team } from './team';
 
-export class TeamSet extends Set<localModels.Team> {
+export class TeamSet extends Set<Team> {
     public find({
         name,
     }: {

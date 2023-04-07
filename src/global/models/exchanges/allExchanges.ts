@@ -1,8 +1,8 @@
-import * as localModels from '../../../local/models';
+import * as localModels from '../../../local';
 
 export const allExchanges = new localModels.ExchangeSet();
 
-export async function allExchangesInit(): Promise<void> {
+export async function initAllExchanges(): Promise<void> {
     // allExchanges.add(
     //     await localModels.Exchange.create({
     //         name: 'Caesar\'s',
@@ -22,7 +22,7 @@ export async function allExchangesInit(): Promise<void> {
     allExchanges.add(
         await localModels.Exchange.create({
             name: 'FanDuel',
-            url: 'file:///Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot/tests/test6.html',
+            url: 'https://sportsbook.fanduel.com/navigation/nba',
         })
     );
 }

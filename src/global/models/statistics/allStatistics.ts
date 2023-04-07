@@ -1,3 +1,3 @@
-import * as localModels from '../../../local/models';
+import { StatisticSet } from '../../../local/models/statistic';
 
-export const allStatistics = new localModels.StatisticSet();
+export const allStatistics = new StatisticSet();
