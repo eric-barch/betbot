@@ -5,4 +5,5 @@
 export * from './exchanges/index';
 export * from './games/index';
 export * from './odds/index';
+export * from './statistics/index';
 export * from './teams/index';

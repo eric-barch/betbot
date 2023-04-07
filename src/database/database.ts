@@ -7,7 +7,7 @@ export const sequelize = new Sequelize('nba', 'root', 'f9R#@hY82l', {
     logging: false,
 });
 
-import { Exchange, Game, Odd, Team } from '../database/models';
+import * as databaseModels from '../database/models';
 
 export async function init(): Promise<void> {
     try {
@@ -18,30 +18,35 @@ export async function init(): Promise<void> {
     }
     
     // Exchange associations
-    Exchange.belongsToMany(Game, {
+    databaseModels.Exchange.belongsToMany(databaseModels.Game, {
         through: 'exchange_games',
         foreignKey: 'exchangeId',
         otherKey: 'gameId',
     });
-    Exchange.hasMany(Odd, { foreignKey: 'exchangeId'} );
+    databaseModels.Exchange.hasMany(databaseModels.Odd, { foreignKey: 'exchangeId'} );
     
     // Game associations 
-    Game.belongsToMany(Exchange, {
+    databaseModels.Game.belongsToMany(databaseModels.Exchange, {
         through: 'exchange_games',
         foreignKey: 'gameId',
         otherKey: 'exchangeId',
     });
-    Game.hasMany(Odd, { foreignKey: 'gameId' });
-    Game.belongsTo(Team, { as: 'gameAwayTeam', foreignKey: 'awayTeamId' });
-    Game.belongsTo(Team, { as: 'gameHomeTeam', foreignKey: 'homeTeamId' });
+    databaseModels.Game.hasMany(databaseModels.Statistic, { foreignKey: 'gameId' });
+    databaseModels.Game.belongsTo(databaseModels.Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
+    databaseModels.Game.belongsTo(databaseModels.Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
     
     // Odd associations
-    Odd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
-    Odd.belongsTo(Game, { foreignKey: 'gameId' });
-    
+    databaseModels.Odd.belongsTo(databaseModels.Exchange, { foreignKey: 'exchangeId' });
+    databaseModels.Odd.belongsTo(databaseModels.Odd, { foreignKey: 'oppositeId' });
+    databaseModels.Odd.belongsTo(databaseModels.Statistic, { foreignKey: 'statisticId' });
+
+    // Statistic associations
+    databaseModels.Statistic.belongsTo(databaseModels.Game, { foreignKey: 'gameId' });
+    databaseModels.Statistic.hasMany(databaseModels.Odd, { foreignKey: 'statisticId' });
+
     // Team associations
-    Team.hasMany(Game, { as: 'gameAwayTeam', foreignKey: 'awayTeamId' });
-    Team.hasMany(Game, { as: 'gameHomeTeam', foreignKey: 'homeTeamId' });
+    databaseModels.Team.hasMany(databaseModels.Game, { as: 'awayTeam', foreignKey: 'awayTeamId' });
+    databaseModels.Team.hasMany(databaseModels.Game, { as: 'homeTeam', foreignKey: 'homeTeamId' });
 
     await sequelize.sync({
         alter: true,

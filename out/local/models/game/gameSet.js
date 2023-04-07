@@ -26,27 +26,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameSet = void 0;
 const localModels = __importStar(require("../../../local/models"));
 class GameSet extends Set {
-    async getGameByTeamsAndStartDate({ awayTeam, homeTeam, exchange, startDate, }) {
+    async findOrCreate({ awayTeam, homeTeam, startDate, }) {
         let requestedGame = undefined;
         for (const game of this) {
-            if (game.matchesByTeamsAndStartDate({
+            if (game.matches({
                 awayTeam: awayTeam,
                 homeTeam: homeTeam,
                 startDate: startDate,
             })) {
                 requestedGame = game;
-                if (exchange) {
-                    requestedGame.exchangeSet.add(exchange);
-                    exchange.gameSet.add(requestedGame);
-                }
                 break;
             }
         }
-        if (requestedGame === undefined) {
+        if (!requestedGame) {
             requestedGame = await localModels.Game.create({
                 awayTeam: awayTeam,
                 homeTeam: homeTeam,
-                exchange: exchange,
                 startDate: startDate,
             });
             this.add(requestedGame);

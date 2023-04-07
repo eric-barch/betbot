@@ -43,7 +43,7 @@ async function allExchangesInit() {
     // );
     exports.allExchanges.add(await localModels.Exchange.create({
         name: 'FanDuel',
-        url: 'file:///Users/ericbarch/Documents/Development/AutomaticSportsBetting/iteration-6/tests/test6.html',
+        url: 'file:///Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot/tests/test6.html',
     }));
 }
 exports.allExchangesInit = allExchangesInit;

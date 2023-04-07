@@ -1,20 +1,29 @@
-import { Browser, Page, connect } from 'puppeteer';
+import * as puppeteer from 'puppeteer';
 
 import * as databaseModels from '../../../database/models';
 import * as globalModels from '../../../global/models';
 import * as localModels from '../../../local/models';
 
 export class Exchange {
+    // public properties
     public name: string;
     public url: string;
+
+    // private properties
+    
+    // public linked objects
     public gameSet: localModels.GameSet;
     public oddSet: localModels.OddSet;
     
-    private wrappedBrowser: Browser | null;
-    private wrappedPage: Page | null;
+    // private linked objects
+    private wrappedBrowser: puppeteer.Browser | null;
+    private wrappedPage: puppeteer.Page | null;
+    
+    // private sequelize object
     private wrappedSqlExchange: databaseModels.Exchange | null;
 
-    constructor({
+    // private constructor
+    private constructor({
         name,
         url,
     }: {
@@ -23,15 +32,17 @@ export class Exchange {
     }) {
         this.name = name;
         this.url = url;
+        
         this.gameSet = new localModels.GameSet();
         this.oddSet = new localModels.OddSet();
 
         this.wrappedBrowser = null;
         this.wrappedPage = null;
+        
         this.wrappedSqlExchange = null;
     }
 
-    // async construction methods
+    // public async constructor
     static async create({
         name,
         url,
@@ -44,16 +55,20 @@ export class Exchange {
             url: url,
         })
 
-        await newExchange.init();
+        await newExchange.connectToExistingPage();
+
+        await newExchange.initSqlExchange();
 
         globalModels.allExchanges.add(newExchange);
 
         return newExchange;
+
+        // Should something be in here that updates Odds/Games from the db
+        // if available?
     }
 
-    private async init(): Promise<Exchange> {
-        await this.connectToExistingPage();
-        
+    // private sequelize instance constructor
+    private async initSqlExchange(): Promise<databaseModels.Exchange> {
         await databaseModels.Exchange.findOrCreate({
             where: {
                 name: this.name,
@@ -68,25 +83,26 @@ export class Exchange {
                     url: this.url,
                 });
             }
-            this.wrappedSqlExchange = sqlExchange;
+
+            this.sqlExchange = sqlExchange;
         });
 
-        return this;
+        return this.sqlExchange;
     }
 
-    // instance methods
+    // public instance methods
     public async analyze(): Promise<void> {
         await this.updateGameSet();
-        await this.updateOddSet();
-        await this.oddSet.updateValues();
+        // await this.updateOddSet();
+        // await this.oddSet.updateValues();
     }
 
     public async close(): Promise<void> {
         this.browser.close();
     }
 
-    public async connectToExistingPage(): Promise<void> {
-        this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
+    public async connectToExistingPage(): Promise<puppeteer.Page> {
+        this.browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222' });
 
         const targets = this.browser.targets();
         const target = targets.find(target => target.url().includes(this.url));
@@ -110,6 +126,8 @@ export class Exchange {
 
         this.page = targetPage;
         this.page.setViewport(windowSize);
+
+        return this.page;
     }
 
     public async updateGameSet(): Promise<localModels.GameSet> {    
@@ -122,15 +140,14 @@ export class Exchange {
             const awayTeamNameString = jsonGame.awayTeam.name;
             const homeTeamNameString = jsonGame.homeTeam.name;
     
-            const awayTeamInstance = globalModels.allTeams.getTeamByNameString({ nameString: awayTeamNameString });
-            const homeTeamInstance = globalModels.allTeams.getTeamByNameString({ nameString: homeTeamNameString });
+            const awayTeamInstance = globalModels.allTeams.find({ name: awayTeamNameString });
+            const homeTeamInstance = globalModels.allTeams.find({ name: homeTeamNameString });
             const startDate = new Date(jsonGame.startDate);
     
-            await globalModels.allGames.getGameByTeamsAndStartDate({
+            await globalModels.allGames.findOrCreate({
                 awayTeam: awayTeamInstance,
                 homeTeam: homeTeamInstance,
                 startDate: startDate,
-                exchange: this,
             });
         }
 
@@ -139,10 +156,10 @@ export class Exchange {
 
     public async updateOddSet(): Promise<localModels.OddSet> {
         for (const game of this.gameSet) {
-            await game.getOddByExchange({
-                exchange: this,
-                game: game,
-            });
+            // await game.getOddByExchange({
+            //     exchange: this,
+            //     game: game,
+            // });
 
             //the below should not be necessary here. this = exchange
             //this.oddSet.add(odd);
@@ -151,8 +168,10 @@ export class Exchange {
         return this.oddSet;
     }
 
+    // public static methods
+
     // getters and setters
-    get browser(): Browser {
+    get browser(): puppeteer.Browser {
         if (this.wrappedBrowser) {
             return this.wrappedBrowser;
         } else {
@@ -160,7 +179,7 @@ export class Exchange {
         }
     }
 
-    set browser(browser: Browser) {
+    set browser(browser: puppeteer.Browser) {
         this.wrappedBrowser = browser;
     }
 
@@ -174,7 +193,7 @@ export class Exchange {
         return firstCharLower;
     }
 
-    get page(): Page {
+    get page(): puppeteer.Page {
         if (this.wrappedPage) {
             return this.wrappedPage;
         } else {
@@ -182,7 +201,7 @@ export class Exchange {
         }
     }
 
-    set page(page: Page) {
+    set page(page: puppeteer.Page) {
         this.wrappedPage = page;
     }
 

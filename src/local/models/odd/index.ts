@@ -4,5 +4,3 @@
 
 export * from './odd';
 export * from './oddSet';
-export * from './elementWrappers/index';
-export * from './updateElementFunctions/index';

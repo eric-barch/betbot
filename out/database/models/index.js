@@ -20,5 +20,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./exchange"), exports);
 __exportStar(require("./game"), exports);
 __exportStar(require("./odd"), exports);
+__exportStar(require("./statistic"), exports);
 __exportStar(require("./team"), exports);
 //# sourceMappingURL=index.js.map

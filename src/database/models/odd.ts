@@ -1,59 +1,51 @@
-import {
-    Association,
-    BelongsToCreateAssociationMixin, BelongsToGetAssociationMixin, BelongsToSetAssociationMixin,
-    CreationOptional,
-    DataTypes,
-    ForeignKey,
-    InferAttributes, InferCreationAttributes,
-    Model,
-    NonAttribute,
-} from 'sequelize';
+import * as sqlz from 'sequelize';
 
 import { sequelize } from '../database';
 
-import { Exchange } from './exchange';
-import { Game } from './game';
+import * as databaseModels from '../../database/models';
 
-export class Odd extends Model<
-    InferAttributes<Odd, {omit: 'exchange' | 'game'}>,
-    InferCreationAttributes<Odd, {omit: 'exchange' | 'game'}>
+export class Odd extends sqlz.Model<
+    sqlz.InferAttributes<Odd, {omit: 'exchange' | 'statistic' | 'opposite'}>,
+    sqlz.InferCreationAttributes<Odd, {omit: 'exchange' | 'statistic' | 'opposite'}>
 > {
     // id
-    declare id: CreationOptional<number>;
+    declare id: sqlz.CreationOptional<number>;
 
     // column headers
-    declare spreadAwaySpread: number | null;
-    declare spreadHomeSpread: number | null;
-    declare spreadAwayPrice: number | null;
-    declare spreadHomePrice: number | null;
-    declare moneyAwayPrice: number | null;
-    declare moneyHomePrice: number | null;
-    declare totalTotal: number | null;
-    declare totalOverPrice: number | null;
-    declare totalUnderPrice: number | null;
+    declare inequality: string;
+    declare price: number;
+    declare numberValue: number;
+    declare stringValue: string;
 
     // timestamps
-    declare createdAt: CreationOptional<Date>;
-    declare updatedAt: CreationOptional<Date>;
+    declare createdAt: sqlz.CreationOptional<Date>;
+    declare updatedAt: sqlz.CreationOptional<Date>;
 
     // foreign keys
-    declare exchangeId: ForeignKey<Exchange['id']>;
-    declare gameId: ForeignKey<Game['id']>;
+    declare exchangeId: sqlz.ForeignKey<databaseModels.Exchange['id']>;
+    declare oppositeId: sqlz.ForeignKey<databaseModels.Odd['id']>;
+    declare statisticId: sqlz.ForeignKey<databaseModels.Statistic['id']>;
 
     // associated sequelize model(s)
-    declare exchange?: NonAttribute<Exchange>;
-    declare game?: NonAttribute<Game>;
+    declare exchange?: sqlz.NonAttribute<databaseModels.Exchange>;
+    declare opposite?: sqlz.NonAttribute<databaseModels.Odd>;
+    declare statistic?: sqlz.NonAttribute<databaseModels.Statistic>;
 
     // virtual model associations
     // belongsTo(Exchange)
-    declare createExchange: BelongsToCreateAssociationMixin<Exchange>;
-    declare getExchange: BelongsToGetAssociationMixin<Exchange>;
-    declare setExchange: BelongsToSetAssociationMixin<Exchange, number>;
+    declare createExchange: sqlz.BelongsToCreateAssociationMixin<databaseModels.Exchange>;
+    declare getExchange: sqlz.BelongsToGetAssociationMixin<databaseModels.Exchange>;
+    declare setExchange: sqlz.BelongsToSetAssociationMixin<databaseModels.Exchange, number>;
 
-    // belongsTo(Game)
-    declare createGame: BelongsToCreateAssociationMixin<Game>;
-    declare getGame: BelongsToGetAssociationMixin<Game>;
-    declare setGame: BelongsToSetAssociationMixin<Game, number>;
+    // belongsTo(Odd)
+    declare createOdd: sqlz.BelongsToCreateAssociationMixin<databaseModels.Odd>;
+    declare getOdd: sqlz.BelongsToGetAssociationMixin<databaseModels.Odd>;
+    declare setOdd: sqlz.BelongsToSetAssociationMixin<databaseModels.Odd, number>;
+
+    // belongsTo(Statistic)
+    declare createStatistic: sqlz.BelongsToCreateAssociationMixin<databaseModels.Statistic>;
+    declare getStatistic: sqlz.BelongsToGetAssociationMixin<databaseModels.Statistic>;
+    declare setStatistic: sqlz.BelongsToSetAssociationMixin<databaseModels.Statistic, number>;
 
     // associated local model
     // none
@@ -61,21 +53,16 @@ export class Odd extends Model<
 
 Odd.init({
     id: {
-    type: DataTypes.INTEGER.UNSIGNED,
-    autoIncrement: true,
-    primaryKey: true
+        type: sqlz.DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true
     },
-    spreadAwaySpread: DataTypes.FLOAT,
-    spreadHomeSpread: DataTypes.FLOAT,
-    spreadAwayPrice: DataTypes.INTEGER,
-    spreadHomePrice: DataTypes.INTEGER,
-    moneyAwayPrice: DataTypes.INTEGER,
-    moneyHomePrice: DataTypes.INTEGER,
-    totalTotal: DataTypes.FLOAT,
-    totalOverPrice: DataTypes.INTEGER,
-    totalUnderPrice: DataTypes.INTEGER,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
+    inequality: new sqlz.DataTypes.STRING(128),
+    price: sqlz.DataTypes.INTEGER,
+    numberValue: sqlz.DataTypes.FLOAT,
+    stringValue: new sqlz.DataTypes.STRING(128),
+    createdAt: sqlz.DataTypes.DATE,
+    updatedAt: sqlz.DataTypes.DATE,
 }, {
     sequelize,
     tableName: 'odds',

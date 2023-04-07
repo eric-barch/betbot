@@ -23,252 +23,96 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TotalOdd = exports.MoneyOdd = exports.SpreadOdd = exports.Odd = void 0;
+exports.Odd = exports.Inequality = void 0;
 const databaseModels = __importStar(require("../../../database/models"));
-const elementWrappers = __importStar(require("./elementWrappers"));
 const globalModels = __importStar(require("../../../global/models"));
-const fanDuel = __importStar(require("./updateElementFunctions/fanDuel"));
-class Odd extends elementWrappers.ElementWrapper {
-    constructor({ exchange, game, }) {
-        super({
-            exchange: exchange,
-            game: game,
-            updateElementFunction: fanDuel.odd,
-        });
+var Inequality;
+(function (Inequality) {
+    Inequality[Inequality["GreaterThan"] = 0] = "GreaterThan";
+    Inequality[Inequality["EqualTo"] = 1] = "EqualTo";
+    Inequality[Inequality["LessThan"] = 2] = "LessThan";
+})(Inequality = exports.Inequality || (exports.Inequality = {}));
+class Odd {
+    // private constructor
+    constructor({ inequality, price, value, exchange, statistic, }) {
+        this.inequality = inequality;
+        this.price = price;
+        this.value = value;
+        this.exchange = exchange;
+        this.statistic = statistic;
         this.exchange.oddSet.add(this);
-        this.game.oddSet.add(this);
-        this.spreadOdd = new SpreadOdd({
-            exchange: exchange,
-            game: game,
-            parent: this,
-        });
-        this.moneyOdd = new MoneyOdd({
-            exchange: exchange,
-            game: game,
-            parent: this,
-        });
-        this.totalOdd = new TotalOdd({
-            exchange: exchange,
-            game: game,
-            parent: this,
-        });
+        this.statistic.oddSet.add(this);
+        this.wrappedElement = null;
+        this.wrappedOpposite = null;
         this.wrappedSqlOdd = null;
     }
-    // async construction methods
-    static async create({ exchange, game, }) {
+    // public async constructor
+    static async create({ inequality, value, price, exchange, statistic, }) {
         const newOdd = new Odd({
+            inequality: inequality,
+            value: value,
+            price: price,
             exchange: exchange,
-            game: game,
+            statistic: statistic,
         });
-        await newOdd.init(); // Breaking here.
+        await newOdd.initSqlOdd();
         globalModels.allOdds.add(newOdd);
         return newOdd;
     }
-    async init() {
+    // private sequelize instance constructor
+    async initSqlOdd() {
         const exchange = this.exchange;
-        const game = this.game;
+        const statistic = this.statistic;
         const exchangeId = exchange.sqlExchange.get('id');
-        const gameId = game.sqlGame.get('id');
-        const spreadOdd = this.spreadOdd;
-        const moneyOdd = this.moneyOdd;
-        const totalOdd = this.totalOdd;
+        const statisticId = statistic.sqlStatistic.get('id');
         await databaseModels.Odd.findOrCreate({
             where: {
                 exchangeId: exchangeId,
-                gameId: gameId,
-            },
-            defaults: {
-                spreadAwaySpread: spreadOdd.awaySpread.value,
-                spreadHomeSpread: spreadOdd.homeSpread.value,
-                spreadAwayPrice: spreadOdd.awayPrice.value,
-                spreadHomePrice: spreadOdd.homePrice.value,
-                moneyAwayPrice: moneyOdd.awayPrice.value,
-                moneyHomePrice: moneyOdd.homePrice.value,
-                totalTotal: totalOdd.overTotal.value,
-                totalOverPrice: totalOdd.overTotalPrice.value,
-                totalUnderPrice: totalOdd.underTotalPrice.value,
-                exchangeId: exchangeId,
-                gameId: gameId,
+                statisticId: statisticId,
             },
         }).then(async ([sqlOdd, created]) => {
             if (!created) {
-                // TODO: Insert code here that transfers the current odd over to 
-                // OldOdd table.
-                await sqlOdd.update({
-                    spreadAwaySpread: spreadOdd.awaySpread.value,
-                    spreadHomeSpread: spreadOdd.homeSpread.value,
-                    spreadAwayPrice: spreadOdd.awayPrice.value,
-                    spreadHomePrice: spreadOdd.homePrice.value,
-                    moneyAwayPrice: moneyOdd.awayPrice.value,
-                    moneyHomePrice: moneyOdd.homePrice.value,
-                    totalTotal: totalOdd.overTotal.value,
-                    totalOverPrice: totalOdd.overTotalPrice.value,
-                    totalUnderPrice: totalOdd.underTotalPrice.value,
-                });
+                // Transfer current odd to PastOdds.
+                await sqlOdd.update({});
             }
-            this.wrappedSqlOdd = sqlOdd;
+            this.sqlOdd = sqlOdd;
         });
-        return this;
+        return this.sqlOdd;
     }
-    // instance methods
-    matchesByExchangeAndGame({ exchange, game, }) {
-        if (this.exchange === exchange && this.game === game) {
-            return true;
-        }
+    // public instance methods
+    matches() {
         return false;
     }
-    async updateValues() {
-        const spreadUpdatesMade = await this.spreadOdd.updateValues();
-        const moneyUpdatesMade = await this.moneyOdd.updateValues();
-        const totalUpdatesMade = await this.totalOdd.updateValues();
-        if (spreadUpdatesMade || moneyUpdatesMade || totalUpdatesMade) {
-            await this.sqlOdd.update({
-                spreadAwaySpread: this.spreadOdd.awaySpread.value,
-                spreadHomeSpread: this.spreadOdd.homeSpread.value,
-                spreadAwayPrice: this.spreadOdd.awayPrice.value,
-                spreadHomePrice: this.spreadOdd.homePrice.value,
-                moneyAwayPrice: this.moneyOdd.awayPrice.value,
-                moneyHomePrice: this.moneyOdd.homePrice.value,
-                totalTotal: this.totalOdd.overTotal.value,
-                totalOverPrice: this.totalOdd.overTotalPrice.value,
-                totalUnderPrice: this.totalOdd.underTotalPrice.value,
-            });
-            console.log(`UPDATED: ${this.exchange.name} ${this.game.regionAbbrIdentifierAbbr}`);
-        }
-    }
+    // public static methods
     // getters and setters
+    get element() {
+        if (!this.wrappedElement) {
+            throw new Error(`${this.exchange.name} ${this.statistic.name} element is null.`);
+        }
+        return this.wrappedElement;
+    }
+    set element(element) {
+        this.wrappedElement = element;
+    }
+    get opposite() {
+        if (!this.wrappedOpposite) {
+            throw new Error(`${this.exchange.name} ${this.statistic.name} opposite is null.`);
+        }
+        return this.wrappedOpposite;
+    }
+    set opposite(opposite) {
+        this.opposite = opposite;
+        opposite.opposite = this;
+    }
     get sqlOdd() {
-        if (this.wrappedSqlOdd) {
-            return this.wrappedSqlOdd;
+        if (!this.wrappedSqlOdd) {
+            throw new Error(`${this.exchange.name} ${this.statistic.name} sqlOdd is null.`);
         }
-        else {
-            throw new Error(`${this.exchange.name} ${this.game.regionAbbrIdentifierAbbr} Odd sqlOdd is null.`);
-        }
+        return this.wrappedSqlOdd;
     }
     set sqlOdd(sqlOdd) {
         this.wrappedSqlOdd = sqlOdd;
     }
 }
 exports.Odd = Odd;
-class SpreadOdd extends elementWrappers.ElementWrapper {
-    constructor({ exchange, game, parent, }) {
-        super({
-            exchange: exchange,
-            game: game,
-            odd: parent,
-            updateElementFunction: fanDuel.spreadOdd,
-        });
-        this.awaySpread = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.awaySpread,
-        });
-        this.awayPrice = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.awaySpreadPrice,
-        });
-        this.homeSpread = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.homeSpread,
-        });
-        this.homePrice = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.homeSpreadPrice,
-        });
-    }
-    async updateValues() {
-        const awaySpreadUpdated = await this.awaySpread.updateValue();
-        const awayPriceUpdated = await this.awayPrice.updateValue();
-        const homeSpreadUpdated = await this.homeSpread.updateValue();
-        const homePriceUpdated = await this.homePrice.updateValue();
-        if (awaySpreadUpdated || awayPriceUpdated || homeSpreadUpdated || homePriceUpdated) {
-            return true;
-        }
-        return false;
-    }
-}
-exports.SpreadOdd = SpreadOdd;
-class MoneyOdd extends elementWrappers.ElementWrapper {
-    constructor({ exchange, game, parent, }) {
-        super({
-            exchange: exchange,
-            game: game,
-            odd: parent,
-            updateElementFunction: fanDuel.moneyOdd,
-        });
-        this.awayPrice = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.awayMoneyPrice,
-        });
-        this.homePrice = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.homeMoneyPrice,
-        });
-    }
-    async updateValues() {
-        const awayPriceUpdated = await this.awayPrice.updateValue();
-        const moneyPriceUpdated = await this.homePrice.updateValue();
-        if (awayPriceUpdated || moneyPriceUpdated) {
-            return true;
-        }
-        return false;
-    }
-}
-exports.MoneyOdd = MoneyOdd;
-class TotalOdd extends elementWrappers.ElementWrapper {
-    constructor({ exchange, game, parent, }) {
-        super({
-            exchange: exchange,
-            game: game,
-            odd: parent,
-            updateElementFunction: fanDuel.totalOdd,
-        });
-        this.overTotal = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.overTotal,
-        });
-        this.overTotalPrice = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.overTotalPrice,
-        });
-        this.underTotal = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.underTotal,
-        });
-        this.underTotalPrice = new elementWrappers.ElementWrapperWithValue({
-            exchange: exchange,
-            game: game,
-            odd: this.odd,
-            updateElementFunction: fanDuel.underTotalPrice,
-        });
-    }
-    async updateValues() {
-        const overTotalUpdated = await this.overTotal.updateValue();
-        const overPriceUpdated = await this.overTotalPrice.updateValue();
-        const underTotalUpdated = await this.underTotal.updateValue();
-        const underPriceUpdated = await this.underTotalPrice.updateValue();
-        if (overTotalUpdated || overPriceUpdated || underTotalUpdated || underPriceUpdated) {
-            return true;
-        }
-        return false;
-    }
-}
-exports.TotalOdd = TotalOdd;
 //# sourceMappingURL=odd.js.map

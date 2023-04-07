@@ -3,15 +3,24 @@ import * as globalModels from '../../../global/models';
 import * as localModels from '../../../local/models';
 
 export class Game {
+    // public properties
+    public startDate: Date;
+
+    // private properties
+
+    // public linked objects
     public awayTeam: localModels.Team;
     public homeTeam: localModels.Team;
-    public startDate: Date;
     public exchangeSet: localModels.ExchangeSet;
-    public oddSet: localModels.OddSet;
+    public statisticSet: localModels.StatisticSet;
+
+    // private linked objects
     
+    // private sequelize object
     private wrappedSqlGame: databaseModels.Game | null;
 
-    constructor({
+    // private constructor
+    private constructor({
         awayTeam,
         homeTeam,
         startDate,
@@ -20,25 +29,24 @@ export class Game {
         homeTeam: localModels.Team,
         startDate: Date,
     }) {
-        this.awayTeam = awayTeam;
-        this.homeTeam = homeTeam;   
         this.startDate = Game.roundDateToNearestInterval(startDate);
 
-        this.exchangeSet = new localModels.ExchangeSet;
-        this.oddSet = new localModels.OddSet();
+        this.awayTeam = awayTeam;
+        this.homeTeam = homeTeam;
+        this.exchangeSet = new localModels.ExchangeSet();
+        this.statisticSet = new localModels.StatisticSet();
+        
         this.wrappedSqlGame = null;
     }
 
-    // async construction methods
+    // public async constructor
     static async create({
         awayTeam,
         homeTeam,
-        exchange,
         startDate,
     }: {
         awayTeam: localModels.Team,
         homeTeam: localModels.Team,
-        exchange?: localModels.Exchange,
         startDate: Date,
     }): Promise<Game> {
         const newGame = new Game({
@@ -47,25 +55,17 @@ export class Game {
             startDate: startDate,
         })
 
-        await newGame.init();
-
-        if (exchange) {
-            newGame.exchangeSet.add(exchange);
-            newGame.sqlGame.addExchange(exchange.sqlExchange);
-
-            exchange.gameSet.add(newGame);
-            //exchange.sqlExchange.addGame(newGame.sqlGame);
-        }
+        await newGame.initSqlGame();
 
         globalModels.allGames.add(newGame);
 
         return newGame;
     }
 
-    private async init(): Promise<Game> {
+    // private sequelize instance constructor
+    private async initSqlGame(): Promise<databaseModels.Game> {
         const awayTeam = this.awayTeam;
         const homeTeam = this.homeTeam;
-        const startDate = this.startDate;
 
         const awayTeamId = awayTeam.sqlTeam.get('id');
         const homeTeamId = homeTeam.sqlTeam.get('id');
@@ -74,63 +74,34 @@ export class Game {
             where: {
                 awayTeamId: awayTeamId,
                 homeTeamId: homeTeamId,
-                startDate: startDate,
+                startDate: this.startDate,
             },
             defaults: {
                 awayTeamId: awayTeamId,
                 homeTeamId: homeTeamId,
-                startDate: startDate,
+                startDate: this.startDate,
             },
-        }).then(([sqlGame, created]) => {
+        }).then(async ([sqlGame, created]) => {
+            if (!created) {
+                await sqlGame.update({
+                    
+                });
+            }
+
             this.wrappedSqlGame = sqlGame;
         });
 
-        return this;
+        return this.sqlGame;
     }
 
-    // instance methods
-    public async getOddByExchange({
-        exchange,
-        game,
-    }: {
-        exchange: localModels.Exchange,
-        game?: localModels.Game,
-    }): Promise<localModels.Odd> {
-        let requestedOdd = undefined;
-
-        const gameOdds = this.oddSet;
-        for (const odd of gameOdds) {
-            if (odd.exchange === exchange) {
-                requestedOdd = odd;
-                break;
-            }
-        }
-        // If it retrieves an odd where the exchange is exchange, the odd should 
-        // already be in exchange's oddSet.
-
-        if (requestedOdd === undefined) {
-            requestedOdd = await localModels.Odd.create({
-                exchange: exchange,
-                game: this,
-            });
-        }
-
-        if (game) {
-            game.oddSet.add(requestedOdd);
-        }
-
-        return requestedOdd;
-    }
-
-    public matchesByTeamsAndStartDate({
+    // public instance methods
+    public matches({
         awayTeam,
         homeTeam,
-        exchange,
         startDate,
     }: {
         awayTeam: localModels.Team,
         homeTeam: localModels.Team,
-        exchange?: localModels.Exchange,
         startDate: Date,
     }): boolean {
         startDate = Game.roundDateToNearestInterval(startDate);
@@ -140,18 +111,13 @@ export class Game {
         const startDateSame = (this.startDate.getTime() === startDate.getTime());
 
         if (awayTeamSame && homeTeamSame && startDateSame) {
-            if (exchange) {
-                this.exchangeSet.add(exchange);
-                exchange.gameSet.add(this);
-            }
-            
             return true;
         }
 
         return false;
     }
 
-    // static methods
+    // public static methods
     static roundDateToNearestInterval(date: Date): Date {
         const ROUND_INTERVAL = 15;
         
