@@ -24,17 +24,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Team = void 0;
-const globalModels = __importStar(require("../../../global/models"));
+const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
 class Team {
-    // private properties
-    // public linked objects
-    // private linked objects
     // private constructor
     constructor({ regionFull, regionAbbr, identifierFull, identifierAbbr, }) {
         this.regionFull = regionFull;
         this.regionAbbr = regionAbbr;
         this.identifierFull = identifierFull;
         this.identifierAbbr = identifierAbbr;
+        this.wrappedSqlTeam = null;
     }
     // public async constructor
     static async create({ regionFull, regionAbbr, identifierFull, identifierAbbr, }) {
@@ -44,8 +43,33 @@ class Team {
             identifierFull: identifierFull,
             identifierAbbr: identifierAbbr,
         });
+        await newTeam.initSqlTeam();
         globalModels.allTeams.add(newTeam);
         return newTeam;
+    }
+    // private sequelize instance constructor
+    async initSqlTeam() {
+        await databaseModels.Team.findOrCreate({
+            where: {
+                regionFull: this.regionFull,
+                identifierFull: this.identifierFull,
+            },
+            defaults: {
+                regionFull: this.regionFull,
+                regionAbbr: this.regionAbbr,
+                identifierFull: this.identifierFull,
+                identifierAbbr: this.identifierAbbr,
+            },
+        }).then(async ([sqlTeam, created]) => {
+            if (!created) {
+                await sqlTeam.update({
+                    regionAbbr: this.regionAbbr,
+                    identifierAbbr: this.identifierAbbr,
+                });
+            }
+            this.sqlTeam = sqlTeam;
+        });
+        return this.sqlTeam;
     }
     // public instance methods
     matches({ name, }) {
@@ -69,6 +93,15 @@ class Team {
     get regionAbbrIdentifierAbbr() {
         const regionAbbrIdentifierAbbr = `${this.regionAbbr} ${this.identifierAbbr}`;
         return regionAbbrIdentifierAbbr;
+    }
+    get sqlTeam() {
+        if (!this.wrappedSqlTeam) {
+            throw new Error(`${this.regionFullIdentifierFull} sqlTeamj is null.`);
+        }
+        return this.wrappedSqlTeam;
+    }
+    set sqlTeam(sqlTeam) {
+        this.wrappedSqlTeam = sqlTeam;
     }
 }
 exports.Team = Team;

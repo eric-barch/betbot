@@ -24,10 +24,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
+const databaseModels = __importStar(require("../../../database"));
 const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
 class Game {
-    // private linked objects
     // private constructor
     constructor({ awayTeam, homeTeam, startDate, }) {
         this.startDate = Game.roundDateToNearestInterval(startDate);
@@ -35,6 +35,7 @@ class Game {
         this.homeTeam = homeTeam;
         this.exchangeSet = new localModels.ExchangeSet();
         this.statisticSet = new localModels.StatisticSet();
+        this.wrappedSqlGame = null;
     }
     // public async constructor
     static async create({ awayTeam, homeTeam, startDate, }) {
@@ -43,9 +44,35 @@ class Game {
             homeTeam: homeTeam,
             startDate: startDate,
         });
+        await newGame.initSqlGame();
         await newGame.updateStatisticSet();
         globalModels.allGames.add(newGame);
         return newGame;
+    }
+    // private sequelize instance constructor
+    async initSqlGame() {
+        const awayTeam = this.awayTeam;
+        const homeTeam = this.homeTeam;
+        const awayTeamId = awayTeam.sqlTeam.get('id');
+        const homeTeamId = homeTeam.sqlTeam.get('id');
+        await databaseModels.Game.findOrCreate({
+            where: {
+                awayTeamId: awayTeamId,
+                homeTeamId: homeTeamId,
+                startDate: this.startDate,
+            },
+            defaults: {
+                awayTeamId: awayTeamId,
+                homeTeamId: homeTeamId,
+                startDate: this.startDate,
+            },
+        }).then(async ([sqlGame, created]) => {
+            if (!created) {
+                await sqlGame.update({});
+            }
+            this.wrappedSqlGame = sqlGame;
+        });
+        return this.sqlGame;
     }
     // public instance methods
     matches({ awayTeam, homeTeam, startDate, }) {
@@ -95,6 +122,17 @@ class Game {
     get regionFullIdentifierFull() {
         const regionFullIdentifierFull = `${this.awayTeam.regionFullIdentifierFull} @ ${this.homeTeam.regionFullIdentifierFull}`;
         return regionFullIdentifierFull;
+    }
+    get sqlGame() {
+        if (this.wrappedSqlGame) {
+            return this.wrappedSqlGame;
+        }
+        else {
+            throw new Error(`${this.regionAbbrIdentifierAbbr} sqlGame is null.`);
+        }
+    }
+    set sqlGame(sqlGame) {
+        this.wrappedSqlGame = sqlGame;
     }
 }
 exports.Game = Game;

@@ -1,5 +1,6 @@
 import * as puppeteer from 'puppeteer';
 
+import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
@@ -18,6 +19,9 @@ export class Exchange {
     private wrappedBrowser: puppeteer.Browser | null;
     private wrappedPage: puppeteer.Page | null;
 
+    // private sequelize object
+    private wrappedSqlExchange: databaseModels.Exchange | null;
+
     // private constructor
     private constructor({
         name,
@@ -34,10 +38,12 @@ export class Exchange {
 
         this.wrappedBrowser = null;
         this.wrappedPage = null;
+
+        this.wrappedSqlExchange = null;
     }
 
     // public async constructor
-    static async create({
+    public static async create({
         name,
         url,
     }: {
@@ -51,7 +57,32 @@ export class Exchange {
 
         await newExchange.connectToExistingPage();
 
+        await newExchange.initSqlExchange();
+
         return newExchange;
+    }
+
+    // private sequelize instance constructor
+    private async initSqlExchange(): Promise<databaseModels.Exchange> {
+        await databaseModels.Exchange.findOrCreate({
+            where: {
+                name: this.name,
+            },
+            defaults: {
+                name: this.name,
+                url: this.url,
+            },
+        }).then(async ([sqlExchange, created]) => {
+            if (!created) {
+                await sqlExchange.update({
+                    url: this.url,
+                });
+            }
+
+            this.sqlExchange = sqlExchange;
+        });
+
+        return this.sqlExchange;
     }
 
     // public instance methods
@@ -186,5 +217,17 @@ export class Exchange {
 
     set page(page: puppeteer.Page) {
         this.wrappedPage = page;
+    }
+
+    get sqlExchange(): databaseModels.Exchange {
+        if (this.wrappedSqlExchange) {
+            return this.wrappedSqlExchange;
+        } else {
+            throw new Error(`${this.name} sqlExchange is null.`)
+        }
+    }
+
+    set sqlExchange(sqlExchange: databaseModels.Exchange) {
+        this.wrappedSqlExchange = sqlExchange;
     }
 }

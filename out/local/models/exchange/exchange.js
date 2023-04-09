@@ -25,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
 const puppeteer = __importStar(require("puppeteer"));
+const databaseModels = __importStar(require("../../../database"));
 const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
 class Exchange {
@@ -36,6 +37,7 @@ class Exchange {
         this.oddSet = new localModels.OddSet();
         this.wrappedBrowser = null;
         this.wrappedPage = null;
+        this.wrappedSqlExchange = null;
     }
     // public async constructor
     static async create({ name, url, }) {
@@ -44,7 +46,28 @@ class Exchange {
             url: url,
         });
         await newExchange.connectToExistingPage();
+        await newExchange.initSqlExchange();
         return newExchange;
+    }
+    // private sequelize instance constructor
+    async initSqlExchange() {
+        await databaseModels.Exchange.findOrCreate({
+            where: {
+                name: this.name,
+            },
+            defaults: {
+                name: this.name,
+                url: this.url,
+            },
+        }).then(async ([sqlExchange, created]) => {
+            if (!created) {
+                await sqlExchange.update({
+                    url: this.url,
+                });
+            }
+            this.sqlExchange = sqlExchange;
+        });
+        return this.sqlExchange;
     }
     // public instance methods
     async analyze() {
@@ -148,6 +171,17 @@ class Exchange {
     }
     set page(page) {
         this.wrappedPage = page;
+    }
+    get sqlExchange() {
+        if (this.wrappedSqlExchange) {
+            return this.wrappedSqlExchange;
+        }
+        else {
+            throw new Error(`${this.name} sqlExchange is null.`);
+        }
+    }
+    set sqlExchange(sqlExchange) {
+        this.wrappedSqlExchange = sqlExchange;
     }
 }
 exports.Exchange = Exchange;

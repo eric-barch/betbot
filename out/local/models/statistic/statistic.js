@@ -24,15 +24,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Statistic = void 0;
-const globalModels = __importStar(require("../../../global/models"));
-const localModels = __importStar(require("../../../local/models"));
+const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
+const localModels = __importStar(require("../../../local"));
 class Statistic {
-    // private linked objects
     // private constructor
     constructor({ name, game, }) {
         this.name = name;
         this.game = game;
         this.oddSet = new localModels.OddSet;
+        this.wrappedSqlStatistic = null;
     }
     // public async constructor
     static async create({ name, game, }) {
@@ -40,8 +41,26 @@ class Statistic {
             name: name,
             game: game,
         });
+        await newStatistic.initSqlStatistic();
         globalModels.allStatistics.add(newStatistic);
         return newStatistic;
+    }
+    // private sequelize instance constructor
+    async initSqlStatistic() {
+        const game = this.game;
+        const gameId = game.sqlGame.get('id');
+        await databaseModels.Statistic.findOrCreate({
+            where: {
+                gameId: gameId,
+                name: this.name,
+            }
+        }).then(async ([sqlStatistic, created]) => {
+            if (!created) {
+                await sqlStatistic.update({});
+            }
+            this.sqlStatistic = sqlStatistic;
+        });
+        return this.sqlStatistic;
     }
     // public instance methods
     matches({ name, game, }) {
@@ -51,6 +70,17 @@ class Statistic {
             return true;
         }
         return false;
+    }
+    // public static methods
+    // getters and setters
+    get sqlStatistic() {
+        if (!this.wrappedSqlStatistic) {
+            throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.name} sqlStatistic is null.`);
+        }
+        return this.wrappedSqlStatistic;
+    }
+    set sqlStatistic(sqlStatistic) {
+        this.wrappedSqlStatistic = sqlStatistic;
     }
 }
 exports.Statistic = Statistic;
