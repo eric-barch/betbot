@@ -1,6 +1,7 @@
-import * as databaseModels from '../../../../database';
 import * as globalModels from '../../../../global';
 import * as localModels from '../../../../local';
+
+import { Odd } from '../odd';
 
 export enum Inequality {
     GreaterThan = 'GREATER_THAN',
@@ -8,7 +9,7 @@ export enum Inequality {
     LessThan = 'LESS_THAN',
 }
 
-export class ContinuousOdd extends localModels.Odd {
+export class ContinuousOdd extends Odd {
     // public properties
     public inequality: Inequality | null;
     public value: number | null;
@@ -16,9 +17,6 @@ export class ContinuousOdd extends localModels.Odd {
     // private properties
 
     // public linked objects
-
-    // private sequelize object
-    private wrappedSqlContinuousOdd: databaseModels.ContinuousOdd | null;
 
     // private constructor
     private constructor({
@@ -38,8 +36,6 @@ export class ContinuousOdd extends localModels.Odd {
 
         this.inequality = null;
         this.value = null;
-
-        this.wrappedSqlContinuousOdd = null;
     }
 
     // public async constructor
@@ -58,15 +54,8 @@ export class ContinuousOdd extends localModels.Odd {
             updateFunction: updateFunction,
         });
 
-        await newContinuousOdd.initSqlContinuousOdd();
-
-        globalModels.allContinuousOdds.add(newContinuousOdd);
+        globalModels.allOdds.add(newContinuousOdd);
 
         return newContinuousOdd;
-    }
-
-    // private sequelize instance constructor
-    private async initSqlContinuousOdd(): Promise<databaseModels.ContinuousOdd> {
-
     }
 }

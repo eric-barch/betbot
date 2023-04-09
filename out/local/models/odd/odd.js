@@ -13,13 +13,20 @@ class Odd {
         this.exchange.oddSet.add(this);
         this.statistic.oddSet.add(this);
     }
-    // public async constructor
-    // cannot instantiate abstract class
-    // private sequelize instance constructor
-    // children hold their own sequelize reference
     // public instance methods
+    matches({ exchange, statistic, }) {
+        const exchangeMatches = (this.exchange === exchange);
+        const statisticMatches = (this.statistic === statistic);
+        if (exchangeMatches && statisticMatches) {
+            return true;
+        }
+        return false;
+    }
     async update() {
-        await this.updateFunction;
+        if (!this.updateFunction) {
+            throw new Error(`Update function is null.`);
+        }
+        await this.updateFunction();
     }
 }
 exports.Odd = Odd;

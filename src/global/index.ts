@@ -1,4 +1,4 @@
 import { init } from './global';
 
-export { init};
+export { init };
 export * from './models';

@@ -25,14 +25,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContinuousOdd = exports.Inequality = void 0;
 const globalModels = __importStar(require("../../../../global"));
-const localModels = __importStar(require("../../../../local"));
+const odd_1 = require("../odd");
 var Inequality;
 (function (Inequality) {
     Inequality["GreaterThan"] = "GREATER_THAN";
     Inequality["EqualTo"] = "EQUAL_TO";
     Inequality["LessThan"] = "LESS_THAN";
 })(Inequality = exports.Inequality || (exports.Inequality = {}));
-class ContinuousOdd extends localModels.Odd {
+class ContinuousOdd extends odd_1.Odd {
+    // private properties
+    // public linked objects
     // private constructor
     constructor({ exchange, statistic, updateFunction, }) {
         super({
@@ -42,7 +44,6 @@ class ContinuousOdd extends localModels.Odd {
         });
         this.inequality = null;
         this.value = null;
-        this.wrappedSqlContinuousOdd = null;
     }
     // public async constructor
     static async create({ exchange, statistic, updateFunction, }) {
@@ -51,12 +52,8 @@ class ContinuousOdd extends localModels.Odd {
             statistic: statistic,
             updateFunction: updateFunction,
         });
-        await newContinuousOdd.initSqlContinuousOdd();
-        globalModels.allContinuousOdds.add(newContinuousOdd);
+        globalModels.allOdds.add(newContinuousOdd);
         return newContinuousOdd;
-    }
-    // private sequelize instance constructor
-    async initSqlContinuousOdd() {
     }
 }
 exports.ContinuousOdd = ContinuousOdd;

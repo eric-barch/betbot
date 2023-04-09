@@ -23,35 +23,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Statistic = void 0;
-const globalModels = __importStar(require("../../../global/models"));
-const localModels = __importStar(require("../../../local/models"));
-class Statistic {
-    // private linked objects
-    // private constructor
-    constructor({ name, game, }) {
-        this.name = name;
-        this.game = game;
-        this.oddSet = new localModels.OddSet;
-    }
-    // public async constructor
-    static async create({ name, game, }) {
-        const newStatistic = new Statistic({
-            name: name,
-            game: game,
-        });
-        globalModels.allStatistics.add(newStatistic);
-        return newStatistic;
-    }
-    // public instance methods
-    matches({ name, game, }) {
-        const nameMatches = (this.name === name);
-        const gameMatches = (this.game === game);
-        if (nameMatches && gameMatches) {
-            return true;
-        }
-        return false;
-    }
-}
-exports.Statistic = Statistic;
-//# sourceMappingURL=statistic.js.map
+exports.statisticOddSet = exports.oddValue = void 0;
+const oddValue = __importStar(require("./oddValue"));
+exports.oddValue = oddValue;
+const statisticOddSet = __importStar(require("./statisticOddSet"));
+exports.statisticOddSet = statisticOddSet;
+//# sourceMappingURL=index.js.map

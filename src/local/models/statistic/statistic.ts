@@ -1,8 +1,7 @@
-import * as databaseModels from '../../../database/models';
 import * as globalModels from '../../../global/models';
 import * as localModels from '../../../local/models';
 
-export abstract class Statistic {
+export class Statistic {
     // public properties
     public name: string; // e.g. 'spread', 'winner', 'total', 'devin-booker-points', 'first-basket'
     
@@ -14,11 +13,8 @@ export abstract class Statistic {
 
     // private linked objects
 
-    // private sequelize object
-    public wrappedSqlStatistic: databaseModels.Statistic | null;
-
     // private constructor
-    public constructor({
+    private constructor({
         name,
         game,
     }: {
@@ -29,34 +25,24 @@ export abstract class Statistic {
         
         this.game = game;
         this.oddSet = new localModels.OddSet;
-
-        this.wrappedSqlStatistic = null;
     }
 
     // public async constructor
+    static async create({
+        name,
+        game,
+    }: {
+        name: string,
+        game: localModels.Game,
+    }): Promise<Statistic> {
+        const newStatistic = new Statistic({
+            name: name,
+            game: game,
+        });
 
-    // private sequelize instance constructor
-    public async initSqlStatistic(): Promise<databaseModels.Statistic> {
-        const game = this.game;
+        globalModels.allStatistics.add(newStatistic);
 
-        const gameId = game.sqlGame.get('id');
-
-        await databaseModels.Statistic.findOrCreate({
-            where: {
-                gameId: gameId,
-                name: this.name,
-            }
-        }).then(async ([sqlStatistic, created]) => {
-            if (!created) {
-                await sqlStatistic.update({
-
-                });
-            }
-
-            this.sqlStatistic = sqlStatistic;
-        })
-
-        return this.sqlStatistic;
+        return newStatistic;
     }
 
     // public instance methods
@@ -80,15 +66,4 @@ export abstract class Statistic {
     // public static methods
 
     // getters and setters
-    get sqlStatistic(): databaseModels.Statistic {
-        if (!this.wrappedSqlStatistic) {
-            throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.name} sqlStatistic is null.`)
-        }
-
-        return this.wrappedSqlStatistic;
-    }
-
-    set sqlStatistic(sqlStatistic: databaseModels.Statistic) {
-        this.wrappedSqlStatistic = sqlStatistic;
-    }
 }

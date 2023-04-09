@@ -11,7 +11,7 @@ export class GameSet extends Set<Game> {
         homeTeam: localModels.Team,
         startDate: Date,
     }): Promise<Game> {
-        let requestedGame = undefined;
+        let requestedGame = null;
         
         for (const game of this) {
             if (game.matches({

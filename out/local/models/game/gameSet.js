@@ -4,7 +4,7 @@ exports.GameSet = void 0;
 const game_1 = require("./game");
 class GameSet extends Set {
     async findOrCreate({ awayTeam, homeTeam, startDate, }) {
-        let requestedGame = undefined;
+        let requestedGame = null;
         for (const game of this) {
             if (game.matches({
                 awayTeam: awayTeam,

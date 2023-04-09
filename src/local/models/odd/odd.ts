@@ -1,6 +1,5 @@
 import * as puppeteer from 'puppeteer';
 
-import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
@@ -9,10 +8,11 @@ export abstract class Odd {
     public price: number | null;
 
     // private properties
-    private updateFunction: Function;
+    private updateFunction: Function | null;
 
     // public linked objects
     public exchange: localModels.Exchange;
+    public statistic: localModels.Statistic;
     
     // private sequelize object
     // children hold their own sequelize reference
@@ -20,9 +20,11 @@ export abstract class Odd {
     // private constructor
     public constructor({
         exchange,
+        statistic,
         updateFunction,
     }: {
         exchange: localModels.Exchange,
+        statistic: localModels.Statistic,
         updateFunction: Function,
     }) {
         this.price = null;
@@ -30,19 +32,36 @@ export abstract class Odd {
         this.updateFunction = updateFunction;
 
         this.exchange = exchange;
+        this.statistic = statistic;
 
         this.exchange.oddSet.add(this);
+        this.statistic.oddSet.add(this);
     }
 
-    // public async constructor
-    // cannot instantiate abstract class
-
-    // private sequelize instance constructor
-    // children hold their own sequelize reference
-
     // public instance methods
+    public matches({
+        exchange,
+        statistic,
+    }: {
+        exchange: localModels.Exchange,
+        statistic: localModels.Statistic,
+    }) {
+        const exchangeMatches = (this.exchange === exchange);
+        const statisticMatches = (this.statistic === statistic);
+        
+        if (exchangeMatches && statisticMatches) {
+            return true;
+        }
+
+        return false;
+    }
+
     public async update() {
-        await this.updateFunction;
+        if (!this.updateFunction) {
+            throw new Error(`Update function is null.`);
+        }
+
+        await this.updateFunction();
     }
 
     // public static methods

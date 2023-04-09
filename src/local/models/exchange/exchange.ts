@@ -1,6 +1,5 @@
 import * as puppeteer from 'puppeteer';
 
-import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
@@ -13,14 +12,11 @@ export class Exchange {
     
     // public linked objects
     public gameSet: localModels.GameSet;
-    public oddSet: localModels.OddSet<localModels.ContinuousOdd | localModels.DiscreteOdd>;
+    public oddSet: localModels.OddSet;
     
     // private linked objects
     private wrappedBrowser: puppeteer.Browser | null;
     private wrappedPage: puppeteer.Page | null;
-    
-    // private sequelize object
-    private wrappedSqlExchange: databaseModels.Exchange | null;
 
     // private constructor
     private constructor({
@@ -38,8 +34,6 @@ export class Exchange {
 
         this.wrappedBrowser = null;
         this.wrappedPage = null;
-        
-        this.wrappedSqlExchange = null;
     }
 
     // public async constructor
@@ -57,43 +51,17 @@ export class Exchange {
 
         await newExchange.connectToExistingPage();
 
-        await newExchange.initSqlExchange();
-
-        globalModels.allExchanges.add(newExchange);
-
         return newExchange;
-
-        // Should something be in here that updates Odds/Games from the db
-        // if available?
-    }
-
-    // private sequelize instance constructor
-    private async initSqlExchange(): Promise<databaseModels.Exchange> {
-        await databaseModels.Exchange.findOrCreate({
-            where: {
-                name: this.name,
-            },
-            defaults: {
-                name: this.name,
-                url: this.url,
-            },
-        }).then(async ([sqlExchange, created]) => {
-            if (!created) {
-                await sqlExchange.update({
-                    url: this.url,
-                });
-            }
-
-            this.sqlExchange = sqlExchange;
-        });
-
-        return this.sqlExchange;
     }
 
     // public instance methods
     public async analyze(): Promise<void> {
         await this.updateGameSet();
         await this.updateOddSet();
+
+        for (const odd of this.oddSet) {
+            await odd.update();
+        }
     }
 
     public async close(): Promise<void> {
@@ -149,18 +117,38 @@ export class Exchange {
                 startDate: startDate,
             });
 
+            requestedGame.exchangeSet.add(this);
             this.gameSet.add(requestedGame);
         }
 
         return this.gameSet;
     }
 
-    public async updateOddSet(): Promise<localModels.OddSet<localModels.ContinuousOdd | localModels.DiscreteOdd>> {
+    public async updateOddSet(): Promise<localModels.OddSet> {
         for (const game of this.gameSet) {
-            await game.updateOddSet({ exchange: this });
+            for (const statistic of game.statisticSet) {
+                await this.updateStatisticOddSet({ statistic: statistic });
+            }
         }
 
         return this.oddSet;
+    }
+
+    public async updateStatisticOddSet({
+        statistic,
+    }: {
+        statistic: localModels.Statistic,
+    }) {
+        const updateFunction = localModels.updateFunctions.fanDuel.statisticOddSet.map.get(statistic.name);
+
+        if (!updateFunction) {
+            return;
+        }
+
+        await updateFunction({
+            exchange: this,
+            statistic: statistic,
+        });
     }
 
     // public static methods
@@ -198,17 +186,5 @@ export class Exchange {
 
     set page(page: puppeteer.Page) {
         this.wrappedPage = page;
-    }
-
-    get sqlExchange(): databaseModels.Exchange {
-        if (this.wrappedSqlExchange) {
-            return this.wrappedSqlExchange;
-        } else {
-            throw new Error(`${this.name} sqlExchange is null.`)
-        }
-    }
-
-    set sqlExchange(sqlExchange: databaseModels.Exchange) {
-        this.wrappedSqlExchange = sqlExchange;
     }
 }

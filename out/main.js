@@ -23,16 +23,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const database = __importStar(require("./database"));
 const globalModels = __importStar(require("./global"));
 const allExchanges = globalModels.allExchanges;
 async function main() {
-    await database.init();
     await globalModels.init();
     while (true) {
+        const startTime = new Date();
         await allExchanges.analyze();
+        const endTime = new Date();
+        const duration = endTime.getTime() - startTime.getTime();
+        console.log(duration);
     }
-    await database.close();
     process.exit(0);
 }
 main();

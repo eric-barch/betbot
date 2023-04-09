@@ -1,17 +1,15 @@
-import * as databaseModels from '../../../../database';
 import * as globalModels from '../../../../global';
-import * as localModels from '../../..';
+import * as localModels from '../../../../local';
 
-export class DiscreteOdd extends localModels.Odd {
+import { Odd } from '../odd';
+
+export class DiscreteOdd extends Odd {
     // public properties
     public value: string | null;
 
     // private properties
 
     // public linked objects
-
-    // private sequelize object
-    private wrappedSqlDiscreteOdd: databaseModels.DiscreteOdd | null;
 
     // private constructor
     private constructor({
@@ -30,8 +28,6 @@ export class DiscreteOdd extends localModels.Odd {
         });
 
         this.value = null;
-
-        this.wrappedSqlDiscreteOdd = null;
     }
 
     // public async constructor
@@ -50,15 +46,8 @@ export class DiscreteOdd extends localModels.Odd {
             updateFunction: updateFunction,
         });
 
-        await newDiscreteOdd.initSqlDiscreteOdd();
-
-        globalModels.allDiscreteOdds.add(newDiscreteOdd);
+        globalModels.allOdds.add(newDiscreteOdd);
 
         return newDiscreteOdd;
-    }
-
-    // private sequelize instance constructor
-    private async initSqlDiscreteOdd(): Promise<databaseModels.DiscreteOdd> {
-        
     }
 }

@@ -1,4 +1,3 @@
-import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
@@ -15,9 +14,6 @@ export class Game {
     public statisticSet: localModels.StatisticSet;
 
     // private linked objects
-    
-    // private sequelize object
-    private wrappedSqlGame: databaseModels.Game | null;
 
     // private constructor
     private constructor({
@@ -35,8 +31,6 @@ export class Game {
         this.homeTeam = homeTeam;
         this.exchangeSet = new localModels.ExchangeSet();
         this.statisticSet = new localModels.StatisticSet();
-        
-        this.wrappedSqlGame = null;
     }
 
     // public async constructor
@@ -55,58 +49,11 @@ export class Game {
             startDate: startDate,
         })
 
-        await newGame.initSqlGame();
-
-        await localModels.Statistic.create<localModels.ContinuousOdd>({
-            name: 'spread',
-            game: newGame,
-        });
-
-        await localModels.Statistic.create<localModels.DiscreteOdd>({
-            name: 'moneyline',
-            game: newGame,
-        });
-
-        await localModels.Statistic.create<localModels.DiscreteOdd>({
-            name: 'total',
-            game: newGame,
-        });
+        await newGame.updateStatisticSet();
 
         globalModels.allGames.add(newGame);
 
         return newGame;
-    }
-
-    // private sequelize instance constructor
-    private async initSqlGame(): Promise<databaseModels.Game> {
-        const awayTeam = this.awayTeam;
-        const homeTeam = this.homeTeam;
-
-        const awayTeamId = awayTeam.sqlTeam.get('id');
-        const homeTeamId = homeTeam.sqlTeam.get('id');
-        
-        await databaseModels.Game.findOrCreate({
-            where: {
-                awayTeamId: awayTeamId,
-                homeTeamId: homeTeamId,
-                startDate: this.startDate,
-            },
-            defaults: {
-                awayTeamId: awayTeamId,
-                homeTeamId: homeTeamId,
-                startDate: this.startDate,
-            },
-        }).then(async ([sqlGame, created]) => {
-            if (!created) {
-                await sqlGame.update({
-                    
-                });
-            }
-
-            this.wrappedSqlGame = sqlGame;
-        });
-
-        return this.sqlGame;
     }
 
     // public instance methods
@@ -132,14 +79,27 @@ export class Game {
         return false;
     }
 
-    public async updateOddSet({
-        exchange,
-    }: {
-        exchange: localModels.Exchange,
-    }) {
-        for (const statistic of this.statisticSet) {
-            await statistic.updateOddSet({ exchange: exchange });
-        }
+    public async updateStatisticSet(): Promise<localModels.StatisticSet> {
+        const spread = await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'spread',
+        });
+
+        const moneyline = await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'moneyline',
+        });
+
+        const total = await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'total',
+        })
+
+        this.statisticSet.add(spread);
+        this.statisticSet.add(moneyline);
+        this.statisticSet.add(total);
+
+        return this.statisticSet;
     }
 
     // public static methods
@@ -166,17 +126,5 @@ export class Game {
     get regionFullIdentifierFull(): string {
         const regionFullIdentifierFull = `${this.awayTeam.regionFullIdentifierFull} @ ${this.homeTeam.regionFullIdentifierFull}`;
         return regionFullIdentifierFull;
-    }
-
-    get sqlGame(): databaseModels.Game {
-        if (this.wrappedSqlGame) {
-            return this.wrappedSqlGame;
-        } else {
-            throw new Error(`${this.regionAbbrIdentifierAbbr} sqlGame is null.`);
-        }
-    }
-
-    set sqlGame(sqlGame: databaseModels.Game) {
-        this.wrappedSqlGame = sqlGame;
     }
 }

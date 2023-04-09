@@ -9,7 +9,7 @@ export class StatisticSet extends Set<Statistic> {
     }: {
         game: localModels.Game,
         name: string,
-    }) {
+    }): Promise<Statistic> {
         let requestedStatistic = null;
 
         for (const statistic of this) {

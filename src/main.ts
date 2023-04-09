@@ -1,17 +1,20 @@
-import * as database from './database';
 import * as globalModels from './global';
 
 const allExchanges = globalModels.allExchanges;
 
 async function main() {
-    await database.init();
     await globalModels.init();
 
     while (true) {
+        const startTime = new Date();
         await allExchanges.analyze();
+        const endTime = new Date();
+
+        const duration = endTime.getTime() - startTime.getTime();
+
+        console.log(duration);
     }
 
-    await database.close();
     process.exit(0);
 }
 

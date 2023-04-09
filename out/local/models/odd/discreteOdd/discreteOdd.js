@@ -25,8 +25,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscreteOdd = void 0;
 const globalModels = __importStar(require("../../../../global"));
-const localModels = __importStar(require("../../.."));
-class DiscreteOdd extends localModels.Odd {
+const odd_1 = require("../odd");
+class DiscreteOdd extends odd_1.Odd {
+    // private properties
+    // public linked objects
     // private constructor
     constructor({ exchange, statistic, updateFunction, }) {
         super({
@@ -35,7 +37,6 @@ class DiscreteOdd extends localModels.Odd {
             updateFunction: updateFunction,
         });
         this.value = null;
-        this.wrappedSqlDiscreteOdd = null;
     }
     // public async constructor
     static async create({ exchange, statistic, updateFunction, }) {
@@ -44,12 +45,8 @@ class DiscreteOdd extends localModels.Odd {
             statistic: statistic,
             updateFunction: updateFunction,
         });
-        await newDiscreteOdd.initSqlDiscreteOdd();
-        globalModels.allDiscreteOdds.add(newDiscreteOdd);
+        globalModels.allOdds.add(newDiscreteOdd);
         return newDiscreteOdd;
-    }
-    // private sequelize instance constructor
-    async initSqlDiscreteOdd() {
     }
 }
 exports.DiscreteOdd = DiscreteOdd;
