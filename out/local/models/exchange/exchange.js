@@ -76,7 +76,6 @@ class Exchange {
     async analyze() {
         await this.updateGameSet();
         await this.updateOddSet();
-        // await this.oddSet.updateValues();
     }
     async close() {
         this.browser.close();
@@ -103,10 +102,10 @@ class Exchange {
         return this.page;
     }
     async updateGameSet() {
-        // Rewrite this in a more readable way.
+        /** Rewrite this in a more readable way */
         const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
         const jsonGames = await this.page.evaluate(element => JSON.parse(element.textContent), jsonGamesScriptTag);
-        //
+        /** *********************************** */
         for (const jsonGame of jsonGames) {
             const awayTeamNameString = jsonGame.awayTeam.name;
             const homeTeamNameString = jsonGame.homeTeam.name;
@@ -118,18 +117,13 @@ class Exchange {
                 homeTeam: homeTeamInstance,
                 startDate: startDate,
             });
-            await requestedGame.updateStatisticSet();
+            this.gameSet.add(requestedGame);
         }
         return this.gameSet;
     }
     async updateOddSet() {
         for (const game of this.gameSet) {
-            for (const statistic of game.statisticSet) {
-                await statistic.oddSet.findOrCreate({
-                    exchange: this,
-                    statistic: statistic,
-                });
-            }
+            await game.updateOddSet({ exchange: this });
         }
         return this.oddSet;
     }

@@ -41,10 +41,11 @@ async function initAllExchanges() {
     //         parseFunction: parseFunctions.parseDraftKings,
     //     })
     // );
-    exports.allExchanges.add(await localModels.Exchange.create({
+    const fanDuel = await localModels.Exchange.create({
         name: 'FanDuel',
         url: 'https://sportsbook.fanduel.com/navigation/nba',
-    }));
+    });
+    exports.allExchanges.add(fanDuel);
 }
 exports.initAllExchanges = initAllExchanges;
 //# sourceMappingURL=allExchanges.js.map

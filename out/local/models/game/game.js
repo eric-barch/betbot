@@ -45,6 +45,18 @@ class Game {
             startDate: startDate,
         });
         await newGame.initSqlGame();
+        await localModels.Statistic.create({
+            name: 'spread',
+            game: newGame,
+        });
+        await localModels.Statistic.create({
+            name: 'moneyline',
+            game: newGame,
+        });
+        await localModels.Statistic.create({
+            name: 'total',
+            game: newGame,
+        });
         globalModels.allGames.add(newGame);
         return newGame;
     }
@@ -84,19 +96,10 @@ class Game {
         }
         return false;
     }
-    async updateStatisticSet() {
-        await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'spread',
-        });
-        await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'money',
-        });
-        await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'total',
-        });
+    async updateOddSet({ exchange, }) {
+        for (const statistic of this.statisticSet) {
+            await statistic.updateOddSet({ exchange: exchange });
+        }
     }
     // public static methods
     static roundDateToNearestInterval(date) {

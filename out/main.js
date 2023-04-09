@@ -36,4 +36,5 @@ async function main() {
     process.exit(0);
 }
 main();
+// Without web analysis, analyze takes about 10 milliseconds.
 //# sourceMappingURL=main.js.map

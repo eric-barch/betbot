@@ -19,10 +19,10 @@ export async function initAllExchanges(): Promise<void> {
     //     })
     // );
 
-    allExchanges.add(
-        await localModels.Exchange.create({
-            name: 'FanDuel',
-            url: 'https://sportsbook.fanduel.com/navigation/nba',
-        })
-    );
+    const fanDuel = await localModels.Exchange.create({
+        name: 'FanDuel',
+        url: 'https://sportsbook.fanduel.com/navigation/nba',
+    });
+    
+    allExchanges.add(fanDuel);
 }

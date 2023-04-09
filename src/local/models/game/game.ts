@@ -57,6 +57,21 @@ export class Game {
 
         await newGame.initSqlGame();
 
+        await localModels.Statistic.create<localModels.ContinuousOdd>({
+            name: 'spread',
+            game: newGame,
+        });
+
+        await localModels.Statistic.create<localModels.DiscreteOdd>({
+            name: 'moneyline',
+            game: newGame,
+        });
+
+        await localModels.Statistic.create<localModels.DiscreteOdd>({
+            name: 'total',
+            game: newGame,
+        });
+
         globalModels.allGames.add(newGame);
 
         return newGame;
@@ -117,21 +132,14 @@ export class Game {
         return false;
     }
 
-    public async updateStatisticSet() {
-        await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'spread',
-        });
-        
-        await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'money',
-        });
-
-        await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'total',
-        })
+    public async updateOddSet({
+        exchange,
+    }: {
+        exchange: localModels.Exchange,
+    }) {
+        for (const statistic of this.statisticSet) {
+            await statistic.updateOddSet({ exchange: exchange });
+        }
     }
 
     // public static methods

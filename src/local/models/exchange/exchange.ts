@@ -13,7 +13,7 @@ export class Exchange {
     
     // public linked objects
     public gameSet: localModels.GameSet;
-    public oddSet: localModels.OddSet;
+    public oddSet: localModels.OddSet<localModels.ContinuousOdd | localModels.DiscreteOdd>;
     
     // private linked objects
     private wrappedBrowser: puppeteer.Browser | null;
@@ -94,7 +94,6 @@ export class Exchange {
     public async analyze(): Promise<void> {
         await this.updateGameSet();
         await this.updateOddSet();
-        // await this.oddSet.updateValues();
     }
 
     public async close(): Promise<void> {
@@ -130,11 +129,11 @@ export class Exchange {
         return this.page;
     }
 
-    public async updateGameSet(): Promise<localModels.GameSet> {    
-        // Rewrite this in a more readable way.
+    public async updateGameSet(): Promise<localModels.GameSet> {
+        /** Rewrite this in a more readable way */
         const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
         const jsonGames = await this.page.evaluate(element => JSON.parse(element!.textContent!), jsonGamesScriptTag);
-        //
+        /** *********************************** */
         
         for (const jsonGame of jsonGames) {
             const awayTeamNameString = jsonGame.awayTeam.name;
@@ -150,20 +149,15 @@ export class Exchange {
                 startDate: startDate,
             });
 
-            await requestedGame.updateStatisticSet();
+            this.gameSet.add(requestedGame);
         }
 
         return this.gameSet;
     }
 
-    public async updateOddSet(): Promise<localModels.OddSet> {
+    public async updateOddSet(): Promise<localModels.OddSet<localModels.ContinuousOdd | localModels.DiscreteOdd>> {
         for (const game of this.gameSet) {
-            for (const statistic of game.statisticSet) {
-                await statistic.oddSet.findOrCreate({
-                    exchange: this,
-                    statistic: statistic,
-                })
-            }
+            await game.updateOddSet({ exchange: this });
         }
 
         return this.oddSet;

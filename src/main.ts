@@ -16,3 +16,5 @@ async function main() {
 }
 
 main();
+
+// Without web analysis, analyze takes about 10 milliseconds.
