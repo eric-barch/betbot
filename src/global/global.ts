@@ -1,6 +1,6 @@
-import { allExchangesInit, allTeamsInit } from "./models";
+import { initAllExchanges, initAllTeams } from './models';
 
 export async function init(): Promise<void> {
-    await allExchangesInit();
-    await allTeamsInit();
+    await initAllTeams();
+    await initAllExchanges();
 }

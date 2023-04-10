@@ -24,9 +24,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Team = void 0;
-const databaseModels = __importStar(require("../../../database/models"));
-const globalModels = __importStar(require("../../../global/models"));
+const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
 class Team {
+    // private constructor
     constructor({ regionFull, regionAbbr, identifierFull, identifierAbbr, }) {
         this.regionFull = regionFull;
         this.regionAbbr = regionAbbr;
@@ -34,7 +35,7 @@ class Team {
         this.identifierAbbr = identifierAbbr;
         this.wrappedSqlTeam = null;
     }
-    // async construction methods
+    // public async constructor
     static async create({ regionFull, regionAbbr, identifierFull, identifierAbbr, }) {
         const newTeam = new Team({
             regionFull: regionFull,
@@ -42,11 +43,12 @@ class Team {
             identifierFull: identifierFull,
             identifierAbbr: identifierAbbr,
         });
-        await newTeam.init();
+        await newTeam.initSqlTeam();
         globalModels.allTeams.add(newTeam);
         return newTeam;
     }
-    async init() {
+    // private sequelize instance constructor
+    async initSqlTeam() {
         await databaseModels.Team.findOrCreate({
             where: {
                 regionFull: this.regionFull,
@@ -65,24 +67,21 @@ class Team {
                     identifierAbbr: this.identifierAbbr,
                 });
             }
-            this.wrappedSqlTeam = sqlTeam;
+            this.sqlTeam = sqlTeam;
         });
+        return this.sqlTeam;
     }
-    // instance methods
-    matchesByNameString({ nameString, }) {
-        if (nameString === this.regionFullIdentifierFull ||
-            nameString === this.regionAbbrIdentifierFull ||
-            nameString === this.regionAbbrIdentifierAbbr) {
+    // public instance methods
+    matches({ name, }) {
+        if (name === this.regionFullIdentifierFull ||
+            name === this.regionAbbrIdentifierFull ||
+            name === this.regionAbbrIdentifierAbbr) {
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
+    // public static methods
     // getters and setters
-    get name() {
-        return this.regionFullIdentifierFull;
-    }
     get regionFullIdentifierFull() {
         const regionFullIdentifierFull = `${this.regionFull} ${this.identifierFull}`;
         return regionFullIdentifierFull;
@@ -96,12 +95,10 @@ class Team {
         return regionAbbrIdentifierAbbr;
     }
     get sqlTeam() {
-        if (this.wrappedSqlTeam) {
-            return this.wrappedSqlTeam;
+        if (!this.wrappedSqlTeam) {
+            throw new Error(`${this.regionFullIdentifierFull} sqlTeamj is null.`);
         }
-        else {
-            throw new Error(`${this.name} sqlTeamj is null.`);
-        }
+        return this.wrappedSqlTeam;
     }
     set sqlTeam(sqlTeam) {
         this.wrappedSqlTeam = sqlTeam;

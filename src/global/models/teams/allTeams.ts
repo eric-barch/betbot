@@ -1,11 +1,11 @@
 import * as leagues from './leagues';
-import * as localModels from '../../../local/models';
+import { Team, TeamSet } from '../../../local/models/team';
 
-export const allTeams = new localModels.TeamSet();
+export const allTeams = new TeamSet();
 
-export async function allTeamsInit(): Promise<void> {
+export async function initAllTeams(): Promise<void> {
     for (const team of leagues.nbaTeams) {
-        const newTeam = await localModels.Team.create({
+        const newTeam = await Team.create({
             regionFull: team.regionFull,
             regionAbbr: team.regionAbbr,
             identifierFull: team.identifierFull,

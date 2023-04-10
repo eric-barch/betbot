@@ -1,40 +1,89 @@
-import * as localModels from '../../../local/models';
+import { Odd } from "./odd";
+import { ContinuousOdd } from "./continuousOdd";
+import { DiscreteOdd } from './discreteOdd';
 
-export class OddSet extends Set<localModels.Odd> {
-    public async getOddByExchangeAndGame({
+import * as localModels from '../../../local';
+
+export class OddSet extends Set<Odd> {
+    public async findOrCreate({
         exchange,
-        game,
+        statistic,
+        inequality,
+        updateFunction,
     }: {
         exchange: localModels.Exchange,
-        game: localModels.Game,
-    }): Promise<localModels.Odd> {
-        let requestedOdd = undefined;
+        statistic: localModels.Statistic,
+        inequality: localModels.Inequality,
+        updateFunction: Function,
+    }): Promise<ContinuousOdd>;
 
+    public async findOrCreate({
+        exchange,
+        statistic,
+        value,
+        updateFunction,
+    }: {
+        exchange: localModels.Exchange,
+        statistic: localModels.Statistic,
+        value: string,
+        updateFunction: Function,
+    }): Promise<DiscreteOdd>;
+
+    public async findOrCreate({
+        exchange,
+        statistic,
+        inequality,
+        value,
+        updateFunction,
+    }: {
+        exchange: localModels.Exchange,
+        statistic: localModels.Statistic,
+        inequality?: localModels.Inequality,
+        value?: string
+        updateFunction: Function,
+    }): Promise<ContinuousOdd | DiscreteOdd> {
         for (const odd of this) {
-            if (odd.matchesByExchangeAndGame({
-                exchange: exchange,
-                game: game,
-            })) {
-                requestedOdd = odd;
-                break;
+            if (odd.exchange === exchange && odd.statistic === statistic) {
+                if (odd instanceof ContinuousOdd && inequality !== undefined) {
+                    if (odd.inequality === inequality) {
+                        return odd;
+                    }
+                } else if (odd instanceof DiscreteOdd && value !== undefined) {
+                    if (odd.value === value) {
+                        return odd;
+                    }
+                }
             }
         }
 
-        if (requestedOdd === undefined) {
-            requestedOdd = await localModels.Odd.create({
+        if (inequality) {
+            const newContinuousOdd = await ContinuousOdd.create({
                 exchange: exchange,
-                game: game,
+                statistic: statistic,
+                inequality: inequality,
+                updateFunction: updateFunction,
             });
             
-            this.add(requestedOdd);
+            newContinuousOdd.inequality = inequality;
+
+            this.add(newContinuousOdd);
+            
+            return newContinuousOdd;
+        } else if (value !== undefined) {
+            const newDiscreteOdd = await DiscreteOdd.create({
+                exchange: exchange,
+                statistic: statistic,
+                value: value,
+                updateFunction: updateFunction,
+            });
+            
+            newDiscreteOdd.value = value;
+            
+            this.add(newDiscreteOdd);
+            
+            return newDiscreteOdd;
         }
 
-        return requestedOdd;
-    }
-
-    public async updateValues() {
-        for (const odd of this) {
-            await odd.updateValues();
-        }
+        throw new Error(`Invalid parameters provided. Either "inequality" or "value" must be defined.`);
     }
 }

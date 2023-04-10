@@ -23,10 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allExchangesInit = exports.allExchanges = void 0;
-const localModels = __importStar(require("../../../local/models"));
+exports.initAllExchanges = exports.allExchanges = void 0;
+const localModels = __importStar(require("../../../local"));
 exports.allExchanges = new localModels.ExchangeSet();
-async function allExchangesInit() {
+async function initAllExchanges() {
     // allExchanges.add(
     //     await localModels.Exchange.create({
     //         name: 'Caesar\'s',
@@ -41,10 +41,11 @@ async function allExchangesInit() {
     //         parseFunction: parseFunctions.parseDraftKings,
     //     })
     // );
-    exports.allExchanges.add(await localModels.Exchange.create({
+    const fanDuel = await localModels.Exchange.create({
         name: 'FanDuel',
-        url: 'file:///Users/ericbarch/Documents/Development/AutomaticSportsBetting/iteration-6/tests/test6.html',
-    }));
+        url: 'https://sportsbook.fanduel.com/navigation/nba',
+    });
+    exports.allExchanges.add(fanDuel);
 }
-exports.allExchangesInit = allExchangesInit;
+exports.initAllExchanges = initAllExchanges;
 //# sourceMappingURL=allExchanges.js.map

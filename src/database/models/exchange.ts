@@ -1,77 +1,70 @@
-import {
-  BelongsToManyAddAssociationMixin, BelongsToManyAddAssociationsMixin,
-  BelongsToManyCountAssociationsMixin, BelongsToManyCreateAssociationMixin,
-  BelongsToManyGetAssociationsMixin,
-  BelongsToManyHasAssociationMixin,
-  BelongsToManyHasAssociationsMixin,
-  BelongsToManyRemoveAssociationMixin, BelongsToManyRemoveAssociationsMixin,
-  BelongsToManySetAssociationsMixin,
-  CreationOptional,
-  DataTypes, HasManyAddAssociationMixin,
-  HasManyAddAssociationsMixin,
-  HasManyCountAssociationsMixin,
-  HasManyCreateAssociationMixin, HasManyGetAssociationsMixin, HasManyHasAssociationMixin,
-  HasManyHasAssociationsMixin,
-  HasManyRemoveAssociationMixin, HasManyRemoveAssociationsMixin,
-  HasManySetAssociationsMixin,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-  NonAttribute
-} from 'sequelize';
+import * as sqlz from 'sequelize';
 
-import { sequelize } from '../database';
+import { sequelize } from '../../database';
 
 import { Game } from './game';
-import { Odd } from './odd';
-import { Team } from './team';
+import { ContinuousOdd } from './continuousOdd';
+import { DiscreteOdd } from './discreteOdd';
 
-export class Exchange extends Model<
-  InferAttributes<Exchange, { omit: 'games' | 'odds'}>,
-  InferCreationAttributes<Exchange, { omit: 'games' | 'odds'}>
+export class Exchange extends sqlz.Model<
+  sqlz.InferAttributes<Exchange, { omit: 'games' | 'continuousOdds' | 'discreteOdds'}>,
+  sqlz.InferCreationAttributes<Exchange, { omit: 'games' | 'continuousOdds' | 'discreteOdds'}>
 > {
   // id
-  declare id: CreationOptional<number>;
+  declare id: sqlz.CreationOptional<number>;
 
   // column headers
   declare name: string;
   declare url: string;
 
   // timestamps
-  declare createdAt: CreationOptional<Date>;
-  declare updatedAt: CreationOptional<Date>;
+  declare createdAt: sqlz.CreationOptional<Date>;
+  declare updatedAt: sqlz.CreationOptional<Date>;
 
   // foreign keys
   // none, all associated sequelize models are plural
 
   // associated sequelize model(s)
-  declare games?: NonAttribute<Game[]>;
-  declare odds?: NonAttribute<Odd[]>;
+  declare games?: sqlz.NonAttribute<Game[]>;
+  declare continuousOdds?: sqlz.NonAttribute<ContinuousOdd[]>;
+  declare discreteOdds?: sqlz.NonAttribute<DiscreteOdd[]>;
 
   // virtual model associations
   // belongsToMany(Game)
-  declare getGames: BelongsToManyGetAssociationsMixin<Game>;
-  declare addGame: BelongsToManyAddAssociationMixin<Game, number>;
-  declare addGames: BelongsToManyAddAssociationsMixin<Game, number>;
-  declare setGames: BelongsToManySetAssociationsMixin<Game, number>;
-  declare removeGame: BelongsToManyRemoveAssociationMixin<Game, number>;
-  declare removeGames: BelongsToManyRemoveAssociationsMixin<Game, number>;
-  declare hasGame: BelongsToManyHasAssociationMixin<Game, number>;
-  declare hasGames: BelongsToManyHasAssociationsMixin<Game, number>;
-  declare countGames: BelongsToManyCountAssociationsMixin;
-  declare createGame: BelongsToManyCreateAssociationMixin<Game>;
+  declare getGames: sqlz.BelongsToManyGetAssociationsMixin<Game>;
+  declare addGame: sqlz.BelongsToManyAddAssociationMixin<Game, number>;
+  declare addGames: sqlz.BelongsToManyAddAssociationsMixin<Game, number>;
+  declare setGames: sqlz.BelongsToManySetAssociationsMixin<Game, number>;
+  declare removeGame: sqlz.BelongsToManyRemoveAssociationMixin<Game, number>;
+  declare removeGames: sqlz.BelongsToManyRemoveAssociationsMixin<Game, number>;
+  declare hasGame: sqlz.BelongsToManyHasAssociationMixin<Game, number>;
+  declare hasGames: sqlz.BelongsToManyHasAssociationsMixin<Game, number>;
+  declare countGames: sqlz.BelongsToManyCountAssociationsMixin;
+  declare createGame: sqlz.BelongsToManyCreateAssociationMixin<Game>;
   
-  // hasMany(Odd)
-  declare getOdds: HasManyGetAssociationsMixin<Odd>;
-  declare addOdd: HasManyAddAssociationMixin<Odd, number>;
-  declare addOdds: HasManyAddAssociationsMixin<Odd, number>;
-  declare setOdds: HasManySetAssociationsMixin<Odd, number>;
-  declare removeOdd: HasManyRemoveAssociationMixin<Odd, number>;
-  declare removeOdds: HasManyRemoveAssociationsMixin<Odd, number>;
-  declare hasOdd: HasManyHasAssociationMixin<Odd, number>;
-  declare hasOdds: HasManyHasAssociationsMixin<Odd, number>;
-  declare countOdds: HasManyCountAssociationsMixin;
-  declare createOdd: HasManyCreateAssociationMixin<Odd, 'exchangeId'>;
+  // hasMany(ContinuousOdd)
+  declare getContinuousOdds: sqlz.HasManyGetAssociationsMixin<ContinuousOdd>;
+  declare addContinuousOdd: sqlz.HasManyAddAssociationMixin<ContinuousOdd, number>;
+  declare addContinuousOdds: sqlz.HasManyAddAssociationsMixin<ContinuousOdd, number>;
+  declare setContinuousOdds: sqlz.HasManySetAssociationsMixin<ContinuousOdd, number>;
+  declare removeContinuousOdd: sqlz.HasManyRemoveAssociationMixin<ContinuousOdd, number>;
+  declare removeContinuousOdds: sqlz.HasManyRemoveAssociationsMixin<ContinuousOdd, number>;
+  declare hasContinuousOdd: sqlz.HasManyHasAssociationMixin<ContinuousOdd, number>;
+  declare hasContinuousOdds: sqlz.HasManyHasAssociationsMixin<ContinuousOdd, number>;
+  declare countContinuousOdds: sqlz.HasManyCountAssociationsMixin;
+  declare createContinuousOdd: sqlz.HasManyCreateAssociationMixin<ContinuousOdd, 'exchangeId'>;
+
+  // hasMany(DiscreteOdd)
+  declare getDiscreteOdds: sqlz.HasManyGetAssociationsMixin<DiscreteOdd>;
+  declare addDiscreteOdd: sqlz.HasManyAddAssociationMixin<DiscreteOdd, number>;
+  declare addDiscreteOdds: sqlz.HasManyAddAssociationsMixin<DiscreteOdd, number>;
+  declare setDiscreteOdds: sqlz.HasManySetAssociationsMixin<DiscreteOdd, number>;
+  declare removeDiscreteOdd: sqlz.HasManyRemoveAssociationMixin<DiscreteOdd, number>;
+  declare removeDiscreteOdds: sqlz.HasManyRemoveAssociationsMixin<DiscreteOdd, number>;
+  declare hasDiscreteOdd: sqlz.HasManyHasAssociationMixin<DiscreteOdd, number>;
+  declare hasDiscreteOdds: sqlz.HasManyHasAssociationsMixin<DiscreteOdd, number>;
+  declare countDiscreteOdds: sqlz.HasManyCountAssociationsMixin;
+  declare createDiscreteOdd: sqlz.HasManyCreateAssociationMixin<DiscreteOdd, 'exchangeId'>;
 
   // associated local model
   // none
@@ -86,14 +79,14 @@ export class Exchange extends Model<
 
 Exchange.init({
   id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: sqlz.DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true
   },
-  name: new DataTypes.STRING(128),
-  url: new DataTypes.STRING(128),
-  createdAt: DataTypes.DATE,
-  updatedAt: DataTypes.DATE,
+  name: new sqlz.DataTypes.STRING(128),
+  url: new sqlz.DataTypes.STRING(128),
+  createdAt: sqlz.DataTypes.DATE,
+  updatedAt: sqlz.DataTypes.DATE,
 }, {
   sequelize,
   tableName: 'exchanges',

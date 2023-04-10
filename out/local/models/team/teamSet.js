@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TeamSet = void 0;
 class TeamSet extends Set {
-    getTeamByNameString({ nameString, }) {
+    find({ name, }) {
         for (const team of this) {
-            if (team.matchesByNameString({ nameString: nameString, })) {
+            if (team.matches({ name: name })) {
                 return team;
             }
         }
-        throw new Error(`Did not find team matching name string ${this.constructor.name}.${this.getTeamByNameString.name}.`);
+        throw new Error(`Did not find team matching name string ${this.constructor.name}.${this.find.name}.`);
     }
 }
 exports.TeamSet = TeamSet;

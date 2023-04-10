@@ -24,11 +24,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
-const puppeteer_1 = require("puppeteer");
-const databaseModels = __importStar(require("../../../database/models"));
-const globalModels = __importStar(require("../../../global/models"));
-const localModels = __importStar(require("../../../local/models"));
+const puppeteer = __importStar(require("puppeteer"));
+const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
+const localModels = __importStar(require("../../../local"));
 class Exchange {
+    // private constructor
     constructor({ name, url, }) {
         this.name = name;
         this.url = url;
@@ -38,18 +39,18 @@ class Exchange {
         this.wrappedPage = null;
         this.wrappedSqlExchange = null;
     }
-    // async construction methods
+    // public async constructor
     static async create({ name, url, }) {
         const newExchange = new Exchange({
             name: name,
             url: url,
         });
-        await newExchange.init();
-        globalModels.allExchanges.add(newExchange);
+        await newExchange.connectToExistingPage();
+        await newExchange.initSqlExchange();
         return newExchange;
     }
-    async init() {
-        await this.connectToExistingPage();
+    // private sequelize instance constructor
+    async initSqlExchange() {
         await databaseModels.Exchange.findOrCreate({
             where: {
                 name: this.name,
@@ -64,21 +65,23 @@ class Exchange {
                     url: this.url,
                 });
             }
-            this.wrappedSqlExchange = sqlExchange;
+            this.sqlExchange = sqlExchange;
         });
-        return this;
+        return this.sqlExchange;
     }
-    // instance methods
+    // public instance methods
     async analyze() {
         await this.updateGameSet();
         await this.updateOddSet();
-        await this.oddSet.updateValues();
+        for (const odd of this.oddSet) {
+            await odd.update();
+        }
     }
     async close() {
         this.browser.close();
     }
     async connectToExistingPage() {
-        this.browser = await (0, puppeteer_1.connect)({ browserURL: 'http://127.0.0.1:9222' });
+        this.browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222' });
         const targets = this.browser.targets();
         const target = targets.find(target => target.url().includes(this.url));
         if (!target) {
@@ -96,38 +99,48 @@ class Exchange {
         });
         this.page = targetPage;
         this.page.setViewport(windowSize);
+        return this.page;
     }
     async updateGameSet() {
-        // Rewrite this in a more readable way.
+        /** Rewrite this in a more readable way */
         const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
         const jsonGames = await this.page.evaluate(element => JSON.parse(element.textContent), jsonGamesScriptTag);
-        //
+        /** *********************************** */
         for (const jsonGame of jsonGames) {
             const awayTeamNameString = jsonGame.awayTeam.name;
             const homeTeamNameString = jsonGame.homeTeam.name;
-            const awayTeamInstance = globalModels.allTeams.getTeamByNameString({ nameString: awayTeamNameString });
-            const homeTeamInstance = globalModels.allTeams.getTeamByNameString({ nameString: homeTeamNameString });
+            const awayTeamInstance = globalModels.allTeams.find({ name: awayTeamNameString });
+            const homeTeamInstance = globalModels.allTeams.find({ name: homeTeamNameString });
             const startDate = new Date(jsonGame.startDate);
-            await globalModels.allGames.getGameByTeamsAndStartDate({
+            const requestedGame = await globalModels.allGames.findOrCreate({
                 awayTeam: awayTeamInstance,
                 homeTeam: homeTeamInstance,
                 startDate: startDate,
-                exchange: this,
             });
+            requestedGame.exchangeSet.add(this);
+            this.gameSet.add(requestedGame);
         }
         return this.gameSet;
     }
     async updateOddSet() {
         for (const game of this.gameSet) {
-            await game.getOddByExchange({
-                exchange: this,
-                game: game,
-            });
-            //the below should not be necessary here. this = exchange
-            //this.oddSet.add(odd);
+            for (const statistic of game.statisticSet) {
+                await this.updateStatisticOddSet({ statistic: statistic });
+            }
         }
         return this.oddSet;
     }
+    async updateStatisticOddSet({ statistic, }) {
+        const updateFunction = localModels.updateFunctions.fanDuel.statisticOddSet.map.get(statistic.name);
+        if (!updateFunction) {
+            return;
+        }
+        await updateFunction({
+            exchange: this,
+            statistic: statistic,
+        });
+    }
+    // public static methods
     // getters and setters
     get browser() {
         if (this.wrappedBrowser) {

@@ -24,95 +24,86 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
-const databaseModels = __importStar(require("../../../database/models"));
-const globalModels = __importStar(require("../../../global/models"));
-const localModels = __importStar(require("../../../local/models"));
+const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
+const localModels = __importStar(require("../../../local"));
 class Game {
+    // private constructor
     constructor({ awayTeam, homeTeam, startDate, }) {
+        this.startDate = Game.roundDateToNearestInterval(startDate);
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
-        this.startDate = Game.roundDateToNearestInterval(startDate);
-        this.exchangeSet = new localModels.ExchangeSet;
-        this.oddSet = new localModels.OddSet();
+        this.exchangeSet = new localModels.ExchangeSet();
+        this.statisticSet = new localModels.StatisticSet();
         this.wrappedSqlGame = null;
     }
-    // async construction methods
-    static async create({ awayTeam, homeTeam, exchange, startDate, }) {
+    // public async constructor
+    static async create({ awayTeam, homeTeam, startDate, }) {
         const newGame = new Game({
             awayTeam: awayTeam,
             homeTeam: homeTeam,
             startDate: startDate,
         });
-        await newGame.init();
-        if (exchange) {
-            newGame.exchangeSet.add(exchange);
-            newGame.sqlGame.addExchange(exchange.sqlExchange);
-            exchange.gameSet.add(newGame);
-            //exchange.sqlExchange.addGame(newGame.sqlGame);
-        }
+        await newGame.initSqlGame();
+        await newGame.updateStatisticSet();
         globalModels.allGames.add(newGame);
         return newGame;
     }
-    async init() {
+    // private sequelize instance constructor
+    async initSqlGame() {
         const awayTeam = this.awayTeam;
         const homeTeam = this.homeTeam;
-        const startDate = this.startDate;
         const awayTeamId = awayTeam.sqlTeam.get('id');
         const homeTeamId = homeTeam.sqlTeam.get('id');
         await databaseModels.Game.findOrCreate({
             where: {
                 awayTeamId: awayTeamId,
                 homeTeamId: homeTeamId,
-                startDate: startDate,
+                startDate: this.startDate,
             },
             defaults: {
                 awayTeamId: awayTeamId,
                 homeTeamId: homeTeamId,
-                startDate: startDate,
+                startDate: this.startDate,
             },
-        }).then(([sqlGame, created]) => {
+        }).then(async ([sqlGame, created]) => {
+            if (!created) {
+                await sqlGame.update({});
+            }
             this.wrappedSqlGame = sqlGame;
         });
-        return this;
+        return this.sqlGame;
     }
-    // instance methods
-    async getOddByExchange({ exchange, game, }) {
-        let requestedOdd = undefined;
-        const gameOdds = this.oddSet;
-        for (const odd of gameOdds) {
-            if (odd.exchange === exchange) {
-                requestedOdd = odd;
-                break;
-            }
-        }
-        // If it retrieves an odd where the exchange is exchange, the odd should 
-        // already be in exchange's oddSet.
-        if (requestedOdd === undefined) {
-            requestedOdd = await localModels.Odd.create({
-                exchange: exchange,
-                game: this,
-            });
-        }
-        if (game) {
-            game.oddSet.add(requestedOdd);
-        }
-        return requestedOdd;
-    }
-    matchesByTeamsAndStartDate({ awayTeam, homeTeam, exchange, startDate, }) {
+    // public instance methods
+    matches({ awayTeam, homeTeam, startDate, }) {
         startDate = Game.roundDateToNearestInterval(startDate);
         const awayTeamSame = (this.awayTeam === awayTeam);
         const homeTeamSame = (this.homeTeam === homeTeam);
         const startDateSame = (this.startDate.getTime() === startDate.getTime());
         if (awayTeamSame && homeTeamSame && startDateSame) {
-            if (exchange) {
-                this.exchangeSet.add(exchange);
-                exchange.gameSet.add(this);
-            }
             return true;
         }
         return false;
     }
-    // static methods
+    async updateStatisticSet() {
+        const spread = await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'spread',
+        });
+        const moneyline = await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'moneyline',
+        });
+        const total = await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'total',
+        });
+        this.statisticSet.add(spread);
+        this.statisticSet.add(moneyline);
+        this.statisticSet.add(total);
+        return this.statisticSet;
+    }
+    // public static methods
     static roundDateToNearestInterval(date) {
         const ROUND_INTERVAL = 15;
         const roundedMinutes = Math.round(date.getMinutes() / ROUND_INTERVAL) * ROUND_INTERVAL;

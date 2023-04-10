@@ -1,55 +1,47 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OddSet = void 0;
-const localModels = __importStar(require("../../../local/models"));
+const continuousOdd_1 = require("./continuousOdd");
+const discreteOdd_1 = require("./discreteOdd");
 class OddSet extends Set {
-    async getOddByExchangeAndGame({ exchange, game, }) {
-        let requestedOdd = undefined;
+    async findOrCreate({ exchange, statistic, inequality, value, updateFunction, }) {
         for (const odd of this) {
-            if (odd.matchesByExchangeAndGame({
-                exchange: exchange,
-                game: game,
-            })) {
-                requestedOdd = odd;
-                break;
+            if (odd.exchange === exchange && odd.statistic === statistic) {
+                if (odd instanceof continuousOdd_1.ContinuousOdd && inequality !== undefined) {
+                    if (odd.inequality === inequality) {
+                        return odd;
+                    }
+                }
+                else if (odd instanceof discreteOdd_1.DiscreteOdd && value !== undefined) {
+                    if (odd.value === value) {
+                        return odd;
+                    }
+                }
             }
         }
-        if (requestedOdd === undefined) {
-            requestedOdd = await localModels.Odd.create({
+        if (inequality) {
+            const newContinuousOdd = await continuousOdd_1.ContinuousOdd.create({
                 exchange: exchange,
-                game: game,
+                statistic: statistic,
+                inequality: inequality,
+                updateFunction: updateFunction,
             });
-            this.add(requestedOdd);
+            newContinuousOdd.inequality = inequality;
+            this.add(newContinuousOdd);
+            return newContinuousOdd;
         }
-        return requestedOdd;
-    }
-    async updateValues() {
-        for (const odd of this) {
-            await odd.updateValues();
+        else if (value !== undefined) {
+            const newDiscreteOdd = await discreteOdd_1.DiscreteOdd.create({
+                exchange: exchange,
+                statistic: statistic,
+                value: value,
+                updateFunction: updateFunction,
+            });
+            newDiscreteOdd.value = value;
+            this.add(newDiscreteOdd);
+            return newDiscreteOdd;
         }
+        throw new Error(`Invalid parameters provided. Either "inequality" or "value" must be defined.`);
     }
 }
 exports.OddSet = OddSet;

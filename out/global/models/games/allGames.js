@@ -24,6 +24,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allGames = void 0;
-const localModels = __importStar(require("../../../local/models"));
+const localModels = __importStar(require("../../../local"));
 exports.allGames = new localModels.GameSet();
 //# sourceMappingURL=allGames.js.map
