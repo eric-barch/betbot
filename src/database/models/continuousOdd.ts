@@ -14,8 +14,8 @@ export class ContinuousOdd extends sqlz.Model<
 
     // column headers
     declare inequality: string;
-    declare price: number;
-    declare value: number;
+    declare price: number | null;
+    declare value: number | null;
 
     // timestamps
     declare createdAt: sqlz.CreationOptional<Date>;

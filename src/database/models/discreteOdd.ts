@@ -13,7 +13,7 @@ export class DiscreteOdd extends sqlz.Model<
     declare id: sqlz.CreationOptional<number>;
 
     // column headers
-    declare price: number;
+    declare price: number | null;
     declare value: string;
 
     // timestamps

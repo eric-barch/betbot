@@ -104,4 +104,16 @@ export class DiscreteOdd extends Odd {
     set sqlDiscreteOdd(sqlDiscreteOdd: databaseModels.DiscreteOdd) {
         this.wrappedSqlDiscreteOdd = sqlDiscreteOdd;
     }
+
+    get price(): number | null {
+        return this.wrappedPrice;
+    }
+
+    public async setPrice(price: number | null) {
+        this.wrappedPrice = price;
+
+        await this.sqlDiscreteOdd.update({
+            price: price,
+        });
+    }
 }

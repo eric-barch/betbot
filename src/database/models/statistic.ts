@@ -3,7 +3,8 @@ import * as sqlz from 'sequelize';
 import { sequelize } from '../../database';
 
 import { Game } from './game';
-import { Odd } from './odd';
+import { ContinuousOdd } from './continuousOdd';
+import { DiscreteOdd } from './discreteOdd';
 
 export class Statistic extends sqlz.Model<
     sqlz.InferAttributes<Statistic, {omit: 'game'}>,
@@ -24,6 +25,8 @@ export class Statistic extends sqlz.Model<
 
     // associated sequelize models
     declare game?: sqlz.NonAttribute<Game>;
+    declare continuousOdds?: sqlz.NonAttribute<ContinuousOdd[]>;
+    declare discreteOdds?: sqlz.NonAttribute<DiscreteOdd[]>;
 
     // virtual model associations
     // belongsTo(Game)
@@ -31,17 +34,29 @@ export class Statistic extends sqlz.Model<
     declare getGame: sqlz.BelongsToGetAssociationMixin<Game>;
     declare setGame: sqlz.BelongsToSetAssociationMixin<Game, number>;
 
-    // hasMany(Odd)
-    declare getOdds: sqlz.HasManyGetAssociationsMixin<Odd>;
-    declare addOdd: sqlz.HasManyAddAssociationMixin<Odd, number>;
-    declare addOdds: sqlz.HasManyAddAssociationsMixin<Odd, number>;
-    declare setOdds: sqlz.HasManySetAssociationsMixin<Odd, number>;
-    declare removeOdd: sqlz.HasManyRemoveAssociationMixin<Odd, number>;
-    declare removeOdds: sqlz.HasManyRemoveAssociationsMixin<Odd, number>;
-    declare hasOdd: sqlz.HasManyHasAssociationMixin<Odd, number>;
-    declare hasOdds: sqlz.HasManyHasAssociationsMixin<Odd, number>;
-    declare countOdds: sqlz.HasManyCountAssociationsMixin;
-    declare createOdd: sqlz.HasManyCreateAssociationMixin<Odd, 'exchangeId'>;
+  // hasMany(ContinuousOdd)
+  declare getContinuousOdds: sqlz.HasManyGetAssociationsMixin<ContinuousOdd>;
+  declare addContinuousOdd: sqlz.HasManyAddAssociationMixin<ContinuousOdd, number>;
+  declare addContinuousOdds: sqlz.HasManyAddAssociationsMixin<ContinuousOdd, number>;
+  declare setContinuousOdds: sqlz.HasManySetAssociationsMixin<ContinuousOdd, number>;
+  declare removeContinuousOdd: sqlz.HasManyRemoveAssociationMixin<ContinuousOdd, number>;
+  declare removeContinuousOdds: sqlz.HasManyRemoveAssociationsMixin<ContinuousOdd, number>;
+  declare hasContinuousOdd: sqlz.HasManyHasAssociationMixin<ContinuousOdd, number>;
+  declare hasContinuousOdds: sqlz.HasManyHasAssociationsMixin<ContinuousOdd, number>;
+  declare countContinuousOdds: sqlz.HasManyCountAssociationsMixin;
+  declare createContinuousOdd: sqlz.HasManyCreateAssociationMixin<ContinuousOdd, 'statisticId'>;
+
+  // hasMany(DiscreteOdd)
+  declare getDiscreteOdds: sqlz.HasManyGetAssociationsMixin<DiscreteOdd>;
+  declare addDiscreteOdd: sqlz.HasManyAddAssociationMixin<DiscreteOdd, number>;
+  declare addDiscreteOdds: sqlz.HasManyAddAssociationsMixin<DiscreteOdd, number>;
+  declare setDiscreteOdds: sqlz.HasManySetAssociationsMixin<DiscreteOdd, number>;
+  declare removeDiscreteOdd: sqlz.HasManyRemoveAssociationMixin<DiscreteOdd, number>;
+  declare removeDiscreteOdds: sqlz.HasManyRemoveAssociationsMixin<DiscreteOdd, number>;
+  declare hasDiscreteOdd: sqlz.HasManyHasAssociationMixin<DiscreteOdd, number>;
+  declare hasDiscreteOdds: sqlz.HasManyHasAssociationsMixin<DiscreteOdd, number>;
+  declare countDiscreteOdds: sqlz.HasManyCountAssociationsMixin;
+  declare createDiscreteOdd: sqlz.HasManyCreateAssociationMixin<DiscreteOdd, 'statisticId'>;
 
     // associated local model
     // none

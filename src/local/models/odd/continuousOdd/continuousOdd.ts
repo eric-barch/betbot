@@ -5,17 +5,17 @@ import * as localModels from '../../../../local';
 import { Odd } from '../odd';
 
 export enum Inequality {
-    Over = 'OVER',
-    EqualTo = 'EQUAL',
-    LessThan = 'UNDER',
+    Over = 'over',
+    Equal = 'equal',
+    Under = 'under',
 }
 
 export class ContinuousOdd extends Odd {
     // public properties
     public inequality: Inequality;
-    public value: number | null;
 
     // private properties
+    private wrappedValue: number | null;
 
     // public linked objects
 
@@ -43,7 +43,7 @@ export class ContinuousOdd extends Odd {
         });
 
         this.inequality = inequality;
-        this.value = null;
+        this.wrappedValue = null;
 
         this.wrappedSqlContinuousOdd = null;
     }
@@ -112,5 +112,29 @@ export class ContinuousOdd extends Odd {
 
     set sqlContinuousOdd(sqlContinuousOdd: databaseModels.ContinuousOdd) {
         this.wrappedSqlContinuousOdd = sqlContinuousOdd;
+    }
+
+    get price(): number | null {
+        return this.wrappedPrice;
+    }
+
+    public async setPrice(price: number | null) {
+        this.wrappedPrice = price;
+
+        await this.sqlContinuousOdd.update({
+            price: price,
+        });
+    }
+
+    get value(): number | null {
+        return this.wrappedValue;
+    }
+
+    public async setValue(value: number | null) {
+        this.wrappedValue = value;
+
+        await this.sqlContinuousOdd.update({
+            value: value,
+        });
     }
 }

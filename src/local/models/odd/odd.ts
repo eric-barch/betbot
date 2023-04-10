@@ -1,13 +1,10 @@
-import * as puppeteer from 'puppeteer';
-
-import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
 export abstract class Odd {
     // public properties
-    public price: number | null;
 
     // private properties
+    protected wrappedPrice: number | null;
     private updateFunction: Function | null;
 
     // public linked objects
@@ -27,7 +24,7 @@ export abstract class Odd {
         statistic: localModels.Statistic,
         updateFunction: Function,
     }) {
-        this.price = null;
+        this.wrappedPrice = null;
 
         this.updateFunction = updateFunction;
 
@@ -67,5 +64,4 @@ export abstract class Odd {
     // public static methods
 
     // getters and setters
-
 }

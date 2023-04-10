@@ -79,6 +79,15 @@ class DiscreteOdd extends odd_1.Odd {
     set sqlDiscreteOdd(sqlDiscreteOdd) {
         this.wrappedSqlDiscreteOdd = sqlDiscreteOdd;
     }
+    get price() {
+        return this.wrappedPrice;
+    }
+    async setPrice(price) {
+        this.wrappedPrice = price;
+        await this.sqlDiscreteOdd.update({
+            price: price,
+        });
+    }
 }
 exports.DiscreteOdd = DiscreteOdd;
 //# sourceMappingURL=discreteOdd.js.map

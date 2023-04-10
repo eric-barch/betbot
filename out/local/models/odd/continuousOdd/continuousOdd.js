@@ -29,9 +29,9 @@ const globalModels = __importStar(require("../../../../global"));
 const odd_1 = require("../odd");
 var Inequality;
 (function (Inequality) {
-    Inequality["Over"] = "OVER";
-    Inequality["EqualTo"] = "EQUAL";
-    Inequality["LessThan"] = "UNDER";
+    Inequality["Over"] = "over";
+    Inequality["Equal"] = "equal";
+    Inequality["Under"] = "under";
 })(Inequality = exports.Inequality || (exports.Inequality = {}));
 class ContinuousOdd extends odd_1.Odd {
     // private constructor
@@ -42,7 +42,7 @@ class ContinuousOdd extends odd_1.Odd {
             updateFunction: updateFunction,
         });
         this.inequality = inequality;
-        this.value = null;
+        this.wrappedValue = null;
         this.wrappedSqlContinuousOdd = null;
     }
     // public async constructor
@@ -86,6 +86,24 @@ class ContinuousOdd extends odd_1.Odd {
     }
     set sqlContinuousOdd(sqlContinuousOdd) {
         this.wrappedSqlContinuousOdd = sqlContinuousOdd;
+    }
+    get price() {
+        return this.wrappedPrice;
+    }
+    async setPrice(price) {
+        this.wrappedPrice = price;
+        await this.sqlContinuousOdd.update({
+            price: price,
+        });
+    }
+    get value() {
+        return this.wrappedValue;
+    }
+    async setValue(value) {
+        this.wrappedValue = value;
+        await this.sqlContinuousOdd.update({
+            value: value,
+        });
     }
 }
 exports.ContinuousOdd = ContinuousOdd;

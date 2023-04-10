@@ -50,7 +50,7 @@ async function spread({ exchange, statistic, }) {
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.LessThan,
+        inequality: localModels.Inequality.Under,
         updateFunction: spreadUnderFunction,
     });
 }
@@ -100,7 +100,7 @@ async function total({ exchange, statistic, }) {
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.LessThan,
+        inequality: localModels.Inequality.Under,
         updateFunction: totalUnderFunction,
     });
 }

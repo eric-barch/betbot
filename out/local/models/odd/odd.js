@@ -6,7 +6,7 @@ class Odd {
     // children hold their own sequelize reference
     // private constructor
     constructor({ exchange, statistic, updateFunction, }) {
-        this.price = null;
+        this.wrappedPrice = null;
         this.updateFunction = updateFunction;
         this.exchange = exchange;
         this.statistic = statistic;
