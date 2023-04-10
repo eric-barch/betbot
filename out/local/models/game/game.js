@@ -86,9 +86,13 @@ class Game {
         return false;
     }
     async updateStatisticSet() {
-        const spread = await this.statisticSet.findOrCreate({
+        const spreadAway = await this.statisticSet.findOrCreate({
             game: this,
-            name: 'spread',
+            name: 'spread_away',
+        });
+        const spreadHome = await this.statisticSet.findOrCreate({
+            game: this,
+            name: 'spread_home',
         });
         const moneyline = await this.statisticSet.findOrCreate({
             game: this,
@@ -98,7 +102,8 @@ class Game {
             game: this,
             name: 'total',
         });
-        this.statisticSet.add(spread);
+        this.statisticSet.add(spreadAway);
+        this.statisticSet.add(spreadHome);
         this.statisticSet.add(moneyline);
         this.statisticSet.add(total);
         return this.statisticSet;

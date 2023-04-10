@@ -1,22 +1,23 @@
 import * as localModels from '../../../../../local';
 
 export const map = new Map<string, Function>([
-    ['spread', spread],
+    ['spread_away', spreadAway],
+    ['spread_home', spreadHome],
     ['moneyline', moneyline],
     ['total', total],
 ]);
 
-export async function spread({
+export async function spreadAway({
     exchange,
     statistic,
 }: {
     exchange: localModels.Exchange,
     statistic: localModels.Statistic,
 }) {
-    const spreadOverKey = `${statistic.name}_over`;
-    const spreadOverFunction = localModels.updateFunctions.fanDuel.oddValue.map.get(spreadOverKey);
+    const spreadAwayOverKey = `${statistic.name}_over`;
+    const spreadAwayOverFunction = localModels.updateFunctions.fanDuel.oddValue.map.get(spreadAwayOverKey);
 
-    if (!spreadOverFunction) {
+    if (!spreadAwayOverFunction) {
         throw new Error(`Did not find function.`);
     }
 
@@ -24,13 +25,13 @@ export async function spread({
         exchange: exchange,
         statistic: statistic,
         inequality: localModels.Inequality.Over,
-        updateFunction: spreadOverFunction,
+        updateFunction: spreadAwayOverFunction,
     });
 
-    const spreadUnderKey = `${statistic.name}_under`;
-    const spreadUnderFunction = localModels.updateFunctions.fanDuel.oddValue.map.get(spreadUnderKey);
+    const spreadAwayUnderKey = `${statistic.name}_under`;
+    const spreadAwayUnderFunction = localModels.updateFunctions.fanDuel.oddValue.map.get(spreadAwayUnderKey);
 
-    if (!spreadUnderFunction) {
+    if (!spreadAwayUnderFunction) {
         throw new Error(`Did not find function.`);
     }
 
@@ -38,7 +39,43 @@ export async function spread({
         exchange: exchange,
         statistic: statistic,
         inequality: localModels.Inequality.Under,
-        updateFunction: spreadUnderFunction,
+        updateFunction: spreadAwayUnderFunction,
+    });
+}
+
+export async function spreadHome({
+    exchange,
+    statistic,
+}: {
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
+}) {
+    const spreadHomeOverKey = `${statistic.name}_over`;
+    const spreadHomeOverFunction = localModels.updateFunctions.fanDuel.oddValue.map.get(spreadHomeOverKey);
+
+    if (!spreadHomeOverFunction) {
+        throw new Error(`Did not find function.`);
+    }
+
+    await statistic.oddSet.findOrCreate({
+        exchange: exchange,
+        statistic: statistic,
+        inequality: localModels.Inequality.Over,
+        updateFunction: spreadHomeOverFunction,
+    });
+
+    const spreadHomeUnderKey = `${statistic.name}_under`;
+    const spreadHomeUnderFunction = localModels.updateFunctions.fanDuel.oddValue.map.get(spreadHomeUnderKey);
+
+    if (!spreadHomeUnderFunction) {
+        throw new Error(`Did not find function.`);
+    }
+
+    await statistic.oddSet.findOrCreate({
+        exchange: exchange,
+        statistic: statistic,
+        inequality: localModels.Inequality.Under,
+        updateFunction: spreadHomeUnderFunction,
     });
 }
 

@@ -1,16 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.totalUnder = exports.totalOver = exports.moneylineHome = exports.moneylineAway = exports.spreadUnder = exports.spreadOver = exports.map = void 0;
+exports.totalUnder = exports.totalOver = exports.moneylineHome = exports.moneylineAway = exports.spreadHomeUnder = exports.spreadHomeOver = exports.spreadAwayUnder = exports.spreadAwayOver = exports.map = void 0;
 const puppeteer_1 = require("puppeteer");
 exports.map = new Map([
-    ['spread_over', spreadOver],
-    ['spread_under', spreadUnder],
+    ['spread_away_over', spreadAwayOver],
+    ['spread_away_under', spreadAwayUnder],
+    ['spread_home_over', spreadHomeOver],
+    ['spread_home_under', spreadHomeUnder],
     ['moneyline_away', moneylineAway],
     ['moneyline_home', moneylineHome],
     ['total_over', totalOver],
     ['total_under', totalUnder],
 ]);
-async function spreadOver() {
+async function spreadAwayOver() {
     const game = this.statistic.game;
     const spreadAwayParent = await getParentElement({
         odd: this,
@@ -35,6 +37,41 @@ async function spreadOver() {
         await this.setValue(Math.abs(spreadAwaySpread));
         return;
     }
+    await this.setPrice(null);
+    await this.setValue(null);
+}
+exports.spreadAwayOver = spreadAwayOver;
+async function spreadAwayUnder() {
+    const game = this.statistic.game;
+    const spreadAwayParent = await getParentElement({
+        odd: this,
+        selectors: [
+            game.awayTeam.regionFullIdentifierFull,
+            'spread betting',
+        ],
+    });
+    if (!spreadAwayParent) {
+        await this.setPrice(null);
+        await this.setValue(null);
+        return;
+    }
+    const spreadAwaySpreadElement = (await spreadAwayParent.$$('span'))[0];
+    const spreadAwaySpreadJson = await (await spreadAwaySpreadElement.getProperty('textContent')).jsonValue();
+    const spreadAwaySpread = Number(spreadAwaySpreadJson);
+    const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
+    const spreadAwayPriceJson = await (await spreadAwayPriceElement.getProperty('textContent')).jsonValue();
+    const spreadAwayPrice = Number(spreadAwayPriceJson);
+    if (spreadAwaySpread > 0) {
+        await this.setPrice(spreadAwayPrice);
+        await this.setValue(Math.abs(spreadAwaySpread));
+        return;
+    }
+    await this.setPrice(null);
+    await this.setValue(null);
+}
+exports.spreadAwayUnder = spreadAwayUnder;
+async function spreadHomeOver() {
+    const game = this.statistic.game;
     const spreadHomeParent = await getParentElement({
         odd: this,
         selectors: [
@@ -61,32 +98,9 @@ async function spreadOver() {
     await this.setPrice(null);
     await this.setValue(null);
 }
-exports.spreadOver = spreadOver;
-async function spreadUnder() {
+exports.spreadHomeOver = spreadHomeOver;
+async function spreadHomeUnder() {
     const game = this.statistic.game;
-    const spreadAwayParent = await getParentElement({
-        odd: this,
-        selectors: [
-            game.awayTeam.regionFullIdentifierFull,
-            'spread betting',
-        ],
-    });
-    if (!spreadAwayParent) {
-        await this.setPrice(null);
-        await this.setValue(null);
-        return;
-    }
-    const spreadAwaySpreadElement = (await spreadAwayParent.$$('span'))[0];
-    const spreadAwaySpreadJson = await (await spreadAwaySpreadElement.getProperty('textContent')).jsonValue();
-    const spreadAwaySpread = Number(spreadAwaySpreadJson);
-    const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
-    const spreadAwayPriceJson = await (await spreadAwayPriceElement.getProperty('textContent')).jsonValue();
-    const spreadAwayPrice = Number(spreadAwayPriceJson);
-    if (spreadAwaySpread > 0) {
-        await this.setPrice(spreadAwayPrice);
-        await this.setValue(Math.abs(spreadAwaySpread));
-        return;
-    }
     const spreadHomeParent = await getParentElement({
         odd: this,
         selectors: [
@@ -113,7 +127,7 @@ async function spreadUnder() {
     await this.setPrice(null);
     await this.setValue(null);
 }
-exports.spreadUnder = spreadUnder;
+exports.spreadHomeUnder = spreadHomeUnder;
 async function moneylineAway() {
     const game = this.statistic.game;
     const moneylineAwayParent = await getParentElement({
