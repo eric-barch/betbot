@@ -1,11 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Odd = void 0;
+exports.Odd = exports.Inequality = void 0;
+var Inequality;
+(function (Inequality) {
+    Inequality["Over"] = "over";
+    Inequality["Equal"] = "equal";
+    Inequality["Under"] = "under";
+})(Inequality = exports.Inequality || (exports.Inequality = {}));
 class Odd {
-    // private sequelize object
-    // children hold their own sequelize reference
     // private constructor
-    constructor({ exchange, statistic, updateFunction, }) {
+    constructor({ exchange, statistic, inequality, updateFunction, }) {
+        this.inequality = inequality;
         this.wrappedPrice = null;
         this.updateFunction = updateFunction;
         this.exchange = exchange;

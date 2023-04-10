@@ -14,8 +14,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OddSet = exports.Odd = void 0;
+exports.OddSet = exports.Odd = exports.Inequality = void 0;
 const odd_1 = require("./odd");
+Object.defineProperty(exports, "Inequality", { enumerable: true, get: function () { return odd_1.Inequality; } });
 Object.defineProperty(exports, "Odd", { enumerable: true, get: function () { return odd_1.Odd; } });
 const oddSet_1 = require("./oddSet");
 Object.defineProperty(exports, "OddSet", { enumerable: true, get: function () { return oddSet_1.OddSet; } });

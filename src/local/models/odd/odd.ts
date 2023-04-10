@@ -1,7 +1,14 @@
 import * as localModels from '../../../local';
 
+export enum Inequality {
+    Over = 'over',
+    Equal = 'equal',
+    Under = 'under',
+}
+
 export abstract class Odd {
     // public properties
+    public inequality: Inequality;
 
     // private properties
     protected wrappedPrice: number | null;
@@ -10,20 +17,21 @@ export abstract class Odd {
     // public linked objects
     public exchange: localModels.Exchange;
     public statistic: localModels.Statistic;
-    
-    // private sequelize object
-    // children hold their own sequelize reference
 
     // private constructor
-    public constructor({
+    protected constructor({
         exchange,
         statistic,
+        inequality,
         updateFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
+        inequality: Inequality,
         updateFunction: Function,
     }) {
+        this.inequality = inequality;
+
         this.wrappedPrice = null;
 
         this.updateFunction = updateFunction;

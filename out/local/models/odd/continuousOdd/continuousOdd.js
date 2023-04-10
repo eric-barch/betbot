@@ -23,22 +23,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContinuousOdd = exports.Inequality = void 0;
+exports.ContinuousOdd = void 0;
 const databaseModels = __importStar(require("../../../../database"));
 const globalModels = __importStar(require("../../../../global"));
 const odd_1 = require("../odd");
-var Inequality;
-(function (Inequality) {
-    Inequality["Over"] = "over";
-    Inequality["Equal"] = "equal";
-    Inequality["Under"] = "under";
-})(Inequality = exports.Inequality || (exports.Inequality = {}));
 class ContinuousOdd extends odd_1.Odd {
     // private constructor
     constructor({ exchange, statistic, inequality, updateFunction, }) {
         super({
             exchange: exchange,
             statistic: statistic,
+            inequality: inequality,
             updateFunction: updateFunction,
         });
         this.inequality = inequality;

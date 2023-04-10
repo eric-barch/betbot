@@ -35,6 +35,7 @@ DiscreteOdd.init({
         autoIncrement: true,
         primaryKey: true
     },
+    inequality: new sqlz.DataTypes.STRING(128),
     price: sqlz.DataTypes.INTEGER,
     value: new sqlz.DataTypes.STRING(128),
     createdAt: sqlz.DataTypes.DATE,

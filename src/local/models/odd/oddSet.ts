@@ -1,8 +1,8 @@
+import * as localModels from '../../../local';
+
 import { Odd } from "./odd";
 import { ContinuousOdd } from "./continuousOdd";
 import { DiscreteOdd } from './discreteOdd';
-
-import * as localModels from '../../../local';
 
 export class OddSet extends Set<Odd> {
     public async findOrCreate({
@@ -77,7 +77,7 @@ export class OddSet extends Set<Odd> {
                 updateFunction: updateFunction,
             });
             
-            newDiscreteOdd.value = value;
+            await newDiscreteOdd.setValue(value);
             
             this.add(newDiscreteOdd);
             

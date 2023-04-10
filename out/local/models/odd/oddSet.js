@@ -37,7 +37,7 @@ class OddSet extends Set {
                 value: value,
                 updateFunction: updateFunction,
             });
-            newDiscreteOdd.value = value;
+            await newDiscreteOdd.setValue(value);
             this.add(newDiscreteOdd);
             return newDiscreteOdd;
         }

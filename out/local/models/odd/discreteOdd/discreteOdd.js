@@ -33,9 +33,10 @@ class DiscreteOdd extends odd_1.Odd {
         super({
             exchange: exchange,
             statistic: statistic,
+            inequality: odd_1.Inequality.Equal,
             updateFunction: updateFunction,
         });
-        this.value = value;
+        this.wrappedValue = value;
         this.wrappedSqlDiscreteOdd = null;
     }
     // public async constructor
@@ -61,6 +62,12 @@ class DiscreteOdd extends odd_1.Odd {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
                 value: this.value,
+            },
+            defaults: {
+                exchangeId: exchangeId,
+                statisticId: statisticId,
+                inequality: odd_1.Inequality.Equal,
+                value: this.value,
             }
         }).then(async ([sqlDiscreteOdd, created]) => {
             if (!created) {
@@ -70,6 +77,8 @@ class DiscreteOdd extends odd_1.Odd {
         });
         return this.sqlDiscreteOdd;
     }
+    // public static methods
+    // getters and setters
     get sqlDiscreteOdd() {
         if (!this.wrappedSqlDiscreteOdd) {
             throw new Error(`${this.exchange.name} ${this.statistic.name} sqlDiscreteOdd is null.`);
@@ -86,6 +95,15 @@ class DiscreteOdd extends odd_1.Odd {
         this.wrappedPrice = price;
         await this.sqlDiscreteOdd.update({
             price: price,
+        });
+    }
+    get value() {
+        return this.wrappedValue;
+    }
+    async setValue(value) {
+        this.wrappedValue = value;
+        await this.sqlDiscreteOdd.update({
+            value: value,
         });
     }
 }

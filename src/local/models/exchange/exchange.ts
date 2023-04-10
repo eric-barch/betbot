@@ -87,6 +87,7 @@ export class Exchange {
 
     // public instance methods
     public async analyze(): Promise<void> {
+        // these function labels need to be more specific
         await this.updateGameSet();
         await this.updateOddSet();
 

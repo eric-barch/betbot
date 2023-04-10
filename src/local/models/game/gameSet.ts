@@ -1,5 +1,6 @@
-import { Game } from './game';
 import * as localModels from '../../../local';
+
+import { Game } from './game';
 
 export class GameSet extends Set<Game> {
     public async findOrCreate({

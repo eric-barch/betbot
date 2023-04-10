@@ -1,6 +1,6 @@
-import { Statistic } from './statistic';
-
 import * as localModels from '../../../local';
+
+import { Statistic } from './statistic';
 
 export class StatisticSet extends Set<Statistic> {
     public async findOrCreate({

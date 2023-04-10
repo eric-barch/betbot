@@ -1,6 +1,5 @@
-import { Inequality, ContinuousOdd } from './continuousOdd';
+import { ContinuousOdd } from './continuousOdd';
 
 export {
-    Inequality,
     ContinuousOdd,
 }

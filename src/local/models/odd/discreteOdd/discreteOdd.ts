@@ -2,13 +2,13 @@ import * as databaseModels from '../../../../database';
 import * as globalModels from '../../../../global';
 import * as localModels from '../../../../local';
 
-import { Odd } from '../odd';
+import { Inequality, Odd } from '../odd';
 
 export class DiscreteOdd extends Odd {
     // public properties
-    public value: string;
 
     // private properties
+    private wrappedValue: string;
 
     // public linked objects
 
@@ -32,10 +32,11 @@ export class DiscreteOdd extends Odd {
         super({
             exchange: exchange,
             statistic: statistic,
+            inequality: Inequality.Equal,
             updateFunction: updateFunction,
         });
 
-        this.value = value;
+        this.wrappedValue = value;
 
         this.wrappedSqlDiscreteOdd = null;
     }
@@ -79,6 +80,12 @@ export class DiscreteOdd extends Odd {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
                 value: this.value,
+            },
+            defaults: {
+                exchangeId: exchangeId,
+                statisticId: statisticId,
+                inequality: Inequality.Equal,
+                value: this.value,
             }
         }).then(async ([sqlDiscreteOdd, created]) => {
             if (!created) {
@@ -93,6 +100,9 @@ export class DiscreteOdd extends Odd {
         return this.sqlDiscreteOdd;
     }
 
+    // public static methods
+
+    // getters and setters
     get sqlDiscreteOdd(): databaseModels.DiscreteOdd {
         if (!this.wrappedSqlDiscreteOdd) {
             throw new Error(`${this.exchange.name} ${this.statistic.name} sqlDiscreteOdd is null.`);
@@ -114,6 +124,18 @@ export class DiscreteOdd extends Odd {
 
         await this.sqlDiscreteOdd.update({
             price: price,
+        });
+    }
+
+    get value(): string {
+        return this.wrappedValue;
+    }
+
+    public async setValue(value: string) {
+        this.wrappedValue = value;
+
+        await this.sqlDiscreteOdd.update({
+            value: value,
         });
     }
 }

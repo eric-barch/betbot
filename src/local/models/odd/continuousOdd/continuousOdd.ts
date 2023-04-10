@@ -2,17 +2,10 @@ import * as databaseModels from '../../../../database';
 import * as globalModels from '../../../../global';
 import * as localModels from '../../../../local';
 
-import { Odd } from '../odd';
-
-export enum Inequality {
-    Over = 'over',
-    Equal = 'equal',
-    Under = 'under',
-}
+import { Inequality, Odd } from '../odd';
 
 export class ContinuousOdd extends Odd {
     // public properties
-    public inequality: Inequality;
 
     // private properties
     private wrappedValue: number | null;
@@ -39,6 +32,7 @@ export class ContinuousOdd extends Odd {
         super({
             exchange: exchange,
             statistic: statistic,
+            inequality: inequality,
             updateFunction: updateFunction,
         });
 

@@ -44,7 +44,9 @@ class Game {
             homeTeam: homeTeam,
             startDate: startDate,
         });
+        // do not change order
         await newGame.initSqlGame();
+        // this method references newGame's sql instance
         await newGame.updateStatisticSet();
         globalModels.allGames.add(newGame);
         return newGame;

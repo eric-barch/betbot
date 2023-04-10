@@ -13,6 +13,7 @@ export class DiscreteOdd extends sqlz.Model<
     declare id: sqlz.CreationOptional<number>;
 
     // column headers
+    declare inequality: string;
     declare price: number | null;
     declare value: string;
 
@@ -49,6 +50,7 @@ DiscreteOdd.init({
         autoIncrement: true,
         primaryKey: true
     },
+    inequality: new sqlz.DataTypes.STRING(128),
     price: sqlz.DataTypes.INTEGER,
     value: new sqlz.DataTypes.STRING(128),
     createdAt: sqlz.DataTypes.DATE,

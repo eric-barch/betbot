@@ -71,6 +71,7 @@ class Exchange {
     }
     // public instance methods
     async analyze() {
+        // these function labels need to be more specific
         await this.updateGameSet();
         await this.updateOddSet();
         for (const odd of this.oddSet) {
