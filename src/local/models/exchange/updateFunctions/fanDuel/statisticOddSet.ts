@@ -23,7 +23,7 @@ export async function spread({
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.GreaterThan,
+        inequality: localModels.Inequality.Over,
         updateFunction: spreadOverFunction,
     });
 
@@ -95,7 +95,7 @@ export async function total({
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.GreaterThan,
+        inequality: localModels.Inequality.Over,
         updateFunction: totalOverFunction,
     });
 

@@ -60,6 +60,7 @@ export class OddSet extends Set<Odd> {
             const newContinuousOdd = await ContinuousOdd.create({
                 exchange: exchange,
                 statistic: statistic,
+                inequality: inequality,
                 updateFunction: updateFunction,
             });
             
@@ -72,6 +73,7 @@ export class OddSet extends Set<Odd> {
             const newDiscreteOdd = await DiscreteOdd.create({
                 exchange: exchange,
                 statistic: statistic,
+                value: value,
                 updateFunction: updateFunction,
             });
             

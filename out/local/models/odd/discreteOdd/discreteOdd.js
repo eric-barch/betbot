@@ -24,29 +24,60 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscreteOdd = void 0;
+const databaseModels = __importStar(require("../../../../database"));
 const globalModels = __importStar(require("../../../../global"));
 const odd_1 = require("../odd");
 class DiscreteOdd extends odd_1.Odd {
-    // private properties
-    // public linked objects
     // private constructor
-    constructor({ exchange, statistic, updateFunction, }) {
+    constructor({ exchange, statistic, value, updateFunction, }) {
         super({
             exchange: exchange,
             statistic: statistic,
             updateFunction: updateFunction,
         });
-        this.value = null;
+        this.value = value;
+        this.wrappedSqlDiscreteOdd = null;
     }
     // public async constructor
-    static async create({ exchange, statistic, updateFunction, }) {
+    static async create({ exchange, statistic, value, updateFunction, }) {
         const newDiscreteOdd = new DiscreteOdd({
             exchange: exchange,
             statistic: statistic,
+            value: value,
             updateFunction: updateFunction,
         });
+        await newDiscreteOdd.initSqlDiscreteOdd();
         globalModels.allOdds.add(newDiscreteOdd);
         return newDiscreteOdd;
+    }
+    // private sequelize instance constructor
+    async initSqlDiscreteOdd() {
+        const exchange = this.exchange;
+        const statistic = this.statistic;
+        const exchangeId = exchange.sqlExchange.get('id');
+        const statisticId = statistic.sqlStatistic.get('id');
+        await databaseModels.DiscreteOdd.findOrCreate({
+            where: {
+                exchangeId: exchangeId,
+                statisticId: statisticId,
+                value: this.value,
+            }
+        }).then(async ([sqlDiscreteOdd, created]) => {
+            if (!created) {
+                await sqlDiscreteOdd.update({});
+            }
+            this.sqlDiscreteOdd = sqlDiscreteOdd;
+        });
+        return this.sqlDiscreteOdd;
+    }
+    get sqlDiscreteOdd() {
+        if (!this.wrappedSqlDiscreteOdd) {
+            throw new Error(`${this.exchange.name} ${this.statistic.name} sqlDiscreteOdd is null.`);
+        }
+        return this.wrappedSqlDiscreteOdd;
+    }
+    set sqlDiscreteOdd(sqlDiscreteOdd) {
+        this.wrappedSqlDiscreteOdd = sqlDiscreteOdd;
     }
 }
 exports.DiscreteOdd = DiscreteOdd;

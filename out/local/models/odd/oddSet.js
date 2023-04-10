@@ -23,6 +23,7 @@ class OddSet extends Set {
             const newContinuousOdd = await continuousOdd_1.ContinuousOdd.create({
                 exchange: exchange,
                 statistic: statistic,
+                inequality: inequality,
                 updateFunction: updateFunction,
             });
             newContinuousOdd.inequality = inequality;
@@ -33,6 +34,7 @@ class OddSet extends Set {
             const newDiscreteOdd = await discreteOdd_1.DiscreteOdd.create({
                 exchange: exchange,
                 statistic: statistic,
+                value: value,
                 updateFunction: updateFunction,
             });
             newDiscreteOdd.value = value;

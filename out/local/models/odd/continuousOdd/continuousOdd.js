@@ -24,36 +24,68 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContinuousOdd = exports.Inequality = void 0;
+const databaseModels = __importStar(require("../../../../database"));
 const globalModels = __importStar(require("../../../../global"));
 const odd_1 = require("../odd");
 var Inequality;
 (function (Inequality) {
-    Inequality["GreaterThan"] = "GREATER_THAN";
-    Inequality["EqualTo"] = "EQUAL_TO";
-    Inequality["LessThan"] = "LESS_THAN";
+    Inequality["Over"] = "OVER";
+    Inequality["EqualTo"] = "EQUAL";
+    Inequality["LessThan"] = "UNDER";
 })(Inequality = exports.Inequality || (exports.Inequality = {}));
 class ContinuousOdd extends odd_1.Odd {
-    // private properties
-    // public linked objects
     // private constructor
-    constructor({ exchange, statistic, updateFunction, }) {
+    constructor({ exchange, statistic, inequality, updateFunction, }) {
         super({
             exchange: exchange,
             statistic: statistic,
             updateFunction: updateFunction,
         });
-        this.inequality = null;
+        this.inequality = inequality;
         this.value = null;
+        this.wrappedSqlContinuousOdd = null;
     }
     // public async constructor
-    static async create({ exchange, statistic, updateFunction, }) {
+    static async create({ exchange, statistic, inequality, updateFunction, }) {
         const newContinuousOdd = new ContinuousOdd({
             exchange: exchange,
             statistic: statistic,
+            inequality: inequality,
             updateFunction: updateFunction,
         });
+        await newContinuousOdd.initSqlContinuousOdd();
         globalModels.allOdds.add(newContinuousOdd);
         return newContinuousOdd;
+    }
+    // private sequelize instance constructor
+    async initSqlContinuousOdd() {
+        const exchange = this.exchange;
+        const statistic = this.statistic;
+        const exchangeId = exchange.sqlExchange.get('id');
+        const statisticId = statistic.sqlStatistic.get('id');
+        await databaseModels.ContinuousOdd.findOrCreate({
+            where: {
+                exchangeId: exchangeId,
+                statisticId: statisticId,
+                inequality: this.inequality.toString(),
+            },
+        }).then(async ([sqlContinuousOdd, created]) => {
+            if (!created) {
+                await sqlContinuousOdd.update({});
+            }
+            this.sqlContinuousOdd = sqlContinuousOdd;
+        });
+        return this.sqlContinuousOdd;
+    }
+    // getters and setters
+    get sqlContinuousOdd() {
+        if (!this.wrappedSqlContinuousOdd) {
+            throw new Error(`${this.exchange.name} ${this.statistic.name} sqlContinuousOdd is null.`);
+        }
+        return this.wrappedSqlContinuousOdd;
+    }
+    set sqlContinuousOdd(sqlContinuousOdd) {
+        this.wrappedSqlContinuousOdd = sqlContinuousOdd;
     }
 }
 exports.ContinuousOdd = ContinuousOdd;

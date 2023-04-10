@@ -39,7 +39,7 @@ async function spread({ exchange, statistic, }) {
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.GreaterThan,
+        inequality: localModels.Inequality.Over,
         updateFunction: spreadOverFunction,
     });
     const spreadUnderKey = `${statistic.name}_under`;
@@ -89,7 +89,7 @@ async function total({ exchange, statistic, }) {
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.GreaterThan,
+        inequality: localModels.Inequality.Over,
         updateFunction: totalOverFunction,
     });
     const totalUnderKey = `${statistic.name}_under`;

@@ -1,6 +1,6 @@
 import { sequelize } from './instance';
 
-import { Exchange, Game, Odd, Statistic, Team } from './models';
+import { Exchange, Game, ContinuousOdd, DiscreteOdd, Statistic, Team } from './models';
 
 export async function init(): Promise<void> {
     try {
@@ -16,7 +16,8 @@ export async function init(): Promise<void> {
         foreignKey: 'exchangeId',
         otherKey: 'gameId',
     });
-    Exchange.hasMany(Odd, { foreignKey: 'exchangeId'} );
+    Exchange.hasMany(ContinuousOdd, { foreignKey: 'exchangeId'});
+    Exchange.hasMany(DiscreteOdd, { foreignKey: 'exchangeId' });
     
     // Game associations 
     Game.belongsToMany(Exchange, {
@@ -28,14 +29,18 @@ export async function init(): Promise<void> {
     Game.belongsTo(Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
     Game.belongsTo(Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
     
-    // Odd associations
-    Odd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
-    Odd.belongsTo(Odd, { foreignKey: 'oppositeId' });
-    Odd.belongsTo(Statistic, { foreignKey: 'statisticId' });
+    // ContinuousOdd associations
+    ContinuousOdd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
+    ContinuousOdd.belongsTo(Statistic, { foreignKey: 'statisticId' });
+
+    // DiscreteOdd associations
+    DiscreteOdd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
+    DiscreteOdd.belongsTo(Statistic, { foreignKey: 'statisticId' });
 
     // Statistic associations
     Statistic.belongsTo(Game, { foreignKey: 'gameId' });
-    Statistic.hasMany(Odd, { foreignKey: 'statisticId' });
+    Statistic.hasMany(ContinuousOdd, { foreignKey: 'statisticId' });
+    Statistic.hasMany(DiscreteOdd, { foreignKey: 'statisticId' });
 
     // Team associations
     Team.hasMany(Game, { as: 'awayTeam', foreignKey: 'awayTeamId' });
