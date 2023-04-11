@@ -4,16 +4,16 @@ exports.OddSet = void 0;
 const continuousOdd_1 = require("./continuousOdd");
 const discreteOdd_1 = require("./discreteOdd");
 class OddSet extends Set {
-    async findOrCreate({ exchange, statistic, inequality, value, updateFunction, }) {
+    async findOrCreate({ exchange, statistic, inequality, value, updateElementsFunction, }) {
         for (const odd of this) {
             if (odd.exchange === exchange && odd.statistic === statistic) {
                 if (odd instanceof continuousOdd_1.ContinuousOdd && inequality !== undefined) {
-                    if (odd.inequality === inequality) {
+                    if (await odd.getInequality() === inequality) {
                         return odd;
                     }
                 }
                 else if (odd instanceof discreteOdd_1.DiscreteOdd && value !== undefined) {
-                    if (odd.value === value) {
+                    if (await odd.getValue() === value) {
                         return odd;
                     }
                 }
@@ -24,9 +24,9 @@ class OddSet extends Set {
                 exchange: exchange,
                 statistic: statistic,
                 inequality: inequality,
-                updateFunction: updateFunction,
+                updateElementsFunction: updateElementsFunction,
             });
-            newContinuousOdd.inequality = inequality;
+            newContinuousOdd.setInequality(inequality);
             this.add(newContinuousOdd);
             return newContinuousOdd;
         }
@@ -35,7 +35,7 @@ class OddSet extends Set {
                 exchange: exchange,
                 statistic: statistic,
                 value: value,
-                updateFunction: updateFunction,
+                updateElementsFunction: updateElementsFunction,
             });
             await newDiscreteOdd.setValue(value);
             this.add(newDiscreteOdd);

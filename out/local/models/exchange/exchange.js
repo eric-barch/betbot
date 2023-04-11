@@ -28,11 +28,20 @@ const puppeteer = __importStar(require("puppeteer"));
 const databaseModels = __importStar(require("../../../database"));
 const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
+const allGames = globalModels.allGames;
 class Exchange {
     // private constructor
-    constructor({ name, url, }) {
+    constructor({ name, url, updateFunctionsMap, }) {
         this.name = name;
         this.url = url;
+        this.updateFunctionsMap = updateFunctionsMap;
+        const updateGamesFunction = updateFunctionsMap.get('games');
+        if (updateGamesFunction) {
+            this.updateGamesFunction = updateGamesFunction.bind(this);
+        }
+        else {
+            throw new Error(`Could not find updateGamesFunction for ${name}`);
+        }
         this.gameSet = new localModels.GameSet();
         this.oddSet = new localModels.OddSet();
         this.wrappedBrowser = null;
@@ -40,10 +49,11 @@ class Exchange {
         this.wrappedSqlExchange = null;
     }
     // public async constructor
-    static async create({ name, url, }) {
+    static async create({ name, url, updateFunctions: updateFunctionsMap, }) {
         const newExchange = new Exchange({
             name: name,
             url: url,
+            updateFunctionsMap: updateFunctionsMap,
         });
         await newExchange.connectToExistingPage();
         await newExchange.initSqlExchange();
@@ -72,11 +82,9 @@ class Exchange {
     // public instance methods
     async analyze() {
         // these function labels need to be more specific
-        await this.updateGameSet();
-        await this.updateOddSet();
-        for (const odd of this.oddSet) {
-            await odd.update();
-        }
+        await this.updateGames();
+        await this.updateOdds();
+        await this.updateValues();
     }
     async close() {
         this.browser.close();
@@ -102,44 +110,23 @@ class Exchange {
         this.page.setViewport(windowSize);
         return this.page;
     }
-    async updateGameSet() {
-        /** Rewrite this in a more readable way */
-        const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
-        const jsonGames = await this.page.evaluate(element => JSON.parse(element.textContent), jsonGamesScriptTag);
-        /** *********************************** */
-        for (const jsonGame of jsonGames) {
-            const awayTeamNameString = jsonGame.awayTeam.name;
-            const homeTeamNameString = jsonGame.homeTeam.name;
-            const awayTeamInstance = globalModels.allTeams.find({ name: awayTeamNameString });
-            const homeTeamInstance = globalModels.allTeams.find({ name: homeTeamNameString });
-            const startDate = new Date(jsonGame.startDate);
-            const requestedGame = await globalModels.allGames.findOrCreate({
-                awayTeam: awayTeamInstance,
-                homeTeam: homeTeamInstance,
-                startDate: startDate,
-            });
-            requestedGame.exchangeSet.add(this);
-            this.gameSet.add(requestedGame);
-        }
+    async updateGames() {
+        await this.updateGamesFunction();
         return this.gameSet;
     }
-    async updateOddSet() {
+    async updateOdds() {
         for (const game of this.gameSet) {
             for (const statistic of game.statisticSet) {
-                await this.updateStatisticOddSet({ statistic: statistic });
+                await statistic.updateOdds({ exchange: this });
             }
         }
         return this.oddSet;
     }
-    async updateStatisticOddSet({ statistic, }) {
-        const updateFunction = localModels.updateFunctions.fanDuel.statisticOddSet.map.get(statistic.name);
-        if (!updateFunction) {
-            return;
+    async updateValues() {
+        for (const odd of this.oddSet) {
+            await odd.updateValues();
         }
-        await updateFunction({
-            exchange: this,
-            statistic: statistic,
-        });
+        return this.oddSet;
     }
     // public static methods
     // getters and setters

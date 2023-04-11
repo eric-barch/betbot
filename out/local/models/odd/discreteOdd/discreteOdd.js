@@ -29,23 +29,23 @@ const globalModels = __importStar(require("../../../../global"));
 const odd_1 = require("../odd");
 class DiscreteOdd extends odd_1.Odd {
     // private constructor
-    constructor({ exchange, statistic, value, updateFunction, }) {
+    constructor({ exchange, statistic, value, updateElementsFunction, }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: odd_1.Inequality.Equal,
-            updateFunction: updateFunction,
+            updateElementsFunction: updateElementsFunction,
         });
         this.wrappedValue = value;
         this.wrappedSqlDiscreteOdd = null;
     }
     // public async constructor
-    static async create({ exchange, statistic, value, updateFunction, }) {
+    static async create({ exchange, statistic, value, updateElementsFunction, }) {
         const newDiscreteOdd = new DiscreteOdd({
             exchange: exchange,
             statistic: statistic,
             value: value,
-            updateFunction: updateFunction,
+            updateElementsFunction: updateElementsFunction,
         });
         await newDiscreteOdd.initSqlDiscreteOdd();
         globalModels.allOdds.add(newDiscreteOdd);
@@ -61,13 +61,13 @@ class DiscreteOdd extends odd_1.Odd {
             where: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
-                value: this.value,
+                value: await this.getValue(),
             },
             defaults: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
                 inequality: odd_1.Inequality.Equal,
-                value: this.value,
+                value: await this.getValue(),
             }
         }).then(async ([sqlDiscreteOdd, created]) => {
             if (!created) {
@@ -77,7 +77,6 @@ class DiscreteOdd extends odd_1.Odd {
         });
         return this.sqlDiscreteOdd;
     }
-    // public static methods
     // getters and setters
     get sqlDiscreteOdd() {
         if (!this.wrappedSqlDiscreteOdd) {
@@ -88,23 +87,49 @@ class DiscreteOdd extends odd_1.Odd {
     set sqlDiscreteOdd(sqlDiscreteOdd) {
         this.wrappedSqlDiscreteOdd = sqlDiscreteOdd;
     }
-    get price() {
-        return this.wrappedPrice;
+    async getInequality() {
+        const inequality = this.inequality;
+        return inequality;
+    }
+    async setInequality(inequality) {
+        this.inequality = inequality;
+        await this.sqlDiscreteOdd.update({
+            inequality: inequality,
+        });
+    }
+    async getPrice() {
+        const price = this.price;
+        return price;
     }
     async setPrice(price) {
-        this.wrappedPrice = price;
+        this.price = price;
         await this.sqlDiscreteOdd.update({
             price: price,
         });
     }
-    get value() {
-        return this.wrappedValue;
+    async getValue() {
+        const value = this.wrappedValue;
+        return value;
     }
     async setValue(value) {
         this.wrappedValue = value;
         await this.sqlDiscreteOdd.update({
             value: value,
         });
+    }
+    async getPriceElement() {
+        const element = await this.getWrappedPriceElement();
+        return element;
+    }
+    async setPriceElement(element) {
+        this.setWrappedPriceElement(element);
+    }
+    async getValueElement() {
+        const element = await this.getWrappedValueElement();
+        return element;
+    }
+    async setValueElement(element) {
+        this.setWrappedValueElement(element);
     }
 }
 exports.DiscreteOdd = DiscreteOdd;

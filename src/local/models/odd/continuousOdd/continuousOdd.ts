@@ -1,3 +1,5 @@
+import { ElementHandle } from 'puppeteer';
+
 import * as databaseModels from '../../../../database';
 import * as globalModels from '../../../../global';
 import * as localModels from '../../../../local';
@@ -5,14 +7,8 @@ import * as localModels from '../../../../local';
 import { Inequality, Odd } from '../odd';
 
 export class ContinuousOdd extends Odd {
-    // public properties
-
     // private properties
-    private wrappedValue: number | null;
-
-    // public linked objects
-
-    // private linked objects
+    protected wrappedValue: number | null;
 
     // private sequelize object
     private wrappedSqlContinuousOdd: databaseModels.ContinuousOdd | null;
@@ -22,21 +18,20 @@ export class ContinuousOdd extends Odd {
         exchange,
         statistic,
         inequality,
-        updateFunction,
+        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: Inequality,
-        updateFunction: Function,
+        updateElementsFunction: Function,
     }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateFunction: updateFunction,
+            updateElementsFunction: updateElementsFunction,
         });
 
-        this.inequality = inequality;
         this.wrappedValue = null;
 
         this.wrappedSqlContinuousOdd = null;
@@ -47,18 +42,18 @@ export class ContinuousOdd extends Odd {
         exchange,
         statistic,
         inequality,
-        updateFunction,
+        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: Inequality,
-        updateFunction: Function,
+        updateElementsFunction: Function,
     }): Promise<ContinuousOdd> {
         const newContinuousOdd = new ContinuousOdd({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateFunction: updateFunction,
+            updateElementsFunction: updateElementsFunction,
         });
 
         await newContinuousOdd.initSqlContinuousOdd();
@@ -80,7 +75,7 @@ export class ContinuousOdd extends Odd {
             where: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
-                inequality: this.inequality.toString(),
+                inequality: await this.getInequality(),
             },
         }).then(async ([sqlContinuousOdd, created]) => {
             if (!created) {
@@ -108,20 +103,35 @@ export class ContinuousOdd extends Odd {
         this.wrappedSqlContinuousOdd = sqlContinuousOdd;
     }
 
-    get price(): number | null {
-        return this.wrappedPrice;
+    public async getInequality(): Promise<Inequality | null> {
+        const inequality = this.inequality;
+        return inequality;
+    }
+
+    public async setInequality(inequality: Inequality | null) {
+        this.inequality = inequality;
+
+        await this.sqlContinuousOdd.update({
+            inequality: inequality,
+        });
+    }
+
+    public async getPrice(): Promise<number | null> {
+        const price = this.price;
+        return price;
     }
 
     public async setPrice(price: number | null) {
-        this.wrappedPrice = price;
+        this.price = price;
 
         await this.sqlContinuousOdd.update({
             price: price,
         });
     }
 
-    get value(): number | null {
-        return this.wrappedValue;
+    public async getValue(): Promise<number | null> {
+        const value = this.wrappedValue;
+        return value;
     }
 
     public async setValue(value: number | null) {
@@ -129,6 +139,24 @@ export class ContinuousOdd extends Odd {
 
         await this.sqlContinuousOdd.update({
             value: value,
-        });
+        })
+    }
+
+    public async getPriceElement(): Promise<ElementHandle | null> {
+        const element = await this.getWrappedPriceElement();
+        return element;
+    }
+
+    public async setPriceElement(element: ElementHandle | null) {
+        this.setWrappedPriceElement(element);
+    }
+
+    public async getValueElement(): Promise<ElementHandle | null> {
+        const element = await this.getWrappedValueElement();
+        return element;
+    }
+
+    public async setValueElement(element: ElementHandle | null) {
+        this.setWrappedValueElement(element);
     }
 }

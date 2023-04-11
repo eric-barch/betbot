@@ -13,7 +13,7 @@ export class ContinuousOdd extends sqlz.Model<
     declare id: sqlz.CreationOptional<number>;
 
     // column headers
-    declare inequality: string;
+    declare inequality: string | null;
     declare price: number | null;
     declare value: number | null;
 

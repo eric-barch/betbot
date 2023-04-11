@@ -29,17 +29,19 @@ const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
 class Statistic {
     // private constructor
-    constructor({ name, game, }) {
+    constructor({ name, game, updateOddsFunction, }) {
         this.name = name;
+        this.updateOddsFunction = updateOddsFunction.bind(this);
         this.game = game;
         this.oddSet = new localModels.OddSet;
         this.wrappedSqlStatistic = null;
     }
     // public async constructor
-    static async create({ name, game, }) {
+    static async create({ name, game, updateOddsFunction, }) {
         const newStatistic = new Statistic({
             name: name,
             game: game,
+            updateOddsFunction: updateOddsFunction,
         });
         await newStatistic.initSqlStatistic();
         globalModels.allStatistics.add(newStatistic);
@@ -70,6 +72,13 @@ class Statistic {
             return true;
         }
         return false;
+    }
+    async updateOdds({ exchange, }) {
+        // Every statistic will have a unique function to update its odds.
+        await this.updateOddsFunction({
+            exchange: exchange,
+            statistic: this,
+        });
     }
     // public static methods
     // getters and setters

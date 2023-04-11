@@ -29,24 +29,23 @@ const globalModels = __importStar(require("../../../../global"));
 const odd_1 = require("../odd");
 class ContinuousOdd extends odd_1.Odd {
     // private constructor
-    constructor({ exchange, statistic, inequality, updateFunction, }) {
+    constructor({ exchange, statistic, inequality, updateElementsFunction, }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateFunction: updateFunction,
+            updateElementsFunction: updateElementsFunction,
         });
-        this.inequality = inequality;
         this.wrappedValue = null;
         this.wrappedSqlContinuousOdd = null;
     }
     // public async constructor
-    static async create({ exchange, statistic, inequality, updateFunction, }) {
+    static async create({ exchange, statistic, inequality, updateElementsFunction, }) {
         const newContinuousOdd = new ContinuousOdd({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateFunction: updateFunction,
+            updateElementsFunction: updateElementsFunction,
         });
         await newContinuousOdd.initSqlContinuousOdd();
         globalModels.allOdds.add(newContinuousOdd);
@@ -62,7 +61,7 @@ class ContinuousOdd extends odd_1.Odd {
             where: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
-                inequality: this.inequality.toString(),
+                inequality: await this.getInequality(),
             },
         }).then(async ([sqlContinuousOdd, created]) => {
             if (!created) {
@@ -82,23 +81,49 @@ class ContinuousOdd extends odd_1.Odd {
     set sqlContinuousOdd(sqlContinuousOdd) {
         this.wrappedSqlContinuousOdd = sqlContinuousOdd;
     }
-    get price() {
-        return this.wrappedPrice;
+    async getInequality() {
+        const inequality = this.inequality;
+        return inequality;
+    }
+    async setInequality(inequality) {
+        this.inequality = inequality;
+        await this.sqlContinuousOdd.update({
+            inequality: inequality,
+        });
+    }
+    async getPrice() {
+        const price = this.price;
+        return price;
     }
     async setPrice(price) {
-        this.wrappedPrice = price;
+        this.price = price;
         await this.sqlContinuousOdd.update({
             price: price,
         });
     }
-    get value() {
-        return this.wrappedValue;
+    async getValue() {
+        const value = this.wrappedValue;
+        return value;
     }
     async setValue(value) {
         this.wrappedValue = value;
         await this.sqlContinuousOdd.update({
             value: value,
         });
+    }
+    async getPriceElement() {
+        const element = await this.getWrappedPriceElement();
+        return element;
+    }
+    async setPriceElement(element) {
+        this.setWrappedPriceElement(element);
+    }
+    async getValueElement() {
+        const element = await this.getWrappedValueElement();
+        return element;
+    }
+    async setValueElement(element) {
+        this.setWrappedValueElement(element);
     }
 }
 exports.ContinuousOdd = ContinuousOdd;

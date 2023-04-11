@@ -1,3 +1,5 @@
+import { ElementHandle } from 'puppeteer';
+
 import * as databaseModels from '../../../../database';
 import * as globalModels from '../../../../global';
 import * as localModels from '../../../../local';
@@ -5,14 +7,8 @@ import * as localModels from '../../../../local';
 import { Inequality, Odd } from '../odd';
 
 export class DiscreteOdd extends Odd {
-    // public properties
-
     // private properties
-    private wrappedValue: string;
-
-    // public linked objects
-
-    // private linked objects
+    protected wrappedValue: string | null;
 
     // private sequelize object
     private wrappedSqlDiscreteOdd: databaseModels.DiscreteOdd | null;
@@ -22,18 +18,18 @@ export class DiscreteOdd extends Odd {
         exchange,
         statistic,
         value,
-        updateFunction,
+        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         value: string,
-        updateFunction: Function,
+        updateElementsFunction: Function,
     }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: Inequality.Equal,
-            updateFunction: updateFunction,
+            updateElementsFunction: updateElementsFunction,
         });
 
         this.wrappedValue = value;
@@ -46,18 +42,18 @@ export class DiscreteOdd extends Odd {
         exchange,
         statistic,
         value,
-        updateFunction,
+        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         value: string,
-        updateFunction: Function,
+        updateElementsFunction: Function,
     }): Promise<DiscreteOdd> {
         const newDiscreteOdd = new DiscreteOdd({
             exchange: exchange,
             statistic: statistic,
             value: value,
-            updateFunction: updateFunction,
+            updateElementsFunction: updateElementsFunction,
         });
 
         await newDiscreteOdd.initSqlDiscreteOdd();
@@ -79,13 +75,13 @@ export class DiscreteOdd extends Odd {
             where: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
-                value: this.value,
+                value: await this.getValue(),
             },
             defaults: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
                 inequality: Inequality.Equal,
-                value: this.value,
+                value: await this.getValue(),
             }
         }).then(async ([sqlDiscreteOdd, created]) => {
             if (!created) {
@@ -100,8 +96,6 @@ export class DiscreteOdd extends Odd {
         return this.sqlDiscreteOdd;
     }
 
-    // public static methods
-
     // getters and setters
     get sqlDiscreteOdd(): databaseModels.DiscreteOdd {
         if (!this.wrappedSqlDiscreteOdd) {
@@ -115,27 +109,60 @@ export class DiscreteOdd extends Odd {
         this.wrappedSqlDiscreteOdd = sqlDiscreteOdd;
     }
 
-    get price(): number | null {
-        return this.wrappedPrice;
+    public async getInequality(): Promise<Inequality | null> {
+        const inequality = this.inequality;
+        return inequality;
+    }
+
+    public async setInequality(inequality: Inequality | null) {
+        this.inequality = inequality;
+
+        await this.sqlDiscreteOdd.update({
+            inequality: inequality,
+        });
+    }
+
+    public async getPrice(): Promise<number | null> {
+        const price = this.price;
+        return price;
     }
 
     public async setPrice(price: number | null) {
-        this.wrappedPrice = price;
+        this.price = price;
 
         await this.sqlDiscreteOdd.update({
             price: price,
         });
     }
 
-    get value(): string {
-        return this.wrappedValue;
+    public async getValue(): Promise<string | null> {
+        const value = this.wrappedValue;
+        return value;
     }
 
-    public async setValue(value: string) {
+    public async setValue(value: string | null) {
         this.wrappedValue = value;
 
         await this.sqlDiscreteOdd.update({
             value: value,
-        });
+        })
+    }
+
+    public async getPriceElement(): Promise<ElementHandle | null> {
+        const element = await this.getWrappedPriceElement();
+        return element;
+    }
+
+    public async setPriceElement(element: ElementHandle | null) {
+        this.setWrappedPriceElement(element);
+    }
+
+    public async getValueElement(): Promise<ElementHandle | null> {
+        const element = await this.getWrappedValueElement();
+        return element;
+    }
+
+    public async setValueElement(element: ElementHandle | null) {
+        this.setWrappedValueElement(element);
     }
 }

@@ -9,24 +9,24 @@ export class OddSet extends Set<Odd> {
         exchange,
         statistic,
         inequality,
-        updateFunction,
+        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: localModels.Inequality,
-        updateFunction: Function,
+        updateElementsFunction: Function,
     }): Promise<ContinuousOdd>;
 
     public async findOrCreate({
         exchange,
         statistic,
         value,
-        updateFunction,
+        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         value: string,
-        updateFunction: Function,
+        updateElementsFunction: Function,
     }): Promise<DiscreteOdd>;
 
     public async findOrCreate({
@@ -34,22 +34,22 @@ export class OddSet extends Set<Odd> {
         statistic,
         inequality,
         value,
-        updateFunction,
+        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality?: localModels.Inequality,
         value?: string
-        updateFunction: Function,
+        updateElementsFunction: Function,
     }): Promise<ContinuousOdd | DiscreteOdd> {
         for (const odd of this) {
             if (odd.exchange === exchange && odd.statistic === statistic) {
                 if (odd instanceof ContinuousOdd && inequality !== undefined) {
-                    if (odd.inequality === inequality) {
+                    if (await odd.getInequality() === inequality) {
                         return odd;
                     }
                 } else if (odd instanceof DiscreteOdd && value !== undefined) {
-                    if (odd.value === value) {
+                    if (await odd.getValue() === value) {
                         return odd;
                     }
                 }
@@ -61,10 +61,10 @@ export class OddSet extends Set<Odd> {
                 exchange: exchange,
                 statistic: statistic,
                 inequality: inequality,
-                updateFunction: updateFunction,
+                updateElementsFunction: updateElementsFunction,
             });
             
-            newContinuousOdd.inequality = inequality;
+            newContinuousOdd.setInequality(inequality);
 
             this.add(newContinuousOdd);
             
@@ -74,7 +74,7 @@ export class OddSet extends Set<Odd> {
                 exchange: exchange,
                 statistic: statistic,
                 value: value,
-                updateFunction: updateFunction,
+                updateElementsFunction: updateElementsFunction,
             });
             
             await newDiscreteOdd.setValue(value);

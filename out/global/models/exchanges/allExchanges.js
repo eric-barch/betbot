@@ -44,6 +44,7 @@ async function initAllExchanges() {
     const fanDuel = await localModels.Exchange.create({
         name: 'FanDuel',
         url: 'https://sportsbook.fanduel.com/navigation/nba',
+        updateFunctions: localModels.exchange.updateFunctionsMap.get('fanDuel'),
     });
     exports.allExchanges.add(fanDuel);
 }

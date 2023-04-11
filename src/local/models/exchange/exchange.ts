@@ -4,12 +4,16 @@ import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
+const allGames = globalModels.allGames;
+
 export class Exchange {
     // public properties
     public name: string;
     public url: string;
+    public updateFunctionsMap: Map<string, Function>;
 
     // private properties
+    private updateGamesFunction: Function;
     
     // public linked objects
     public gameSet: localModels.GameSet;
@@ -26,12 +30,23 @@ export class Exchange {
     private constructor({
         name,
         url,
+        updateFunctionsMap,
     }: {
         name: string,
         url: string,
+        updateFunctionsMap: Map<string, Function>,
     }) {
         this.name = name;
         this.url = url;
+
+        this.updateFunctionsMap = updateFunctionsMap;
+        
+        const updateGamesFunction = updateFunctionsMap.get('games');
+        if (updateGamesFunction) {
+            this.updateGamesFunction = updateGamesFunction.bind(this);
+        } else {
+            throw new Error(`Could not find updateGamesFunction for ${name}`);
+        }
         
         this.gameSet = new localModels.GameSet();
         this.oddSet = new localModels.OddSet();
@@ -46,13 +61,16 @@ export class Exchange {
     public static async create({
         name,
         url,
+        updateFunctions: updateFunctionsMap,
     }: {
         name: string,
         url: string,
+        updateFunctions: Map<string, Function>,
     }): Promise<Exchange> {
         const newExchange = new Exchange({
             name: name,
             url: url,
+            updateFunctionsMap: updateFunctionsMap,
         })
 
         await newExchange.connectToExistingPage();
@@ -88,12 +106,9 @@ export class Exchange {
     // public instance methods
     public async analyze(): Promise<void> {
         // these function labels need to be more specific
-        await this.updateGameSet();
-        await this.updateOddSet();
-
-        for (const odd of this.oddSet) {
-            await odd.update();
-        }
+        await this.updateGames();
+        await this.updateOdds();
+        await this.updateValues();
     }
 
     public async close(): Promise<void> {
@@ -129,58 +144,27 @@ export class Exchange {
         return this.page;
     }
 
-    public async updateGameSet(): Promise<localModels.GameSet> {
-        /** Rewrite this in a more readable way */
-        const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
-        const jsonGames = await this.page.evaluate(element => JSON.parse(element!.textContent!), jsonGamesScriptTag);
-        /** *********************************** */
-        
-        for (const jsonGame of jsonGames) {
-            const awayTeamNameString = jsonGame.awayTeam.name;
-            const homeTeamNameString = jsonGame.homeTeam.name;
-    
-            const awayTeamInstance = globalModels.allTeams.find({ name: awayTeamNameString });
-            const homeTeamInstance = globalModels.allTeams.find({ name: homeTeamNameString });
-            const startDate = new Date(jsonGame.startDate);
-    
-            const requestedGame = await globalModels.allGames.findOrCreate({
-                awayTeam: awayTeamInstance,
-                homeTeam: homeTeamInstance,
-                startDate: startDate,
-            });
-
-            requestedGame.exchangeSet.add(this);
-            this.gameSet.add(requestedGame);
-        }
-
+    public async updateGames(): Promise<localModels.GameSet> {
+        await this.updateGamesFunction();
         return this.gameSet;
     }
 
-    public async updateOddSet(): Promise<localModels.OddSet> {
+    public async updateOdds(): Promise<localModels.OddSet> {
         for (const game of this.gameSet) {
             for (const statistic of game.statisticSet) {
-                await this.updateStatisticOddSet({ statistic: statistic });
+                await statistic.updateOdds({ exchange: this });
             }
         }
 
         return this.oddSet;
     }
 
-    public async updateStatisticOddSet({
-        statistic,
-    }: {
-        statistic: localModels.Statistic,
-    }) {
-        const updateFunction = localModels.updateFunctions.fanDuel.statisticOddSet.map.get(statistic.name);
-
-        if (!updateFunction) {
-            return;
+    public async updateValues(): Promise<localModels.OddSet> {
+        for (const odd of this.oddSet) {
+            await odd.updateValues();
         }
 
-        await updateFunction({
-            exchange: this,
-            statistic: statistic,
-        });
+        return this.oddSet;
     }
 
     // public static methods
