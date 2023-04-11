@@ -99,6 +99,7 @@ export async function moneyline({
         throw new Error(`Did not find function.`);
     }
 
+    // problem here
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,
@@ -113,6 +114,7 @@ export async function moneyline({
         throw new Error(`Did not find function.`);
     }
 
+    // problem here
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,

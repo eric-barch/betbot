@@ -42,16 +42,24 @@ export class OddSet extends Set<Odd> {
         value?: string
         updateElementsFunction: Function,
     }): Promise<ContinuousOdd | DiscreteOdd> {
+        let requestedOdd = null;
+
         for (const odd of this) {
-            if (odd.exchange === exchange && odd.statistic === statistic) {
-                if (odd instanceof ContinuousOdd && inequality !== undefined) {
-                    if (await odd.getInequality() === inequality) {
-                        return odd;
-                    }
-                } else if (odd instanceof DiscreteOdd && value !== undefined) {
-                    if (await odd.getValue() === value) {
-                        return odd;
-                    }
+            if (odd instanceof ContinuousOdd) {
+                if (odd.matches({
+                    exchange: exchange,
+                    statistic: statistic,
+                    inequality: inequality!,
+                })) {
+                    return odd;
+                }
+            } else if (odd instanceof DiscreteOdd) {
+                if (odd.matches({
+                    exchange: exchange,
+                    statistic: statistic,
+                    value: value!,
+                })) {
+                    return odd;
                 }
             }
         }
@@ -63,21 +71,17 @@ export class OddSet extends Set<Odd> {
                 inequality: inequality,
                 updateElementsFunction: updateElementsFunction,
             });
-            
-            newContinuousOdd.setInequality(inequality);
 
             this.add(newContinuousOdd);
             
             return newContinuousOdd;
-        } else if (value !== undefined) {
+        } else if (value) {
             const newDiscreteOdd = await DiscreteOdd.create({
                 exchange: exchange,
                 statistic: statistic,
                 value: value,
                 updateElementsFunction: updateElementsFunction,
             });
-            
-            await newDiscreteOdd.setValue(value);
             
             this.add(newDiscreteOdd);
             

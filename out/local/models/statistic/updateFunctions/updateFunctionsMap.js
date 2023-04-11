@@ -90,6 +90,7 @@ async function moneyline({ exchange, statistic, }) {
     if (!awayUpdateElementFunction) {
         throw new Error(`Did not find function.`);
     }
+    // problem here
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,
@@ -101,6 +102,7 @@ async function moneyline({ exchange, statistic, }) {
     if (!homeUpdateElementFunction) {
         throw new Error(`Did not find function.`);
     }
+    // problem here
     await statistic.oddSet.findOrCreate({
         exchange: exchange,
         statistic: statistic,

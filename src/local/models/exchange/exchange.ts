@@ -1,10 +1,7 @@
 import * as puppeteer from 'puppeteer';
 
 import * as databaseModels from '../../../database';
-import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
-
-const allGames = globalModels.allGames;
 
 export class Exchange {
     // public properties
@@ -106,9 +103,21 @@ export class Exchange {
     // public instance methods
     public async analyze(): Promise<void> {
         // these function labels need to be more specific
+        const updateGamesStart = new Date();
         await this.updateGames();
+        const updateGamesEnd = new Date();
+
+        const updateOddsStart = new Date();
         await this.updateOdds();
+        const updateOddsEnd = new Date();
+
+        const updateValuesStart = new Date();
         await this.updateValues();
+        const updateValuesEnd = new Date();
+
+        console.log(`updateGames duration: ${updateGamesEnd.getTime() - updateGamesStart.getTime()}`)
+        console.log(`updateOdds duration: ${updateOddsEnd.getTime() - updateOddsStart.getTime()}`)
+        console.log(`updateValues duration: ${updateValuesEnd.getTime() - updateValuesStart.getTime()}`)
     }
 
     public async close(): Promise<void> {

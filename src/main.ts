@@ -2,6 +2,7 @@ import * as database from './database';
 import * as globalModels from './global';
 
 const allExchanges = globalModels.allExchanges;
+console.log(allExchanges);
 
 async function main() {
     await database.init();
@@ -14,7 +15,7 @@ async function main() {
 
         const duration = endTime.getTime() - startTime.getTime();
 
-        console.log(duration);
+        console.log(`total duration: ${endTime.getTime() - startTime.getTime()}\n`);
     }
 
     process.exit(0);

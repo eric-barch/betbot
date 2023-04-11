@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database = __importStar(require("./database"));
 const globalModels = __importStar(require("./global"));
 const allExchanges = globalModels.allExchanges;
+console.log(allExchanges);
 async function main() {
     await database.init();
     await globalModels.init();
@@ -34,7 +35,7 @@ async function main() {
         await allExchanges.analyze();
         const endTime = new Date();
         const duration = endTime.getTime() - startTime.getTime();
-        console.log(duration);
+        console.log(`total duration: ${endTime.getTime() - startTime.getTime()}\n`);
     }
     process.exit(0);
 }

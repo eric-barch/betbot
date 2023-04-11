@@ -1,5 +1,3 @@
-import { ElementHandle } from 'puppeteer';
-
 import * as databaseModels from '../../../../database';
 import * as globalModels from '../../../../global';
 import * as localModels from '../../../../local';
@@ -8,7 +6,7 @@ import { Inequality, Odd } from '../odd';
 
 export class DiscreteOdd extends Odd {
     // private properties
-    protected wrappedValue: string | null;
+    protected wrappedValue: string;
 
     // private sequelize object
     private wrappedSqlDiscreteOdd: databaseModels.DiscreteOdd | null;
@@ -70,18 +68,19 @@ export class DiscreteOdd extends Odd {
 
         const exchangeId = exchange.sqlExchange.get('id');
         const statisticId = statistic.sqlStatistic.get('id');
+        const value = await this.getValue();
 
         await databaseModels.DiscreteOdd.findOrCreate({
             where: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
-                value: await this.getValue(),
+                value: value,
             },
             defaults: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
                 inequality: Inequality.Equal,
-                value: await this.getValue(),
+                value: value,
             }
         }).then(async ([sqlDiscreteOdd, created]) => {
             if (!created) {
@@ -94,6 +93,46 @@ export class DiscreteOdd extends Odd {
         });
 
         return this.sqlDiscreteOdd;
+    }
+
+    // public instance methods
+    public matches({
+        exchange,
+        statistic,
+        value,
+    }: {
+        exchange: localModels.Exchange,
+        statistic: localModels.Statistic,
+        value: string,
+    }): boolean {
+        const exchangeMatches = (this.exchange === exchange);
+        const statisticMatches = (this.statistic === statistic);
+        const valueMatches = (this.wrappedValue === value);
+
+        if (exchangeMatches && statisticMatches && valueMatches) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public async updateValues(): Promise<void> {
+        const priceElement = await this.getPriceElement();
+
+        if (!priceElement) {
+            await this.setPrice(null);
+        } else {
+            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
+
+            if (!priceJson) {
+                await this.setPrice(null);
+                return;
+            }
+    
+            const price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
+
+            await this.setPrice(price);
+        }
     }
 
     // getters and setters
@@ -109,60 +148,31 @@ export class DiscreteOdd extends Odd {
         this.wrappedSqlDiscreteOdd = sqlDiscreteOdd;
     }
 
-    public async getInequality(): Promise<Inequality | null> {
-        const inequality = this.inequality;
-        return inequality;
-    }
-
-    public async setInequality(inequality: Inequality | null) {
-        this.inequality = inequality;
+    public async setInequality(inequality: Inequality) {
+        this.wrappedInequality = inequality;
 
         await this.sqlDiscreteOdd.update({
             inequality: inequality,
         });
     }
 
-    public async getPrice(): Promise<number | null> {
-        const price = this.price;
-        return price;
-    }
-
     public async setPrice(price: number | null) {
-        this.price = price;
+        this.wrappedPrice = price;
 
         await this.sqlDiscreteOdd.update({
             price: price,
         });
     }
 
-    public async getValue(): Promise<string | null> {
-        const value = this.wrappedValue;
-        return value;
+    public getValue(): string | null {
+        return this.wrappedValue;
     }
 
-    public async setValue(value: string | null) {
+    public async setValue(value: string) {
         this.wrappedValue = value;
 
         await this.sqlDiscreteOdd.update({
             value: value,
         })
-    }
-
-    public async getPriceElement(): Promise<ElementHandle | null> {
-        const element = await this.getWrappedPriceElement();
-        return element;
-    }
-
-    public async setPriceElement(element: ElementHandle | null) {
-        this.setWrappedPriceElement(element);
-    }
-
-    public async getValueElement(): Promise<ElementHandle | null> {
-        const element = await this.getWrappedValueElement();
-        return element;
-    }
-
-    public async setValueElement(element: ElementHandle | null) {
-        this.setWrappedValueElement(element);
     }
 }

@@ -26,9 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
 const puppeteer = __importStar(require("puppeteer"));
 const databaseModels = __importStar(require("../../../database"));
-const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
-const allGames = globalModels.allGames;
 class Exchange {
     // private constructor
     constructor({ name, url, updateFunctionsMap, }) {
@@ -82,9 +80,18 @@ class Exchange {
     // public instance methods
     async analyze() {
         // these function labels need to be more specific
+        const updateGamesStart = new Date();
         await this.updateGames();
+        const updateGamesEnd = new Date();
+        const updateOddsStart = new Date();
         await this.updateOdds();
+        const updateOddsEnd = new Date();
+        const updateValuesStart = new Date();
         await this.updateValues();
+        const updateValuesEnd = new Date();
+        console.log(`updateGames duration: ${updateGamesEnd.getTime() - updateGamesStart.getTime()}`);
+        console.log(`updateOdds duration: ${updateOddsEnd.getTime() - updateOddsStart.getTime()}`);
+        console.log(`updateValues duration: ${updateValuesEnd.getTime() - updateValuesStart.getTime()}`);
     }
     async close() {
         this.browser.close();

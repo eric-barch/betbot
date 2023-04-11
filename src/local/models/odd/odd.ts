@@ -9,13 +9,11 @@ export enum Inequality {
 }
 
 export abstract class Odd {
-    // public properties
-    public inequality: Inequality | null;
-    public price: number | null;
-
     // private properties
+    protected wrappedInequality: Inequality;
+    protected wrappedPrice: number | null;
     protected abstract wrappedValue: number | string | null;
-    private updateElementsFunction: Function;
+    protected updateElementsFunction: Function;
 
     // public linked objects
     public exchange: localModels.Exchange;
@@ -37,8 +35,8 @@ export abstract class Odd {
         inequality: Inequality,
         updateElementsFunction: Function,
     }) {
-        this.inequality = inequality;
-        this.price = null;
+        this.wrappedInequality = inequality;
+        this.wrappedPrice = null;
 
         this.updateElementsFunction = updateElementsFunction.bind(this);
 
@@ -53,64 +51,22 @@ export abstract class Odd {
     }
 
     // public instance methods
-    public matches({
+    abstract matches({
         exchange,
         statistic,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
-    }) {
-        const exchangeMatches = (this.exchange === exchange);
-        const statisticMatches = (this.statistic === statistic);
-        
-        if (exchangeMatches && statisticMatches) {
-            return true;
-        }
-
-        return false;
-    }
+    }): boolean;
 
     protected async updateElements() {
         await this.updateElementsFunction();
     }
 
-    public async updateValues() {
-        const priceElement = await this.getWrappedPriceElement();
-        const valueElement = await this.getWrappedValueElement();
-
-        if (!priceElement) {
-            this.price = null;
-        } else {
-            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
-
-            if (!priceJson) {
-                this.price = null;
-                return;
-            }
-    
-            this.price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
-        }
-
-        if (!valueElement) {
-            this.wrappedValue = null;
-            return;
-        }
-
-        const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
-
-        if (!valueJson) {
-            this.wrappedValue = null;
-            return;
-        }
-
-        // this needs to be updated to account for strings
-        this.wrappedValue = Number(valueJson.replace(/[^0-9+\-.]/g, ''));
-    }
-
-    // public static methods
+    abstract updateValues(): Promise<void>;
 
     // getters and setters
-    protected async getWrappedPriceElement(): Promise<ElementHandle | null> {
+    public async getPriceElement(): Promise<ElementHandle | null> {
         if (!this.wrappedPriceElement) {
             await this.updateElements();
         }
@@ -118,19 +74,35 @@ export abstract class Odd {
         return this.wrappedPriceElement;
     }
 
-    protected async setWrappedPriceElement(element: ElementHandle | null) {
-        this.wrappedPriceElement = element;
+    public setPriceElement(priceElement: ElementHandle | null) {
+        this.wrappedPriceElement = priceElement;
     }
 
-    protected async getWrappedValueElement(): Promise<ElementHandle | null> {
-        if (!this.wrappedValueElement) {
+    public async getValueElement(): Promise<ElementHandle | null> {
+        if(!this.wrappedValueElement) {
             await this.updateElements();
         }
 
         return this.wrappedValueElement;
     }
 
-    protected async setWrappedValueElement(element: ElementHandle | null) {
-        this.wrappedValueElement = element;
+    public setValueElement(valueElement: ElementHandle | null) {
+        this.wrappedValueElement = valueElement;
     }
+
+    public getInequality(): Inequality {
+        return this.wrappedInequality;
+    }
+
+    abstract setInequality(inequality: Inequality): Promise<void>;
+
+    public getPrice(): number | null {
+        return this.wrappedPrice;
+    }
+
+    abstract setPrice(price: number | null): Promise<void>;
+
+    abstract getValue(): string | number | null;
+
+    abstract setValue(value: string | number | null): Promise<void>;
 }

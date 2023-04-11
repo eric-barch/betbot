@@ -5,17 +5,24 @@ const continuousOdd_1 = require("./continuousOdd");
 const discreteOdd_1 = require("./discreteOdd");
 class OddSet extends Set {
     async findOrCreate({ exchange, statistic, inequality, value, updateElementsFunction, }) {
+        let requestedOdd = null;
         for (const odd of this) {
-            if (odd.exchange === exchange && odd.statistic === statistic) {
-                if (odd instanceof continuousOdd_1.ContinuousOdd && inequality !== undefined) {
-                    if (await odd.getInequality() === inequality) {
-                        return odd;
-                    }
+            if (odd instanceof continuousOdd_1.ContinuousOdd) {
+                if (odd.matches({
+                    exchange: exchange,
+                    statistic: statistic,
+                    inequality: inequality,
+                })) {
+                    return odd;
                 }
-                else if (odd instanceof discreteOdd_1.DiscreteOdd && value !== undefined) {
-                    if (await odd.getValue() === value) {
-                        return odd;
-                    }
+            }
+            else if (odd instanceof discreteOdd_1.DiscreteOdd) {
+                if (odd.matches({
+                    exchange: exchange,
+                    statistic: statistic,
+                    value: value,
+                })) {
+                    return odd;
                 }
             }
         }
@@ -26,18 +33,16 @@ class OddSet extends Set {
                 inequality: inequality,
                 updateElementsFunction: updateElementsFunction,
             });
-            newContinuousOdd.setInequality(inequality);
             this.add(newContinuousOdd);
             return newContinuousOdd;
         }
-        else if (value !== undefined) {
+        else if (value) {
             const newDiscreteOdd = await discreteOdd_1.DiscreteOdd.create({
                 exchange: exchange,
                 statistic: statistic,
                 value: value,
                 updateElementsFunction: updateElementsFunction,
             });
-            await newDiscreteOdd.setValue(value);
             this.add(newDiscreteOdd);
             return newDiscreteOdd;
         }

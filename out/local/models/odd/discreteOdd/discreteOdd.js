@@ -57,17 +57,18 @@ class DiscreteOdd extends odd_1.Odd {
         const statistic = this.statistic;
         const exchangeId = exchange.sqlExchange.get('id');
         const statisticId = statistic.sqlStatistic.get('id');
+        const value = await this.getValue();
         await databaseModels.DiscreteOdd.findOrCreate({
             where: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
-                value: await this.getValue(),
+                value: value,
             },
             defaults: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
                 inequality: odd_1.Inequality.Equal,
-                value: await this.getValue(),
+                value: value,
             }
         }).then(async ([sqlDiscreteOdd, created]) => {
             if (!created) {
@@ -76,6 +77,31 @@ class DiscreteOdd extends odd_1.Odd {
             this.sqlDiscreteOdd = sqlDiscreteOdd;
         });
         return this.sqlDiscreteOdd;
+    }
+    // public instance methods
+    matches({ exchange, statistic, value, }) {
+        const exchangeMatches = (this.exchange === exchange);
+        const statisticMatches = (this.statistic === statistic);
+        const valueMatches = (this.wrappedValue === value);
+        if (exchangeMatches && statisticMatches && valueMatches) {
+            return true;
+        }
+        return false;
+    }
+    async updateValues() {
+        const priceElement = await this.getPriceElement();
+        if (!priceElement) {
+            await this.setPrice(null);
+        }
+        else {
+            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
+            if (!priceJson) {
+                await this.setPrice(null);
+                return;
+            }
+            const price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
+            await this.setPrice(price);
+        }
     }
     // getters and setters
     get sqlDiscreteOdd() {
@@ -87,49 +113,26 @@ class DiscreteOdd extends odd_1.Odd {
     set sqlDiscreteOdd(sqlDiscreteOdd) {
         this.wrappedSqlDiscreteOdd = sqlDiscreteOdd;
     }
-    async getInequality() {
-        const inequality = this.inequality;
-        return inequality;
-    }
     async setInequality(inequality) {
-        this.inequality = inequality;
+        this.wrappedInequality = inequality;
         await this.sqlDiscreteOdd.update({
             inequality: inequality,
         });
     }
-    async getPrice() {
-        const price = this.price;
-        return price;
-    }
     async setPrice(price) {
-        this.price = price;
+        this.wrappedPrice = price;
         await this.sqlDiscreteOdd.update({
             price: price,
         });
     }
-    async getValue() {
-        const value = this.wrappedValue;
-        return value;
+    getValue() {
+        return this.wrappedValue;
     }
     async setValue(value) {
         this.wrappedValue = value;
         await this.sqlDiscreteOdd.update({
             value: value,
         });
-    }
-    async getPriceElement() {
-        const element = await this.getWrappedPriceElement();
-        return element;
-    }
-    async setPriceElement(element) {
-        this.setWrappedPriceElement(element);
-    }
-    async getValueElement() {
-        const element = await this.getWrappedValueElement();
-        return element;
-    }
-    async setValueElement(element) {
-        this.setWrappedValueElement(element);
     }
 }
 exports.DiscreteOdd = DiscreteOdd;

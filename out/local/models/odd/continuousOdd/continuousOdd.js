@@ -57,11 +57,19 @@ class ContinuousOdd extends odd_1.Odd {
         const statistic = this.statistic;
         const exchangeId = exchange.sqlExchange.get('id');
         const statisticId = statistic.sqlStatistic.get('id');
+        const inequality = this.getInequality();
+        const value = this.getValue();
         await databaseModels.ContinuousOdd.findOrCreate({
             where: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
-                inequality: await this.getInequality(),
+                inequality: inequality,
+            },
+            defaults: {
+                exchangeId: exchangeId,
+                statisticId: statisticId,
+                inequality: inequality,
+                value: value,
             },
         }).then(async ([sqlContinuousOdd, created]) => {
             if (!created) {
@@ -70,6 +78,56 @@ class ContinuousOdd extends odd_1.Odd {
             this.sqlContinuousOdd = sqlContinuousOdd;
         });
         return this.sqlContinuousOdd;
+    }
+    // public instance methods
+    matches({ exchange, statistic, inequality, }) {
+        const exchangeMatches = (this.exchange === exchange);
+        const statisticMatches = (this.statistic === statistic);
+        const inequalityMatches = (this.wrappedInequality === inequality);
+        if (exchangeMatches && statisticMatches && inequalityMatches) {
+            return true;
+        }
+        return false;
+    }
+    // this function is slow
+    async updateValues() {
+        const start = new Date();
+        const priceElement = await this.getPriceElement();
+        const valueElement = await this.getValueElement();
+        if (!priceElement) {
+            await this.setPrice(null);
+            const priceEnd = new Date();
+            const priceDuration = (priceEnd.getTime() - start.getTime());
+            console.log(`priceDuration: ${priceDuration}`);
+        }
+        else {
+            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
+            if (!priceJson) {
+                await this.setPrice(null);
+                const priceEnd = new Date();
+                const priceDuration = (priceEnd.getTime() - start.getTime());
+                console.log(`priceDuration: ${priceDuration}`);
+                return;
+            }
+            const price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
+            await this.setPrice(price);
+            const priceEnd = new Date();
+            const priceDuration = (priceEnd.getTime() - start.getTime());
+            console.log(`priceDuration: ${priceDuration}`);
+        }
+        if (!valueElement) {
+            this.setValue(null);
+            return;
+        }
+        else {
+            const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
+            if (!valueJson) {
+                this.setValue(null);
+                return;
+            }
+            const value = Number(valueJson.replace(/[^0-9+\-.]/g, ''));
+            this.setValue(value);
+        }
     }
     // getters and setters
     get sqlContinuousOdd() {
@@ -81,49 +139,26 @@ class ContinuousOdd extends odd_1.Odd {
     set sqlContinuousOdd(sqlContinuousOdd) {
         this.wrappedSqlContinuousOdd = sqlContinuousOdd;
     }
-    async getInequality() {
-        const inequality = this.inequality;
-        return inequality;
-    }
     async setInequality(inequality) {
-        this.inequality = inequality;
+        this.wrappedInequality = inequality;
         await this.sqlContinuousOdd.update({
             inequality: inequality,
         });
     }
-    async getPrice() {
-        const price = this.price;
-        return price;
-    }
     async setPrice(price) {
-        this.price = price;
+        this.wrappedPrice = price;
         await this.sqlContinuousOdd.update({
             price: price,
         });
     }
-    async getValue() {
-        const value = this.wrappedValue;
-        return value;
+    getValue() {
+        return this.wrappedValue;
     }
     async setValue(value) {
         this.wrappedValue = value;
         await this.sqlContinuousOdd.update({
             value: value,
         });
-    }
-    async getPriceElement() {
-        const element = await this.getWrappedPriceElement();
-        return element;
-    }
-    async setPriceElement(element) {
-        this.setWrappedPriceElement(element);
-    }
-    async getValueElement() {
-        const element = await this.getWrappedValueElement();
-        return element;
-    }
-    async setValueElement(element) {
-        this.setWrappedValueElement(element);
     }
 }
 exports.ContinuousOdd = ContinuousOdd;
