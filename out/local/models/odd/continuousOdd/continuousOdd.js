@@ -29,23 +29,23 @@ const globalModels = __importStar(require("../../../../global"));
 const odd_1 = require("../odd");
 class ContinuousOdd extends odd_1.Odd {
     // private constructor
-    constructor({ exchange, statistic, inequality, updateElementsFunction, }) {
+    constructor({ exchange, statistic, inequality, updateOddElementsFunction, }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateElementsFunction: updateElementsFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
         this.wrappedValue = null;
         this.wrappedSqlContinuousOdd = null;
     }
     // public async constructor
-    static async create({ exchange, statistic, inequality, updateElementsFunction, }) {
+    static async create({ exchange, statistic, inequality, updateOddElementsFunction, }) {
         const newContinuousOdd = new ContinuousOdd({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateElementsFunction: updateElementsFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
         await newContinuousOdd.initSqlContinuousOdd();
         globalModels.allOdds.add(newContinuousOdd);
@@ -89,45 +89,33 @@ class ContinuousOdd extends odd_1.Odd {
         }
         return false;
     }
-    // this function is slow
     async updateValues() {
-        const start = new Date();
         const priceElement = await this.getPriceElement();
         const valueElement = await this.getValueElement();
         if (!priceElement) {
             await this.setPrice(null);
-            const priceEnd = new Date();
-            const priceDuration = (priceEnd.getTime() - start.getTime());
-            console.log(`priceDuration: ${priceDuration}`);
         }
         else {
             const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
             if (!priceJson) {
                 await this.setPrice(null);
-                const priceEnd = new Date();
-                const priceDuration = (priceEnd.getTime() - start.getTime());
-                console.log(`priceDuration: ${priceDuration}`);
-                return;
             }
-            const price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
-            await this.setPrice(price);
-            const priceEnd = new Date();
-            const priceDuration = (priceEnd.getTime() - start.getTime());
-            console.log(`priceDuration: ${priceDuration}`);
+            else {
+                const price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
+                await this.setPrice(price);
+            }
         }
         if (!valueElement) {
+            await this.setValue(null);
+            return;
+        }
+        const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
+        if (!valueJson) {
             this.setValue(null);
             return;
         }
-        else {
-            const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
-            if (!valueJson) {
-                this.setValue(null);
-                return;
-            }
-            const value = Number(valueJson.replace(/[^0-9+\-.]/g, ''));
-            this.setValue(value);
-        }
+        const value = Number(valueJson.replace(/[^0-9+\-.]/g, ''));
+        this.setValue(value);
     }
     // getters and setters
     get sqlContinuousOdd() {

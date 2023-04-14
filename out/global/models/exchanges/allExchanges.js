@@ -23,30 +23,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initAllExchanges = exports.allExchanges = void 0;
+exports.allExchanges = void 0;
 const localModels = __importStar(require("../../../local"));
-exports.allExchanges = new localModels.ExchangeSet();
-async function initAllExchanges() {
-    // allExchanges.add(
-    //     await localModels.Exchange.create({
-    //         name: 'Caesar\'s',
-    //         url: 'https://www.williamhill.com/us/ny/bet/basketball',
-    //         parseFunction: parseFunctions.parseCaesars,
-    //     })
-    // );
-    // allExchanges.add(
-    //     await localModels.Exchange.create({
-    //         name: 'DraftKings',
-    //         url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
-    //         parseFunction: parseFunctions.parseDraftKings,
-    //     })
-    // );
-    const fanDuel = await localModels.Exchange.create({
-        name: 'FanDuel',
-        url: 'https://sportsbook.fanduel.com/navigation/nba',
-        updateFunctions: localModels.exchange.updateFunctionsMap.get('fanDuel'),
-    });
-    exports.allExchanges.add(fanDuel);
+class AllExchanges extends localModels.ExchangeSet {
+    async init() {
+        const draftKings = await localModels.Exchange.create({
+            name: 'DraftKings',
+            url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
+        });
+        this.add(draftKings);
+        const fanDuel = await localModels.Exchange.create({
+            name: 'FanDuel',
+            url: 'https://sportsbook.fanduel.com/navigation/nba',
+        });
+        this.add(fanDuel);
+        return this;
+    }
 }
-exports.initAllExchanges = initAllExchanges;
+exports.allExchanges = new AllExchanges();
 //# sourceMappingURL=allExchanges.js.map

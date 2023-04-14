@@ -4,7 +4,7 @@ exports.OddSet = void 0;
 const continuousOdd_1 = require("./continuousOdd");
 const discreteOdd_1 = require("./discreteOdd");
 class OddSet extends Set {
-    async findOrCreate({ exchange, statistic, inequality, value, updateElementsFunction, }) {
+    async findOrCreate({ exchange, statistic, inequality, value, updateOddElementsFunction, }) {
         let requestedOdd = null;
         for (const odd of this) {
             if (odd instanceof continuousOdd_1.ContinuousOdd) {
@@ -31,7 +31,7 @@ class OddSet extends Set {
                 exchange: exchange,
                 statistic: statistic,
                 inequality: inequality,
-                updateElementsFunction: updateElementsFunction,
+                updateOddElementsFunction: updateOddElementsFunction,
             });
             this.add(newContinuousOdd);
             return newContinuousOdd;
@@ -41,12 +41,17 @@ class OddSet extends Set {
                 exchange: exchange,
                 statistic: statistic,
                 value: value,
-                updateElementsFunction: updateElementsFunction,
+                updateOddElementsFunction: updateOddElementsFunction,
             });
             this.add(newDiscreteOdd);
             return newDiscreteOdd;
         }
         throw new Error(`Invalid parameters provided. Either "inequality" or "value" must be defined.`);
+    }
+    async updateValues() {
+        for (const odd of this) {
+            await odd.updateValues();
+        }
     }
 }
 exports.OddSet = OddSet;

@@ -4,10 +4,10 @@ import * as localModels from '../../../local';
 
 export class Statistic {
     // public properties
-    public name: string; // e.g. 'spread', 'winner', 'total', 'devin-booker-points', 'first-basket'
+    public name: string;
     
     // private properties
-    private updateOddsFunction: Function;
+    private wrappedUpdateOddsFunction: Function | undefined;
 
     // public linked objects
     public game: localModels.Game;
@@ -22,15 +22,13 @@ export class Statistic {
     private constructor({
         name,
         game,
-        updateOddsFunction,
     }: {
         name: string,
         game: localModels.Game,
-        updateOddsFunction: Function,
     }) {
         this.name = name;
 
-        this.updateOddsFunction = updateOddsFunction.bind(this);
+        this.wrappedUpdateOddsFunction = undefined;
         
         this.game = game;
         this.oddSet = new localModels.OddSet;
@@ -42,16 +40,13 @@ export class Statistic {
     static async create({
         name,
         game,
-        updateOddsFunction,
     }: {
         name: string,
         game: localModels.Game,
-        updateOddsFunction: Function,
     }): Promise<Statistic> {
         const newStatistic = new Statistic({
             name: name,
             game: game,
-            updateOddsFunction: updateOddsFunction,
         });
 
         await newStatistic.initSqlStatistic();
@@ -103,21 +98,28 @@ export class Statistic {
         return false;
     }
 
-    public async updateOdds({
-        exchange,
-    }: {
-        exchange: localModels.Exchange,
-    }) {
-        // Every statistic will have a unique function to update its odds.
-        await this.updateOddsFunction({
-            exchange: exchange,
-            statistic: this,
-        });
+    public async updateOdds(): Promise<localModels.OddSet> {
+        await this.updateOddsFunction();
+        return this.oddSet;
     }
 
-    // public static methods
-
     // getters and setters
+    get updateOddsFunction(): Function {
+        if (!this.wrappedUpdateOddsFunction) {
+            throw new Error(`wrappedUpdateOddsFunction is undefined.`)
+        }
+
+        return this.wrappedUpdateOddsFunction;
+    }
+
+    set updateOddsFunction(updateOddsFunction: Function | undefined) {
+        if (!updateOddsFunction) {
+            throw new Error(`updateOddsFunction is undefined.`);
+        }
+
+        this.wrappedUpdateOddsFunction = updateOddsFunction.bind(this);
+    }
+
     get sqlStatistic(): databaseModels.Statistic {
         if (!this.wrappedSqlStatistic) {
             throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.name} sqlStatistic is null.`)

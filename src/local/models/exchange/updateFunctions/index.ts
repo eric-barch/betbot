@@ -1,3 +1,3 @@
-import { updateFunctionsMap } from './updateFunctionsMap';
+import { updateFunctionsMap } from './functionsMap';
 
 export { updateFunctionsMap };

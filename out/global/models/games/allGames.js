@@ -24,6 +24,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allGames = void 0;
+const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
-exports.allGames = new localModels.GameSet();
+const updateExchangeGames_1 = require("./updateExchangeGames");
+class AllGames extends localModels.GameSet {
+    async init() {
+        for (const exchange of globalModels.allExchanges) {
+            const updateGamesFunction = updateExchangeGames_1.updateExchangeGamesFunctionsMap.get(exchange.nameCamelCase);
+            exchange.updateGamesFunction = updateGamesFunction;
+            await exchange.updateGames();
+        }
+        return this;
+    }
+}
+exports.allGames = new AllGames();
 //# sourceMappingURL=allGames.js.map

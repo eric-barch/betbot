@@ -9,24 +9,24 @@ export class OddSet extends Set<Odd> {
         exchange,
         statistic,
         inequality,
-        updateElementsFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: localModels.Inequality,
-        updateElementsFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<ContinuousOdd>;
 
     public async findOrCreate({
         exchange,
         statistic,
         value,
-        updateElementsFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         value: string,
-        updateElementsFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<DiscreteOdd>;
 
     public async findOrCreate({
@@ -34,13 +34,13 @@ export class OddSet extends Set<Odd> {
         statistic,
         inequality,
         value,
-        updateElementsFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality?: localModels.Inequality,
         value?: string
-        updateElementsFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<ContinuousOdd | DiscreteOdd> {
         let requestedOdd = null;
 
@@ -69,7 +69,7 @@ export class OddSet extends Set<Odd> {
                 exchange: exchange,
                 statistic: statistic,
                 inequality: inequality,
-                updateElementsFunction: updateElementsFunction,
+                updateOddElementsFunction: updateOddElementsFunction,
             });
 
             this.add(newContinuousOdd);
@@ -80,7 +80,7 @@ export class OddSet extends Set<Odd> {
                 exchange: exchange,
                 statistic: statistic,
                 value: value,
-                updateElementsFunction: updateElementsFunction,
+                updateOddElementsFunction: updateOddElementsFunction,
             });
             
             this.add(newDiscreteOdd);
@@ -89,5 +89,11 @@ export class OddSet extends Set<Odd> {
         }
 
         throw new Error(`Invalid parameters provided. Either "inequality" or "value" must be defined.`);
+    }
+
+    public async updateValues() {
+        for (const odd of this) {
+            await odd.updateValues();
+        }
     }
 }

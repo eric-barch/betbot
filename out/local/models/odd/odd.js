@@ -9,10 +9,10 @@ var Inequality;
 })(Inequality = exports.Inequality || (exports.Inequality = {}));
 class Odd {
     // private constructor
-    constructor({ exchange, statistic, inequality, updateElementsFunction, }) {
+    constructor({ exchange, statistic, inequality, updateOddElementsFunction, }) {
         this.wrappedInequality = inequality;
         this.wrappedPrice = null;
-        this.updateElementsFunction = updateElementsFunction.bind(this);
+        this.updateOddElementsFunction = updateOddElementsFunction.bind(this);
         this.exchange = exchange;
         this.statistic = statistic;
         this.wrappedPriceElement = null;
@@ -21,7 +21,10 @@ class Odd {
         this.statistic.oddSet.add(this);
     }
     async updateElements() {
-        await this.updateElementsFunction();
+        await this.updateOddElementsFunction({
+            exchange: this.exchange,
+            statistic: this.statistic,
+        });
     }
     // getters and setters
     async getPriceElement() {

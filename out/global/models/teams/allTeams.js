@@ -23,20 +23,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initAllTeams = exports.allTeams = void 0;
+exports.allTeams = void 0;
 const leagues = __importStar(require("./leagues"));
-const team_1 = require("../../../local/models/team");
-exports.allTeams = new team_1.TeamSet();
-async function initAllTeams() {
-    for (const team of leagues.nbaTeams) {
-        const newTeam = await team_1.Team.create({
-            regionFull: team.regionFull,
-            regionAbbr: team.regionAbbr,
-            identifierFull: team.identifierFull,
-            identifierAbbr: team.identifierAbbr,
-        });
-        exports.allTeams.add(newTeam);
+const localModels = __importStar(require("../../../local"));
+class AllTeams extends localModels.TeamSet {
+    async init() {
+        for (const team of leagues.nbaTeams) {
+            const newTeam = await localModels.Team.create({
+                regionFull: team.regionFull,
+                regionAbbr: team.regionAbbr,
+                identifierFull: team.identifierFull,
+                identifierAbbr: team.identifierAbbr,
+                altNames: team.altNames,
+            });
+            this.add(newTeam);
+        }
     }
 }
-exports.initAllTeams = initAllTeams;
+exports.allTeams = new AllTeams();
 //# sourceMappingURL=allTeams.js.map

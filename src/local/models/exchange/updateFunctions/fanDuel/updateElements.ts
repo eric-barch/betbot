@@ -1,12 +1,21 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as localModels from '../../../..';
+import * as localModels from '../../../../../local';
 
-export async function spreadAwayOver(this: localModels.ContinuousOdd): Promise<void> {
-    const game = this.statistic.game;
+export async function spreadAwayOver({
+    exchange,
+    statistic,
+    odd,
+}: {
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
+    odd?: localModels.Odd,
+}): Promise<boolean> {
+    const game = statistic.game;
 
     const spreadAwayParent = await getParentElement({
-        odd: this,
+        exchange: exchange,
+        statistic: statistic,
         selectors: [
             game.awayTeam.regionFullIdentifierFull,
             'spread betting',
@@ -14,9 +23,12 @@ export async function spreadAwayOver(this: localModels.ContinuousOdd): Promise<v
     });
 
     if (!spreadAwayParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
-        return;
+        if (odd) {
+            odd.setPriceElement(null);
+            odd.setValueElement(null);
+        }
+
+        return false;
     }
 
     const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
@@ -26,20 +38,36 @@ export async function spreadAwayOver(this: localModels.ContinuousOdd): Promise<v
     const spreadAwayValue = Number(spreadAwayValueJson);
 
     if (spreadAwayValue < 0) {
-        await this.setPriceElement(spreadAwayPriceElement);
-        await this.setValueElement(spreadAwayValueElement);
-        return;
+        if (odd) {
+            odd.setPriceElement(spreadAwayPriceElement);
+            odd.setValueElement(spreadAwayValueElement);
+        }
+
+        return true;
     }
 
-    await this.setPriceElement(null);
-    await this.setValueElement(null);
+    if (odd) {
+        odd.setPriceElement(null);
+        odd.setValueElement(null);
+    }
+
+    return false;
 }
 
-export async function spreadAwayUnder(this: localModels.ContinuousOdd) {
-    const game = this.statistic.game;
+export async function spreadAwayUnder({
+    exchange,
+    statistic,
+    odd,
+}: {
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
+    odd?: localModels.Odd,
+}): Promise<boolean> {
+    const game = statistic.game;
 
     const spreadAwayParent = await getParentElement({
-        odd: this,
+        exchange: exchange,
+        statistic: statistic,
         selectors: [
             game.awayTeam.regionFullIdentifierFull,
             'spread betting',
@@ -47,9 +75,12 @@ export async function spreadAwayUnder(this: localModels.ContinuousOdd) {
     });
 
     if (!spreadAwayParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
-        return;
+        if (odd) {
+            odd.setPriceElement(null);
+            odd.setValueElement(null);
+        }
+
+        return false;
     }
 
     const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
@@ -59,20 +90,36 @@ export async function spreadAwayUnder(this: localModels.ContinuousOdd) {
     const spreadAwayValue = Number(spreadAwayValueJson);
 
     if (spreadAwayValue > 0) {
-        await this.setPriceElement(spreadAwayPriceElement);
-        await this.setValueElement(spreadAwayValueElement);
-        return;
+        if (odd) {
+            odd.setPriceElement(spreadAwayPriceElement);
+            odd.setValueElement(spreadAwayValueElement);
+        }
+
+        return true;
     }
 
-    await this.setPriceElement(null);
-    await this.setValueElement(null);
+    if (odd) {
+        odd.setPriceElement(null);
+        odd.setValueElement(null);
+    }
+
+    return false;
 }
 
-export async function spreadHomeOver(this: localModels.ContinuousOdd): Promise<void> {
-    const game = this.statistic.game;
+export async function spreadHomeOver({
+    exchange,
+    statistic,
+    odd,
+}: {
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
+    odd?: localModels.Odd,
+}): Promise<boolean> {
+    const game = statistic.game;
 
     const spreadHomeParent = await getParentElement({
-        odd: this,
+        exchange: exchange,
+        statistic: statistic,
         selectors: [
             game.homeTeam.regionFullIdentifierFull,
             'spread betting',
@@ -80,9 +127,12 @@ export async function spreadHomeOver(this: localModels.ContinuousOdd): Promise<v
     });
 
     if (!spreadHomeParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
-        return;
+        if (odd) {
+            odd.setPriceElement(null);
+            odd.setValueElement(null);
+        }
+
+        return false;
     }
 
     const spreadHomePriceElement = (await spreadHomeParent.$$('span'))[1];
@@ -92,20 +142,37 @@ export async function spreadHomeOver(this: localModels.ContinuousOdd): Promise<v
     const spreadHomeValue = Number(spreadHomeValueJson);
 
     if (spreadHomeValue < 0) {
-        await this.setPriceElement(spreadHomePriceElement);
-        await this.setValueElement(spreadHomeValueElement);
-        return;
+        if (odd) {
+            odd.setPriceElement(spreadHomePriceElement);
+            odd.setValueElement(spreadHomeValueElement);
+        }
+
+        return true;
     }
 
-    await this.setPriceElement(null);
-    await this.setValueElement(null);
+    if (odd) {
+        odd.setPriceElement(null);
+        odd.setValueElement(null);
+    }
+    
+    
+    return false;
 }
 
-export async function spreadHomeUnder(this: localModels.ContinuousOdd) {
-    const game = this.statistic.game;
+export async function spreadHomeUnder({
+    exchange,
+    statistic,
+    odd,
+}: {
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
+    odd?: localModels.Odd,
+}): Promise<boolean> {
+    const game = statistic.game;
 
     const spreadHomeParent = await getParentElement({
-        odd: this,
+        exchange: exchange,
+        statistic: statistic,
         selectors: [
             game.homeTeam.regionFullIdentifierFull,
             'spread betting',
@@ -113,9 +180,12 @@ export async function spreadHomeUnder(this: localModels.ContinuousOdd) {
     });
 
     if (!spreadHomeParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
-        return;
+        if (odd) {
+            odd.setPriceElement(null);
+            odd.setValueElement(null);
+        }
+
+        return false;
     }
 
     const spreadHomePriceElement = (await spreadHomeParent.$$('span'))[1];
@@ -125,20 +195,28 @@ export async function spreadHomeUnder(this: localModels.ContinuousOdd) {
     const spreadHomeValue = Number(spreadHomeValueJson);
 
     if (spreadHomeValue > 0) {
-        await this.setPriceElement(spreadHomePriceElement);
-        await this.setValueElement(spreadHomeValueElement);
-        return;
+        if (odd) {
+            odd.setPriceElement(spreadHomePriceElement);
+            odd.setValueElement(spreadHomeValueElement);
+        }
+
+        return true;
     }
 
-    await this.setPriceElement(null);
-    await this.setValueElement(null);
+    if (odd) {
+        odd.setPriceElement(null);
+        odd.setValueElement(null);
+    }
+
+    return false;
 }
 
 export async function moneylineAway(this: localModels.DiscreteOdd) {
     const game = this.statistic.game;
     
     const moneylineAwayParent = await getParentElement({
-        odd: this,
+        exchange: this.exchange,
+        statistic: this.statistic,
         selectors: [
             game.awayTeam.regionFullIdentifierFull,
             'moneyline',
@@ -146,32 +224,33 @@ export async function moneylineAway(this: localModels.DiscreteOdd) {
     })
 
     if (!moneylineAwayParent) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
 
     const moneylineAwayPriceElement = await moneylineAwayParent.$('span');
 
     if (!(moneylineAwayPriceElement instanceof ElementHandle)) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
 
     const moneylineAwayPriceJson = await (await moneylineAwayPriceElement.getProperty('textContent')).jsonValue();
 
     if (!moneylineAwayPriceJson) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
 
-    await this.setPriceElement(moneylineAwayPriceElement);
+    this.setPriceElement(moneylineAwayPriceElement);
 }
 
 export async function moneylineHome(this: localModels.DiscreteOdd) {
     const game = this.statistic.game;
     
     const moneylineHomeParent = await getParentElement({
-        odd: this,
+        exchange: this.exchange,
+        statistic: this.statistic,
         selectors: [
             game.homeTeam.regionFullIdentifierFull,
             'moneyline',
@@ -179,30 +258,31 @@ export async function moneylineHome(this: localModels.DiscreteOdd) {
     })
 
     if (!moneylineHomeParent) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
 
     const moneylineHomePriceElement = await moneylineHomeParent.$('span');
 
     if (!(moneylineHomePriceElement instanceof ElementHandle)) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
 
     const moneylineHomePriceJson = await (await moneylineHomePriceElement.getProperty('textContent')).jsonValue();
 
     if (!moneylineHomePriceJson) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
 
-    await this.setPriceElement(moneylineHomePriceElement);
+    this.setPriceElement(moneylineHomePriceElement);
 }
 
 export async function totalOver(this: localModels.ContinuousOdd) {
     const totalOverParent = await getParentElement({
-        odd: this,
+        exchange: this.exchange,
+        statistic: this.statistic,
         selectors: [
             'over',
             'total points',
@@ -210,21 +290,22 @@ export async function totalOver(this: localModels.ContinuousOdd) {
     });
 
     if (!totalOverParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
+        this.setPriceElement(null);
+        this.setValueElement(null);
         return;
     }
 
     const totalOverPriceElement = (await totalOverParent.$$('span'))[1];
     const totalOverValueElement = (await totalOverParent.$$('span'))[0];
 
-    await this.setPriceElement(totalOverPriceElement);
-    await this.setValueElement(totalOverValueElement);
+    this.setPriceElement(totalOverPriceElement);
+    this.setValueElement(totalOverValueElement);
 }
 
 export async function totalUnder(this: localModels.ContinuousOdd) {
     const totalUnderParent = await getParentElement({
-        odd: this,
+        exchange: this.exchange,
+        statistic: this.statistic,
         selectors: [
             'under',
             'total points',
@@ -232,28 +313,27 @@ export async function totalUnder(this: localModels.ContinuousOdd) {
     });
 
     if (!totalUnderParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
+        this.setPriceElement(null);
+        this.setValueElement(null);
         return;
     }
 
     const totalUnderPriceElement = (await totalUnderParent.$$('span'))[1];
     const totalUnderValueElement = (await totalUnderParent.$$('span'))[0];
 
-    await this.setPriceElement(totalUnderPriceElement);
-    await this.setValueElement(totalUnderValueElement);
+    this.setPriceElement(totalUnderPriceElement);
+    this.setValueElement(totalUnderValueElement);
 }
 
 async function getParentElement({
-    odd,
+    exchange,
+    statistic,
     selectors,
 }: {
-    odd: localModels.Odd,
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
     selectors: Array<string>,
 }): Promise<ElementHandle | null> {
-    const exchange = odd.exchange;
-    const statistic = odd.statistic;
-
     const game = statistic.game;
     const page = exchange.page;
 

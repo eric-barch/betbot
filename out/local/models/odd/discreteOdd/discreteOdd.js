@@ -29,23 +29,23 @@ const globalModels = __importStar(require("../../../../global"));
 const odd_1 = require("../odd");
 class DiscreteOdd extends odd_1.Odd {
     // private constructor
-    constructor({ exchange, statistic, value, updateElementsFunction, }) {
+    constructor({ exchange, statistic, value, updateOddElementsFunction, }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: odd_1.Inequality.Equal,
-            updateElementsFunction: updateElementsFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
         this.wrappedValue = value;
         this.wrappedSqlDiscreteOdd = null;
     }
     // public async constructor
-    static async create({ exchange, statistic, value, updateElementsFunction, }) {
+    static async create({ exchange, statistic, value, updateOddElementsFunction, }) {
         const newDiscreteOdd = new DiscreteOdd({
             exchange: exchange,
             statistic: statistic,
             value: value,
-            updateElementsFunction: updateElementsFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
         await newDiscreteOdd.initSqlDiscreteOdd();
         globalModels.allOdds.add(newDiscreteOdd);

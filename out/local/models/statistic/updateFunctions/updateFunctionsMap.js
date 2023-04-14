@@ -38,23 +38,35 @@ async function spreadAway({ exchange, statistic, }) {
     if (!overUpdateElementFunction) {
         throw new Error(`Did not find spreadAwayOver element function.`);
     }
-    await statistic.oddSet.findOrCreate({
+    const spreadAwayOverOddExists = await overUpdateElementFunction({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.Over,
-        updateElementsFunction: overUpdateElementFunction,
     });
+    if (spreadAwayOverOddExists) {
+        await statistic.oddSet.findOrCreate({
+            exchange: exchange,
+            statistic: statistic,
+            inequality: localModels.Inequality.Over,
+            updateElementsFunction: overUpdateElementFunction,
+        });
+    }
     const underKey = `${statistic.name}_under`;
     const underUpdateElementFunction = exchangeUpdateFunctionsMap.get(underKey);
     if (!underUpdateElementFunction) {
         throw new Error(`Did not find spreadAwayUnder function.`);
     }
-    await statistic.oddSet.findOrCreate({
+    const spreadAwayUnderOddExists = await underUpdateElementFunction({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.Under,
-        updateElementsFunction: underUpdateElementFunction,
     });
+    if (spreadAwayUnderOddExists) {
+        await statistic.oddSet.findOrCreate({
+            exchange: exchange,
+            statistic: statistic,
+            inequality: localModels.Inequality.Under,
+            updateElementsFunction: underUpdateElementFunction,
+        });
+    }
 }
 exports.spreadAway = spreadAway;
 async function spreadHome({ exchange, statistic, }) {
@@ -64,23 +76,35 @@ async function spreadHome({ exchange, statistic, }) {
     if (!overUpdateElementFunction) {
         throw new Error(`Did not find spreadHomeOver element function.`);
     }
-    await statistic.oddSet.findOrCreate({
+    const spreadHomeOverOddExists = await overUpdateElementFunction({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.Over,
-        updateElementsFunction: overUpdateElementFunction,
     });
+    if (spreadHomeOverOddExists) {
+        await statistic.oddSet.findOrCreate({
+            exchange: exchange,
+            statistic: statistic,
+            inequality: localModels.Inequality.Over,
+            updateElementsFunction: overUpdateElementFunction,
+        });
+    }
     const underKey = `${statistic.name}_under`;
     const underUpdateElementFunction = exchangeUpdateFunctionsMap.get(underKey);
     if (!underUpdateElementFunction) {
         throw new Error(`Did not find spreadHomeUnder function.`);
     }
-    await statistic.oddSet.findOrCreate({
+    const spreadHomeUnderOddExists = await underUpdateElementFunction({
         exchange: exchange,
         statistic: statistic,
-        inequality: localModels.Inequality.Under,
-        updateElementsFunction: underUpdateElementFunction,
     });
+    if (spreadHomeUnderOddExists) {
+        await statistic.oddSet.findOrCreate({
+            exchange: exchange,
+            statistic: statistic,
+            inequality: localModels.Inequality.Under,
+            updateElementsFunction: underUpdateElementFunction,
+        });
+    }
 }
 exports.spreadHome = spreadHome;
 async function moneyline({ exchange, statistic, }) {

@@ -1,3 +1,3 @@
-import { fanDuelFunctionsMap } from './fanDuelFunctionsMap';
+import { fanDuelFunctionsMap } from './functionsMap';
 
 export { fanDuelFunctionsMap };

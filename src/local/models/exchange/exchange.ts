@@ -7,10 +7,9 @@ export class Exchange {
     // public properties
     public name: string;
     public url: string;
-    public updateFunctionsMap: Map<string, Function>;
 
     // private properties
-    private updateGamesFunction: Function;
+    private wrappedUpdateGamesFunction: Function | undefined;
     
     // public linked objects
     public gameSet: localModels.GameSet;
@@ -27,23 +26,14 @@ export class Exchange {
     private constructor({
         name,
         url,
-        updateFunctionsMap,
     }: {
         name: string,
         url: string,
-        updateFunctionsMap: Map<string, Function>,
     }) {
         this.name = name;
         this.url = url;
 
-        this.updateFunctionsMap = updateFunctionsMap;
-        
-        const updateGamesFunction = updateFunctionsMap.get('games');
-        if (updateGamesFunction) {
-            this.updateGamesFunction = updateGamesFunction.bind(this);
-        } else {
-            throw new Error(`Could not find updateGamesFunction for ${name}`);
-        }
+        this.wrappedUpdateGamesFunction = undefined;
         
         this.gameSet = new localModels.GameSet();
         this.oddSet = new localModels.OddSet();
@@ -58,16 +48,13 @@ export class Exchange {
     public static async create({
         name,
         url,
-        updateFunctions: updateFunctionsMap,
     }: {
         name: string,
         url: string,
-        updateFunctions: Map<string, Function>,
     }): Promise<Exchange> {
         const newExchange = new Exchange({
             name: name,
             url: url,
-            updateFunctionsMap: updateFunctionsMap,
         })
 
         await newExchange.connectToExistingPage();
@@ -101,25 +88,6 @@ export class Exchange {
     }
 
     // public instance methods
-    public async analyze(): Promise<void> {
-        // these function labels need to be more specific
-        const updateGamesStart = new Date();
-        await this.updateGames();
-        const updateGamesEnd = new Date();
-
-        const updateOddsStart = new Date();
-        await this.updateOdds();
-        const updateOddsEnd = new Date();
-
-        const updateValuesStart = new Date();
-        await this.updateValues();
-        const updateValuesEnd = new Date();
-
-        console.log(`updateGames duration: ${updateGamesEnd.getTime() - updateGamesStart.getTime()}`)
-        console.log(`updateOdds duration: ${updateOddsEnd.getTime() - updateOddsStart.getTime()}`)
-        console.log(`updateValues duration: ${updateValuesEnd.getTime() - updateValuesStart.getTime()}`)
-    }
-
     public async close(): Promise<void> {
         this.browser.close();
     }
@@ -158,24 +126,6 @@ export class Exchange {
         return this.gameSet;
     }
 
-    public async updateOdds(): Promise<localModels.OddSet> {
-        for (const game of this.gameSet) {
-            for (const statistic of game.statisticSet) {
-                await statistic.updateOdds({ exchange: this });
-            }
-        }
-
-        return this.oddSet;
-    }
-
-    public async updateValues(): Promise<localModels.OddSet> {
-        for (const odd of this.oddSet) {
-            await odd.updateValues();
-        }
-
-        return this.oddSet;
-    }
-
     // public static methods
 
     // getters and setters
@@ -199,6 +149,22 @@ export class Exchange {
         let alphanumericString = this.nameStripped;
         let firstCharLower = alphanumericString.charAt(0).toLowerCase() + alphanumericString.slice(1);
         return firstCharLower;
+    }
+
+    get updateGamesFunction(): Function {
+        if (!this.wrappedUpdateGamesFunction) {
+            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
+        }
+
+        return this.wrappedUpdateGamesFunction;
+    }
+
+    set updateGamesFunction(updateGamesFunction: Function | undefined) {
+        if (!updateGamesFunction) {
+            throw new Error(`updateGamesFunction is undefined.`);
+        }
+        
+        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
     }
 
     get page(): puppeteer.Page {

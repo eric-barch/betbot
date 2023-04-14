@@ -7,14 +7,13 @@ export class Game {
     public startDate: Date;
 
     // private properties
+    private wrappedUpdateStatisticsFunction: Function | undefined;
 
     // public linked objects
     public awayTeam: localModels.Team;
     public homeTeam: localModels.Team;
     public exchangeSet: localModels.ExchangeSet;
     public statisticSet: localModels.StatisticSet;
-
-    // private linked objects
 
     // private sequelize object
     private wrappedSqlGame: databaseModels.Game | null;
@@ -30,6 +29,8 @@ export class Game {
         startDate: Date,
     }) {
         this.startDate = Game.roundDateToNearestInterval(startDate);
+
+        this.wrappedUpdateStatisticsFunction = undefined;
 
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
@@ -53,12 +54,8 @@ export class Game {
             awayTeam: awayTeam,
             homeTeam: homeTeam,
             startDate: startDate,
-        })
-        // do not change order
+        });
         await newGame.initSqlGame();
-
-        // this method references newGame's sql instance
-        await newGame.updateStatisticSet();
 
         globalModels.allGames.add(newGame);
 
@@ -120,32 +117,8 @@ export class Game {
         return false;
     }
 
-    public async updateStatisticSet(): Promise<localModels.StatisticSet> {
-        const spreadAway = await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'spread_away',
-        });
-
-        const spreadHome = await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'spread_home',
-        });
-
-        const moneyline = await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'moneyline',
-        });
-
-        const total = await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'total',
-        })
-
-        this.statisticSet.add(spreadAway);
-        this.statisticSet.add(spreadHome);
-        this.statisticSet.add(moneyline);
-        this.statisticSet.add(total);
-
+    public async updateStatistics(): Promise<localModels.StatisticSet> {
+        await this.updateStatisticsFunction();
         return this.statisticSet;
     }
 
@@ -173,6 +146,22 @@ export class Game {
     get regionFullIdentifierFull(): string {
         const regionFullIdentifierFull = `${this.awayTeam.regionFullIdentifierFull} @ ${this.homeTeam.regionFullIdentifierFull}`;
         return regionFullIdentifierFull;
+    }
+
+    get updateStatisticsFunction(): Function {
+        if (!this.wrappedUpdateStatisticsFunction) {
+            throw new Error(`wrappedUpdateStatisticsFunction is undefined.`);
+        }
+
+        return this.wrappedUpdateStatisticsFunction;
+    }
+
+    set updateStatisticsFunction(updateStatisticsFunction: Function | undefined) {
+        if (!updateStatisticsFunction) {
+            throw new Error(`updateStatisticsFunction is undefined.`);
+        }
+
+        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
     }
 
     get sqlGame(): databaseModels.Game {

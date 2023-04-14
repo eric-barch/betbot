@@ -2,207 +2,241 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.totalUnder = exports.totalOver = exports.moneylineHome = exports.moneylineAway = exports.spreadHomeUnder = exports.spreadHomeOver = exports.spreadAwayUnder = exports.spreadAwayOver = void 0;
 const puppeteer_1 = require("puppeteer");
-async function spreadAwayOver() {
-    const game = this.statistic.game;
+async function spreadAwayOver({ exchange, statistic, odd, }) {
+    const game = statistic.game;
     const spreadAwayParent = await getParentElement({
-        odd: this,
+        exchange: exchange,
+        statistic: statistic,
         selectors: [
             game.awayTeam.regionFullIdentifierFull,
             'spread betting',
         ],
     });
     if (!spreadAwayParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
-        return;
+        if (odd) {
+            odd.setPriceElement(null);
+            odd.setValueElement(null);
+        }
+        return false;
     }
     const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
     const spreadAwayValueElement = (await spreadAwayParent.$$('span'))[0];
     const spreadAwayValueJson = await (await spreadAwayValueElement.getProperty('textContent')).jsonValue();
     const spreadAwayValue = Number(spreadAwayValueJson);
     if (spreadAwayValue < 0) {
-        await this.setPriceElement(spreadAwayPriceElement);
-        await this.setValueElement(spreadAwayValueElement);
-        return;
+        if (odd) {
+            odd.setPriceElement(spreadAwayPriceElement);
+            odd.setValueElement(spreadAwayValueElement);
+        }
+        return true;
     }
-    await this.setPriceElement(null);
-    await this.setValueElement(null);
+    if (odd) {
+        odd.setPriceElement(null);
+        odd.setValueElement(null);
+    }
+    return false;
 }
 exports.spreadAwayOver = spreadAwayOver;
-async function spreadAwayUnder() {
-    const game = this.statistic.game;
+async function spreadAwayUnder({ exchange, statistic, odd, }) {
+    const game = statistic.game;
     const spreadAwayParent = await getParentElement({
-        odd: this,
+        exchange: exchange,
+        statistic: statistic,
         selectors: [
             game.awayTeam.regionFullIdentifierFull,
             'spread betting',
         ],
     });
     if (!spreadAwayParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
-        return;
+        if (odd) {
+            odd.setPriceElement(null);
+            odd.setValueElement(null);
+        }
+        return false;
     }
     const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
     const spreadAwayValueElement = (await spreadAwayParent.$$('span'))[0];
     const spreadAwayValueJson = await (await spreadAwayValueElement.getProperty('textContent')).jsonValue();
     const spreadAwayValue = Number(spreadAwayValueJson);
     if (spreadAwayValue > 0) {
-        await this.setPriceElement(spreadAwayPriceElement);
-        await this.setValueElement(spreadAwayValueElement);
-        return;
+        if (odd) {
+            odd.setPriceElement(spreadAwayPriceElement);
+            odd.setValueElement(spreadAwayValueElement);
+        }
+        return true;
     }
-    await this.setPriceElement(null);
-    await this.setValueElement(null);
+    if (odd) {
+        odd.setPriceElement(null);
+        odd.setValueElement(null);
+    }
+    return false;
 }
 exports.spreadAwayUnder = spreadAwayUnder;
-async function spreadHomeOver() {
-    const game = this.statistic.game;
+async function spreadHomeOver({ exchange, statistic, odd, }) {
+    const game = statistic.game;
     const spreadHomeParent = await getParentElement({
-        odd: this,
+        exchange: exchange,
+        statistic: statistic,
         selectors: [
             game.homeTeam.regionFullIdentifierFull,
             'spread betting',
         ],
     });
     if (!spreadHomeParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
-        return;
+        if (odd) {
+            odd.setPriceElement(null);
+            odd.setValueElement(null);
+        }
+        return false;
     }
     const spreadHomePriceElement = (await spreadHomeParent.$$('span'))[1];
     const spreadHomeValueElement = (await spreadHomeParent.$$('span'))[0];
     const spreadHomeValueJson = await (await spreadHomeValueElement.getProperty('textContent')).jsonValue();
     const spreadHomeValue = Number(spreadHomeValueJson);
     if (spreadHomeValue < 0) {
-        await this.setPriceElement(spreadHomePriceElement);
-        await this.setValueElement(spreadHomeValueElement);
-        return;
+        if (odd) {
+            odd.setPriceElement(spreadHomePriceElement);
+            odd.setValueElement(spreadHomeValueElement);
+        }
+        return true;
     }
-    await this.setPriceElement(null);
-    await this.setValueElement(null);
+    if (odd) {
+        odd.setPriceElement(null);
+        odd.setValueElement(null);
+    }
+    return false;
 }
 exports.spreadHomeOver = spreadHomeOver;
-async function spreadHomeUnder() {
-    const game = this.statistic.game;
+async function spreadHomeUnder({ exchange, statistic, odd, }) {
+    const game = statistic.game;
     const spreadHomeParent = await getParentElement({
-        odd: this,
+        exchange: exchange,
+        statistic: statistic,
         selectors: [
             game.homeTeam.regionFullIdentifierFull,
             'spread betting',
         ],
     });
     if (!spreadHomeParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
-        return;
+        if (odd) {
+            odd.setPriceElement(null);
+            odd.setValueElement(null);
+        }
+        return false;
     }
     const spreadHomePriceElement = (await spreadHomeParent.$$('span'))[1];
     const spreadHomeValueElement = (await spreadHomeParent.$$('span'))[0];
     const spreadHomeValueJson = await (await spreadHomeValueElement.getProperty('textContent')).jsonValue();
     const spreadHomeValue = Number(spreadHomeValueJson);
     if (spreadHomeValue > 0) {
-        await this.setPriceElement(spreadHomePriceElement);
-        await this.setValueElement(spreadHomeValueElement);
-        return;
+        if (odd) {
+            odd.setPriceElement(spreadHomePriceElement);
+            odd.setValueElement(spreadHomeValueElement);
+        }
+        return true;
     }
-    await this.setPriceElement(null);
-    await this.setValueElement(null);
+    if (odd) {
+        odd.setPriceElement(null);
+        odd.setValueElement(null);
+    }
+    return false;
 }
 exports.spreadHomeUnder = spreadHomeUnder;
 async function moneylineAway() {
     const game = this.statistic.game;
     const moneylineAwayParent = await getParentElement({
-        odd: this,
+        exchange: this.exchange,
+        statistic: this.statistic,
         selectors: [
             game.awayTeam.regionFullIdentifierFull,
             'moneyline',
         ]
     });
     if (!moneylineAwayParent) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
     const moneylineAwayPriceElement = await moneylineAwayParent.$('span');
     if (!(moneylineAwayPriceElement instanceof puppeteer_1.ElementHandle)) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
     const moneylineAwayPriceJson = await (await moneylineAwayPriceElement.getProperty('textContent')).jsonValue();
     if (!moneylineAwayPriceJson) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
-    await this.setPriceElement(moneylineAwayPriceElement);
+    this.setPriceElement(moneylineAwayPriceElement);
 }
 exports.moneylineAway = moneylineAway;
 async function moneylineHome() {
     const game = this.statistic.game;
     const moneylineHomeParent = await getParentElement({
-        odd: this,
+        exchange: this.exchange,
+        statistic: this.statistic,
         selectors: [
             game.homeTeam.regionFullIdentifierFull,
             'moneyline',
         ]
     });
     if (!moneylineHomeParent) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
     const moneylineHomePriceElement = await moneylineHomeParent.$('span');
     if (!(moneylineHomePriceElement instanceof puppeteer_1.ElementHandle)) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
     const moneylineHomePriceJson = await (await moneylineHomePriceElement.getProperty('textContent')).jsonValue();
     if (!moneylineHomePriceJson) {
-        await this.setPriceElement(null);
+        this.setPriceElement(null);
         return;
     }
-    await this.setPriceElement(moneylineHomePriceElement);
+    this.setPriceElement(moneylineHomePriceElement);
 }
 exports.moneylineHome = moneylineHome;
 async function totalOver() {
     const totalOverParent = await getParentElement({
-        odd: this,
+        exchange: this.exchange,
+        statistic: this.statistic,
         selectors: [
             'over',
             'total points',
         ],
     });
     if (!totalOverParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
+        this.setPriceElement(null);
+        this.setValueElement(null);
         return;
     }
     const totalOverPriceElement = (await totalOverParent.$$('span'))[1];
     const totalOverValueElement = (await totalOverParent.$$('span'))[0];
-    await this.setPriceElement(totalOverPriceElement);
-    await this.setValueElement(totalOverValueElement);
+    this.setPriceElement(totalOverPriceElement);
+    this.setValueElement(totalOverValueElement);
 }
 exports.totalOver = totalOver;
 async function totalUnder() {
     const totalUnderParent = await getParentElement({
-        odd: this,
+        exchange: this.exchange,
+        statistic: this.statistic,
         selectors: [
             'under',
             'total points',
         ],
     });
     if (!totalUnderParent) {
-        await this.setPriceElement(null);
-        await this.setValueElement(null);
+        this.setPriceElement(null);
+        this.setValueElement(null);
         return;
     }
     const totalUnderPriceElement = (await totalUnderParent.$$('span'))[1];
     const totalUnderValueElement = (await totalUnderParent.$$('span'))[0];
-    await this.setPriceElement(totalUnderPriceElement);
-    await this.setValueElement(totalUnderValueElement);
+    this.setPriceElement(totalUnderPriceElement);
+    this.setValueElement(totalUnderValueElement);
 }
 exports.totalUnder = totalUnder;
-async function getParentElement({ odd, selectors, }) {
-    const exchange = odd.exchange;
-    const statistic = odd.statistic;
+async function getParentElement({ exchange, statistic, selectors, }) {
     const game = statistic.game;
     const page = exchange.page;
     const gameName = game.regionFullIdentifierFull;

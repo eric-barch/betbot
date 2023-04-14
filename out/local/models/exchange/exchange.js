@@ -29,17 +29,10 @@ const databaseModels = __importStar(require("../../../database"));
 const localModels = __importStar(require("../../../local"));
 class Exchange {
     // private constructor
-    constructor({ name, url, updateFunctionsMap, }) {
+    constructor({ name, url, }) {
         this.name = name;
         this.url = url;
-        this.updateFunctionsMap = updateFunctionsMap;
-        const updateGamesFunction = updateFunctionsMap.get('games');
-        if (updateGamesFunction) {
-            this.updateGamesFunction = updateGamesFunction.bind(this);
-        }
-        else {
-            throw new Error(`Could not find updateGamesFunction for ${name}`);
-        }
+        this.wrappedUpdateGamesFunction = undefined;
         this.gameSet = new localModels.GameSet();
         this.oddSet = new localModels.OddSet();
         this.wrappedBrowser = null;
@@ -47,11 +40,10 @@ class Exchange {
         this.wrappedSqlExchange = null;
     }
     // public async constructor
-    static async create({ name, url, updateFunctions: updateFunctionsMap, }) {
+    static async create({ name, url, }) {
         const newExchange = new Exchange({
             name: name,
             url: url,
-            updateFunctionsMap: updateFunctionsMap,
         });
         await newExchange.connectToExistingPage();
         await newExchange.initSqlExchange();
@@ -78,21 +70,6 @@ class Exchange {
         return this.sqlExchange;
     }
     // public instance methods
-    async analyze() {
-        // these function labels need to be more specific
-        const updateGamesStart = new Date();
-        await this.updateGames();
-        const updateGamesEnd = new Date();
-        const updateOddsStart = new Date();
-        await this.updateOdds();
-        const updateOddsEnd = new Date();
-        const updateValuesStart = new Date();
-        await this.updateValues();
-        const updateValuesEnd = new Date();
-        console.log(`updateGames duration: ${updateGamesEnd.getTime() - updateGamesStart.getTime()}`);
-        console.log(`updateOdds duration: ${updateOddsEnd.getTime() - updateOddsStart.getTime()}`);
-        console.log(`updateValues duration: ${updateValuesEnd.getTime() - updateValuesStart.getTime()}`);
-    }
     async close() {
         this.browser.close();
     }
@@ -121,20 +98,6 @@ class Exchange {
         await this.updateGamesFunction();
         return this.gameSet;
     }
-    async updateOdds() {
-        for (const game of this.gameSet) {
-            for (const statistic of game.statisticSet) {
-                await statistic.updateOdds({ exchange: this });
-            }
-        }
-        return this.oddSet;
-    }
-    async updateValues() {
-        for (const odd of this.oddSet) {
-            await odd.updateValues();
-        }
-        return this.oddSet;
-    }
     // public static methods
     // getters and setters
     get browser() {
@@ -155,6 +118,18 @@ class Exchange {
         let alphanumericString = this.nameStripped;
         let firstCharLower = alphanumericString.charAt(0).toLowerCase() + alphanumericString.slice(1);
         return firstCharLower;
+    }
+    get updateGamesFunction() {
+        if (!this.wrappedUpdateGamesFunction) {
+            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
+        }
+        return this.wrappedUpdateGamesFunction;
+    }
+    set updateGamesFunction(updateGamesFunction) {
+        if (!updateGamesFunction) {
+            throw new Error(`updateGamesFunction is undefined.`);
+        }
+        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
     }
     get page() {
         if (this.wrappedPage) {

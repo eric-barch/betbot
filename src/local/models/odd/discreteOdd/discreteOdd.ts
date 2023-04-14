@@ -16,18 +16,18 @@ export class DiscreteOdd extends Odd {
         exchange,
         statistic,
         value,
-        updateElementsFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         value: string,
-        updateElementsFunction: Function,
+        updateOddElementsFunction: Function,
     }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: Inequality.Equal,
-            updateElementsFunction: updateElementsFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
 
         this.wrappedValue = value;
@@ -40,18 +40,18 @@ export class DiscreteOdd extends Odd {
         exchange,
         statistic,
         value,
-        updateElementsFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         value: string,
-        updateElementsFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<DiscreteOdd> {
         const newDiscreteOdd = new DiscreteOdd({
             exchange: exchange,
             statistic: statistic,
             value: value,
-            updateElementsFunction: updateElementsFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
 
         await newDiscreteOdd.initSqlDiscreteOdd();

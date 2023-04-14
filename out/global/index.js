@@ -14,8 +14,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.init = void 0;
-const global_1 = require("./global");
-Object.defineProperty(exports, "init", { enumerable: true, get: function () { return global_1.init; } });
 __exportStar(require("./models"), exports);
 //# sourceMappingURL=index.js.map

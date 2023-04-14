@@ -16,18 +16,18 @@ export class ContinuousOdd extends Odd {
         exchange,
         statistic,
         inequality,
-        updateElementsFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: Inequality,
-        updateElementsFunction: Function,
+        updateOddElementsFunction: Function,
     }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateElementsFunction: updateElementsFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
 
         this.wrappedValue = null;
@@ -40,18 +40,18 @@ export class ContinuousOdd extends Odd {
         exchange,
         statistic,
         inequality,
-        updateElementsFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: Inequality,
-        updateElementsFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<ContinuousOdd> {
         const newContinuousOdd = new ContinuousOdd({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateElementsFunction: updateElementsFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
 
         await newContinuousOdd.initSqlContinuousOdd();
@@ -117,54 +117,37 @@ export class ContinuousOdd extends Odd {
         return false;
     }
 
-    // this function is slow
     public async updateValues(): Promise<void> {
-        const start = new Date();
         const priceElement = await this.getPriceElement();
         const valueElement = await this.getValueElement();
 
         if (!priceElement) {
             await this.setPrice(null);
-            const priceEnd = new Date();
-
-            const priceDuration = (priceEnd.getTime() - start.getTime());
-            console.log(`priceDuration: ${priceDuration}`); // 15 32 28
         } else {
             const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
 
             if (!priceJson) {
                 await this.setPrice(null);
-                const priceEnd = new Date();
-
-                const priceDuration = (priceEnd.getTime() - start.getTime());
-                console.log(`priceDuration: ${priceDuration}`);
-                return;
+            } else {
+                const price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
+                await this.setPrice(price);
             }
-    
-            const price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
-
-            await this.setPrice(price);
-            const priceEnd = new Date();
-
-            const priceDuration = (priceEnd.getTime() - start.getTime());
-            console.log(`priceDuration: ${priceDuration}`); // 39 24 14 17 24
         }
 
         if (!valueElement) {
+            await this.setValue(null);
+            return;
+        }
+
+        const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
+
+        if (!valueJson) {
             this.setValue(null);
             return;
-        } else {
-            const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
-
-            if (!valueJson) {
-                this.setValue(null);
-                return;
-            }
-    
-            const value = Number(valueJson.replace(/[^0-9+\-.]/g, ''));
-    
-            this.setValue(value);
         }
+    
+        const value = Number(valueJson.replace(/[^0-9+\-.]/g, ''));
+        this.setValue(value);
     }
 
     // getters and setters

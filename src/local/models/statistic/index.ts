@@ -1,9 +1,9 @@
-import * as statistic from './updateFunctions';
+//import * as statistic from './updateFunctions';
 import { Statistic } from './statistic';
 import { StatisticSet } from './statisticSet';
 
 export {
-    statistic,
+//    statistic,
     Statistic,
     StatisticSet,
 };

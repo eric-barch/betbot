@@ -13,7 +13,7 @@ export abstract class Odd {
     protected wrappedInequality: Inequality;
     protected wrappedPrice: number | null;
     protected abstract wrappedValue: number | string | null;
-    protected updateElementsFunction: Function;
+    protected updateOddElementsFunction: Function;
 
     // public linked objects
     public exchange: localModels.Exchange;
@@ -28,17 +28,17 @@ export abstract class Odd {
         exchange,
         statistic,
         inequality,
-        updateElementsFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: Inequality,
-        updateElementsFunction: Function,
+        updateOddElementsFunction: Function,
     }) {
         this.wrappedInequality = inequality;
         this.wrappedPrice = null;
 
-        this.updateElementsFunction = updateElementsFunction.bind(this);
+        this.updateOddElementsFunction = updateOddElementsFunction.bind(this);
 
         this.exchange = exchange;
         this.statistic = statistic;
@@ -60,7 +60,10 @@ export abstract class Odd {
     }): boolean;
 
     protected async updateElements() {
-        await this.updateElementsFunction();
+        await this.updateOddElementsFunction({
+            exchange: this.exchange,
+            statistic: this.statistic,
+        });
     }
 
     abstract updateValues(): Promise<void>;
