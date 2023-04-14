@@ -1,6 +1,7 @@
 import * as puppeteer from 'puppeteer';
 
 import * as databaseModels from '../../../database';
+import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
 export class Exchange {
@@ -10,9 +11,11 @@ export class Exchange {
 
     // private properties
     private wrappedUpdateGamesFunction: Function | undefined;
+    private wrappedUpdateStatisticsFunction: Function | undefined;
     
     // public linked objects
     public gameSet: localModels.GameSet;
+    public statisticSet: localModels.StatisticSet;
     public oddSet: localModels.OddSet;
     
     // private linked objects
@@ -34,8 +37,10 @@ export class Exchange {
         this.url = url;
 
         this.wrappedUpdateGamesFunction = undefined;
+        this.wrappedUpdateStatisticsFunction = undefined;
         
         this.gameSet = new localModels.GameSet();
+        this.statisticSet = new localModels.StatisticSet();
         this.oddSet = new localModels.OddSet();
 
         this.wrappedBrowser = null;
@@ -126,6 +131,26 @@ export class Exchange {
         return this.gameSet;
     }
 
+    public async updateStatistics(): Promise<localModels.StatisticSet> {
+        await this.updateStatisticsFunction();
+        return this.statisticSet;
+    }
+
+    public async updateOdds() {
+        for (const statistic of this.statisticSet) {
+            const updateOddFunction = globalModels.updateOddFunctions.get(`${this.nameCamelCase}_${statistic.name}`);
+
+            if (!updateOddFunction) {
+                throw new Error(`Did not find corresponding update odd function.`);
+            }
+
+            await updateOddFunction({
+                exchange: this,
+                statistic: statistic,
+            });
+        }
+    }
+
     // public static methods
 
     // getters and setters
@@ -151,22 +176,6 @@ export class Exchange {
         return firstCharLower;
     }
 
-    get updateGamesFunction(): Function {
-        if (!this.wrappedUpdateGamesFunction) {
-            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
-        }
-
-        return this.wrappedUpdateGamesFunction;
-    }
-
-    set updateGamesFunction(updateGamesFunction: Function | undefined) {
-        if (!updateGamesFunction) {
-            throw new Error(`updateGamesFunction is undefined.`);
-        }
-        
-        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
-    }
-
     get page(): puppeteer.Page {
         if (this.wrappedPage) {
             return this.wrappedPage;
@@ -189,5 +198,37 @@ export class Exchange {
 
     set sqlExchange(sqlExchange: databaseModels.Exchange) {
         this.wrappedSqlExchange = sqlExchange;
+    }
+
+    get updateGamesFunction(): Function {
+        if (!this.wrappedUpdateGamesFunction) {
+            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
+        }
+
+        return this.wrappedUpdateGamesFunction;
+    }
+
+    set updateGamesFunction(updateGamesFunction: Function | undefined) {
+        if (!updateGamesFunction) {
+            throw new Error(`updateGamesFunction is undefined.`);
+        }
+        
+        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
+    }
+
+    get updateStatisticsFunction(): Function {
+        if (!this.wrappedUpdateStatisticsFunction) {
+            throw new Error(`wrappedUpdateStatisticsFunction is undefined.`);
+        }
+
+        return this.wrappedUpdateStatisticsFunction;
+    }
+
+    set updateStatisticsFunction(updateStatisticsFunction: Function | undefined) {
+        if (!updateStatisticsFunction) {
+            throw new Error(`updateStatisticsFunction is undefined.`);
+        }
+        
+        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
     }
 }

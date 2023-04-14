@@ -26,13 +26,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.allOdds = void 0;
 const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
-const updateStatisticOdds_1 = require("./updateFunctions/updateStatisticOdds");
 class AllOdds extends localModels.OddSet {
     async init() {
-        for (const statistic of globalModels.allStatistics) {
-            const updateOddsFunction = updateStatisticOdds_1.updateStatisticOddsFunctionsMap.get(statistic.name);
-            statistic.updateOddsFunction = updateOddsFunction;
-            await statistic.updateOdds();
+        for (const exchange of globalModels.allExchanges) {
+            await exchange.updateOdds();
         }
         return this;
     }

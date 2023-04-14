@@ -31,7 +31,6 @@ class Statistic {
     // private constructor
     constructor({ name, game, }) {
         this.name = name;
-        this.wrappedUpdateOddsFunction = undefined;
         this.game = game;
         this.oddSet = new localModels.OddSet;
         this.wrappedSqlStatistic = null;
@@ -72,23 +71,7 @@ class Statistic {
         }
         return false;
     }
-    async updateOdds() {
-        await this.updateOddsFunction();
-        return this.oddSet;
-    }
     // getters and setters
-    get updateOddsFunction() {
-        if (!this.wrappedUpdateOddsFunction) {
-            throw new Error(`wrappedUpdateOddsFunction is undefined.`);
-        }
-        return this.wrappedUpdateOddsFunction;
-    }
-    set updateOddsFunction(updateOddsFunction) {
-        if (!updateOddsFunction) {
-            throw new Error(`updateOddsFunction is undefined.`);
-        }
-        this.wrappedUpdateOddsFunction = updateOddsFunction.bind(this);
-    }
     get sqlStatistic() {
         if (!this.wrappedSqlStatistic) {
             throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.name} sqlStatistic is null.`);

@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
 const puppeteer = __importStar(require("puppeteer"));
 const databaseModels = __importStar(require("../../../database"));
+const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
 class Exchange {
     // private constructor
@@ -33,7 +34,9 @@ class Exchange {
         this.name = name;
         this.url = url;
         this.wrappedUpdateGamesFunction = undefined;
+        this.wrappedUpdateStatisticsFunction = undefined;
         this.gameSet = new localModels.GameSet();
+        this.statisticSet = new localModels.StatisticSet();
         this.oddSet = new localModels.OddSet();
         this.wrappedBrowser = null;
         this.wrappedPage = null;
@@ -98,6 +101,22 @@ class Exchange {
         await this.updateGamesFunction();
         return this.gameSet;
     }
+    async updateStatistics() {
+        await this.updateStatisticsFunction();
+        return this.statisticSet;
+    }
+    async updateOdds() {
+        for (const statistic of this.statisticSet) {
+            const updateOddFunction = globalModels.updateOddFunctions.get(`${this.nameCamelCase}_${statistic.name}`);
+            if (!updateOddFunction) {
+                throw new Error(`Did not find corresponding update odd function.`);
+            }
+            await updateOddFunction({
+                exchange: this,
+                statistic: statistic,
+            });
+        }
+    }
     // public static methods
     // getters and setters
     get browser() {
@@ -118,18 +137,6 @@ class Exchange {
         let alphanumericString = this.nameStripped;
         let firstCharLower = alphanumericString.charAt(0).toLowerCase() + alphanumericString.slice(1);
         return firstCharLower;
-    }
-    get updateGamesFunction() {
-        if (!this.wrappedUpdateGamesFunction) {
-            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
-        }
-        return this.wrappedUpdateGamesFunction;
-    }
-    set updateGamesFunction(updateGamesFunction) {
-        if (!updateGamesFunction) {
-            throw new Error(`updateGamesFunction is undefined.`);
-        }
-        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
     }
     get page() {
         if (this.wrappedPage) {
@@ -152,6 +159,30 @@ class Exchange {
     }
     set sqlExchange(sqlExchange) {
         this.wrappedSqlExchange = sqlExchange;
+    }
+    get updateGamesFunction() {
+        if (!this.wrappedUpdateGamesFunction) {
+            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
+        }
+        return this.wrappedUpdateGamesFunction;
+    }
+    set updateGamesFunction(updateGamesFunction) {
+        if (!updateGamesFunction) {
+            throw new Error(`updateGamesFunction is undefined.`);
+        }
+        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
+    }
+    get updateStatisticsFunction() {
+        if (!this.wrappedUpdateStatisticsFunction) {
+            throw new Error(`wrappedUpdateStatisticsFunction is undefined.`);
+        }
+        return this.wrappedUpdateStatisticsFunction;
+    }
+    set updateStatisticsFunction(updateStatisticsFunction) {
+        if (!updateStatisticsFunction) {
+            throw new Error(`updateStatisticsFunction is undefined.`);
+        }
+        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
     }
 }
 exports.Exchange = Exchange;

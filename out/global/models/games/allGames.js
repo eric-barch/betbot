@@ -26,11 +26,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.allGames = void 0;
 const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
-const updateExchangeGames_1 = require("./updateExchangeGames");
+const exchanges_1 = require("../exchanges");
 class AllGames extends localModels.GameSet {
     async init() {
         for (const exchange of globalModels.allExchanges) {
-            const updateGamesFunction = updateExchangeGames_1.updateExchangeGamesFunctionsMap.get(exchange.nameCamelCase);
+            const updateGamesFunction = exchanges_1.updateGamesFunctions.get(exchange.nameCamelCase);
             exchange.updateGamesFunction = updateGamesFunction;
             await exchange.updateGames();
         }

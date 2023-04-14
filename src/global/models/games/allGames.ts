@@ -1,12 +1,12 @@
 import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
-import { updateExchangeGamesFunctionsMap } from './updateExchangeGames';
+import { updateGamesFunctions } from '../exchanges';
 
 class AllGames extends localModels.GameSet {
     public async init(): Promise<localModels.GameSet> {
         for (const exchange of globalModels.allExchanges) {
-            const updateGamesFunction = updateExchangeGamesFunctionsMap.get(exchange.nameCamelCase);
+            const updateGamesFunction = updateGamesFunctions.get(exchange.nameCamelCase);
             exchange.updateGamesFunction = updateGamesFunction;
             await exchange.updateGames();
         }
