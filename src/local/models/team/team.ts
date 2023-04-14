@@ -8,6 +8,7 @@ export class Team {
     public regionAbbr: string;
     public identifierFull: string;
     public identifierAbbr: string;
+    public altNames: string[];
 
     // private properties
 
@@ -24,17 +25,20 @@ export class Team {
         regionAbbr,
         identifierFull,
         identifierAbbr,
+        altNames,
     }: {
         regionFull: string,
         regionAbbr: string,
         identifierFull: string,
         identifierAbbr: string,
+        altNames: Array<string>,
     }) {
         this.regionFull = regionFull;
         this.regionAbbr = regionAbbr;
         this.identifierFull = identifierFull;
         this.identifierAbbr = identifierAbbr;
         this.wrappedSqlTeam = null;
+        this.altNames = altNames;
     }
 
     // public async constructor
@@ -43,17 +47,20 @@ export class Team {
         regionAbbr,
         identifierFull,
         identifierAbbr,
+        altNames,
     }: {
         regionFull: string,
         regionAbbr: string,
         identifierFull: string,
         identifierAbbr: string,
+        altNames: Array<string>,
     }): Promise<localModels.Team> {
         const newTeam = new Team({
             regionFull: regionFull,
             regionAbbr: regionAbbr,
             identifierFull: identifierFull,
             identifierAbbr: identifierAbbr,
+            altNames: altNames,
         });
 
         await newTeam.initSqlTeam();
@@ -97,11 +104,17 @@ export class Team {
         name: string,
     }): boolean {
         if (
-            name === this.regionFullIdentifierFull ||
-            name === this.regionAbbrIdentifierFull ||
-            name === this.regionAbbrIdentifierAbbr
+            name.includes(this.regionFullIdentifierFull)||
+            name.includes(this.regionAbbrIdentifierFull) ||
+            name.includes(this.regionAbbrIdentifierAbbr)
         ) {
             return true;
+        }
+
+        for (const altName of this.altNames) {
+            if (name.includes(altName)) {
+                return true;
+            }
         }
         
         return false;

@@ -1,7 +1,6 @@
 import * as puppeteer from 'puppeteer';
 
 import * as databaseModels from '../../../database';
-import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
 export class Exchange {
@@ -10,6 +9,7 @@ export class Exchange {
     public url: string;
 
     // private properties
+    private wrappedUpdateGamesFunction: Function | undefined;
     
     // public linked objects
     public gameSet: localModels.GameSet;
@@ -32,6 +32,8 @@ export class Exchange {
     }) {
         this.name = name;
         this.url = url;
+
+        this.wrappedUpdateGamesFunction = undefined;
         
         this.gameSet = new localModels.GameSet();
         this.oddSet = new localModels.OddSet();
@@ -86,16 +88,6 @@ export class Exchange {
     }
 
     // public instance methods
-    public async analyze(): Promise<void> {
-        // these function labels need to be more specific
-        await this.updateGameSet();
-        await this.updateOddSet();
-
-        for (const odd of this.oddSet) {
-            await odd.update();
-        }
-    }
-
     public async close(): Promise<void> {
         this.browser.close();
     }
@@ -129,58 +121,9 @@ export class Exchange {
         return this.page;
     }
 
-    public async updateGameSet(): Promise<localModels.GameSet> {
-        /** Rewrite this in a more readable way */
-        const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
-        const jsonGames = await this.page.evaluate(element => JSON.parse(element!.textContent!), jsonGamesScriptTag);
-        /** *********************************** */
-        
-        for (const jsonGame of jsonGames) {
-            const awayTeamNameString = jsonGame.awayTeam.name;
-            const homeTeamNameString = jsonGame.homeTeam.name;
-    
-            const awayTeamInstance = globalModels.allTeams.find({ name: awayTeamNameString });
-            const homeTeamInstance = globalModels.allTeams.find({ name: homeTeamNameString });
-            const startDate = new Date(jsonGame.startDate);
-    
-            const requestedGame = await globalModels.allGames.findOrCreate({
-                awayTeam: awayTeamInstance,
-                homeTeam: homeTeamInstance,
-                startDate: startDate,
-            });
-
-            requestedGame.exchangeSet.add(this);
-            this.gameSet.add(requestedGame);
-        }
-
+    public async updateGames(): Promise<localModels.GameSet> {
+        await this.updateGamesFunction();
         return this.gameSet;
-    }
-
-    public async updateOddSet(): Promise<localModels.OddSet> {
-        for (const game of this.gameSet) {
-            for (const statistic of game.statisticSet) {
-                await this.updateStatisticOddSet({ statistic: statistic });
-            }
-        }
-
-        return this.oddSet;
-    }
-
-    public async updateStatisticOddSet({
-        statistic,
-    }: {
-        statistic: localModels.Statistic,
-    }) {
-        const updateFunction = localModels.updateFunctions.fanDuel.statisticOddSet.map.get(statistic.name);
-
-        if (!updateFunction) {
-            return;
-        }
-
-        await updateFunction({
-            exchange: this,
-            statistic: statistic,
-        });
     }
 
     // public static methods
@@ -206,6 +149,22 @@ export class Exchange {
         let alphanumericString = this.nameStripped;
         let firstCharLower = alphanumericString.charAt(0).toLowerCase() + alphanumericString.slice(1);
         return firstCharLower;
+    }
+
+    get updateGamesFunction(): Function {
+        if (!this.wrappedUpdateGamesFunction) {
+            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
+        }
+
+        return this.wrappedUpdateGamesFunction;
+    }
+
+    set updateGamesFunction(updateGamesFunction: Function | undefined) {
+        if (!updateGamesFunction) {
+            throw new Error(`updateGamesFunction is undefined.`);
+        }
+        
+        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
     }
 
     get page(): puppeteer.Page {

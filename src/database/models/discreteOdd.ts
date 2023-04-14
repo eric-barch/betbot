@@ -13,9 +13,9 @@ export class DiscreteOdd extends sqlz.Model<
     declare id: sqlz.CreationOptional<number>;
 
     // column headers
-    declare inequality: string;
+    declare inequality: string | null;
     declare price: number | null;
-    declare value: string;
+    declare value: string | null;
 
     // timestamps
     declare createdAt: sqlz.CreationOptional<Date>;

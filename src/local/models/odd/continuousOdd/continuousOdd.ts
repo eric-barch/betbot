@@ -5,14 +5,8 @@ import * as localModels from '../../../../local';
 import { Inequality, Odd } from '../odd';
 
 export class ContinuousOdd extends Odd {
-    // public properties
-
     // private properties
-    private wrappedValue: number | null;
-
-    // public linked objects
-
-    // private linked objects
+    protected wrappedValue: number | null;
 
     // private sequelize object
     private wrappedSqlContinuousOdd: databaseModels.ContinuousOdd | null;
@@ -22,21 +16,20 @@ export class ContinuousOdd extends Odd {
         exchange,
         statistic,
         inequality,
-        updateFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: Inequality,
-        updateFunction: Function,
+        updateOddElementsFunction: Function,
     }) {
         super({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateFunction: updateFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
 
-        this.inequality = inequality;
         this.wrappedValue = null;
 
         this.wrappedSqlContinuousOdd = null;
@@ -47,18 +40,18 @@ export class ContinuousOdd extends Odd {
         exchange,
         statistic,
         inequality,
-        updateFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: Inequality,
-        updateFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<ContinuousOdd> {
         const newContinuousOdd = new ContinuousOdd({
             exchange: exchange,
             statistic: statistic,
             inequality: inequality,
-            updateFunction: updateFunction,
+            updateOddElementsFunction: updateOddElementsFunction,
         });
 
         await newContinuousOdd.initSqlContinuousOdd();
@@ -75,12 +68,20 @@ export class ContinuousOdd extends Odd {
 
         const exchangeId = exchange.sqlExchange.get('id');
         const statisticId = statistic.sqlStatistic.get('id');
+        const inequality = this.getInequality();
+        const value = this.getValue();
 
         await databaseModels.ContinuousOdd.findOrCreate({
             where: {
                 exchangeId: exchangeId,
                 statisticId: statisticId,
-                inequality: this.inequality.toString(),
+                inequality: inequality,
+            },
+            defaults: {
+                exchangeId: exchangeId,
+                statisticId: statisticId,
+                inequality: inequality,
+                value: value,
             },
         }).then(async ([sqlContinuousOdd, created]) => {
             if (!created) {
@@ -93,6 +94,60 @@ export class ContinuousOdd extends Odd {
         });
 
         return this.sqlContinuousOdd;
+    }
+
+    // public instance methods
+    public matches({
+        exchange,
+        statistic,
+        inequality,
+    }: {
+        exchange: localModels.Exchange,
+        statistic: localModels.Statistic,
+        inequality: Inequality,
+    }): boolean {
+        const exchangeMatches = (this.exchange === exchange);
+        const statisticMatches = (this.statistic === statistic);
+        const inequalityMatches = (this.wrappedInequality === inequality);
+
+        if (exchangeMatches && statisticMatches && inequalityMatches) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public async updateValues(): Promise<void> {
+        const priceElement = await this.getPriceElement();
+        const valueElement = await this.getValueElement();
+
+        if (!priceElement) {
+            await this.setPrice(null);
+        } else {
+            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
+
+            if (!priceJson) {
+                await this.setPrice(null);
+            } else {
+                const price = Number(priceJson.replace(/[^0-9+\-.]/g, ''));
+                await this.setPrice(price);
+            }
+        }
+
+        if (!valueElement) {
+            await this.setValue(null);
+            return;
+        }
+
+        const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
+
+        if (!valueJson) {
+            this.setValue(null);
+            return;
+        }
+    
+        const value = Number(valueJson.replace(/[^0-9+\-.]/g, ''));
+        this.setValue(value);
     }
 
     // getters and setters
@@ -108,8 +163,12 @@ export class ContinuousOdd extends Odd {
         this.wrappedSqlContinuousOdd = sqlContinuousOdd;
     }
 
-    get price(): number | null {
-        return this.wrappedPrice;
+    public async setInequality(inequality: Inequality) {
+        this.wrappedInequality = inequality;
+
+        await this.sqlContinuousOdd.update({
+            inequality: inequality,
+        });
     }
 
     public async setPrice(price: number | null) {
@@ -120,7 +179,7 @@ export class ContinuousOdd extends Odd {
         });
     }
 
-    get value(): number | null {
+    public getValue(): number | null {
         return this.wrappedValue;
     }
 
@@ -129,6 +188,6 @@ export class ContinuousOdd extends Odd {
 
         await this.sqlContinuousOdd.update({
             value: value,
-        });
+        })
     }
 }

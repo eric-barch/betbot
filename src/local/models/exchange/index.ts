@@ -1,9 +1,10 @@
+import * as exchange from './updateFunctions';
 import { Exchange } from './exchange';
 import { ExchangeSet } from './exchangeSet';
-import * as updateFunctions from './updateFunctions'
 
 export {
+    exchange,
     Exchange,
     ExchangeSet,
-    updateFunctions,
 };
+//export * from './updateFunctions';

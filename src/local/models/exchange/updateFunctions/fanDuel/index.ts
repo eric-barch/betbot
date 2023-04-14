@@ -1,7 +1,3 @@
-import * as oddValue from './oddValue';
-import * as statisticOddSet from "./statisticOddSet";
+import { fanDuelFunctionsMap } from './functionsMap';
 
-export { 
-    oddValue,
-    statisticOddSet,
-};
+export { fanDuelFunctionsMap };

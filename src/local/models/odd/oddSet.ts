@@ -9,24 +9,24 @@ export class OddSet extends Set<Odd> {
         exchange,
         statistic,
         inequality,
-        updateFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality: localModels.Inequality,
-        updateFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<ContinuousOdd>;
 
     public async findOrCreate({
         exchange,
         statistic,
         value,
-        updateFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         value: string,
-        updateFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<DiscreteOdd>;
 
     public async findOrCreate({
@@ -34,24 +34,32 @@ export class OddSet extends Set<Odd> {
         statistic,
         inequality,
         value,
-        updateFunction,
+        updateOddElementsFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
         inequality?: localModels.Inequality,
         value?: string
-        updateFunction: Function,
+        updateOddElementsFunction: Function,
     }): Promise<ContinuousOdd | DiscreteOdd> {
+        let requestedOdd = null;
+
         for (const odd of this) {
-            if (odd.exchange === exchange && odd.statistic === statistic) {
-                if (odd instanceof ContinuousOdd && inequality !== undefined) {
-                    if (odd.inequality === inequality) {
-                        return odd;
-                    }
-                } else if (odd instanceof DiscreteOdd && value !== undefined) {
-                    if (odd.value === value) {
-                        return odd;
-                    }
+            if (odd instanceof ContinuousOdd) {
+                if (odd.matches({
+                    exchange: exchange,
+                    statistic: statistic,
+                    inequality: inequality!,
+                })) {
+                    return odd;
+                }
+            } else if (odd instanceof DiscreteOdd) {
+                if (odd.matches({
+                    exchange: exchange,
+                    statistic: statistic,
+                    value: value!,
+                })) {
+                    return odd;
                 }
             }
         }
@@ -61,23 +69,19 @@ export class OddSet extends Set<Odd> {
                 exchange: exchange,
                 statistic: statistic,
                 inequality: inequality,
-                updateFunction: updateFunction,
+                updateOddElementsFunction: updateOddElementsFunction,
             });
-            
-            newContinuousOdd.inequality = inequality;
 
             this.add(newContinuousOdd);
             
             return newContinuousOdd;
-        } else if (value !== undefined) {
+        } else if (value) {
             const newDiscreteOdd = await DiscreteOdd.create({
                 exchange: exchange,
                 statistic: statistic,
                 value: value,
-                updateFunction: updateFunction,
+                updateOddElementsFunction: updateOddElementsFunction,
             });
-            
-            await newDiscreteOdd.setValue(value);
             
             this.add(newDiscreteOdd);
             
@@ -85,5 +89,11 @@ export class OddSet extends Set<Odd> {
         }
 
         throw new Error(`Invalid parameters provided. Either "inequality" or "value" must be defined.`);
+    }
+
+    public async updateValues() {
+        for (const odd of this) {
+            await odd.updateValues();
+        }
     }
 }

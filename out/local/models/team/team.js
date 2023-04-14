@@ -28,20 +28,22 @@ const databaseModels = __importStar(require("../../../database"));
 const globalModels = __importStar(require("../../../global"));
 class Team {
     // private constructor
-    constructor({ regionFull, regionAbbr, identifierFull, identifierAbbr, }) {
+    constructor({ regionFull, regionAbbr, identifierFull, identifierAbbr, altNames, }) {
         this.regionFull = regionFull;
         this.regionAbbr = regionAbbr;
         this.identifierFull = identifierFull;
         this.identifierAbbr = identifierAbbr;
         this.wrappedSqlTeam = null;
+        this.altNames = altNames;
     }
     // public async constructor
-    static async create({ regionFull, regionAbbr, identifierFull, identifierAbbr, }) {
+    static async create({ regionFull, regionAbbr, identifierFull, identifierAbbr, altNames, }) {
         const newTeam = new Team({
             regionFull: regionFull,
             regionAbbr: regionAbbr,
             identifierFull: identifierFull,
             identifierAbbr: identifierAbbr,
+            altNames: altNames,
         });
         await newTeam.initSqlTeam();
         globalModels.allTeams.add(newTeam);
@@ -73,10 +75,15 @@ class Team {
     }
     // public instance methods
     matches({ name, }) {
-        if (name === this.regionFullIdentifierFull ||
-            name === this.regionAbbrIdentifierFull ||
-            name === this.regionAbbrIdentifierAbbr) {
+        if (name.includes(this.regionFullIdentifierFull) ||
+            name.includes(this.regionAbbrIdentifierFull) ||
+            name.includes(this.regionAbbrIdentifierAbbr)) {
             return true;
+        }
+        for (const altName of this.altNames) {
+            if (name.includes(altName)) {
+                return true;
+            }
         }
         return false;
     }

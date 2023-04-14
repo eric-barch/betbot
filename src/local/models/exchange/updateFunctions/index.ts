@@ -1,3 +1,3 @@
-import * as fanDuel from './fanDuel';
+import { updateFunctionsMap } from './functionsMap';
 
-export { fanDuel };
+export { updateFunctionsMap };

@@ -23,11 +23,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateFunctions = exports.ExchangeSet = exports.Exchange = void 0;
+exports.ExchangeSet = exports.Exchange = exports.exchange = void 0;
+const exchange = __importStar(require("./updateFunctions"));
+exports.exchange = exchange;
 const exchange_1 = require("./exchange");
 Object.defineProperty(exports, "Exchange", { enumerable: true, get: function () { return exchange_1.Exchange; } });
 const exchangeSet_1 = require("./exchangeSet");
 Object.defineProperty(exports, "ExchangeSet", { enumerable: true, get: function () { return exchangeSet_1.ExchangeSet; } });
-const updateFunctions = __importStar(require("./updateFunctions"));
-exports.updateFunctions = updateFunctions;
+//export * from './updateFunctions';
 //# sourceMappingURL=index.js.map

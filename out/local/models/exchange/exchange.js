@@ -26,13 +26,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exchange = void 0;
 const puppeteer = __importStar(require("puppeteer"));
 const databaseModels = __importStar(require("../../../database"));
-const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
 class Exchange {
     // private constructor
     constructor({ name, url, }) {
         this.name = name;
         this.url = url;
+        this.wrappedUpdateGamesFunction = undefined;
         this.gameSet = new localModels.GameSet();
         this.oddSet = new localModels.OddSet();
         this.wrappedBrowser = null;
@@ -70,14 +70,6 @@ class Exchange {
         return this.sqlExchange;
     }
     // public instance methods
-    async analyze() {
-        // these function labels need to be more specific
-        await this.updateGameSet();
-        await this.updateOddSet();
-        for (const odd of this.oddSet) {
-            await odd.update();
-        }
-    }
     async close() {
         this.browser.close();
     }
@@ -102,44 +94,9 @@ class Exchange {
         this.page.setViewport(windowSize);
         return this.page;
     }
-    async updateGameSet() {
-        /** Rewrite this in a more readable way */
-        const jsonGamesScriptTag = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
-        const jsonGames = await this.page.evaluate(element => JSON.parse(element.textContent), jsonGamesScriptTag);
-        /** *********************************** */
-        for (const jsonGame of jsonGames) {
-            const awayTeamNameString = jsonGame.awayTeam.name;
-            const homeTeamNameString = jsonGame.homeTeam.name;
-            const awayTeamInstance = globalModels.allTeams.find({ name: awayTeamNameString });
-            const homeTeamInstance = globalModels.allTeams.find({ name: homeTeamNameString });
-            const startDate = new Date(jsonGame.startDate);
-            const requestedGame = await globalModels.allGames.findOrCreate({
-                awayTeam: awayTeamInstance,
-                homeTeam: homeTeamInstance,
-                startDate: startDate,
-            });
-            requestedGame.exchangeSet.add(this);
-            this.gameSet.add(requestedGame);
-        }
+    async updateGames() {
+        await this.updateGamesFunction();
         return this.gameSet;
-    }
-    async updateOddSet() {
-        for (const game of this.gameSet) {
-            for (const statistic of game.statisticSet) {
-                await this.updateStatisticOddSet({ statistic: statistic });
-            }
-        }
-        return this.oddSet;
-    }
-    async updateStatisticOddSet({ statistic, }) {
-        const updateFunction = localModels.updateFunctions.fanDuel.statisticOddSet.map.get(statistic.name);
-        if (!updateFunction) {
-            return;
-        }
-        await updateFunction({
-            exchange: this,
-            statistic: statistic,
-        });
     }
     // public static methods
     // getters and setters
@@ -161,6 +118,18 @@ class Exchange {
         let alphanumericString = this.nameStripped;
         let firstCharLower = alphanumericString.charAt(0).toLowerCase() + alphanumericString.slice(1);
         return firstCharLower;
+    }
+    get updateGamesFunction() {
+        if (!this.wrappedUpdateGamesFunction) {
+            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
+        }
+        return this.wrappedUpdateGamesFunction;
+    }
+    set updateGamesFunction(updateGamesFunction) {
+        if (!updateGamesFunction) {
+            throw new Error(`updateGamesFunction is undefined.`);
+        }
+        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
     }
     get page() {
         if (this.wrappedPage) {

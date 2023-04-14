@@ -4,9 +4,10 @@ import * as localModels from '../../../local';
 
 export class Statistic {
     // public properties
-    public name: string; // e.g. 'spread', 'winner', 'total', 'devin-booker-points', 'first-basket'
+    public name: string;
     
     // private properties
+    private wrappedUpdateOddsFunction: Function | undefined;
 
     // public linked objects
     public game: localModels.Game;
@@ -26,6 +27,8 @@ export class Statistic {
         game: localModels.Game,
     }) {
         this.name = name;
+
+        this.wrappedUpdateOddsFunction = undefined;
         
         this.game = game;
         this.oddSet = new localModels.OddSet;
@@ -95,9 +98,28 @@ export class Statistic {
         return false;
     }
 
-    // public static methods
+    public async updateOdds(): Promise<localModels.OddSet> {
+        await this.updateOddsFunction();
+        return this.oddSet;
+    }
 
     // getters and setters
+    get updateOddsFunction(): Function {
+        if (!this.wrappedUpdateOddsFunction) {
+            throw new Error(`wrappedUpdateOddsFunction is undefined.`)
+        }
+
+        return this.wrappedUpdateOddsFunction;
+    }
+
+    set updateOddsFunction(updateOddsFunction: Function | undefined) {
+        if (!updateOddsFunction) {
+            throw new Error(`updateOddsFunction is undefined.`);
+        }
+
+        this.wrappedUpdateOddsFunction = updateOddsFunction.bind(this);
+    }
+
     get sqlStatistic(): databaseModels.Statistic {
         if (!this.wrappedSqlStatistic) {
             throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.name} sqlStatistic is null.`)

@@ -31,6 +31,7 @@ class Game {
     // private constructor
     constructor({ awayTeam, homeTeam, startDate, }) {
         this.startDate = Game.roundDateToNearestInterval(startDate);
+        this.wrappedUpdateStatisticsFunction = undefined;
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
         this.exchangeSet = new localModels.ExchangeSet();
@@ -44,10 +45,7 @@ class Game {
             homeTeam: homeTeam,
             startDate: startDate,
         });
-        // do not change order
         await newGame.initSqlGame();
-        // this method references newGame's sql instance
-        await newGame.updateStatisticSet();
         globalModels.allGames.add(newGame);
         return newGame;
     }
@@ -87,27 +85,8 @@ class Game {
         }
         return false;
     }
-    async updateStatisticSet() {
-        const spreadAway = await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'spread_away',
-        });
-        const spreadHome = await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'spread_home',
-        });
-        const moneyline = await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'moneyline',
-        });
-        const total = await this.statisticSet.findOrCreate({
-            game: this,
-            name: 'total',
-        });
-        this.statisticSet.add(spreadAway);
-        this.statisticSet.add(spreadHome);
-        this.statisticSet.add(moneyline);
-        this.statisticSet.add(total);
+    async updateStatistics() {
+        await this.updateStatisticsFunction();
         return this.statisticSet;
     }
     // public static methods
@@ -129,6 +108,18 @@ class Game {
     get regionFullIdentifierFull() {
         const regionFullIdentifierFull = `${this.awayTeam.regionFullIdentifierFull} @ ${this.homeTeam.regionFullIdentifierFull}`;
         return regionFullIdentifierFull;
+    }
+    get updateStatisticsFunction() {
+        if (!this.wrappedUpdateStatisticsFunction) {
+            throw new Error(`wrappedUpdateStatisticsFunction is undefined.`);
+        }
+        return this.wrappedUpdateStatisticsFunction;
+    }
+    set updateStatisticsFunction(updateStatisticsFunction) {
+        if (!updateStatisticsFunction) {
+            throw new Error(`updateStatisticsFunction is undefined.`);
+        }
+        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
     }
     get sqlGame() {
         if (this.wrappedSqlGame) {
