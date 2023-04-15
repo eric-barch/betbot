@@ -1,219 +1,377 @@
+import { ElementHandle } from 'puppeteer';
+
 import * as localModels from '../../../../../local';
 
-import { updateOddElementsFunctions } from '../updateOddElements/fanDuel';
-
-export async function spreadAway({
+export async function spreadAway(this: localModels.Odd, {
     exchange,
     statistic,
 }: {
     exchange: localModels.Exchange,
     statistic: localModels.Statistic,
-}): Promise<localModels.OddSet> {
-    const updateOverOddElementsFunction = updateOddElementsFunctions.get(`spread_away_over`);
-
-    if (!updateOverOddElementsFunction) {
-        throw new Error(`Did not find function`);
+}): Promise<boolean> {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
     }
 
-    const overOddExists = await updateOverOddElementsFunction({
+    const game = statistic.game;
+
+    const spreadAwayParent = await getParentElement({
         exchange: exchange,
         statistic: statistic,
+        selectors: [
+            game.awayTeam.regionFullIdentifierFull,
+            'spread betting',
+        ],
     });
 
-    if (overOddExists) {
-        const overOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Over,
-            updateOddElementsFunction: updateOverOddElementsFunction,
-        });
-        exchange.oddSet.add(overOdd);
-        statistic.oddSet.add(overOdd);
+    if (!spreadAwayParent) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+
+        return false;
     }
 
-    const updateUnderOddElementsFunction = updateOddElementsFunctions.get(`spread_away_under`);
+    const spreadAwayValueElement = (await spreadAwayParent.$$('span'))[0];
+    const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
+
+    if (this) {
+        this.setPriceElement(spreadAwayPriceElement);
+        this.setValueElement(spreadAwayValueElement);
+    }
+
+    return true;
+}
+
+export async function spreadHome(this: localModels.Odd, {
+    exchange,
+    statistic,
+}: {
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
+}): Promise<boolean> {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
+    }
+
+    const game = statistic.game;
+
+    const spreadAwayParent = await getParentElement({
+        exchange: exchange,
+        statistic: statistic,
+        selectors: [
+            game.homeTeam.regionFullIdentifierFull,
+            'spread betting',
+        ],
+    });
+
+    if (!spreadAwayParent) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+
+        return false;
+    }
+
+    const spreadAwayValueElement = (await spreadAwayParent.$$('span'))[0];
+    const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
+
+    if (this) {
+        this.setPriceElement(spreadAwayPriceElement);
+        this.setValueElement(spreadAwayValueElement);
+    }
+
+    return true;
+}
+
+export async function moneylineAway(this: localModels.Odd, {
+    exchange,
+    statistic,
+}: {
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
+}): Promise<boolean> {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
+    }
+
+    const game = statistic.game;
     
-    if (!updateUnderOddElementsFunction) {
-        throw new Error(`Did not find function`);
-    }
-
-    const underOddExists = await updateUnderOddElementsFunction({
+    const moneylineAwayParent = await getParentElement({
         exchange: exchange,
         statistic: statistic,
-    });
+        selectors: [
+            game.awayTeam.regionFullIdentifierFull,
+            'moneyline',
+        ]
+    })
 
-    if (underOddExists) {
-        const underOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Under,
-            updateOddElementsFunction: updateUnderOddElementsFunction,
-        });
-        exchange.oddSet.add(underOdd);
-        statistic.oddSet.add(underOdd);
+    if (!moneylineAwayParent) {
+        if (this) {
+            this.setPriceElement(null);
+        }
+
+        return false;
     }
 
-    return exchange.oddSet;
+    const moneylineAwayPriceElement = await moneylineAwayParent.$('span');
+
+    if (!(moneylineAwayPriceElement instanceof ElementHandle)) {
+        if (this) {
+            this.setPriceElement(null);
+        }
+
+        return false;
+    }
+
+    const moneylineAwayPriceJson = await (await moneylineAwayPriceElement.getProperty('textContent')).jsonValue();
+
+    if (!moneylineAwayPriceJson) {
+        if (this) {
+            this.setPriceElement(null);
+        }
+
+        return false;
+    }
+
+    if (this) {
+        this.setPriceElement(moneylineAwayPriceElement);
+    }
+
+    return true;
 }
 
-export async function spreadHome({
+export async function moneylineHome(this: localModels.Odd, {
     exchange,
     statistic,
 }: {
     exchange: localModels.Exchange,
     statistic: localModels.Statistic,
-}): Promise<localModels.OddSet> {
-    const updateOverOddElementsFunction = updateOddElementsFunctions.get(`spread_home_over`);
-
-    if (!updateOverOddElementsFunction) {
-        throw new Error(`Did not find function`);
+}): Promise<boolean> {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
     }
 
-    const overOddExists = await updateOverOddElementsFunction({
-        exchange: exchange,
-        statistic: statistic,
-    });
-
-    if (overOddExists) {
-        const overOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Over,
-            updateOddElementsFunction: updateOverOddElementsFunction,
-        });
-        exchange.oddSet.add(overOdd);
-        statistic.oddSet.add(overOdd);
-    }
-
-    const updateUnderOddElementsFunction = updateOddElementsFunctions.get(`spread_home_under`);
+    const game = statistic.game;
     
-    if (!updateUnderOddElementsFunction) {
-        throw new Error(`Did not find function`);
-    }
-
-    const underOddExists = await updateUnderOddElementsFunction({
+    const moneylineHomeParent = await getParentElement({
         exchange: exchange,
         statistic: statistic,
-    });
+        selectors: [
+            game.homeTeam.regionFullIdentifierFull,
+            'moneyline',
+        ]
+    })
 
-    if (underOddExists) {
-        const underOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Under,
-            updateOddElementsFunction: updateUnderOddElementsFunction,
-        });
-        exchange.oddSet.add(underOdd);
-        statistic.oddSet.add(underOdd);
+    if (!moneylineHomeParent) {
+        if (this) {
+            this.setPriceElement(null);
+        }
+
+        return false;
     }
 
-    return exchange.oddSet;
+    const moneylineHomePriceElement = await moneylineHomeParent.$('span');
+
+    if (!(moneylineHomePriceElement instanceof ElementHandle)) {
+        if (this) {
+            this.setPriceElement(null);
+        }
+
+        return false;
+    }
+
+    const moneylineHomePriceJson = await (await moneylineHomePriceElement.getProperty('textContent')).jsonValue();
+
+    if (!moneylineHomePriceJson) {
+        if (this) {
+            this.setPriceElement(null);
+        }
+
+        return false;
+    }
+
+    if (this) {
+        this.setPriceElement(moneylineHomePriceElement);
+    }
+
+    return true;
 }
 
-export async function moneyline({
+export async function totalOver(this: localModels.Odd, {
     exchange,
     statistic,
 }: {
     exchange: localModels.Exchange,
     statistic: localModels.Statistic,
-}) {
-    const updateAwayOddElementsFunction = updateOddElementsFunctions.get(`moneyline_away`);
-
-    if (!updateAwayOddElementsFunction) {
-        throw new Error(`Did not find function`);
+}): Promise<boolean> {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
     }
 
-    const awayOddExists = await updateAwayOddElementsFunction({
+    const totalOverParent = await getParentElement({
         exchange: exchange,
         statistic: statistic,
+        selectors: [
+            'over',
+            'total points',
+        ],
     });
 
-    if (awayOddExists) {
-        const awayOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            value: 'away',
-            updateOddElementsFunction: updateAwayOddElementsFunction,
-        });
-        exchange.oddSet.add(awayOdd);
-        statistic.oddSet.add(awayOdd);
+    if (!totalOverParent) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+
+        return false;
     }
 
-    const updateHomeOddElementsFunction = updateOddElementsFunctions.get(`moneyline_home`);
+    const totalOverPriceElement = (await totalOverParent.$$('span'))[1];
+    const totalOverValueElement = (await totalOverParent.$$('span'))[0];
 
-    if (!updateHomeOddElementsFunction) {
-        throw new Error(`Did not find function`);
+    if (this) {
+        this.setPriceElement(totalOverPriceElement);
+        this.setValueElement(totalOverValueElement);
     }
 
-    const homeOddExists = await updateHomeOddElementsFunction({
-        exchange: exchange,
-        statistic: statistic,
-    });
-
-    if (homeOddExists) {
-        const homeOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            value: 'home',
-            updateOddElementsFunction: updateHomeOddElementsFunction,
-        });
-        exchange.oddSet.add(homeOdd);
-        statistic.oddSet.add(homeOdd);
-    }
-
-    return exchange.oddSet;
+    return true;
 }
 
-export async function total({
+export async function totalUnder(this: localModels.Odd, {
     exchange,
     statistic,
 }: {
     exchange: localModels.Exchange,
     statistic: localModels.Statistic,
-}): Promise<localModels.OddSet> {
-    const updateOverOddElementsFunction = updateOddElementsFunctions.get(`total_over`);
-
-    if (!updateOverOddElementsFunction) {
-        throw new Error(`Did not find function`);
+}): Promise<boolean> {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
     }
 
-    const overOddExists = await updateOverOddElementsFunction({
+    const totalUnderParent = await getParentElement({
         exchange: exchange,
         statistic: statistic,
+        selectors: [
+            'under',
+            'total points',
+        ],
     });
 
-    if (overOddExists) {
-        const overOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Over,
-            updateOddElementsFunction: updateOverOddElementsFunction,
-        });
-        exchange.oddSet.add(overOdd);
-        statistic.oddSet.add(overOdd)
+    if (!totalUnderParent) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+
+        return false;
     }
 
-    const updateUnderOddElementsFunction = updateOddElementsFunctions.get(`total_under`);
+    const totalUnderPriceElement = (await totalUnderParent.$$('span'))[1];
+    const totalUnderValueElement = (await totalUnderParent.$$('span'))[0];
 
-    if (!updateUnderOddElementsFunction) {
-        throw new Error(`Did not find function`);
+    if (this) {
+        this.setPriceElement(totalUnderPriceElement);
+        this.setValueElement(totalUnderValueElement);
+    }
+    
+    return true;
+}
+
+async function getParentElement({
+    exchange,
+    statistic,
+    selectors,
+}: {
+    exchange: localModels.Exchange,
+    statistic: localModels.Statistic,
+    selectors: Array<string>,
+}): Promise<ElementHandle | null> {
+    const game = statistic.game;
+    const page = exchange.page;
+
+    const gameName = game.regionFullIdentifierFull;
+    const gameTitleElements = await page.$$(`[title="${gameName}"]`);
+
+    if (gameTitleElements.length === 0) {
+        console.log(`${gameName} exists in ${exchange.name} JSON but not in the visible document.`);
+        return null;
+    }else if (gameTitleElements.length > 2) {
+        throw new Error(`Did not expect more than 2 game element handles for ${gameName}.`);
     }
 
-    const underOddExists = await updateUnderOddElementsFunction({
-        exchange: exchange,
-        statistic: statistic,
-    });
+    const gameElement = await (await gameTitleElements[0].getProperty('parentElement')).getProperty('parentElement');
 
-    if (underOddExists) {
-        const underOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Under,
-            updateOddElementsFunction: updateUnderOddElementsFunction,
-        });
-        exchange.oddSet.add(underOdd);
-        statistic.oddSet.add(underOdd);
+    if (!(gameElement instanceof ElementHandle)) {
+        return null;
     }
 
-    return exchange.oddSet;
+    let fullSelector = '';
+
+    for (const selector of selectors) {
+        fullSelector = fullSelector + `[aria-label*="${selector}" i]`
+    }
+
+    let parentElement = null;
+
+    const possibleParentElements = await gameElement.$$(fullSelector);
+
+    if (possibleParentElements.length < 1) {
+        return null;
+    } else if (possibleParentElements.length === 1) {
+        parentElement = possibleParentElements[0];
+    } else if (possibleParentElements.length > 1) {
+        // This deals with cases where the ARIA label incorrectly contains
+        // the selector, e.g. 'Oklahoma City Thunder' contains 'under'.
+        for (const possibleParentElement of possibleParentElements) {
+            const ariaLabel = await (await possibleParentElement.getProperty('ariaLabel')).jsonValue();
+
+            if (!ariaLabel) {
+                continue;
+            }
+
+            let foundSelector = true;
+            let i = 0;
+
+            while (foundSelector && i < selectors.length) {
+                const regex = new RegExp(`\\b${selectors[i]}\\b`, 'i');
+
+                if (!regex.test(ariaLabel)) {
+                    foundSelector = false;
+                } else {
+                    i++;
+                }
+            }
+
+            if (!foundSelector) {
+                continue;
+            }
+
+            parentElement = possibleParentElement;
+        }
+    }
+
+    if (!parentElement) {
+        return null;
+    }
+
+    const parentAriaLabel = await (await parentElement.getProperty('ariaLabel')).jsonValue();
+
+    if (!parentAriaLabel) {
+        return null;
+    }
+
+    if (parentAriaLabel.toLowerCase().includes('unavailable')) {
+        return null;
+    }
+
+    return parentElement;
 }

@@ -1,10 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Team = exports.Statistic = exports.Game = exports.Exchange = exports.DiscreteOdd = exports.ContinuousOdd = void 0;
-const continuousOdd_1 = require("./continuousOdd");
-Object.defineProperty(exports, "ContinuousOdd", { enumerable: true, get: function () { return continuousOdd_1.ContinuousOdd; } });
-const discreteOdd_1 = require("./discreteOdd");
-Object.defineProperty(exports, "DiscreteOdd", { enumerable: true, get: function () { return discreteOdd_1.DiscreteOdd; } });
+exports.Team = exports.Statistic = exports.Game = exports.Exchange = exports.Odd = void 0;
+const odd_1 = require("./odd");
+Object.defineProperty(exports, "Odd", { enumerable: true, get: function () { return odd_1.Odd; } });
 const exchange_1 = require("./exchange");
 Object.defineProperty(exports, "Exchange", { enumerable: true, get: function () { return exchange_1.Exchange; } });
 const game_1 = require("./game");

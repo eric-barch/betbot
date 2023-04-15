@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Odd = void 0;
 const sqlz = __importStar(require("sequelize"));
-const database_1 = require("../../database");
+const __1 = require("..");
 class Odd extends sqlz.Model {
 }
 exports.Odd = Odd;
@@ -35,14 +35,12 @@ Odd.init({
         autoIncrement: true,
         primaryKey: true
     },
-    inequality: new sqlz.DataTypes.STRING(128),
     price: sqlz.DataTypes.INTEGER,
-    numberValue: sqlz.DataTypes.FLOAT,
-    stringValue: new sqlz.DataTypes.STRING(128),
+    value: sqlz.DataTypes.FLOAT,
     createdAt: sqlz.DataTypes.DATE,
     updatedAt: sqlz.DataTypes.DATE,
 }, {
-    sequelize: database_1.sequelize,
+    sequelize: __1.sequelize,
     tableName: 'odds',
 });
 //# sourceMappingURL=odd.js.map

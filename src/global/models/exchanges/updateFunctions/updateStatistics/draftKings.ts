@@ -14,18 +14,30 @@ export async function updateStatistics(this: localModels.Exchange): Promise<loca
             name: 'spread_home',
         });
         this.statisticSet.add(spreadHome);
-    
-        const moneyline = await globalModels.allStatistics.findOrCreate({
+
+        const moneylineAway = await globalModels.allStatistics.findOrCreate({
             game: game,
-            name: 'moneyline',
+            name: 'moneyline_away',
         });
-        this.statisticSet.add(moneyline);
-    
-        const total = await globalModels.allStatistics.findOrCreate({
+        this.statisticSet.add(moneylineAway);
+
+        const moneylineHome = await globalModels.allStatistics.findOrCreate({
             game: game,
-            name: 'total',
+            name: 'moneyline_home',
+        });
+        this.statisticSet.add(moneylineHome);
+
+        const totalOver = await globalModels.allStatistics.findOrCreate({
+            game: game,
+            name: 'total_over',
         })
-        this.statisticSet.add(total);
+        this.statisticSet.add(totalOver);
+
+        const totalUnder = await globalModels.allStatistics.findOrCreate({
+            game: game,
+            name: 'total_under',
+        })
+        this.statisticSet.add(totalUnder);
     }
 
     return this.statisticSet;

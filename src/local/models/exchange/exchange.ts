@@ -144,11 +144,23 @@ export class Exchange {
                 throw new Error(`Did not find corresponding update odd function.`);
             }
 
-            await updateOddFunction({
+            const oddExists = await updateOddFunction({
                 exchange: this,
                 statistic: statistic,
             });
+
+            if (oddExists) {
+                const odd = await this.oddSet.findOrCreate({
+                    exchange: this,
+                    statistic: statistic,
+                    updateOddElementsFunction: updateOddFunction,
+                });
+                this.oddSet.add(odd);
+                statistic.oddSet.add(odd);
+            }
         }
+
+        return this.oddSet;
     }
 
     // public static methods

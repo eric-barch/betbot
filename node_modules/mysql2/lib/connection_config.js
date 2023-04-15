@@ -10,6 +10,7 @@
 const { URL } = require('url');
 const ClientConstants = require('./constants/client');
 const Charsets = require('./constants/charsets');
+const { version } = require('../package.json')
 let SSLProfiles = null;
 
 const validOptions = {
@@ -59,6 +60,8 @@ const validOptions = {
   user: 1,
   // These options are used for Pool
   connectionLimit: 1,
+  maxIdle: 1,
+  idleTimeout: 1,
   Promise: 1,
   queueLimit: 1,
   waitForConnections: 1
@@ -89,7 +92,7 @@ class ConnectionConfig {
     this.isServer = options.isServer;
     this.stream = options.stream;
     this.host = options.host || 'localhost';
-    this.port = options.port || 3306;
+    this.port = (typeof options.port === 'string' ? parseInt(options.port, 10) : options.port)|| 3306;
     this.localAddress = options.localAddress;
     this.socketPath = options.socketPath;
     this.user = options.user || undefined;
@@ -167,7 +170,13 @@ class ConnectionConfig {
       ConnectionConfig.getDefaultFlags(options),
       options.flags || ''
     );
-    this.connectAttributes = options.connectAttributes;
+    // Default connection attributes
+    // https://dev.mysql.com/doc/refman/8.0/en/performance-schema-connection-attribute-tables.html
+    const defaultConnectAttributes =  {
+      _client_name: 'Node-MySQL-2',
+      _client_version: version
+    };
+    this.connectAttributes = { ...defaultConnectAttributes, ...(options.connectAttributes || {})};
     this.maxPreparedStatements = options.maxPreparedStatements || 16000;
   }
 
@@ -215,7 +224,8 @@ class ConnectionConfig {
       'SECURE_CONNECTION',
       'MULTI_RESULTS',
       'TRANSACTIONS',
-      'SESSION_TRACK'
+      'SESSION_TRACK',
+      'CONNECT_ATTRS'
     ];
     if (options && options.multipleStatements) {
       defaultFlags.push('MULTI_STATEMENTS');
@@ -223,9 +233,6 @@ class ConnectionConfig {
     defaultFlags.push('PLUGIN_AUTH');
     defaultFlags.push('PLUGIN_AUTH_LENENC_CLIENT_DATA');
 
-    if (options && options.connectAttributes) {
-      defaultFlags.push('CONNECT_ATTRS');
-    }
     return defaultFlags;
   }
 
@@ -252,7 +259,7 @@ class ConnectionConfig {
     const parsedUrl = new URL(url);
     const options = {
       host: parsedUrl.hostname,
-      port: parsedUrl.port,
+      port: parseInt(parsedUrl.port, 10),
       database: parsedUrl.pathname.slice(1),
       user: parsedUrl.username,
       password: parsedUrl.password

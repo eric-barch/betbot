@@ -24,16 +24,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateOddFunctions = void 0;
-const fanDuel = __importStar(require("./fanDuel"));
 const draftKings = __importStar(require("./draftKings"));
+const fanDuel = __importStar(require("./fanDuel"));
 exports.updateOddFunctions = new Map([
-    ['draftKings_spread_away', draftKings.spreadAway],
-    ['draftKings_spread_home', draftKings.spreadHome],
-    ['draftKings_moneyline', draftKings.moneyline],
-    ['draftKings_total', draftKings.total],
     ['fanDuel_spread_away', fanDuel.spreadAway],
     ['fanDuel_spread_home', fanDuel.spreadHome],
-    ['fanDuel_moneyline', fanDuel.moneyline],
-    ['fanDuel_total', fanDuel.total],
+    ['fanDuel_moneyline_away', fanDuel.moneylineAway],
+    ['fanDuel_moneyline_home', fanDuel.moneylineHome],
+    ['fanDuel_total_over', fanDuel.totalOver],
+    ['fanDuel_total_under', fanDuel.totalUnder],
+    ['draftKings_spread_away', draftKings.spreadAway],
+    ['draftKings_spread_home', draftKings.spreadHome],
+    ['draftKings_moneyline_away', draftKings.moneylineAway],
+    ['draftKings_moneyline_home', draftKings.moneylineHome],
+    ['draftKings_total_over', draftKings.totalOver],
+    ['draftKings_total_under', draftKings.totalUnder],
 ]);
 //# sourceMappingURL=index.js.map

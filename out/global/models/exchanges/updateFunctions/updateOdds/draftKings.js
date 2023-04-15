@@ -1,189 +1,172 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.total = exports.moneyline = exports.spreadHome = exports.spreadAway = void 0;
-const localModels = __importStar(require("../../../../../local"));
-const draftKings_1 = require("../updateOddElements/draftKings");
+exports.totalUnder = exports.totalOver = exports.moneylineHome = exports.moneylineAway = exports.spreadHome = exports.spreadAway = void 0;
 async function spreadAway({ exchange, statistic, }) {
-    const updateOverOddElementsFunction = draftKings_1.updateOddElementsFunctions.get(`spread_away_over`);
-    if (!updateOverOddElementsFunction) {
-        throw new Error(`Did not find function`);
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
     }
-    const overOddExists = await updateOverOddElementsFunction({
+    const game = statistic.game;
+    const teamRowElement = await getTeamRowElement({
         exchange: exchange,
         statistic: statistic,
+        team: game.awayTeam,
     });
-    if (overOddExists) {
-        const overOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Over,
-            updateOddElementsFunction: updateOverOddElementsFunction,
-        });
-        exchange.oddSet.add(overOdd);
-        statistic.oddSet.add(overOdd);
+    const valueElement = await teamRowElement.$('xpath/td[1]/div/div/div/div[1]/span');
+    const priceElement = await teamRowElement.$('xpath/td[1]/div/div/div/div[2]/div[2]/span');
+    if (!valueElement) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+        return false;
     }
-    const updateUnderOddElementsFunction = draftKings_1.updateOddElementsFunctions.get(`spread_away_under`);
-    if (!updateUnderOddElementsFunction) {
-        throw new Error(`Did not find function`);
+    if (!priceElement) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+        return false;
     }
-    const underOddExists = await updateUnderOddElementsFunction({
-        exchange: exchange,
-        statistic: statistic,
-    });
-    if (underOddExists) {
-        const underOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Under,
-            updateOddElementsFunction: updateUnderOddElementsFunction,
-        });
-        exchange.oddSet.add(underOdd);
-        statistic.oddSet.add(underOdd);
+    if (this) {
+        this.setPriceElement(priceElement);
+        this.setValueElement(valueElement);
     }
-    return exchange.oddSet;
+    return true;
 }
 exports.spreadAway = spreadAway;
 async function spreadHome({ exchange, statistic, }) {
-    const updateOverOddElementsFunction = draftKings_1.updateOddElementsFunctions.get(`spread_home_over`);
-    if (!updateOverOddElementsFunction) {
-        throw new Error(`Did not find function`);
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
     }
-    const overOddExists = await updateOverOddElementsFunction({
+    const game = statistic.game;
+    const teamRowElement = await getTeamRowElement({
         exchange: exchange,
         statistic: statistic,
+        team: game.homeTeam,
     });
-    if (overOddExists) {
-        const overOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Over,
-            updateOddElementsFunction: updateOverOddElementsFunction,
-        });
-        exchange.oddSet.add(overOdd);
-        statistic.oddSet.add(overOdd);
+    const valueElement = await teamRowElement.$('xpath/td[1]/div/div/div/div[1]/span');
+    const priceElement = await teamRowElement.$('xpath/td[1]/div/div/div/div[2]/div[2]/span');
+    if (!valueElement) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+        return false;
     }
-    const updateUnderOddElementsFunction = draftKings_1.updateOddElementsFunctions.get(`spread_home_under`);
-    if (!updateUnderOddElementsFunction) {
-        throw new Error(`Did not find function`);
+    if (!priceElement) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+        return false;
     }
-    const underOddExists = await updateUnderOddElementsFunction({
-        exchange: exchange,
-        statistic: statistic,
-    });
-    if (underOddExists) {
-        const underOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Under,
-            updateOddElementsFunction: updateUnderOddElementsFunction,
-        });
-        exchange.oddSet.add(underOdd);
-        statistic.oddSet.add(underOdd);
+    if (this) {
+        this.setPriceElement(priceElement);
+        this.setValueElement(valueElement);
     }
-    return exchange.oddSet;
+    return true;
 }
 exports.spreadHome = spreadHome;
-async function moneyline({ exchange, statistic, }) {
-    const updateAwayOddElementsFunction = draftKings_1.updateOddElementsFunctions.get(`moneyline_away`);
-    if (!updateAwayOddElementsFunction) {
-        throw new Error(`Did not find function`);
+async function moneylineAway({ exchange, statistic, }) {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
     }
-    const awayOddExists = await updateAwayOddElementsFunction({
+    const game = statistic.game;
+    const teamRowElement = await getTeamRowElement({
         exchange: exchange,
         statistic: statistic,
+        team: game.awayTeam,
     });
-    if (awayOddExists) {
-        const awayOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            value: 'away',
-            updateOddElementsFunction: updateAwayOddElementsFunction,
-        });
-        exchange.oddSet.add(awayOdd);
-        statistic.oddSet.add(awayOdd);
+    const priceElement = await teamRowElement.$('xpath/td[3]/div/div/div/div/div[2]/span');
+    if (!priceElement) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+        return false;
     }
-    const updateHomeOddElementsFunction = draftKings_1.updateOddElementsFunctions.get(`moneyline_home`);
-    if (!updateHomeOddElementsFunction) {
-        throw new Error(`Did not find function`);
+    if (this) {
+        this.setPriceElement(priceElement);
+        this.setValueElement(null);
     }
-    const homeOddExists = await updateHomeOddElementsFunction({
-        exchange: exchange,
-        statistic: statistic,
-    });
-    if (homeOddExists) {
-        const homeOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            value: 'home',
-            updateOddElementsFunction: updateHomeOddElementsFunction,
-        });
-        exchange.oddSet.add(homeOdd);
-        statistic.oddSet.add(homeOdd);
-    }
-    return exchange.oddSet;
+    return true;
 }
-exports.moneyline = moneyline;
-async function total({ exchange, statistic, }) {
-    const updateOverOddElementsFunction = draftKings_1.updateOddElementsFunctions.get(`total_over`);
-    if (!updateOverOddElementsFunction) {
-        throw new Error(`Did not find function`);
+exports.moneylineAway = moneylineAway;
+async function moneylineHome({ exchange, statistic, }) {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
     }
-    const overOddExists = await updateOverOddElementsFunction({
+    const game = statistic.game;
+    const teamRowElement = await getTeamRowElement({
         exchange: exchange,
         statistic: statistic,
+        team: game.homeTeam,
     });
-    if (overOddExists) {
-        const overOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Over,
-            updateOddElementsFunction: updateOverOddElementsFunction,
-        });
-        exchange.oddSet.add(overOdd);
-        statistic.oddSet.add(overOdd);
+    const priceElement = await teamRowElement.$('xpath/td[3]/div/div/div/div/div[2]/span');
+    if (!priceElement) {
+        if (this) {
+            this.setPriceElement(null);
+            this.setValueElement(null);
+        }
+        return false;
     }
-    const updateUnderOddElementsFunction = draftKings_1.updateOddElementsFunctions.get(`total_under`);
-    if (!updateUnderOddElementsFunction) {
-        throw new Error(`Did not find function`);
+    if (this) {
+        this.setPriceElement(priceElement);
+        this.setValueElement(null);
     }
-    const underOddExists = await updateUnderOddElementsFunction({
-        exchange: exchange,
-        statistic: statistic,
-    });
-    if (underOddExists) {
-        const underOdd = await exchange.oddSet.findOrCreate({
-            exchange: exchange,
-            statistic: statistic,
-            inequality: localModels.Inequality.Under,
-            updateOddElementsFunction: updateUnderOddElementsFunction,
-        });
-        exchange.oddSet.add(underOdd);
-        statistic.oddSet.add(underOdd);
-    }
-    return exchange.oddSet;
+    return true;
 }
-exports.total = total;
+exports.moneylineHome = moneylineHome;
+async function totalOver({ exchange, statistic, }) {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
+    }
+    return false;
+}
+exports.totalOver = totalOver;
+async function totalUnder({ exchange, statistic, }) {
+    if (this) {
+        exchange = this.exchange;
+        statistic = this.statistic;
+    }
+    return false;
+}
+exports.totalUnder = totalUnder;
+async function getTeamRowElement({ exchange, statistic, team, }) {
+    const page = exchange.page;
+    const teamRows = await page.$$('tbody > tr');
+    const game = statistic.game;
+    const awayTeamName = game.awayTeam.identifierFull.toLowerCase();
+    const homeTeamName = game.homeTeam.identifierFull.toLowerCase();
+    const matchedTeamRows = [];
+    for (const teamRow of teamRows) {
+        const aElement = await teamRow.$('th > a');
+        if (!aElement) {
+            continue;
+        }
+        const hrefString = await (await aElement.getProperty('href')).jsonValue();
+        const hrefStringClean = hrefString.trim().toLowerCase();
+        if (hrefStringClean.includes(awayTeamName) && hrefStringClean.includes(homeTeamName)) {
+            matchedTeamRows.push(teamRow);
+        }
+    }
+    if (matchedTeamRows.length < 2) {
+        throw new Error(`Did not expect fewer than 2 game element handles from ${game.regionAbbrIdentifierAbbr}`);
+    }
+    else if (matchedTeamRows.length > 2) {
+        throw new Error(`Did not expect more than 2 game element handles for ${game.regionAbbrIdentifierAbbr}.`);
+    }
+    if (team === game.awayTeam) {
+        return matchedTeamRows[0];
+    }
+    else if (team === game.homeTeam) {
+        return matchedTeamRows[1];
+    }
+    throw new Error(`Error finding team row element`);
+}
 //# sourceMappingURL=draftKings.js.map

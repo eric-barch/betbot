@@ -42,7 +42,7 @@ async function main() {
         await allOdds.updateValues();
         const endTime = new Date();
         const duration = endTime.getTime() - startTime.getTime();
-        console.log(`total duration: ${duration}\n`);
+        console.log(`total duration: ${duration}`);
     }
     process.exit(0);
 }

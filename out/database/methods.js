@@ -12,32 +12,27 @@ async function init() {
         console.log(`MySQL connection unsuccessful: ${error}`);
     }
     // Exchange associations
-    models_1.Exchange.belongsToMany(models_1.Game, {
-        through: 'exchange_games',
-        foreignKey: 'exchangeId',
-        otherKey: 'gameId',
-    });
-    models_1.Exchange.hasMany(models_1.ContinuousOdd, { foreignKey: 'exchangeId' });
-    models_1.Exchange.hasMany(models_1.DiscreteOdd, { foreignKey: 'exchangeId' });
+    // Exchange.belongsToMany(Game, {
+    //     through: 'exchange_games',
+    //     foreignKey: 'exchangeId',
+    //     otherKey: 'gameId',
+    // });
+    models_1.Exchange.hasMany(models_1.Odd, { foreignKey: 'exchangeId' });
     // Game associations 
-    models_1.Game.belongsToMany(models_1.Exchange, {
-        through: 'exchange_games',
-        foreignKey: 'gameId',
-        otherKey: 'exchangeId',
-    });
+    // Game.belongsToMany(Exchange, {
+    //     through: 'exchange_games',
+    //     foreignKey: 'gameId',
+    //     otherKey: 'exchangeId',
+    // });
     models_1.Game.hasMany(models_1.Statistic, { foreignKey: 'gameId' });
     models_1.Game.belongsTo(models_1.Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
     models_1.Game.belongsTo(models_1.Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
-    // ContinuousOdd associations
-    models_1.ContinuousOdd.belongsTo(models_1.Exchange, { foreignKey: 'exchangeId' });
-    models_1.ContinuousOdd.belongsTo(models_1.Statistic, { foreignKey: 'statisticId' });
-    // DiscreteOdd associations
-    models_1.DiscreteOdd.belongsTo(models_1.Exchange, { foreignKey: 'exchangeId' });
-    models_1.DiscreteOdd.belongsTo(models_1.Statistic, { foreignKey: 'statisticId' });
+    // Odd associations
+    models_1.Odd.belongsTo(models_1.Exchange, { foreignKey: 'exchangeId' });
+    models_1.Odd.belongsTo(models_1.Statistic, { foreignKey: 'statisticId' });
     // Statistic associations
     models_1.Statistic.belongsTo(models_1.Game, { foreignKey: 'gameId' });
-    models_1.Statistic.hasMany(models_1.ContinuousOdd, { foreignKey: 'statisticId' });
-    models_1.Statistic.hasMany(models_1.DiscreteOdd, { foreignKey: 'statisticId' });
+    models_1.Statistic.hasMany(models_1.Odd, { foreignKey: 'statisticId' });
     // Team associations
     models_1.Team.hasMany(models_1.Game, { as: 'awayTeam', foreignKey: 'awayTeamId' });
     models_1.Team.hasMany(models_1.Game, { as: 'homeTeam', foreignKey: 'homeTeamId' });
