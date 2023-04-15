@@ -5,3 +5,4 @@ import {
 export {
     allExchanges,
 };
+export * from './updateFunctions';

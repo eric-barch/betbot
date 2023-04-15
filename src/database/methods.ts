@@ -1,6 +1,6 @@
 import { sequelize } from './instance';
 
-import { Exchange, Game, ContinuousOdd, DiscreteOdd, Statistic, Team } from './models';
+import { Exchange, Game, Odd, Statistic, Team } from './models';
 
 export async function init(): Promise<void> {
     try {
@@ -11,36 +11,30 @@ export async function init(): Promise<void> {
     }
     
     // Exchange associations
-    Exchange.belongsToMany(Game, {
-        through: 'exchange_games',
-        foreignKey: 'exchangeId',
-        otherKey: 'gameId',
-    });
-    Exchange.hasMany(ContinuousOdd, { foreignKey: 'exchangeId'});
-    Exchange.hasMany(DiscreteOdd, { foreignKey: 'exchangeId' });
+    // Exchange.belongsToMany(Game, {
+    //     through: 'exchange_games',
+    //     foreignKey: 'exchangeId',
+    //     otherKey: 'gameId',
+    // });
+    Exchange.hasMany(Odd, { foreignKey: 'exchangeId'});
     
     // Game associations 
-    Game.belongsToMany(Exchange, {
-        through: 'exchange_games',
-        foreignKey: 'gameId',
-        otherKey: 'exchangeId',
-    });
+    // Game.belongsToMany(Exchange, {
+    //     through: 'exchange_games',
+    //     foreignKey: 'gameId',
+    //     otherKey: 'exchangeId',
+    // });
     Game.hasMany(Statistic, { foreignKey: 'gameId' });
     Game.belongsTo(Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
     Game.belongsTo(Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
     
-    // ContinuousOdd associations
-    ContinuousOdd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
-    ContinuousOdd.belongsTo(Statistic, { foreignKey: 'statisticId' });
-
-    // DiscreteOdd associations
-    DiscreteOdd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
-    DiscreteOdd.belongsTo(Statistic, { foreignKey: 'statisticId' });
+    // Odd associations
+    Odd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
+    Odd.belongsTo(Statistic, { foreignKey: 'statisticId' });
 
     // Statistic associations
     Statistic.belongsTo(Game, { foreignKey: 'gameId' });
-    Statistic.hasMany(ContinuousOdd, { foreignKey: 'statisticId' });
-    Statistic.hasMany(DiscreteOdd, { foreignKey: 'statisticId' });
+    Statistic.hasMany(Odd, { foreignKey: 'statisticId' });
 
     // Team associations
     Team.hasMany(Game, { as: 'awayTeam', foreignKey: 'awayTeamId' });
