@@ -28,10 +28,11 @@ const databaseModels = __importStar(require("../../../database"));
 const globalModels = __importStar(require("../../../global"));
 class Odd {
     // private constructor
-    constructor({ exchange, statistic, updateOddElementsFunction, }) {
+    constructor({ exchange, statistic, updateElementsFunction, updateValuesFunction, }) {
         this.wrappedPrice = null;
         this.wrappedValue = null;
-        this.updateOddElementsFunction = updateOddElementsFunction.bind(this);
+        this.updateElementsFunction = updateElementsFunction.bind(this);
+        this.updateValuesFunction = updateValuesFunction.bind(this);
         this.exchange = exchange;
         this.statistic = statistic;
         this.wrappedPriceElement = null;
@@ -41,11 +42,12 @@ class Odd {
         this.wrappedSqlOdd = null;
     }
     // public async constructor
-    static async create({ exchange, statistic, updateOddElementsFunction, }) {
+    static async create({ exchange, statistic, updateElementsFunction, updateValuesFunction, }) {
         const newOdd = new Odd({
             exchange: exchange,
             statistic: statistic,
-            updateOddElementsFunction: updateOddElementsFunction,
+            updateElementsFunction: updateElementsFunction,
+            updateValuesFunction: updateValuesFunction,
         });
         await newOdd.initSqlOdd();
         globalModels.allOdds.add(newOdd);
@@ -87,40 +89,16 @@ class Odd {
     }
     ;
     async updateElements() {
-        await this.updateOddElementsFunction({
+        await this.updateElementsFunction({
             exchange: this.exchange,
             statistic: this.statistic,
         });
     }
     async updateValues() {
-        const priceElement = await this.getPriceElement();
-        const valueElement = await this.getValueElement();
-        if (!priceElement) {
-            await this.setPrice(null);
-        }
-        else {
-            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
-            if (!priceJson) {
-                await this.setPrice(null);
-            }
-            else {
-                const priceJsonClean = priceJson.replace(/[a-zA-Z\s]/g, '').replace(/−/g, '-');
-                const price = Number(priceJsonClean);
-                await this.setPrice(price);
-            }
-        }
-        if (!valueElement) {
-            await this.setValue(null);
-            return;
-        }
-        const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
-        if (!valueJson) {
-            this.setValue(null);
-            return;
-        }
-        const valueJsonClean = valueJson.replace(/[a-zA-Z\s]/g, '').replace(/−/g, '-');
-        const value = Number(valueJsonClean);
-        await this.setValue(value);
+        await this.updateValuesFunction({
+            exchange: this.exchange,
+            statistic: this.statistic,
+        });
     }
     // getters and setters
     async getPriceElement() {

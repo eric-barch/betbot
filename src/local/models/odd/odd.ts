@@ -8,7 +8,8 @@ export class Odd {
     // private properties
     private wrappedPrice: number | null;
     private wrappedValue: number | null;
-    private updateOddElementsFunction: Function;
+    private updateElementsFunction: Function;
+    private updateValuesFunction: Function;
 
     // public linked objects
     public exchange: localModels.Exchange;
@@ -25,16 +26,19 @@ export class Odd {
     private constructor({
         exchange,
         statistic,
-        updateOddElementsFunction,
+        updateElementsFunction,
+        updateValuesFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
-        updateOddElementsFunction: Function,
+        updateElementsFunction: Function,
+        updateValuesFunction: Function,
     }) {
         this.wrappedPrice = null;
         this.wrappedValue = null;
 
-        this.updateOddElementsFunction = updateOddElementsFunction.bind(this);
+        this.updateElementsFunction = updateElementsFunction.bind(this);
+        this.updateValuesFunction = updateValuesFunction.bind(this);
 
         this.exchange = exchange;
         this.statistic = statistic;
@@ -52,16 +56,19 @@ export class Odd {
     static async create({
         exchange,
         statistic,
-        updateOddElementsFunction,
+        updateElementsFunction,
+        updateValuesFunction,
     }: {
         exchange: localModels.Exchange,
         statistic: localModels.Statistic,
-        updateOddElementsFunction: Function,
+        updateElementsFunction: Function,
+        updateValuesFunction: Function,
     }): Promise<Odd> {
         const newOdd = new Odd({
             exchange: exchange,
             statistic: statistic,
-            updateOddElementsFunction: updateOddElementsFunction,
+            updateElementsFunction: updateElementsFunction,
+            updateValuesFunction: updateValuesFunction,
         });
 
         await newOdd.initSqlOdd();
@@ -122,45 +129,17 @@ export class Odd {
     };
 
     public async updateElements() {
-        await this.updateOddElementsFunction({
+        await this.updateElementsFunction({
             exchange: this.exchange,
             statistic: this.statistic,
         });
     }
 
-    public async updateValues(): Promise<void> {
-        const priceElement = await this.getPriceElement();
-        const valueElement = await this.getValueElement();
-
-        if (!priceElement) {
-            await this.setPrice(null);
-        } else {
-            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
-
-            if (!priceJson) {
-                await this.setPrice(null);
-            } else {
-                const priceJsonClean = priceJson.replace(/[a-zA-Z\s]/g, '').replace(/−/g, '-');
-                const price = Number(priceJsonClean);
-                await this.setPrice(price);
-            }
-        }
-
-        if (!valueElement) {
-            await this.setValue(null);
-            return;
-        }
-
-        const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
-
-        if (!valueJson) {
-            this.setValue(null);
-            return;
-        }
-    
-        const valueJsonClean = valueJson.replace(/[a-zA-Z\s]/g, '').replace(/−/g, '-');
-        const value = Number(valueJsonClean);
-        await this.setValue(value);
+    public async updateValues() {
+        await this.updateValuesFunction({
+            exchange: this.exchange,
+            statistic: this.statistic,
+        })
     }
 
     // getters and setters

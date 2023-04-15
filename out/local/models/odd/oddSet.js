@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OddSet = void 0;
 const odd_1 = require("./odd");
 class OddSet extends Set {
-    async findOrCreate({ exchange, statistic, updateOddElementsFunction, }) {
+    async findOrCreate({ exchange, statistic, updateElementsFunction, updateValuesFunction, }) {
         for (const odd of this) {
             if (odd.matches({
                 exchange: exchange,
@@ -15,7 +15,8 @@ class OddSet extends Set {
         const newOdd = await odd_1.Odd.create({
             exchange: exchange,
             statistic: statistic,
-            updateOddElementsFunction: updateOddElementsFunction,
+            updateElementsFunction: updateElementsFunction,
+            updateValuesFunction: updateValuesFunction,
         });
         this.add(newOdd);
         return newOdd;

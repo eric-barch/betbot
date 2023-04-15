@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as localModels from '../../../../../local';
+import * as localModels from '../../../../../../local';
 
 export async function spreadAway(this: localModels.Odd, {
     exchange,
@@ -305,7 +305,7 @@ async function getParentElement({
         console.log(`${gameName} exists in ${exchange.name} JSON but not in the visible document.`);
         return null;
     }else if (gameTitleElements.length > 2) {
-        throw new Error(`Did not expect more than 2 game element handles for ${gameName}.`);
+        throw new Error(`Did not expect more than 2 game element handles for FanDuel ${gameName}.`);
     }
 
     const gameElement = await (await gameTitleElements[0].getProperty('parentElement')).getProperty('parentElement');

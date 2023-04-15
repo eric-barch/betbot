@@ -107,19 +107,24 @@ class Exchange {
     }
     async updateOdds() {
         for (const statistic of this.statisticSet) {
-            const updateOddFunction = globalModels.updateOddFunctions.get(`${this.nameCamelCase}_${statistic.name}`);
-            if (!updateOddFunction) {
-                throw new Error(`Did not find corresponding update odd function.`);
+            const updateElementsFunction = globalModels.updateElementsFunctions.get(`${this.nameCamelCase}_${statistic.name}`);
+            if (!updateElementsFunction) {
+                throw new Error(`Did not find corresponding update elements function.`);
             }
-            const oddExists = await updateOddFunction({
+            const oddExists = await updateElementsFunction({
                 exchange: this,
                 statistic: statistic,
             });
+            const updateValuesFunction = globalModels.updateValuesFunctions.get(`${this.nameCamelCase}`);
+            if (!updateValuesFunction) {
+                throw new Error(`Did not find corresponding update values function.`);
+            }
             if (oddExists) {
                 const odd = await this.oddSet.findOrCreate({
                     exchange: this,
                     statistic: statistic,
-                    updateOddElementsFunction: updateOddFunction,
+                    updateElementsFunction: updateElementsFunction,
+                    updateValuesFunction: updateValuesFunction
                 });
                 this.oddSet.add(odd);
                 statistic.oddSet.add(odd);
