@@ -30,11 +30,11 @@ const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
 class Exchange {
     // private constructor
-    constructor({ name, url, }) {
+    constructor({ name, url, updateGamesFunction, updateStatisticsFunction, }) {
         this.name = name;
         this.url = url;
-        this.wrappedUpdateGamesFunction = undefined;
-        this.wrappedUpdateStatisticsFunction = undefined;
+        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
+        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
         this.gameSet = new localModels.GameSet();
         this.statisticSet = new localModels.StatisticSet();
         this.oddSet = new localModels.OddSet();
@@ -43,10 +43,12 @@ class Exchange {
         this.wrappedSqlExchange = null;
     }
     // public async constructor
-    static async create({ name, url, }) {
+    static async create({ name, url, updateGamesFunction, updateStatisticsFunction, }) {
         const newExchange = new Exchange({
             name: name,
             url: url,
+            updateGamesFunction: updateGamesFunction,
+            updateStatisticsFunction: updateStatisticsFunction,
         });
         await newExchange.connectToExistingPage();
         await newExchange.initSqlExchange();

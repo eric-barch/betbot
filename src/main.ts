@@ -17,18 +17,27 @@ async function main() {
     await allOdds.init();
 
     while (true) {
-        const startTime = new Date();
+        const updateElementsStart = new Date();
+        await allOdds.updateElements();
+        const updateElementsEnd = new Date();
+
+        const updateElementsDuration = updateElementsEnd.getTime() - updateElementsStart.getTime();
+        console.log(`Update elements duration: ${updateElementsDuration}`);
+
+        const updateValuesStart = new Date();
         await allOdds.updateValues();
-        const endTime = new Date();
+        const updateValuesEnd = new Date();
 
-        const duration = endTime.getTime() - startTime.getTime();
+        const updateValuesDuration = updateValuesEnd.getTime() - updateValuesStart.getTime();
+        console.log(`Update values duration: ${updateValuesDuration}`);
 
-        console.log(`total duration: ${duration}`);
+        const totalDuration = updateValuesEnd.getTime() - updateElementsStart.getTime();
+        console.log(`Update total duration: ${totalDuration}`);
     }
+    
+    
 
     process.exit(0);
 }
 
 main();
-
-// Without web analysis, analyze takes about 10 milliseconds.

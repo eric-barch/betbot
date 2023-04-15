@@ -37,9 +37,11 @@ export class OddSet extends Set<Odd> {
         return newOdd;
     }
 
+    public async updateElements() {
+        await Promise.all(Array.from(this).map(odd => odd.updateElements()));
+    }
+
     public async updateValues() {
-        for (const odd of this) {
-            await odd.updateValues();
-        }
+        await Promise.all(Array.from(this).map(odd => odd.updateValues()));
     }
 }

@@ -2,7 +2,8 @@ import * as globalModels from '../../../../../global';
 import * as localModels from '../../../../../local';
 
 export async function updateGames(this: localModels.Exchange): Promise<localModels.GameSet> {
-    const gameScriptElements = await this.page.$$('script[type="application/ld+json"]');
+    const page = this.page;
+    const gameScriptElements = await page.$$('script[type="application/ld+json"]');
 
     const jsonGames: Record<string,any>[] = [];
 

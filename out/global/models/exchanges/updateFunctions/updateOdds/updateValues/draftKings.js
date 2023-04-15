@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateValues = void 0;
 async function updateValues() {
-    await this.updateElements();
     const priceElement = await this.getPriceElement();
     const valueElement = await this.getValueElement();
     if (!priceElement) {

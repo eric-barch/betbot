@@ -1,8 +1,6 @@
 import * as localModels from '../../../../../../local';
 
 export async function updateValues(this: localModels.Odd): Promise<void> {
-    await this.updateElements();
-
     const priceElement = await this.getPriceElement();
     const valueElement = await this.getValueElement();
 

@@ -26,7 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateGames = void 0;
 const globalModels = __importStar(require("../../../../../global"));
 async function updateGames() {
-    const gameScriptElements = await this.page.$$('script[type="application/ld+json"]');
+    const page = this.page;
+    const gameScriptElements = await page.$$('script[type="application/ld+json"]');
     const jsonGames = [];
     for (const gameScriptElement of gameScriptElements) {
         const content = await gameScriptElement.getProperty('textContent');

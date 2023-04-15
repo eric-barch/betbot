@@ -6,11 +6,9 @@ import { updateGamesFunctions } from '../exchanges';
 class AllGames extends localModels.GameSet {
     public async init(): Promise<localModels.GameSet> {
         for (const exchange of globalModels.allExchanges) {
-            const updateGamesFunction = updateGamesFunctions.get(exchange.nameCamelCase);
-            exchange.updateGamesFunction = updateGamesFunction;
             await exchange.updateGames();
         }
-
+        
         return this;
     }
 }

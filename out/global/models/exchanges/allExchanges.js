@@ -24,17 +24,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allExchanges = void 0;
+const globalModels = __importStar(require("../../../global"));
 const localModels = __importStar(require("../../../local"));
 class AllExchanges extends localModels.ExchangeSet {
     async init() {
         const draftKings = await localModels.Exchange.create({
             name: 'DraftKings',
             url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
+            updateGamesFunction: globalModels.updateGamesFunctions.get('draftKings'),
+            updateStatisticsFunction: globalModels.updateStatisticsFunctions.get('draftKings'),
         });
         this.add(draftKings);
         const fanDuel = await localModels.Exchange.create({
             name: 'FanDuel',
             url: 'https://sportsbook.fanduel.com/navigation/nba',
+            updateGamesFunction: globalModels.updateGamesFunctions.get('fanDuel'),
+            updateStatisticsFunction: globalModels.updateStatisticsFunctions.get('fanDuel'),
         });
         this.add(fanDuel);
         return this;

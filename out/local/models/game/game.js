@@ -91,7 +91,7 @@ class Game {
     }
     // public static methods
     static roundDateToNearestInterval(date) {
-        const ROUND_INTERVAL = 15;
+        const ROUND_INTERVAL = 60;
         const roundedMinutes = Math.round(date.getMinutes() / ROUND_INTERVAL) * ROUND_INTERVAL;
         const roundedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), roundedMinutes, 0);
         return roundedDate;

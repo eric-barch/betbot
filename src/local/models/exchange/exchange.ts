@@ -10,8 +10,8 @@ export class Exchange {
     public url: string;
 
     // private properties
-    private wrappedUpdateGamesFunction: Function | undefined;
-    private wrappedUpdateStatisticsFunction: Function | undefined;
+    private wrappedUpdateGamesFunction: Function;
+    private wrappedUpdateStatisticsFunction: Function;
     
     // public linked objects
     public gameSet: localModels.GameSet;
@@ -29,15 +29,19 @@ export class Exchange {
     private constructor({
         name,
         url,
+        updateGamesFunction,
+        updateStatisticsFunction,
     }: {
         name: string,
         url: string,
+        updateGamesFunction: Function,
+        updateStatisticsFunction: Function,
     }) {
         this.name = name;
         this.url = url;
 
-        this.wrappedUpdateGamesFunction = undefined;
-        this.wrappedUpdateStatisticsFunction = undefined;
+        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
+        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
         
         this.gameSet = new localModels.GameSet();
         this.statisticSet = new localModels.StatisticSet();
@@ -53,13 +57,19 @@ export class Exchange {
     public static async create({
         name,
         url,
+        updateGamesFunction,
+        updateStatisticsFunction,
     }: {
         name: string,
         url: string,
+        updateGamesFunction: Function,
+        updateStatisticsFunction: Function,
     }): Promise<Exchange> {
         const newExchange = new Exchange({
             name: name,
             url: url,
+            updateGamesFunction: updateGamesFunction,
+            updateStatisticsFunction: updateStatisticsFunction,
         })
 
         await newExchange.connectToExistingPage();

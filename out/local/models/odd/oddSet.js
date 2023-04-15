@@ -21,10 +21,11 @@ class OddSet extends Set {
         this.add(newOdd);
         return newOdd;
     }
+    async updateElements() {
+        await Promise.all(Array.from(this).map(odd => odd.updateElements()));
+    }
     async updateValues() {
-        for (const odd of this) {
-            await odd.updateValues();
-        }
+        await Promise.all(Array.from(this).map(odd => odd.updateValues()));
     }
 }
 exports.OddSet = OddSet;
