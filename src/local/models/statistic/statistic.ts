@@ -10,8 +10,6 @@ export class Statistic {
     public game: localModels.Game;
     public oddSet: localModels.OddSet;
 
-    // private linked objects
-
     // private sequelize object
     public wrappedSqlStatistic: databaseModels.Statistic | null;
 

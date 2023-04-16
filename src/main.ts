@@ -16,28 +16,30 @@ async function main() {
     await allStatistics.init();
     await allOdds.init();
 
-    while (true) {
-        const updateElementsStart = new Date();
+    async function updateElements() {
+        const start = new Date();
         await allOdds.updateElements();
-        const updateElementsEnd = new Date();
+        const end = new Date();
 
-        const updateElementsDuration = updateElementsEnd.getTime() - updateElementsStart.getTime();
-        console.log(`Update elements duration: ${updateElementsDuration}`);
+        const duration = end.getTime() - start.getTime();
+        console.log(`Update elements duration: ${duration}`);
 
-        const updateValuesStart = new Date();
-        await allOdds.updateValues();
-        const updateValuesEnd = new Date();
-
-        const updateValuesDuration = updateValuesEnd.getTime() - updateValuesStart.getTime();
-        console.log(`Update values duration: ${updateValuesDuration}`);
-
-        const totalDuration = updateValuesEnd.getTime() - updateElementsStart.getTime();
-        console.log(`Update total duration: ${totalDuration}`);
+        setTimeout(updateElements, 0);
     }
-    
-    
 
-    process.exit(0);
+    async function updateValues() {
+        const start = new Date();
+        await allOdds.updateValues();
+        const end = new Date();
+
+        const duration = end.getTime() - start.getTime();
+        console.log(`Update values duration: ${duration}`);
+
+        setTimeout(updateValues, 0);
+    }
+
+    updateElements();
+    updateValues();
 }
 
 main();

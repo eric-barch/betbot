@@ -14,10 +14,8 @@ export class Odd {
     // public linked objects
     public exchange: localModels.Exchange;
     public statistic: localModels.Statistic;
-
-    // private linked objects
-    private wrappedPriceElement: ElementHandle | null;
-    private wrappedValueElement: ElementHandle | null;
+    public priceElement: ElementHandle | null;
+    public valueElement: ElementHandle | null;
 
     // private sequelize object
     private wrappedSqlOdd: databaseModels.Odd | null;
@@ -43,8 +41,8 @@ export class Odd {
         this.exchange = exchange;
         this.statistic = statistic;
 
-        this.wrappedPriceElement = null;
-        this.wrappedValueElement = null;
+        this.priceElement = null;
+        this.valueElement = null;
 
         this.exchange.oddSet.add(this);
         this.statistic.oddSet.add(this);
@@ -143,30 +141,6 @@ export class Odd {
     }
 
     // getters and setters
-    public async getPriceElement(): Promise<ElementHandle | null> {
-        if (!this.wrappedPriceElement) {
-            await this.updateElements();
-        }
-
-        return this.wrappedPriceElement;
-    }
-
-    public setPriceElement(priceElement: ElementHandle | null) {
-        this.wrappedPriceElement = priceElement;
-    }
-
-    public async getValueElement(): Promise<ElementHandle | null> {
-        if(!this.wrappedValueElement) {
-            await this.updateElements();
-        }
-
-        return this.wrappedValueElement;
-    }
-
-    public setValueElement(valueElement: ElementHandle | null) {
-        this.wrappedValueElement = valueElement;
-    }
-
     public getPrice(): number | null {
         return this.wrappedPrice;
     }
@@ -179,18 +153,6 @@ export class Odd {
         });
     }
 
-    public getValue(): number | null {
-        return this.wrappedValue;
-    }
-
-    public async setValue(value: number | null) {
-        this.wrappedValue = value;
-
-        await this.sqlOdd.update({
-            value: value,
-        })
-    }
-
     get sqlOdd(): databaseModels.Odd {
         if (!this.wrappedSqlOdd) {
             throw new Error(`${this.exchange.name} ${this.statistic.name} sqlOdd is null.`);
@@ -201,5 +163,17 @@ export class Odd {
 
     set sqlOdd(sqlOdd: databaseModels.Odd) {
         this.wrappedSqlOdd = sqlOdd;
+    }
+
+    public getValue(): number | null {
+        return this.wrappedValue;
+    }
+
+    public async setValue(value: number | null) {
+        this.wrappedValue = value;
+
+        await this.sqlOdd.update({
+            value: value,
+        })
     }
 }

@@ -6,9 +6,6 @@ export class Game {
     // public properties
     public startDate: Date;
 
-    // private properties
-    private wrappedUpdateStatisticsFunction: Function | undefined;
-
     // public linked objects
     public awayTeam: localModels.Team;
     public homeTeam: localModels.Team;
@@ -29,8 +26,6 @@ export class Game {
         startDate: Date,
     }) {
         this.startDate = Game.roundDateToNearestInterval(startDate);
-
-        this.wrappedUpdateStatisticsFunction = undefined;
 
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
@@ -55,6 +50,7 @@ export class Game {
             homeTeam: homeTeam,
             startDate: startDate,
         });
+
         await newGame.initSqlGame();
 
         globalModels.allGames.add(newGame);
@@ -117,11 +113,6 @@ export class Game {
         return false;
     }
 
-    public async updateStatistics(): Promise<localModels.StatisticSet> {
-        await this.updateStatisticsFunction();
-        return this.statisticSet;
-    }
-
     // public static methods
     static roundDateToNearestInterval(date: Date): Date {
         const ROUND_INTERVAL = 60;
@@ -146,22 +137,6 @@ export class Game {
     get regionFullIdentifierFull(): string {
         const regionFullIdentifierFull = `${this.awayTeam.regionFullIdentifierFull} @ ${this.homeTeam.regionFullIdentifierFull}`;
         return regionFullIdentifierFull;
-    }
-
-    get updateStatisticsFunction(): Function {
-        if (!this.wrappedUpdateStatisticsFunction) {
-            throw new Error(`wrappedUpdateStatisticsFunction is undefined.`);
-        }
-
-        return this.wrappedUpdateStatisticsFunction;
-    }
-
-    set updateStatisticsFunction(updateStatisticsFunction: Function | undefined) {
-        if (!updateStatisticsFunction) {
-            throw new Error(`updateStatisticsFunction is undefined.`);
-        }
-
-        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
     }
 
     get sqlGame(): databaseModels.Game {

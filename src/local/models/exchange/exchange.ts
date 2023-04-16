@@ -1,4 +1,4 @@
-import * as puppeteer from 'puppeteer';
+import { connect, Browser, Page } from 'puppeteer';
 
 import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
@@ -19,8 +19,8 @@ export class Exchange {
     public oddSet: localModels.OddSet;
     
     // private linked objects
-    private wrappedBrowser: puppeteer.Browser | null;
-    private wrappedPage: puppeteer.Page | null;
+    private wrappedBrowser: Browser | null;
+    private wrappedPage: Page | null;
 
     // private sequelize object
     private wrappedSqlExchange: databaseModels.Exchange | null;
@@ -107,8 +107,8 @@ export class Exchange {
         this.browser.close();
     }
 
-    public async connectToExistingPage(): Promise<puppeteer.Page> {
-        this.browser = await puppeteer.connect({ browserURL: 'http://127.0.0.1:9222' });
+    public async connectToExistingPage(): Promise<Page> {
+        this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
 
         const targets = this.browser.targets();
         const target = targets.find(target => target.url().includes(this.url));
@@ -126,7 +126,7 @@ export class Exchange {
         const windowSize = await targetPage.evaluate(() => {
             return {
                 width: window.outerWidth,
-                height: window.outerHeight - 75 // This seems to be roughly the height of the Chrome navigation bar. Find a less hacky way to do this.
+                height: window.outerHeight,
             };
         });
 
@@ -139,11 +139,6 @@ export class Exchange {
     public async updateGames(): Promise<localModels.GameSet> {
         await this.updateGamesFunction();
         return this.gameSet;
-    }
-
-    public async updateStatistics(): Promise<localModels.StatisticSet> {
-        await this.updateStatisticsFunction();
-        return this.statisticSet;
     }
 
     public async updateOdds() {
@@ -180,10 +175,15 @@ export class Exchange {
         return this.oddSet;
     }
 
+    public async updateStatistics(): Promise<localModels.StatisticSet> {
+        await this.updateStatisticsFunction();
+        return this.statisticSet;
+    }
+
     // public static methods
 
     // getters and setters
-    get browser(): puppeteer.Browser {
+    get browser(): Browser {
         if (this.wrappedBrowser) {
             return this.wrappedBrowser;
         } else {
@@ -191,7 +191,7 @@ export class Exchange {
         }
     }
 
-    set browser(browser: puppeteer.Browser) {
+    set browser(browser: Browser) {
         this.wrappedBrowser = browser;
     }
 
@@ -205,7 +205,7 @@ export class Exchange {
         return firstCharLower;
     }
 
-    get page(): puppeteer.Page {
+    get page(): Page {
         if (this.wrappedPage) {
             return this.wrappedPage;
         } else {
@@ -213,7 +213,7 @@ export class Exchange {
         }
     }
 
-    set page(page: puppeteer.Page) {
+    set page(page: Page) {
         this.wrappedPage = page;
     }
 
@@ -237,11 +237,7 @@ export class Exchange {
         return this.wrappedUpdateGamesFunction;
     }
 
-    set updateGamesFunction(updateGamesFunction: Function | undefined) {
-        if (!updateGamesFunction) {
-            throw new Error(`updateGamesFunction is undefined.`);
-        }
-        
+    set updateGamesFunction(updateGamesFunction: Function) {
         this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
     }
 
@@ -253,11 +249,7 @@ export class Exchange {
         return this.wrappedUpdateStatisticsFunction;
     }
 
-    set updateStatisticsFunction(updateStatisticsFunction: Function | undefined) {
-        if (!updateStatisticsFunction) {
-            throw new Error(`updateStatisticsFunction is undefined.`);
-        }
-        
+    set updateStatisticsFunction(updateStatisticsFunction: Function) {
         this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
     }
 }

@@ -10,12 +10,6 @@ export class Team {
     public identifierAbbr: string;
     public altNames: string[];
 
-    // private properties
-
-    // public linked objects
-
-    // private linked objects
-
     // private sequelize objects
     private wrappedSqlTeam: databaseModels.Team | null;
 
@@ -98,6 +92,7 @@ export class Team {
     }
 
     // public instance methods
+    // TODO: Can make this better/simpler
     public matches({
         name,
     }: {
@@ -119,8 +114,6 @@ export class Team {
         
         return false;
     }
-
-    // public static methods
 
     // getters and setters
     get regionFullIdentifierFull(): string {

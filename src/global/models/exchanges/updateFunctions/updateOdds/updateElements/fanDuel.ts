@@ -27,8 +27,8 @@ export async function spreadAway(this: localModels.Odd, {
 
     if (!spreadAwayParent) {
         if (this) {
-            this.setPriceElement(null);
-            this.setValueElement(null);
+            this.priceElement = null;
+            this.valueElement = null;
         }
 
         return false;
@@ -38,8 +38,8 @@ export async function spreadAway(this: localModels.Odd, {
     const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
 
     if (this) {
-        this.setPriceElement(spreadAwayPriceElement);
-        this.setValueElement(spreadAwayValueElement);
+        this.priceElement = spreadAwayPriceElement;
+        this.valueElement = spreadAwayValueElement;
     }
 
     return true;
@@ -70,8 +70,8 @@ export async function spreadHome(this: localModels.Odd, {
 
     if (!spreadAwayParent) {
         if (this) {
-            this.setPriceElement(null);
-            this.setValueElement(null);
+            this.priceElement = null;
+            this.valueElement = null;
         }
 
         return false;
@@ -81,8 +81,8 @@ export async function spreadHome(this: localModels.Odd, {
     const spreadAwayPriceElement = (await spreadAwayParent.$$('span'))[1];
 
     if (this) {
-        this.setPriceElement(spreadAwayPriceElement);
-        this.setValueElement(spreadAwayValueElement);
+        this.priceElement = spreadAwayPriceElement;
+        this.valueElement = spreadAwayValueElement;
     }
 
     return true;
@@ -113,7 +113,7 @@ export async function moneylineAway(this: localModels.Odd, {
 
     if (!moneylineAwayParent) {
         if (this) {
-            this.setPriceElement(null);
+            this.priceElement = null;
         }
 
         return false;
@@ -123,7 +123,7 @@ export async function moneylineAway(this: localModels.Odd, {
 
     if (!(moneylineAwayPriceElement instanceof ElementHandle)) {
         if (this) {
-            this.setPriceElement(null);
+            this.priceElement = null;
         }
 
         return false;
@@ -133,14 +133,14 @@ export async function moneylineAway(this: localModels.Odd, {
 
     if (!moneylineAwayPriceJson) {
         if (this) {
-            this.setPriceElement(null);
+            this.priceElement = null;
         }
 
         return false;
     }
 
     if (this) {
-        this.setPriceElement(moneylineAwayPriceElement);
+        this.priceElement = moneylineAwayPriceElement;
     }
 
     return true;
@@ -171,7 +171,7 @@ export async function moneylineHome(this: localModels.Odd, {
 
     if (!moneylineHomeParent) {
         if (this) {
-            this.setPriceElement(null);
+            this.priceElement = null;
         }
 
         return false;
@@ -181,7 +181,7 @@ export async function moneylineHome(this: localModels.Odd, {
 
     if (!(moneylineHomePriceElement instanceof ElementHandle)) {
         if (this) {
-            this.setPriceElement(null);
+            this.priceElement = null;
         }
 
         return false;
@@ -191,14 +191,14 @@ export async function moneylineHome(this: localModels.Odd, {
 
     if (!moneylineHomePriceJson) {
         if (this) {
-            this.setPriceElement(null);
+            this.priceElement = null;
         }
 
         return false;
     }
 
     if (this) {
-        this.setPriceElement(moneylineHomePriceElement);
+        this.priceElement = moneylineHomePriceElement;
     }
 
     return true;
@@ -227,8 +227,8 @@ export async function totalOver(this: localModels.Odd, {
 
     if (!totalOverParent) {
         if (this) {
-            this.setPriceElement(null);
-            this.setValueElement(null);
+            this.priceElement = null;
+            this.valueElement = null;
         }
 
         return false;
@@ -238,8 +238,8 @@ export async function totalOver(this: localModels.Odd, {
     const totalOverValueElement = (await totalOverParent.$$('span'))[0];
 
     if (this) {
-        this.setPriceElement(totalOverPriceElement);
-        this.setValueElement(totalOverValueElement);
+        this.priceElement = totalOverPriceElement;
+        this.valueElement = totalOverValueElement;
     }
 
     return true;
@@ -268,8 +268,8 @@ export async function totalUnder(this: localModels.Odd, {
 
     if (!totalUnderParent) {
         if (this) {
-            this.setPriceElement(null);
-            this.setValueElement(null);
+            this.priceElement = null;
+            this.valueElement = null;
         }
 
         return false;
@@ -279,8 +279,8 @@ export async function totalUnder(this: localModels.Odd, {
     const totalUnderValueElement = (await totalUnderParent.$$('span'))[0];
 
     if (this) {
-        this.setPriceElement(totalUnderPriceElement);
-        this.setValueElement(totalUnderValueElement);
+        this.priceElement = totalUnderPriceElement;
+        this.valueElement = totalUnderValueElement;
     }
     
     return true;
