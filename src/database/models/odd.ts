@@ -3,11 +3,11 @@ import * as sqlz from 'sequelize';
 import { sequelize } from '..';
 
 import { Exchange } from './exchange';
-import { Statistic } from './statistic';
+import { Outcome } from './outcome';
 
 export class Odd extends sqlz.Model<
-    sqlz.InferAttributes<Odd, { omit: 'exchange' | 'statistic' }>,
-    sqlz.InferCreationAttributes<Odd, { omit: 'exchange' | 'statistic' }>
+    sqlz.InferAttributes<Odd, { omit: 'exchange' | 'outcome' }>,
+    sqlz.InferCreationAttributes<Odd, { omit: 'exchange' | 'outcome' }>
 > {
     // id
     declare id: sqlz.CreationOptional<number>;
@@ -22,11 +22,11 @@ export class Odd extends sqlz.Model<
 
     // foreign keys
     declare exchangeId: sqlz.ForeignKey<Exchange['id']>;
-    declare statisticId: sqlz.ForeignKey<Statistic['id']>;
+    declare outcomeId: sqlz.ForeignKey<Outcome['id']>;
 
     // associated sequelize model(s)
     declare exchange?: sqlz.NonAttribute<Exchange>;
-    declare statistic?: sqlz.NonAttribute<Statistic>;
+    declare outcome?: sqlz.NonAttribute<Outcome>;
 
     // virtual model associations
     // belongsTo(Exchange)
@@ -34,10 +34,10 @@ export class Odd extends sqlz.Model<
     declare getExchange: sqlz.BelongsToGetAssociationMixin<Exchange>;
     declare setExchange: sqlz.BelongsToSetAssociationMixin<Exchange, number>;
 
-    // belongsTo(Statistic)
-    declare createStatistic: sqlz.BelongsToCreateAssociationMixin<Statistic>;
-    declare getStatistic: sqlz.BelongsToGetAssociationMixin<Statistic>;
-    declare setStatistic: sqlz.BelongsToSetAssociationMixin<Statistic, number>;
+    // belongsTo(Outcome)
+    declare createOutcome: sqlz.BelongsToCreateAssociationMixin<Outcome>;
+    declare getOutcome: sqlz.BelongsToGetAssociationMixin<Outcome>;
+    declare setOutcome: sqlz.BelongsToSetAssociationMixin<Outcome, number>;
 
     // associated local model
     // none

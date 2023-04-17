@@ -5,20 +5,17 @@ import { Odd } from "./odd";
 export class OddSet extends Set<Odd> {
     public async findOrCreate({
         exchange,
-        statistic,
+        outcome,
         updateElementsFunction,
-        updateValuesFunction,
-
     }: {
         exchange: localModels.Exchange,
-        statistic: localModels.Statistic,
+        outcome: localModels.Outcome,
         updateElementsFunction: Function,
-        updateValuesFunction: Function,
     }): Promise<Odd> {
         for (const odd of this) {
             if (odd.matches({
                 exchange: exchange,
-                statistic: statistic,
+                outcome: outcome,
             })) {
                 return odd;
             }
@@ -27,9 +24,8 @@ export class OddSet extends Set<Odd> {
 
         const newOdd = await Odd.create({
             exchange: exchange,
-            statistic: statistic,
+            outcome: outcome,
             updateElementsFunction: updateElementsFunction,
-            updateValuesFunction: updateValuesFunction,
         });
         
         this.add(newOdd);
@@ -38,10 +34,16 @@ export class OddSet extends Set<Odd> {
     }
 
     public async updateElements() {
-        await Promise.all(Array.from(this).map(odd => odd.updateElements()));
+        for (const odd of this) {
+            await odd.updateElements();
+        }
+
+        return this;
     }
 
     public async updateValues() {
-        await Promise.all(Array.from(this).map(odd => odd.updateValues()));
+        for (const odd of this) {
+            await odd.updateValues();
+        }
     }
 }

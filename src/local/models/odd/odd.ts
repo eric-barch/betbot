@@ -8,12 +8,11 @@ export class Odd {
     // private properties
     private wrappedPrice: number | null;
     private wrappedValue: number | null;
-    private updateElementsFunction: Function;
-    private updateValuesFunction: Function;
+    private wrappedUpdateElementsFunction: Function;
 
     // public linked objects
     public exchange: localModels.Exchange;
-    public statistic: localModels.Statistic;
+    public outcome: localModels.Outcome;
     public priceElement: ElementHandle | null;
     public valueElement: ElementHandle | null;
 
@@ -23,29 +22,26 @@ export class Odd {
     // private constructor
     private constructor({
         exchange,
-        statistic,
+        outcome,
         updateElementsFunction,
-        updateValuesFunction,
     }: {
         exchange: localModels.Exchange,
-        statistic: localModels.Statistic,
+        outcome: localModels.Outcome,
         updateElementsFunction: Function,
-        updateValuesFunction: Function,
     }) {
         this.wrappedPrice = null;
         this.wrappedValue = null;
 
-        this.updateElementsFunction = updateElementsFunction.bind(this);
-        this.updateValuesFunction = updateValuesFunction.bind(this);
+        this.wrappedUpdateElementsFunction = updateElementsFunction.bind(this);
 
         this.exchange = exchange;
-        this.statistic = statistic;
+        this.outcome = outcome;
 
         this.priceElement = null;
         this.valueElement = null;
 
-        this.exchange.oddSet.add(this);
-        this.statistic.oddSet.add(this);
+        this.exchange.odds.add(this);
+        this.outcome.oddSet.add(this);
 
         this.wrappedSqlOdd = null;
     }
@@ -53,20 +49,17 @@ export class Odd {
     // public async constructor
     static async create({
         exchange,
-        statistic,
+        outcome,
         updateElementsFunction,
-        updateValuesFunction,
     }: {
         exchange: localModels.Exchange,
-        statistic: localModels.Statistic,
+        outcome: localModels.Outcome,
         updateElementsFunction: Function,
-        updateValuesFunction: Function,
     }): Promise<Odd> {
         const newOdd = new Odd({
             exchange: exchange,
-            statistic: statistic,
+            outcome: outcome,
             updateElementsFunction: updateElementsFunction,
-            updateValuesFunction: updateValuesFunction,
         });
 
         await newOdd.initSqlOdd();
@@ -79,20 +72,20 @@ export class Odd {
     // private sequelize instance constructor
     private async initSqlOdd(): Promise<databaseModels.Odd> {
         const exchange = this.exchange;
-        const statistic = this.statistic;
+        const outcome = this.outcome;
 
         const exchangeId = exchange.sqlExchange.get('id');
-        const statisticId = statistic.sqlStatistic.get('id');
+        const outcomeId = outcome.sqlOutcome.get('id');
         const value = this.getValue();
 
         await databaseModels.Odd.findOrCreate({
             where: {
                 exchangeId: exchangeId,
-                statisticId: statisticId,
+                outcomeId: outcomeId,
             },
             defaults: {
                 exchangeId: exchangeId,
-                statisticId: statisticId,
+                outcomeId: outcomeId,
                 value: value,
             },
         }).then(async ([sqlOdd, created]) => {
@@ -111,15 +104,15 @@ export class Odd {
     // public instance methods
     public matches({
         exchange,
-        statistic,
+        outcome,
     }: {
         exchange: localModels.Exchange,
-        statistic: localModels.Statistic,
+        outcome: localModels.Outcome,
     }): boolean {
         const exchangeMatches = (this.exchange === exchange);
-        const statisticMatches = (this.statistic === statistic);
+        const outcomeMatches = (this.outcome === outcome);
 
-        if (exchangeMatches && statisticMatches) {
+        if (exchangeMatches && outcomeMatches) {
             return true;
         }
 
@@ -127,17 +120,62 @@ export class Odd {
     };
 
     public async updateElements() {
-        await this.updateElementsFunction({
-            exchange: this.exchange,
-            statistic: this.statistic,
-        });
+        await this.wrappedUpdateElementsFunction();
     }
 
-    public async updateValues() {
-        await this.updateValuesFunction({
-            exchange: this.exchange,
-            statistic: this.statistic,
-        })
+    public async updateValues(): Promise<{
+        priceValue: number | null,
+        valueValue: number | null,
+    }> {
+        const priceElement = this.priceElement;
+        const valueElement = this.valueElement;
+
+        if (!priceElement) {
+            await this.setPrice(null);
+        } else {
+            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
+
+            if (!priceJson) {
+                await this.setPrice(null);
+            } else {
+                const hyphenVariations = /[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]/g;
+                const nonNumericChars = /[^0-9.-]/g;
+        
+                const cleanedPriceJson = priceJson
+                    .replace(hyphenVariations, '-')
+                    .replace(nonNumericChars, '');
+        
+                const price = Number(cleanedPriceJson);
+
+                await this.setPrice(price);
+            }
+        }
+
+        if (!valueElement) {
+            await this.setValue(null);
+        } else {
+            const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
+
+            if (!valueJson) {
+                await this.setValue(null);
+            } else {
+                const hyphenVariations = /[\u2010\u2011\u2012\u2013\u2014\u2015]/g;
+                const nonNumericChars = /[^0-9.-]/g;
+        
+                const cleanedValueJson = valueJson
+                    .replace(hyphenVariations, '-')
+                    .replace(nonNumericChars, '');
+        
+                const value = Number(cleanedValueJson);
+
+                await this.setValue(value);
+            }
+        }
+
+        return {
+            priceValue: this.getPrice(),
+            valueValue: this.getValue(),
+        }
     }
 
     // getters and setters
@@ -155,7 +193,7 @@ export class Odd {
 
     get sqlOdd(): databaseModels.Odd {
         if (!this.wrappedSqlOdd) {
-            throw new Error(`${this.exchange.name} ${this.statistic.name} sqlOdd is null.`);
+            throw new Error(`${this.exchange.name} ${this.outcome.name} sqlOdd is null.`);
         }
 
         return this.wrappedSqlOdd;

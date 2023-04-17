@@ -4,19 +4,53 @@ import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
+export class UpdateOddElementsFunctions {
+    spreadAway: Function;
+    spreadHome: Function;
+    moneylineAway: Function;
+    moneylineHome: Function;
+    totalOver: Function;
+    totalUnder: Function;
+
+    constructor({
+        spreadAway,
+        spreadHome,
+        moneylineAway,
+        moneylineHome,
+        totalOver,
+        totalUnder,
+    }: {
+        spreadAway: Function,
+        spreadHome: Function,
+        moneylineAway: Function,
+        moneylineHome: Function,
+        totalOver: Function,
+        totalUnder: Function,
+    }) {
+        this.spreadAway = spreadAway;
+        this.spreadHome = spreadHome;
+        this.moneylineAway = moneylineAway;
+        this.moneylineHome = moneylineHome;
+        this.totalOver = totalOver;
+        this.totalUnder = totalUnder;
+    }
+}
+
 export class Exchange {
     // public properties
     public name: string;
     public url: string;
 
     // private properties
-    private wrappedUpdateGamesFunction: Function;
-    private wrappedUpdateStatisticsFunction: Function;
+    private wrappedUpdateExchangeGamesFunction: Function;
+    private wrappedUpdateExchangeGameElementFunction: Function;
+    private wrappedUpdateExchangeGameTeamElementFunction: Function;
+    private wrappedUpdateExchangeOutcomesFunction: Function;
+    private wrappedUpdateOddElementsFunctions: UpdateOddElementsFunctions;
     
     // public linked objects
-    public gameSet: localModels.GameSet;
-    public statisticSet: localModels.StatisticSet;
-    public oddSet: localModels.OddSet;
+    public exchangeGames: localModels.ExchangeGameSet;
+    public odds: localModels.OddSet;
     
     // private linked objects
     private wrappedBrowser: Browser | null;
@@ -29,23 +63,31 @@ export class Exchange {
     private constructor({
         name,
         url,
-        updateGamesFunction,
-        updateStatisticsFunction,
+        updateExchangeGamesFunction,
+        updateExchangeGameElementFunction,
+        updateExchangeGameTeamElementFunction,
+        updateExchangeOutcomesFunction,
+        updateOddElementsFunctions,
     }: {
         name: string,
         url: string,
-        updateGamesFunction: Function,
-        updateStatisticsFunction: Function,
+        updateExchangeGamesFunction: Function,
+        updateExchangeGameElementFunction: Function,
+        updateExchangeGameTeamElementFunction: Function,
+        updateExchangeOutcomesFunction: Function,
+        updateOddElementsFunctions: UpdateOddElementsFunctions,
     }) {
         this.name = name;
         this.url = url;
 
-        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
-        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
+        this.wrappedUpdateExchangeGamesFunction = updateExchangeGamesFunction.bind(this);
+        this.wrappedUpdateExchangeGameElementFunction = updateExchangeGameElementFunction;
+        this.wrappedUpdateExchangeGameTeamElementFunction = updateExchangeGameTeamElementFunction;
+        this.wrappedUpdateExchangeOutcomesFunction = updateExchangeOutcomesFunction.bind(this);
+        this.wrappedUpdateOddElementsFunctions = updateOddElementsFunctions;
         
-        this.gameSet = new localModels.GameSet();
-        this.statisticSet = new localModels.StatisticSet();
-        this.oddSet = new localModels.OddSet();
+        this.exchangeGames = new localModels.ExchangeGameSet;
+        this.odds = new localModels.OddSet();
 
         this.wrappedBrowser = null;
         this.wrappedPage = null;
@@ -57,19 +99,28 @@ export class Exchange {
     public static async create({
         name,
         url,
-        updateGamesFunction,
-        updateStatisticsFunction,
+        updateExchangeGamesFunction,
+        updateExchangeGameElementFunction,
+        updateExchangeGameTeamElementFunction,
+        updateExchangeOutcomesFunction,
+        updateOddElementsFunctions,
     }: {
         name: string,
         url: string,
-        updateGamesFunction: Function,
-        updateStatisticsFunction: Function,
+        updateExchangeGamesFunction: Function,
+        updateExchangeGameElementFunction: Function,
+        updateExchangeGameTeamElementFunction: Function,
+        updateExchangeOutcomesFunction: Function,
+        updateOddElementsFunctions: UpdateOddElementsFunctions,
     }): Promise<Exchange> {
         const newExchange = new Exchange({
             name: name,
             url: url,
-            updateGamesFunction: updateGamesFunction,
-            updateStatisticsFunction: updateStatisticsFunction,
+            updateExchangeGamesFunction: updateExchangeGamesFunction,
+            updateExchangeGameElementFunction: updateExchangeGameElementFunction,
+            updateExchangeGameTeamElementFunction: updateExchangeGameTeamElementFunction,
+            updateExchangeOutcomesFunction: updateExchangeOutcomesFunction,
+            updateOddElementsFunctions: updateOddElementsFunctions,
         })
 
         await newExchange.connectToExistingPage();
@@ -136,48 +187,34 @@ export class Exchange {
         return this.page;
     }
 
-    public async updateGames(): Promise<localModels.GameSet> {
-        await this.updateGamesFunction();
-        return this.gameSet;
+    public async updateExchangeGames(): Promise<localModels.ExchangeGameSet> {
+        const exchangeGames = await this.wrappedUpdateExchangeGamesFunction();
+        return exchangeGames;
     }
 
-    public async updateOdds() {
-        for (const statistic of this.statisticSet) {
-            const updateElementsFunction = globalModels.updateElementsFunctions.get(`${this.nameCamelCase}_${statistic.name}`);
-
-            if (!updateElementsFunction) {
-                throw new Error(`Did not find corresponding update elements function.`);
-            }
-
-            const oddExists = await updateElementsFunction({
-                exchange: this,
-                statistic: statistic,
-            });
-
-            const updateValuesFunction = globalModels.updateValuesFunctions.get(`${this.nameCamelCase}`);
-
-            if (!updateValuesFunction) {
-                throw new Error(`Did not find corresponding update values function.`);
-            }
-
-            if (oddExists) {
-                const odd = await this.oddSet.findOrCreate({
-                    exchange: this,
-                    statistic: statistic,
-                    updateElementsFunction: updateElementsFunction,
-                    updateValuesFunction: updateValuesFunction
-                });
-                this.oddSet.add(odd);
-                statistic.oddSet.add(odd);
-            }
-        }
-
-        return this.oddSet;
+    public async updateExchangeGameElements(): Promise<localModels.ExchangeGameSet> {
+        const exchangeGames = await this.exchangeGames.updateElements();
+        return exchangeGames;
     }
 
-    public async updateStatistics(): Promise<localModels.StatisticSet> {
-        await this.updateStatisticsFunction();
-        return this.statisticSet;
+    public async updateExchangeGameTeamElements() {
+        const exchangeGameTeams = await this.exchangeGames.updateExchangeGameTeamElements();
+        return exchangeGameTeams;
+    }
+
+    public async updateExchangeOutcomes() {
+        const odds = await this.wrappedUpdateExchangeOutcomesFunction();
+        return odds;
+    }
+
+    public async updateOddElements() {
+        const odds = await this.odds.updateElements();
+        return odds;
+    }
+
+    public async updateOutcomes(): Promise<localModels.OutcomeSet> {
+        const outcomeSet = await this.updateOutcomesFunction();
+        return outcomeSet;
     }
 
     // public static methods
@@ -230,26 +267,18 @@ export class Exchange {
     }
 
     get updateGamesFunction(): Function {
-        if (!this.wrappedUpdateGamesFunction) {
-            throw new Error(`wrappedUpdateGamesFunction is undefined.`);
-        }
-
-        return this.wrappedUpdateGamesFunction;
+        return this.wrappedUpdateExchangeGamesFunction;
     }
 
-    set updateGamesFunction(updateGamesFunction: Function) {
-        this.wrappedUpdateGamesFunction = updateGamesFunction.bind(this);
+    get updateExchangeGameTeamsFunction(): Function {
+        return this.wrappedUpdateExchangeGameTeamElementFunction;
     }
 
-    get updateStatisticsFunction(): Function {
-        if (!this.wrappedUpdateStatisticsFunction) {
-            throw new Error(`wrappedUpdateStatisticsFunction is undefined.`);
-        }
-
-        return this.wrappedUpdateStatisticsFunction;
+    get updateOutcomesFunction(): Function {
+        return this.wrappedUpdateExchangeOutcomesFunction;
     }
 
-    set updateStatisticsFunction(updateStatisticsFunction: Function) {
-        this.wrappedUpdateStatisticsFunction = updateStatisticsFunction.bind(this);
+    get updateOddsFunctions(): UpdateOddElementsFunctions {
+        return this.wrappedUpdateOddElementsFunctions;
     }
 }

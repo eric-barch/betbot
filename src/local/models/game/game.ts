@@ -9,8 +9,8 @@ export class Game {
     // public linked objects
     public awayTeam: localModels.Team;
     public homeTeam: localModels.Team;
-    public exchangeSet: localModels.ExchangeSet;
-    public statisticSet: localModels.StatisticSet;
+    public exchangeGames: localModels.ExchangeGameSet;
+    public outcomeSet: localModels.OutcomeSet;
 
     // private sequelize object
     private wrappedSqlGame: databaseModels.Game | null;
@@ -29,8 +29,8 @@ export class Game {
 
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
-        this.exchangeSet = new localModels.ExchangeSet();
-        this.statisticSet = new localModels.StatisticSet();
+        this.exchangeGames = new localModels.ExchangeGameSet;
+        this.outcomeSet = new localModels.OutcomeSet;
 
         this.wrappedSqlGame = null;
     }

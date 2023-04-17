@@ -8,7 +8,9 @@ export class Team {
     public regionAbbr: string;
     public identifierFull: string;
     public identifierAbbr: string;
-    public altNames: string[];
+
+    // public linked objects
+    public exchangeGameTeams: localModels.ExchangeGameTeamSet;
 
     // private sequelize objects
     private wrappedSqlTeam: databaseModels.Team | null;
@@ -31,8 +33,10 @@ export class Team {
         this.regionAbbr = regionAbbr;
         this.identifierFull = identifierFull;
         this.identifierAbbr = identifierAbbr;
+
+        this.exchangeGameTeams = new localModels.ExchangeGameTeamSet;
+
         this.wrappedSqlTeam = null;
-        this.altNames = altNames;
     }
 
     // public async constructor
@@ -104,12 +108,6 @@ export class Team {
             name.includes(this.regionAbbrIdentifierAbbr)
         ) {
             return true;
-        }
-
-        for (const altName of this.altNames) {
-            if (name.includes(altName)) {
-                return true;
-            }
         }
         
         return false;
