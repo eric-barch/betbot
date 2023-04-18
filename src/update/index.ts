@@ -1,13 +1,13 @@
-import * as game from './game';
-import * as exchangeGame from './exchangeGame';
-import * as exchangeGameTeam from './exchangeGameTeam';
-import * as odd from './odd';
-import * as outcome from './outcome';
+import * as exchangeGames from './exchangeGames';
+import * as exchangeGameElement from './exchangeGameElement';
+import * as exchangeGameTeamElement from './exchangeGameTeamElement';
+import * as oddElements from './oddElements';
+import * as exchangeOutcomes from './exchangeOutcomes';
 
 export {
-    game,
-    exchangeGame,
-    exchangeGameTeam,
-    odd,
-    outcome,
+    exchangeGames,
+    exchangeGameElement,
+    exchangeGameTeamElement,
+    oddElements,
+    exchangeOutcomes,
 }

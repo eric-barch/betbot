@@ -6,11 +6,11 @@ class AllExchanges extends localModels.ExchangeSet {
         const draftKings = await localModels.Exchange.create({
             name: 'DraftKings',
             url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
-            updateExchangeGamesFunction: updateFunctions.game.draftKings,
-            updateExchangeGameElementFunction: updateFunctions.exchangeGame.draftKings,
-            updateExchangeGameTeamElementFunction: updateFunctions.exchangeGameTeam.draftKings,
-            updateExchangeOutcomesFunction: updateFunctions.outcome.draftKings,
-            updateOddElementsFunctions: updateFunctions.odd.draftKings,
+            updateExchangeGamesFunction: updateFunctions.exchangeGames.draftKings,
+            updateExchangeGameElementFunction: updateFunctions.exchangeGameElement.draftKings,
+            updateExchangeGameTeamElementFunction: updateFunctions.exchangeGameTeamElement.draftKings,
+            updateExchangeOutcomesFunction: updateFunctions.exchangeOutcomes.draftKings,
+            updateOddElementsFunctions: updateFunctions.oddElements.draftKings,
         })
         await draftKings.updateExchangeGames();
         await draftKings.updateExchangeGameElements();
@@ -20,16 +20,30 @@ class AllExchanges extends localModels.ExchangeSet {
         const fanDuel = await localModels.Exchange.create({
             name: 'FanDuel',
             url: 'https://sportsbook.fanduel.com/navigation/nba',
-            updateExchangeGamesFunction: updateFunctions.game.fanDuel,
-            updateExchangeGameElementFunction: updateFunctions.exchangeGame.fanDuel,
-            updateExchangeGameTeamElementFunction: updateFunctions.exchangeGameTeam.fanDuel,
-            updateExchangeOutcomesFunction: updateFunctions.outcome.fanDuel,
-            updateOddElementsFunctions: updateFunctions.odd.fanDuel,
+            updateExchangeGamesFunction: updateFunctions.exchangeGames.fanDuel,
+            updateExchangeGameElementFunction: updateFunctions.exchangeGameElement.fanDuel,
+            updateExchangeGameTeamElementFunction: updateFunctions.exchangeGameTeamElement.fanDuel,
+            updateExchangeOutcomesFunction: updateFunctions.exchangeOutcomes.fanDuel,
+            updateOddElementsFunctions: updateFunctions.oddElements.fanDuel,
         });
         await fanDuel.updateExchangeGames();
         await fanDuel.updateExchangeGameElements();
         await fanDuel.updateOutcomes();
         this.add(fanDuel);
+
+        const sugarHouse = await localModels.Exchange.create({
+            name: 'SugarHouse',
+            url: 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home',
+            updateExchangeGamesFunction: updateFunctions.exchangeGames.sugarHouse,
+            updateExchangeGameElementFunction: updateFunctions.exchangeGameElement.sugarHouse,
+            updateExchangeGameTeamElementFunction: updateFunctions.exchangeGameTeamElement.sugarHouse,
+            updateExchangeOutcomesFunction: updateFunctions.exchangeOutcomes.sugarHouse,
+            updateOddElementsFunctions: updateFunctions.oddElements.sugarHouse,
+        });
+        await sugarHouse.updateExchangeGames();
+        await sugarHouse.updateExchangeGameElements();
+        await sugarHouse.updateOutcomes();
+        this.add(sugarHouse);
 
         return this;
     }
