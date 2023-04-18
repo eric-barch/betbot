@@ -42,7 +42,7 @@ async function updateExchangeGameElements() {
     const duration = end.getTime() - start.getTime();
     console.log(`Update exchange game elements duration: ${duration}`);
 
-    setTimeout(updateExchangeGameElements, 0);
+    setTimeout(updateExchangeGameElements, 1000);
 }
 
 async function updateExchangeGameTeamElements() {
@@ -53,7 +53,7 @@ async function updateExchangeGameTeamElements() {
     const duration = end.getTime() - start.getTime();
     console.log(`Update exchange game team elements duration: ${duration}`);
 
-    setTimeout(updateExchangeGameTeamElements, 0);
+    setTimeout(updateExchangeGameTeamElements, 1000);
 }
 
 async function updateExchangeOutcomes() {
@@ -75,7 +75,7 @@ async function updateOddElements() {
     const duration = end.getTime() - start.getTime();
     console.log(`Update odd elements duration: ${duration}`);
 
-    setTimeout(updateOddElements, 0);
+    setTimeout(updateOddElements, 1000);
 }
 
 async function updateOddValues() {
@@ -86,5 +86,5 @@ async function updateOddValues() {
     const duration = end.getTime() - start.getTime();
     console.log(`Update odd values duration: ${duration}`);
 
-    setTimeout(updateOddValues, 0);
+    setTimeout(updateOddValues, 100);
 }
