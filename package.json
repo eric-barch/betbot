@@ -19,6 +19,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "chrono-node": "^2.6.3",
     "mysql2": "^3.2.1",
     "prompt": "^1.3.0",
     "puppeteer": "^19.9.0",
