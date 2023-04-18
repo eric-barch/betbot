@@ -8,13 +8,9 @@ export class Team {
     public regionAbbr: string;
     public identifierFull: string;
     public identifierAbbr: string;
-    public altNames: string[];
-
-    // private properties
 
     // public linked objects
-
-    // private linked objects
+    public exchangeGameTeams: localModels.ExchangeGameTeamSet;
 
     // private sequelize objects
     private wrappedSqlTeam: databaseModels.Team | null;
@@ -37,8 +33,10 @@ export class Team {
         this.regionAbbr = regionAbbr;
         this.identifierFull = identifierFull;
         this.identifierAbbr = identifierAbbr;
+
+        this.exchangeGameTeams = new localModels.ExchangeGameTeamSet;
+
         this.wrappedSqlTeam = null;
-        this.altNames = altNames;
     }
 
     // public async constructor
@@ -98,6 +96,7 @@ export class Team {
     }
 
     // public instance methods
+    // TODO: Can make this better/simpler
     public matches({
         name,
     }: {
@@ -110,17 +109,9 @@ export class Team {
         ) {
             return true;
         }
-
-        for (const altName of this.altNames) {
-            if (name.includes(altName)) {
-                return true;
-            }
-        }
         
         return false;
     }
-
-    // public static methods
 
     // getters and setters
     get regionFullIdentifierFull(): string {

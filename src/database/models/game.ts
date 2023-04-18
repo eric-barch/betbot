@@ -3,12 +3,12 @@ import * as sqlz from 'sequelize';
 import { sequelize } from '../../database';
   
   import { Exchange } from './exchange';
-  import { Statistic } from './statistic';
+  import { Outcome } from './outcome';
   import { Team } from './team';
   
   export class Game extends sqlz.Model<
-    sqlz.InferAttributes<Game, {omit: 'exchanges' | 'statistics' | 'awayTeam' | 'homeTeam'}>,
-    sqlz.InferCreationAttributes<Game, {omit: 'exchanges' | 'statistics' | 'awayTeam' | 'homeTeam'}>
+    sqlz.InferAttributes<Game, {omit: 'exchanges' | 'outcomes' | 'awayTeam' | 'homeTeam'}>,
+    sqlz.InferCreationAttributes<Game, {omit: 'exchanges' | 'outcomes' | 'awayTeam' | 'homeTeam'}>
   > {
     // id
     declare id: sqlz.CreationOptional<number>;
@@ -26,7 +26,7 @@ import { sequelize } from '../../database';
   
     // associated sequelize models
     declare exchanges?: sqlz.NonAttribute<Exchange[]>;
-    declare statistics?: sqlz.NonAttribute<Statistic[]>;
+    declare outcomes?: sqlz.NonAttribute<Outcome[]>;
     declare awayTeam?: sqlz.NonAttribute<Team>;
     declare homeTeam?: sqlz.NonAttribute<Team>;
   
@@ -43,17 +43,17 @@ import { sequelize } from '../../database';
     declare countExchanges: sqlz.BelongsToManyCountAssociationsMixin;
     declare createExchange: sqlz.BelongsToManyCreateAssociationMixin<Exchange>;
   
-    // hasMany(Statistic)
-    declare getStatistics: sqlz.HasManyGetAssociationsMixin<Statistic>;
-    declare addStatistic: sqlz.HasManyAddAssociationMixin<Statistic, number>;
-    declare addStatistics: sqlz.HasManyAddAssociationsMixin<Statistic, number>;
-    declare setStatistics: sqlz.HasManySetAssociationsMixin<Statistic, number>;
-    declare removeStatistic: sqlz.HasManyRemoveAssociationMixin<Statistic, number>;
-    declare removeStatistics: sqlz.HasManyRemoveAssociationsMixin<Statistic, number>;
-    declare hasStatistic: sqlz.HasManyHasAssociationMixin<Statistic, number>;
-    declare hasStatistics: sqlz.HasManyHasAssociationsMixin<Statistic, number>;
-    declare countStatistics: sqlz.HasManyCountAssociationsMixin;
-    declare createStatistic: sqlz.HasManyCreateAssociationMixin<Statistic, 'gameId'>;
+    // hasMany(Outcome)
+    declare getOutcomes: sqlz.HasManyGetAssociationsMixin<Outcome>;
+    declare addOutcome: sqlz.HasManyAddAssociationMixin<Outcome, number>;
+    declare addOutcomes: sqlz.HasManyAddAssociationsMixin<Outcome, number>;
+    declare setOutcomes: sqlz.HasManySetAssociationsMixin<Outcome, number>;
+    declare removeOutcome: sqlz.HasManyRemoveAssociationMixin<Outcome, number>;
+    declare removeOutcomes: sqlz.HasManyRemoveAssociationsMixin<Outcome, number>;
+    declare hasOutcome: sqlz.HasManyHasAssociationMixin<Outcome, number>;
+    declare hasOutcomes: sqlz.HasManyHasAssociationsMixin<Outcome, number>;
+    declare countOutcomes: sqlz.HasManyCountAssociationsMixin;
+    declare createOutcome: sqlz.HasManyCreateAssociationMixin<Outcome, 'gameId'>;
   
     // belongsTo(Team)
     declare createTeam: sqlz.BelongsToCreateAssociationMixin<Team>;
