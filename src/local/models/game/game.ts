@@ -102,11 +102,13 @@ export class Game {
     }): boolean {
         startDate = Game.roundDateToNearestInterval(startDate);
 
-        const awayTeamSame = (this.awayTeam === awayTeam);
-        const homeTeamSame = (this.homeTeam === homeTeam);
-        const startDateSame = (this.startDate.getTime() === startDate.getTime());
+        const awayTeamMatches = (this.awayTeam === awayTeam);
+        const homeTeamMatches = (this.homeTeam === homeTeam);
 
-        if (awayTeamSame && homeTeamSame && startDateSame) {
+        const startDateDifferenceInHours = Math.abs(this.startDate.getTime() - startDate.getTime()) / 1000 / 60 / 60;
+        const startDateMatches = (startDateDifferenceInHours <= 3);
+
+        if (awayTeamMatches && homeTeamMatches && startDateMatches) {
             return true;
         }
 

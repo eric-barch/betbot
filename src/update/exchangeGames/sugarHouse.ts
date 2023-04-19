@@ -28,7 +28,11 @@ export async function sugarHouse(this: localModels.Exchange)/*: Promise<localMod
 
         const awayTeam = globalModels.allTeams.find({ name: awayTeamName });
         const homeTeam = globalModels.allTeams.find({ name: homeTeamName });
-        const startDate = chrono.parseDate(startDateText);
+        let startDate = chrono.parseDate(startDateText);
+
+        if (!startDate) {
+            startDate = new Date();
+        }
 
         const requestedGame = await globalModels.allGames.findOrCreate({
             awayTeam: awayTeam,
