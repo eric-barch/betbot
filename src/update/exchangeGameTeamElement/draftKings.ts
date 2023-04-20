@@ -14,6 +14,8 @@ export async function draftKings(this: localModels.ExchangeGameTeam): Promise<El
     const awayTeamIdentifier = game.awayTeam.identifierFull.toLowerCase();
     const homeTeamIdentifier = game.homeTeam.identifierFull.toLowerCase();
 
+    const regex = new RegExp(`${awayTeamIdentifier}.*${homeTeamIdentifier}`);
+
     const matchedTeamRowElements = [];
 
     for (const teamRow of teamRowElements) {
@@ -26,7 +28,7 @@ export async function draftKings(this: localModels.ExchangeGameTeam): Promise<El
         const hrefString = await (await aElement.getProperty('href')).jsonValue();
         const hrefStringClean = hrefString.trim().toLowerCase();
 
-        if (hrefStringClean.includes(awayTeamIdentifier) && hrefStringClean.includes(homeTeamIdentifier)) {
+        if (regex.test(hrefStringClean)) {
             matchedTeamRowElements.push(teamRow);
         }
     }
