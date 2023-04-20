@@ -33,7 +33,7 @@ class AllExchanges extends localModels.ExchangeSet {
 
         const sugarHouse = await localModels.Exchange.create({
             name: 'SugarHouse',
-            url: 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home',
+            url: 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches',
             updateExchangeGamesFunction: updateFunctions.exchangeGames.sugarHouse,
             updateExchangeGameElementFunction: updateFunctions.exchangeGameElement.sugarHouse,
             updateExchangeGameTeamElementFunction: updateFunctions.exchangeGameTeamElement.sugarHouse,
