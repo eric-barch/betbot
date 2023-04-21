@@ -1,6 +1,6 @@
 import * as localModels from '../../../local';
 
-import { Odd } from "./odd";
+import { Odd } from "./oddOld";
 
 export class OddSet extends Set<Odd> {
     public async findOrCreate({
@@ -31,6 +31,12 @@ export class OddSet extends Set<Odd> {
         this.add(newOdd);
         
         return newOdd;
+    }
+
+    public async checkForArbitrage() {
+        for (const odd of this) {
+            await odd.checkForArbitrage();
+        }
     }
 
     public async updateElements() {

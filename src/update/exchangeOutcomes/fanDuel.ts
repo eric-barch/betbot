@@ -16,6 +16,7 @@ export async function fanDuel(this: localModels.Exchange): Promise<localModels.O
         const spreadHome = await globalModels.allOutcomes.findOrCreate({
             game: exchangeGame.game,
             name: 'spread_home',
+            oppositeOutcome: spreadAway,
         });
         await this.odds.findOrCreate({
             exchange: this,
@@ -36,6 +37,7 @@ export async function fanDuel(this: localModels.Exchange): Promise<localModels.O
         const moneylineHome = await globalModels.allOutcomes.findOrCreate({
             game: exchangeGame.game,
             name: 'moneyline_home',
+            oppositeOutcome: moneylineAway,
         });
         await this.odds.findOrCreate({
             exchange: this,
@@ -56,6 +58,7 @@ export async function fanDuel(this: localModels.Exchange): Promise<localModels.O
         const totalUnder = await globalModels.allOutcomes.findOrCreate({
             game: exchangeGame.game,
             name: 'total_under',
+            oppositeOutcome: totalOver,
         });
         await this.odds.findOrCreate({
             exchange: this,

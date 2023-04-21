@@ -3,17 +3,12 @@ import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
 export class Outcome {
-    // public properties
     public name: string;
-
-    // public linked objects
     public game: localModels.Game;
     public oddSet: localModels.OddSet;
-
-    // private sequelize object
+    private wrappedOppositeOutcome: Outcome | null;
     public wrappedSqlOutcome: databaseModels.Outcome | null;
 
-    // private constructor
     private constructor({
         name,
         game,
@@ -25,6 +20,7 @@ export class Outcome {
         
         this.game = game;
         this.oddSet = new localModels.OddSet;
+        this.wrappedOppositeOutcome = null;
 
         this.wrappedSqlOutcome = null;
     }
@@ -33,14 +29,20 @@ export class Outcome {
     static async create({
         game,
         name,
+        oppositeOutcome,
     }: {
         game: localModels.Game,
         name: string,
+        oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
         const newOutcome = new Outcome({
             name: name,
             game: game,
         });
+
+        if (oppositeOutcome) {
+            newOutcome.oppositeOutcome = oppositeOutcome;
+        }
 
         await newOutcome.initSqlOutcome();
 
@@ -92,6 +94,19 @@ export class Outcome {
     }
 
     // getters and setters
+    get oppositeOutcome(): Outcome {
+        if (!this.wrappedOppositeOutcome) {
+            throw new Error(`wrappedOppositeOutcome is null.`);
+        }
+
+        return this.wrappedOppositeOutcome;
+    }
+
+    set oppositeOutcome(oppositeOutcome: Outcome) {
+        this.wrappedOppositeOutcome = oppositeOutcome;
+        oppositeOutcome.wrappedOppositeOutcome = this;
+    }
+
     get sqlOutcome(): databaseModels.Outcome {
         if (!this.wrappedSqlOutcome) {
             throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.name} sqlOutcome is null.`)

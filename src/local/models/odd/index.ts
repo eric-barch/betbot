@@ -1,4 +1,4 @@
-import { Odd } from './odd';
+import { Odd } from './oddOld';
 import { OddSet } from './oddSet';
 
 export {
