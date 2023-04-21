@@ -1,6 +1,6 @@
 import * as localModels from '../../../local';
 
-import { Odd } from "./oddOld";
+import { Odd } from "./odd";
 
 export class OddSet extends Set<Odd> {
     public async findOrCreate({

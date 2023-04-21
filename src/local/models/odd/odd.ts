@@ -62,6 +62,23 @@ export abstract class Odd {
         return this.sqlOdd;
     }
 
+    public matches({
+        exchange,
+        outcome,
+    }: {
+        exchange: localModels.Exchange,
+        outcome: localModels.Outcome,
+    }): boolean {
+        const exchangeMatches = (this.exchange === exchange);
+        const outcomeMatches = (this.outcome === outcome);
+
+        if (exchangeMatches && outcomeMatches) {
+            return true;
+        }
+
+        return false;
+    }
+
     public async updateElements(): Promise<{
         priceElement: ElementHandle | null,
         valueElement: ElementHandle | null,
