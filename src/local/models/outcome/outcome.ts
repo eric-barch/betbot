@@ -5,7 +5,7 @@ import * as localModels from '../../../local';
 export class Outcome {
     public name: string;
     public game: localModels.Game;
-    public oddSet: localModels.OddSet;
+    public odds: localModels.OddSet;
     private wrappedOppositeOutcome: Outcome | null;
     public wrappedSqlOutcome: databaseModels.Outcome | null;
 
@@ -19,7 +19,7 @@ export class Outcome {
         this.name = name;
         
         this.game = game;
-        this.oddSet = new localModels.OddSet;
+        this.odds = new localModels.OddSet;
         this.wrappedOppositeOutcome = null;
 
         this.wrappedSqlOutcome = null;

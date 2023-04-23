@@ -6,7 +6,7 @@ import * as localModels from '../../../local';
 
 export abstract class Odd {
     abstract priceElementXPath: string;
-    abstract valueElementXPath: string;
+    abstract valueElementXPath: string | null;
 
     public priceElement: ElementHandle | null;
     public valueElement: ElementHandle | null;
@@ -35,8 +35,8 @@ export abstract class Odd {
     }
 
     public async initSqlOdd(): Promise<databaseModels.Odd> {
-        const exchangeId = this.exchange.sqlExchange.get('id');
-        const outcomeId = this.outcome.sqlOutcome.get('id');
+        const exchangeId = this.getExchange().sqlExchange.get('id');
+        const outcomeId = this.getOutcome().sqlOutcome.get('id');
         const value = this.getValue();
 
         await databaseModels.Odd.findOrCreate({
@@ -69,8 +69,8 @@ export abstract class Odd {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
     }): boolean {
-        const exchangeMatches = (this.exchange === exchange);
-        const outcomeMatches = (this.outcome === outcome);
+        const exchangeMatches = (this.getExchange() === exchange);
+        const outcomeMatches = (this.getOutcome() === outcome);
 
         if (exchangeMatches && outcomeMatches) {
             return true;
@@ -92,6 +92,19 @@ export abstract class Odd {
         }
     }
 
+    public async updateValues(): Promise<{
+        priceValue: number | null,
+        valueValue: number | null,
+    }> {
+        const priceValue = await this.updatePriceValue();
+        const valueValue = await this.updateValueValue();
+
+        return {
+            priceValue: priceValue,
+            valueValue: valueValue,
+        }
+    }
+
     public async updatePriceElement(): Promise<ElementHandle | null> {
         const priceElement = await this.updateElement(this.priceElementXPath);
         this.priceElement = priceElement;
@@ -104,7 +117,43 @@ export abstract class Odd {
         return valueElement;
     }
 
-    abstract updateElement(xPath: string): Promise<ElementHandle | null>;
+    public async updatePriceValue(): Promise<number | null> {
+        const priceElement = this.priceElement;
+        const priceValue = await this.updateValue(priceElement);
+        await this.setPrice(priceValue);
+        return priceValue;
+    }
+
+    public async updateValueValue(): Promise<number | null> {
+        const valueElement = this.valueElement;
+        const valueValue = await this.updateValue(valueElement);
+        await this.setValue(valueValue);
+        return valueValue;
+    }
+
+    abstract updateElement(xPath: string | null): Promise<ElementHandle | null>;
+
+    public async updateValue(element: ElementHandle | null): Promise<number | null> {
+        if (!element) {
+            return null;
+        }
+
+        const json = await (await element.getProperty('textContent')).jsonValue();
+
+        if (!json) {
+            return null;
+        }
+
+        const hyphenVariations = /[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]/g;
+        const nonNumericChars = /[^0-9.-]/g;
+
+        const cleanedJson = json
+            .replace(hyphenVariations, '-')
+            .replace(nonNumericChars, '');
+        
+        const value = Number(cleanedJson);
+        return value;
+    }
 
     public getPrice(): number | null {
         return this.wrappedPrice;
@@ -130,33 +179,35 @@ export abstract class Odd {
         })
     }
 
-    get exchange(): localModels.Exchange {
+    public getExchange(): localModels.Exchange {
         if (!this.wrappedExchange) {
-            throw new Error(`${this.exchange.name} exchange is null.`);
+            throw new Error(`Exchange is null.`);
         }
 
         return this.wrappedExchange;
     }
 
-    set exchange(exchange: localModels.Exchange) {
+    public setExchange(exchange: localModels.Exchange) {
         this.wrappedExchange = exchange;
+        exchange.getOdds().add(this);
     }
 
-    get outcome(): localModels.Outcome {
+    public getOutcome(): localModels.Outcome {
         if (!this.wrappedOutcome) {
-            throw new Error(`${this.outcome.name} outcome is null.`);
+            throw new Error(`Outcome is null.`);
         }
 
         return this.wrappedOutcome;
     }
 
-    set outcome(outcome: localModels.Outcome) {
+    public setOutcome(outcome: localModels.Outcome) {
         this.wrappedOutcome = outcome;
+        outcome.odds.add(this);
     }
 
     get sqlOdd(): databaseModels.Odd {
         if (!this.wrappedSqlOdd) {
-            throw new Error(`${this.exchange.name} ${this.outcome.name} sqlOdd is null.`);
+            throw new Error(`sqlOdd is null.`);
         }
 
         return this.wrappedSqlOdd;

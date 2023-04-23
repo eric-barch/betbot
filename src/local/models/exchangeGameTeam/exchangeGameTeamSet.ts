@@ -20,14 +20,12 @@ export class ExchangeGameTeamSet extends Set<ExchangeGameTeam> {
             }
         }
 
-        const exchangeGameTeam = new ExchangeGameTeam({
+        const exchangeGameTeam = await ExchangeGameTeam.create({
             exchangeGame: exchangeGame,
             team: team,
-            updateElementFunction: exchangeGame.exchange.updateExchangeGameTeamsFunction,
         });
 
         this.add(exchangeGameTeam);
-
         return exchangeGameTeam;
     }
 

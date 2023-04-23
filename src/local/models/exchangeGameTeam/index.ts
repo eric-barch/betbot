@@ -5,3 +5,4 @@ export {
     ExchangeGameTeam,
     ExchangeGameTeamSet,
 }
+export * from './exchangeModels';
