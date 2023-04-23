@@ -5,3 +5,4 @@ import {
 export {
     allTeams,
 };
+export * from './leagues';

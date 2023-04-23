@@ -1,5 +1,4 @@
 import * as localModels from '../../../local';
-import * as updateFunctions from '../../../update';
 
 import { ExchangeGameTeam } from './exchangeGameTeam';
 

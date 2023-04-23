@@ -4,7 +4,7 @@ import { Odd } from '../odd';
 
 abstract class FanDuelOdd extends Odd {
     async updateElement(xPath: string): Promise<ElementHandle | null> {
-        // const exchangeGameTeam = this.exchangeGameTeam;
+        // const exchangeGameTeam = this.getExchangeGameTeam();
 
         // if (!exchangeGameTeam) {
         //     return null;

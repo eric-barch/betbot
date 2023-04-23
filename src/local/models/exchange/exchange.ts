@@ -21,8 +21,6 @@ export abstract class Exchange {
         this.wrappedPage = null;
 
         this.wrappedSqlExchange = null;
-
-        globalModels.allExchanges.add(this);
     }
 
     public async init(): Promise<Exchange> {
@@ -92,6 +90,64 @@ export abstract class Exchange {
     abstract updateExchangeGamesFromJson(): Promise<localModels.ExchangeGameSet | null>;
 
     abstract updateExchangeGamesFromDocument(): Promise<localModels.ExchangeGameSet | null>;
+
+    public async updateOdds() {
+        for (const exchangeGame of this.getExchangeGames()) {
+            const spreadAway = await globalModels.allOutcomes.findOrCreate({
+                game: exchangeGame.getGame(),
+                name: 'spread_away',
+            });
+            await this.getOdds().findOrCreate({
+                exchange: this,
+                outcome: spreadAway,
+            });
+
+            const spreadHome = await globalModels.allOutcomes.findOrCreate({
+                game: exchangeGame.getGame(),
+                name: 'spread_home',
+            });
+            await this.getOdds().findOrCreate({
+                exchange: this,
+                outcome: spreadHome,
+            });
+
+            const moneylineAway = await globalModels.allOutcomes.findOrCreate({
+                game: exchangeGame.getGame(),
+                name: 'moneyline_away',
+            });
+            await this.getOdds().findOrCreate({
+                exchange: this,
+                outcome: moneylineAway,
+            });
+
+            const moneylineHome = await globalModels.allOutcomes.findOrCreate({
+                game: exchangeGame.getGame(),
+                name: 'moneyline_home',
+            });
+            await this.getOdds().findOrCreate({
+                exchange: this,
+                outcome: moneylineHome,
+            });
+
+            const totalOver = await globalModels.allOutcomes.findOrCreate({
+                game: exchangeGame.getGame(),
+                name: 'total_over',
+            });
+            await this.getOdds().findOrCreate({
+                exchange: this,
+                outcome: totalOver,
+            });
+
+            const totalUnder = await globalModels.allOutcomes.findOrCreate({
+                game: exchangeGame.getGame(),
+                name: 'total_under',
+            });
+            await this.getOdds().findOrCreate({
+                exchange: this,
+                outcome: totalUnder,
+            });
+        }
+    }
 
     public async close(): Promise<void> {
         this.browser.close();

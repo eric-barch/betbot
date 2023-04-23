@@ -1,5 +1,5 @@
-export * from './exchangeGameTeams';
 export * from './exchangeGames';
+export * from './exchangeGameTeams';
 export * from './exchanges';
 export * from './games';
 export * from './odds';

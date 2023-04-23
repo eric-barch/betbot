@@ -15,6 +15,8 @@ export abstract class Odd {
     private wrappedValue: number | null;
 
     private wrappedExchange: localModels.Exchange | null;
+    private wrappedExchangeGame: localModels.ExchangeGame | null;
+    private wrappedExchangeGameTeam: localModels.ExchangeGameTeam | null;
     private wrappedOutcome: localModels.Outcome | null;
 
     private wrappedSqlOdd: databaseModels.Odd | null;
@@ -27,11 +29,113 @@ export abstract class Odd {
         this.wrappedValue = null;
 
         this.wrappedExchange = null;
+        this.wrappedExchangeGame = null;
+        this.wrappedExchangeGameTeam = null;
         this.wrappedOutcome = null;
 
         this.wrappedSqlOdd = null;
 
         globalModels.allOdds.add(this);
+    }
+
+    static async create({
+        exchange,
+        outcome,
+    }: {
+        exchange: localModels.Exchange,
+        outcome: localModels.Outcome,
+    }): Promise<Odd> {;
+        let newOdd;
+
+        if (exchange.name === 'DraftKings') {
+            switch (outcome.name) {
+                case 'spread_away':
+                    newOdd = new localModels.DraftKingsSpreadAway();
+                    break;
+                case 'spread_home':
+                    newOdd = new localModels.DraftKingsSpreadHome();
+                    break;
+                case 'moneyline_away':
+                    newOdd = new localModels.DraftKingsMoneylineAway();
+                    break;
+                case 'moneyline_home':
+                    newOdd = new localModels.DraftKingsMoneylineHome();
+                    break;
+                case 'total_over':
+                    newOdd = new localModels.DraftKingsTotalOver();
+                    break;
+                case 'total_under':
+                    newOdd = new localModels.DraftKingsTotalUnder();
+                    break;
+                default:
+                    throw new Error(`Could not find corresponding DraftKingsOdd`);
+            }
+        } else if (exchange.name === 'FanDuel') {
+            switch (outcome.name) {
+                case 'spread_away':
+                    newOdd = new localModels.FanDuelSpreadAway();
+                    break;
+                case 'spread_home':
+                    newOdd = new localModels.FanDuelSpreadHome();
+                    break;
+                case 'moneyline_away':
+                    newOdd = new localModels.FanDuelMoneylineAway();
+                    break;
+                case 'moneyline_home':
+                    newOdd = new localModels.FanDuelMoneylineHome();
+                    break;
+                case 'total_over':
+                    newOdd = new localModels.FanDuelTotalOver();
+                    break;
+                case 'total_under':
+                    newOdd = new localModels.FanDuelTotalUnder();
+                    break;
+                default:
+                    throw new Error(`Could not find corresponding FanDuelOdd`);
+            }
+        } else if (exchange.name === 'SugarHouse') {
+            switch (outcome.name) {
+                case 'spread_away':
+                    newOdd = new localModels.SugarHouseSpreadAway();
+                    break;
+                case 'spread_home':
+                    newOdd = new localModels.SugarHouseSpreadHome();
+                    break;
+                case 'moneyline_away':
+                    newOdd = new localModels.SugarHouseMoneylineAway();
+                    break;
+                case 'moneyline_home':
+                    newOdd = new localModels.SugarHouseMoneylineHome();
+                    break;
+                case 'total_over':
+                    newOdd = new localModels.SugarHouseTotalOver();
+                    break;
+                case 'total_under':
+                    newOdd = new localModels.SugarHouseTotalUnder();
+                    break;
+                default:
+                    throw new Error(`Could not find corresponding SugarHouseOdd`);
+            }
+        }
+
+        if (!(newOdd instanceof Odd)) {
+            throw new Error(`Did not find corresponding exchange.`);
+        }
+        
+        const exchangeGame = await globalModels.allExchangeGames.findOrCreate({
+            exchange: exchange,
+            game: outcome.game,
+        })
+
+        newOdd.setExchange(exchange);
+        newOdd.setExchangeGame(exchangeGame);
+        newOdd.setOutcome(outcome);
+
+        await newOdd.initSqlOdd();
+
+        globalModels.allOdds.add(newOdd);
+
+        return newOdd;
     }
 
     public async initSqlOdd(): Promise<databaseModels.Odd> {
@@ -92,6 +196,18 @@ export abstract class Odd {
         }
     }
 
+    public async updatePriceElement(): Promise<ElementHandle | null> {
+        const priceElement = await this.updateElement(this.priceElementXPath);
+        this.priceElement = priceElement;
+        return priceElement;
+    }
+
+    public async updateValueElement(): Promise<ElementHandle | null> {
+        const valueElement = await this.updateElement(this.valueElementXPath);
+        this.valueElement = valueElement;
+        return valueElement;
+    }
+
     public async updateValues(): Promise<{
         priceValue: number | null,
         valueValue: number | null,
@@ -103,18 +219,6 @@ export abstract class Odd {
             priceValue: priceValue,
             valueValue: valueValue,
         }
-    }
-
-    public async updatePriceElement(): Promise<ElementHandle | null> {
-        const priceElement = await this.updateElement(this.priceElementXPath);
-        this.priceElement = priceElement;
-        return priceElement;
-    }
-
-    public async updateValueElement(): Promise<ElementHandle | null> {
-        const valueElement = await this.updateElement(this.valueElementXPath);
-        this.valueElement = valueElement;
-        return valueElement;
     }
 
     public async updatePriceValue(): Promise<number | null> {
@@ -190,6 +294,30 @@ export abstract class Odd {
     public setExchange(exchange: localModels.Exchange) {
         this.wrappedExchange = exchange;
         exchange.getOdds().add(this);
+    }
+
+    public getExchangeGame(): localModels.ExchangeGame {
+        if (!this.wrappedExchangeGame) {
+            throw new Error(`ExchangeGame is null.`);
+        }
+
+        return this.wrappedExchangeGame;
+    }
+
+    public setExchangeGame(exchangeGame: localModels.ExchangeGame) {
+        this.wrappedExchangeGame = exchangeGame;
+    }
+
+    public getExchangeGameTeam(): localModels.ExchangeGameTeam {
+        if (!this.wrappedExchangeGameTeam) {
+            throw new Error(`ExchangeGameTeam is null.`);
+        }
+
+        return this.wrappedExchangeGameTeam;
+    }
+
+    public setExchangeGameTeam(exchangeGameTeam: localModels.ExchangeGameTeam) {
+        this.wrappedExchangeGameTeam = exchangeGameTeam;
     }
 
     public getOutcome(): localModels.Outcome {

@@ -7,6 +7,7 @@ const allGames = globalModels.allGames;
 const allOutcomes = globalModels.allOutcomes;
 const allExchangeGames = globalModels.allExchangeGames;
 const allExchangeGameTeams = globalModels.allExchangeGameTeams;
+const allOdds = globalModels.allOdds;
 
 async function main() {
     await database.init();
@@ -15,11 +16,13 @@ async function main() {
     await allExchanges.init();
     await allExchangeGames.init();
     await allExchangeGameTeams.init();
+    await allOutcomes.init();
+    await allOdds.init();
 
-    // await allExchangeGames.updateElements();
-    // await allExchangeGameTeams.updateElements();
+    await allOdds.updateElements();
+    await allOdds.updateValues();
 
-    console.log(allGames, allOutcomes);
+    console.log(allGames, allOutcomes, allOdds);
     process.exit(0);
 }
 
@@ -29,33 +32,4 @@ main();
 //     await allExchanges.updateExchangeGames();
 //     setTimeout(updateExchangeGames, 30000);
 //     setTimeout(updateExchangeGameElements, 1000);
-// }
-
-// async function updateExchangeGameElements() {
-//     await allExchanges.updateExchangeGameElements();
-//     setTimeout(updateExchangeGameTeamElements, 1000);
-// }
-
-// async function updateExchangeGameTeamElements() {
-//     await allExchanges.updateExchangeGameTeamElements();
-//     setTimeout(updateExchangeOutcomes, 30000);
-// }
-
-// async function updateExchangeOutcomes() {
-//     await allExchanges.updateExchangeOutcomes();
-//     setTimeout(updateOddElements, 1000);
-// }
-
-// async function updateOddElements() {
-//     await allExchanges.updateOddElements();
-//     setTimeout(updateOddValues, 100);
-// }
-
-// async function updateOddValues() {
-//     await allOdds.updateValues();
-//     // setTimeout(checkForArbitrage, 100);
-// }
-
-// async function checkForArbitrage() {
-//     await allOdds.checkForArbitrage();
 // }

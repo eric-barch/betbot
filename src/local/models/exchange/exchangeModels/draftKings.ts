@@ -1,5 +1,4 @@
 import { Exchange } from '../exchange';
-
 import * as globalModels from '../../../../global';
 import * as localModels from '../../../../local';
 

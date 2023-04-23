@@ -1,12 +1,15 @@
 import * as localModels from '../../../local';
 
+export const draftKingsExchange = new localModels.DraftKingsExchange();
+export const fanDuelExchange = new localModels.FanDuelExchange();
+export const sugarHouseExchange = new localModels.SugarHouseExchange();
+
 class AllExchanges extends localModels.ExchangeSet {
     public async init() {
-        /**TODO: Make these singletons and export named instances so they can be accessed throughout
-         * the program. */
-        this.add(new localModels.DraftKingsExchange);
-        this.add(new localModels.FanDuelExchange);
-        this.add(new localModels.SugarHouseExchange);
+        /**TODO: Make these singletons. */
+        this.add(draftKingsExchange);
+        this.add(fanDuelExchange);
+        this.add(sugarHouseExchange);
 
         for (const exchange of this) {
             await exchange.init();
