@@ -4,7 +4,7 @@ import * as localModels from '../../../local';
 class AllOutcomes extends localModels.OutcomeSet {
     public async init() {
         for (const game of allGames) {
-            await this.findOrCreate({
+            const spreadAway = await this.findOrCreate({
                 game: game,
                 name: 'spread_away',
             });
@@ -12,9 +12,10 @@ class AllOutcomes extends localModels.OutcomeSet {
             await this.findOrCreate({
                 game: game,
                 name: 'spread_home',
+                oppositeOutcome: spreadAway,
             });
 
-            await this.findOrCreate({
+            const moneylineAway = await this.findOrCreate({
                 game: game,
                 name: 'moneyline_away',
             });
@@ -22,9 +23,10 @@ class AllOutcomes extends localModels.OutcomeSet {
             await this.findOrCreate({
                 game: game,
                 name: 'moneyline_home',
+                oppositeOutcome: moneylineAway,
             });
 
-            await this.findOrCreate({
+            const totalOver = await this.findOrCreate({
                 game: game,
                 name: 'total_over',
             });
@@ -32,6 +34,7 @@ class AllOutcomes extends localModels.OutcomeSet {
             await this.findOrCreate({
                 game: game,
                 name: 'total_under',
+                oppositeOutcome: totalOver,
             });
         }
     }

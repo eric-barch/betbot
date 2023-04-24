@@ -1,23 +1,26 @@
 import { ElementHandle } from 'puppeteer';
 
+import * as localModels from '../../../../local';
+
 import { Odd } from '../odd';
 
 abstract class FanDuelOdd extends Odd {
+    private exchangeGameTeam: localModels.ExchangeGameTeam;
+
     async updateElement(xPath: string): Promise<ElementHandle | null> {
-        // const exchangeGameTeam = this.getExchangeGameTeam();
+        const exchangeGameTeamElement = this.exchangeGameTeam.element;
 
-        // if (!exchangeGameTeam) {
-        //     return null;
-        // }
+        if (!exchangeGameTeamElement) {
+            return null;
+        }
 
-        // const element = await exchangeGameTeam.$(`xpath/${xPath}`);
+        const oddElement = await exchangeGameTeamElement.$(`xpath/${xPath}`);
 
-        // if (!element) {
-        //     return null;
-        // }
+        if (!oddElement) {
+            return null;
+        }
 
-        // return element;
-        return null;
+        return oddElement;
     }
 }
 

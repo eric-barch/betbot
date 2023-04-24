@@ -9,7 +9,6 @@ export class Team {
     public identifierFull: string;
     public identifierAbbr: string;
 
-    public exchangeGameTeams: localModels.ExchangeGameTeamSet;
     private wrappedSqlTeam: databaseModels.Team | null;
     
     public constructor({
@@ -27,8 +26,6 @@ export class Team {
         this.regionAbbr = regionAbbr;
         this.identifierFull = identifierFull;
         this.identifierAbbr = identifierAbbr;
-
-        this.exchangeGameTeams = new localModels.ExchangeGameTeamSet;
 
         this.wrappedSqlTeam = null;
     }

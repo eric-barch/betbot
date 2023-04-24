@@ -128,6 +128,5 @@ export abstract class ExchangeGameTeam {
 
     public setTeam(team: localModels.Team) {
         this.wrappedTeam = team;
-        team.exchangeGameTeams.add(this);
     }
 }

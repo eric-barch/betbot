@@ -12,24 +12,26 @@ const allOdds = globalModels.allOdds;
 async function main() {
     await database.init();
 
+    // initialize primary objects
     await allTeams.init();
     await allExchanges.init();
+    await allGames.init();
+    await allOutcomes.init();
+
+    // initialize linkage objects
     await allExchangeGames.init();
     await allExchangeGameTeams.init();
-    await allOutcomes.init();
     await allOdds.init();
 
+    // update linkage object elements
+    await allExchangeGames.updateElements();
+    await allExchangeGameTeams.updateElements();
     await allOdds.updateElements();
+
+    // update odd values
     await allOdds.updateValues();
 
-    console.log(allGames, allOutcomes, allOdds);
     process.exit(0);
 }
 
 main();
-
-// async function updateExchangeGames() {
-//     await allExchanges.updateExchangeGames();
-//     setTimeout(updateExchangeGames, 30000);
-//     setTimeout(updateExchangeGameElements, 1000);
-// }

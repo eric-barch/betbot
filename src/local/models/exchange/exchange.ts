@@ -5,21 +5,19 @@ import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
 export abstract class Exchange {
-    abstract name: string;
-    abstract url: string;
+    public abstract name: string;
+    public abstract url: string;
 
     protected abstract wrappedExchangeGames: localModels.ExchangeGameSet | null;
     protected abstract wrappedOdds: localModels.OddSet | null;
 
     private wrappedBrowser: Browser | null;
     private wrappedPage: Page | null;
-
     private wrappedSqlExchange: databaseModels.Exchange | null;
 
     public constructor() {
         this.wrappedBrowser = null;
         this.wrappedPage = null;
-
         this.wrappedSqlExchange = null;
     }
 
@@ -81,15 +79,20 @@ export abstract class Exchange {
         return this.page;
     }
 
+    abstract getGames(): Promise<Array<localModels.Game>>;
+
     public async updateExchangeGames(): Promise<localModels.ExchangeGameSet | null> {
-        await this.updateExchangeGamesFromJson();
-        await this.updateExchangeGamesFromDocument();
+        const games = await this.getGames();
+
+        for (const game of games) {
+            this.getExchangeGames().findOrCreate({
+                exchange: this,
+                game: game,
+            })
+        }
+
         return this.getExchangeGames();
     }
-
-    abstract updateExchangeGamesFromJson(): Promise<localModels.ExchangeGameSet | null>;
-
-    abstract updateExchangeGamesFromDocument(): Promise<localModels.ExchangeGameSet | null>;
 
     public async updateOdds() {
         for (const exchangeGame of this.getExchangeGames()) {

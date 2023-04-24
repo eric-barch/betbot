@@ -27,7 +27,6 @@ export class OddSet extends Set<Odd> {
         });
         
         this.add(newOdd);
-        
         return newOdd;
     }
 

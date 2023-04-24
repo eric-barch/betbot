@@ -8,33 +8,18 @@ export abstract class Odd {
     abstract priceElementXPath: string;
     abstract valueElementXPath: string | null;
 
-    public priceElement: ElementHandle | null;
-    public valueElement: ElementHandle | null;
+    public priceElement: ElementHandle | null = null;
+    public valueElement: ElementHandle | null = null;
 
-    private wrappedPrice: number | null;
-    private wrappedValue: number | null;
+    private wrappedPrice: number | null = null;
+    private wrappedValue: number | null = null;
 
-    private wrappedExchange: localModels.Exchange | null;
-    private wrappedExchangeGame: localModels.ExchangeGame | null;
-    private wrappedExchangeGameTeam: localModels.ExchangeGameTeam | null;
-    private wrappedOutcome: localModels.Outcome | null;
+    private wrappedExchange: localModels.Exchange | null = null;
+    private wrappedOutcome: localModels.Outcome | null = null;
 
-    private wrappedSqlOdd: databaseModels.Odd | null;
+    private wrappedSqlOdd: databaseModels.Odd | null = null;
 
     constructor() {
-        this.priceElement = null;
-        this.valueElement = null;
-
-        this.wrappedPrice = null;
-        this.wrappedValue = null;
-
-        this.wrappedExchange = null;
-        this.wrappedExchangeGame = null;
-        this.wrappedExchangeGameTeam = null;
-        this.wrappedOutcome = null;
-
-        this.wrappedSqlOdd = null;
-
         globalModels.allOdds.add(this);
     }
 
@@ -128,7 +113,6 @@ export abstract class Odd {
         })
 
         newOdd.setExchange(exchange);
-        newOdd.setExchangeGame(exchangeGame);
         newOdd.setOutcome(outcome);
 
         await newOdd.initSqlOdd();
@@ -294,30 +278,6 @@ export abstract class Odd {
     public setExchange(exchange: localModels.Exchange) {
         this.wrappedExchange = exchange;
         exchange.getOdds().add(this);
-    }
-
-    public getExchangeGame(): localModels.ExchangeGame {
-        if (!this.wrappedExchangeGame) {
-            throw new Error(`ExchangeGame is null.`);
-        }
-
-        return this.wrappedExchangeGame;
-    }
-
-    public setExchangeGame(exchangeGame: localModels.ExchangeGame) {
-        this.wrappedExchangeGame = exchangeGame;
-    }
-
-    public getExchangeGameTeam(): localModels.ExchangeGameTeam {
-        if (!this.wrappedExchangeGameTeam) {
-            throw new Error(`ExchangeGameTeam is null.`);
-        }
-
-        return this.wrappedExchangeGameTeam;
-    }
-
-    public setExchangeGameTeam(exchangeGameTeam: localModels.ExchangeGameTeam) {
-        this.wrappedExchangeGameTeam = exchangeGameTeam;
     }
 
     public getOutcome(): localModels.Outcome {

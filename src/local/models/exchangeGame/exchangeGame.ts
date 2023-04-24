@@ -76,8 +76,7 @@ export abstract class ExchangeGame {
             exchangeGame: this,
             team: team,
         });
-
-        await requestedExchangeGameTeam.updateElement();
+        
         return requestedExchangeGameTeam;
     }
 
@@ -89,7 +88,6 @@ export abstract class ExchangeGame {
             team: team,
         });
 
-        await requestedExchangeGameTeam.updateElement();
         return requestedExchangeGameTeam;
     }
 

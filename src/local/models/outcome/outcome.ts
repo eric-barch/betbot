@@ -46,6 +46,7 @@ export class Outcome {
 
         await newOutcome.initSqlOutcome();
 
+        game.outcomes.add(newOutcome);
         globalModels.allOutcomes.add(newOutcome);
 
         return newOutcome;

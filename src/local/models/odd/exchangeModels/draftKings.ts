@@ -5,6 +5,8 @@ import * as localModels from '../../..';
 import { Odd } from '../odd';
 
 abstract class DraftKingsOdd extends Odd {
+    private exchangeGameTeam = localModels.ExchangeGameTeam;
+
     async updateElement(xPath: string | null): Promise<ElementHandle | null> {
         if (!xPath) {
             return null;

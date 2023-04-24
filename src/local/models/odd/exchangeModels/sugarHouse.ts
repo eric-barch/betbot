@@ -1,23 +1,26 @@
 import { ElementHandle } from 'puppeteer';
 
+import * as localModels from '../../../../local';
+
 import { Odd } from '../odd';
 
 abstract class SugarHouseOdd extends Odd {
+    private exchangeGame: localModels.ExchangeGame;
+
     async updateElement(xPath: string): Promise<ElementHandle | null> {
-        // const exchangeGameTeam = this.exchangeGameTeam;
+        const exchangeGameElement = this.exchangeGame.element;
 
-        // if (!exchangeGameTeam) {
-        //     return null;
-        // }
+        if (!exchangeGameElement) {
+            return null;
+        }
 
-        // const element = await exchangeGameTeam.$(`xpath/${xPath}`);
+        const oddElement = await exchangeGameElement.$(`xpath/${xPath}`);
 
-        // if (!element) {
-        //     return null;
-        // }
+        if (!oddElement) {
+            return null;
+        }
 
-        // return element;
-        return null;
+        return oddElement;
     }
 }
 
