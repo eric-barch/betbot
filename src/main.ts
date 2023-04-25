@@ -8,6 +8,7 @@ const allOutcomes = globalModels.allOutcomes;
 const allExchangeGames = globalModels.allExchangeGames;
 const allExchangeGameTeams = globalModels.allExchangeGameTeams;
 const allOdds = globalModels.allOdds;
+const allArbs = globalModels.allArbs;
 
 async function main() {
     await database.init();
@@ -26,10 +27,11 @@ async function main() {
     await allOdds.updateElements();
 
     await allOdds.updateValues();
+    await allOutcomes.checkForArbs();
 
     updateSlowElements();
     updateOddElements();
-    updateOddValues();
+    updateOddValuesAndCheckForArbs();
 }
 
 main();
@@ -42,7 +44,7 @@ async function updateSlowElements() {
 
     const duration = end.getTime() - start.getTime();
 
-    console.log(`updateSlowElements duration: ${duration}`);
+    // console.log(`updateSlowElements duration: ${duration}`);
 
     setTimeout(updateSlowElements, 10000);
 }
@@ -54,19 +56,20 @@ async function updateOddElements() {
 
     const duration = end.getTime() - start.getTime();
 
-    console.log(`updateOddElements duration: ${duration}`);
+    // console.log(`updateOddElements duration: ${duration}`);
 
     setTimeout(updateOddElements, 500);
 }
 
-async function updateOddValues() {
+async function updateOddValuesAndCheckForArbs() {
     const start = new Date();
     await allOdds.updateValues();
+    await allOutcomes.checkForArbs();
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();
 
-    console.log(`updateOddValues duration: ${duration}`);
+    // console.log(`Duration: ${duration}`);
 
-    setTimeout(updateOddValues, 100);
+    setTimeout(updateOddValuesAndCheckForArbs, 100);
 }
