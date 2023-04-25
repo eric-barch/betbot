@@ -1,18 +1,15 @@
 import * as localModels from '../../../local';
-import * as updateFunctions from '../../../update';
 
 import { ExchangeGame } from './exchangeGame';
 
 export class ExchangeGameSet extends Set<ExchangeGame> {
-    public async findOrCreate({
+    public find({
         exchange,
         game,
-        updateElementFunction,
     }: {
         exchange: localModels.Exchange,
         game: localModels.Game,
-        updateElementFunction?: Function,
-    }): Promise<ExchangeGame> {
+    }): ExchangeGame | null {
         for (const exchangeGame of this) {
             if (exchangeGame.matches({
                 exchange: exchange,
@@ -22,33 +19,37 @@ export class ExchangeGameSet extends Set<ExchangeGame> {
             }
         }
 
-        if (!updateElementFunction) {
-            throw new Error(`${exchange.name} ${game.regionAbbrIdentifierAbbr} ExchangeGame not found. updateElementFunction require to instantiate new instance.`);
-        }
+        return null;
+    }
 
-        const exchangeGame = new ExchangeGame({
+    public async findOrCreate({
+        exchange,
+        game,
+    }: {
+        exchange: localModels.Exchange,
+        game: localModels.Game,
+    }): Promise<ExchangeGame> {
+        const foundExchangeGame = this.find({
             exchange: exchange,
             game: game,
-            updateElementFunction: updateElementFunction,
         });
 
-        this.add(exchangeGame);
+        if (foundExchangeGame) {
+            return foundExchangeGame;
+        }
 
-        return exchangeGame;
+        const newExchangeGame = await ExchangeGame.create({
+            exchange: exchange,
+            game: game,
+        });
+
+        this.add(newExchangeGame);
+        return newExchangeGame;
     }
 
     public async updateElements(): Promise<ExchangeGameSet> {
         for (const exchangeGame of this) {
             await exchangeGame.updateElement();
-            await exchangeGame.updateExchangeGameTeams();
-        }
-
-        return this;
-    }
-
-    public async updateExchangeGameTeamElements(): Promise<ExchangeGameSet> {
-        for (const exchangeGame of this) {
-            await exchangeGame.exchangeGameTeams.updateElements();
         }
 
         return this;

@@ -1,3 +1,4 @@
+import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
 import { Odd } from "./odd";
@@ -6,11 +7,9 @@ export class OddSet extends Set<Odd> {
     public async findOrCreate({
         exchange,
         outcome,
-        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
-        updateElementsFunction: Function,
     }): Promise<Odd> {
         for (const odd of this) {
             if (odd.matches({
@@ -25,12 +24,16 @@ export class OddSet extends Set<Odd> {
         const newOdd = await Odd.create({
             exchange: exchange,
             outcome: outcome,
-            updateElementsFunction: updateElementsFunction,
         });
         
         this.add(newOdd);
-        
         return newOdd;
+    }
+
+    public async checkForArbitrage() {
+        for (const odd of this) {
+            // await odd.checkForArbitrage();
+        }
     }
 
     public async updateElements() {

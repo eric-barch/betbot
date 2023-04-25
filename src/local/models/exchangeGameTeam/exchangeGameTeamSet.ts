@@ -1,33 +1,56 @@
 import * as localModels from '../../../local';
-import * as updateFunctions from '../../../update';
 
 import { ExchangeGameTeam } from './exchangeGameTeam';
 
 export class ExchangeGameTeamSet extends Set<ExchangeGameTeam> {
-    public async findOrCreate({
-        exchangeGame,
+    public find({
+        exchange,
+        game,
         team,
     }: {
-        exchangeGame: localModels.ExchangeGame,
+        exchange: localModels.Exchange,
+        game: localModels.Game,
         team: localModels.Team,
-    }) {
+    }): ExchangeGameTeam | null {
         for (const exchangeGameTeam of this) {
             if (exchangeGameTeam.matches({
-                exchangeGame: exchangeGame,
+                exchange: exchange,
+                game: game,
                 team: team,
             })) {
                 return exchangeGameTeam;
             }
         }
 
-        const exchangeGameTeam = new ExchangeGameTeam({
-            exchangeGame: exchangeGame,
+        return null;
+    }
+
+    public async findOrCreate({
+        exchange,
+        game,
+        team,
+    }: {
+        exchange: localModels.Exchange,
+        game: localModels.Game,
+        team: localModels.Team,
+    }) {
+        const foundExchangeGameTeam = this.find({
+            exchange: exchange,
+            game: game,
             team: team,
-            updateElementFunction: exchangeGame.exchange.updateExchangeGameTeamsFunction,
+        });
+
+        if (foundExchangeGameTeam) {
+            return foundExchangeGameTeam;
+        }
+
+        const exchangeGameTeam = await ExchangeGameTeam.create({
+            exchange: exchange,
+            game: game,
+            team: team,
         });
 
         this.add(exchangeGameTeam);
-
         return exchangeGameTeam;
     }
 

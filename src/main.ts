@@ -5,6 +5,8 @@ const allTeams = globalModels.allTeams;
 const allExchanges = globalModels.allExchanges;
 const allGames = globalModels.allGames;
 const allOutcomes = globalModels.allOutcomes;
+const allExchangeGames = globalModels.allExchangeGames;
+const allExchangeGameTeams = globalModels.allExchangeGameTeams;
 const allOdds = globalModels.allOdds;
 
 async function main() {
@@ -12,70 +14,49 @@ async function main() {
 
     await allTeams.init();
     await allExchanges.init();
+    await allGames.init();
+    await allOutcomes.init();
 
-    updateExchangeGames();
-    updateExchangeGameElements();
-    updateExchangeGameTeamElements();
-    updateExchangeOutcomes();
+    await allExchangeGames.init();
+    await allExchangeGameTeams.init();
+    await allOdds.init();
+
+    await allExchangeGames.updateElements();
+    await allExchangeGameTeams.updateElements();
+    await allOdds.updateElements();
+
+    await allOdds.updateValues();
+
+    updateSlowElements();
     updateOddElements();
     updateOddValues();
 }
 
 main();
 
-async function updateExchangeGames() {
+async function updateSlowElements() {
     const start = new Date();
-    await allExchanges.updateExchangeGames();
+    await allExchangeGames.updateElements();
+    await allExchangeGameTeams.updateElements();
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();
-    console.log(`Update exchange games duration: ${duration}`);
 
-    setTimeout(updateExchangeGames, 30000);
-}
+    console.log(`updateSlowElements duration: ${duration}`);
 
-async function updateExchangeGameElements() {
-    const start = new Date();
-    await allExchanges.updateExchangeGameElements();
-    const end = new Date();
-
-    const duration = end.getTime() - start.getTime();
-    console.log(`Update exchange game elements duration: ${duration}`);
-
-    setTimeout(updateExchangeGameElements, 1000);
-}
-
-async function updateExchangeGameTeamElements() {
-    const start = new Date();
-    await allExchanges.updateExchangeGameTeamElements();
-    const end = new Date();
-
-    const duration = end.getTime() - start.getTime();
-    console.log(`Update exchange game team elements duration: ${duration}`);
-
-    setTimeout(updateExchangeGameTeamElements, 1000);
-}
-
-async function updateExchangeOutcomes() {
-    const start = new Date();
-    await allExchanges.updateExchangeOutcomes();
-    const end = new Date();
-
-    const duration = end.getTime() - start.getTime();
-    console.log(`Update exchange outcomes duration: ${duration}`);
-
-    setTimeout(updateExchangeOutcomes, 30000);
+    setTimeout(updateSlowElements, 10000);
 }
 
 async function updateOddElements() {
     const start = new Date();
-    await allExchanges.updateOddElements();
+    await allOdds.updateElements();
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();
-    console.log(`Update odd elements duration: ${duration}`);
 
-    setTimeout(updateOddElements, 1000);
+    console.log(`updateOddElements duration: ${duration}`);
+
+    setTimeout(updateOddElements, 500);
 }
 
 async function updateOddValues() {
@@ -84,7 +65,8 @@ async function updateOddValues() {
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();
-    console.log(`Update odd values duration: ${duration}`);
+
+    console.log(`updateOddValues duration: ${duration}`);
 
     setTimeout(updateOddValues, 100);
 }

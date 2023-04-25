@@ -10,7 +10,7 @@ export class Game {
     public awayTeam: localModels.Team;
     public homeTeam: localModels.Team;
     public exchangeGames: localModels.ExchangeGameSet;
-    public outcomeSet: localModels.OutcomeSet;
+    public outcomes: localModels.OutcomeSet;
 
     // private sequelize object
     private wrappedSqlGame: databaseModels.Game | null;
@@ -30,7 +30,7 @@ export class Game {
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
         this.exchangeGames = new localModels.ExchangeGameSet;
-        this.outcomeSet = new localModels.OutcomeSet;
+        this.outcomes = new localModels.OutcomeSet;
 
         this.wrappedSqlGame = null;
     }

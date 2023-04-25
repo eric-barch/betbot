@@ -3,28 +3,27 @@ import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
 export class Outcome {
-    // public properties
     public name: string;
-
-    // public linked objects
     public game: localModels.Game;
-    public oddSet: localModels.OddSet;
-
-    // private sequelize object
+    public team: localModels.Team;
+    public odds: localModels.OddSet;
+    private wrappedOppositeOutcome: Outcome | null;
     public wrappedSqlOutcome: databaseModels.Outcome | null;
 
-    // private constructor
     private constructor({
         name,
         game,
+        team,
     }: {
         name: string,
         game: localModels.Game,
+        team: localModels.Team,
     }) {
         this.name = name;
-        
         this.game = game;
-        this.oddSet = new localModels.OddSet;
+        this.team = team;
+        this.odds = new localModels.OddSet;
+        this.wrappedOppositeOutcome = null;
 
         this.wrappedSqlOutcome = null;
     }
@@ -33,17 +32,27 @@ export class Outcome {
     static async create({
         game,
         name,
+        team,
+        oppositeOutcome,
     }: {
         game: localModels.Game,
         name: string,
+        team: localModels.Team,
+        oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
         const newOutcome = new Outcome({
             name: name,
             game: game,
+            team: team,
         });
+
+        if (oppositeOutcome) {
+            newOutcome.oppositeOutcome = oppositeOutcome;
+        }
 
         await newOutcome.initSqlOutcome();
 
+        game.outcomes.add(newOutcome);
         globalModels.allOutcomes.add(newOutcome);
 
         return newOutcome;
@@ -92,6 +101,19 @@ export class Outcome {
     }
 
     // getters and setters
+    get oppositeOutcome(): Outcome {
+        if (!this.wrappedOppositeOutcome) {
+            throw new Error(`wrappedOppositeOutcome is null.`);
+        }
+
+        return this.wrappedOppositeOutcome;
+    }
+
+    set oppositeOutcome(oppositeOutcome: Outcome) {
+        this.wrappedOppositeOutcome = oppositeOutcome;
+        oppositeOutcome.wrappedOppositeOutcome = this;
+    }
+
     get sqlOutcome(): databaseModels.Outcome {
         if (!this.wrappedSqlOutcome) {
             throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.name} sqlOutcome is null.`)

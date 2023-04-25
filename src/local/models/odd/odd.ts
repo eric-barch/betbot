@@ -4,63 +4,179 @@ import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
-export class Odd {
-    // private properties
-    private wrappedPrice: number | null;
-    private wrappedValue: number | null;
-    private wrappedUpdateElementsFunction: Function;
+export abstract class Odd {
+    abstract priceElementXPath: string;
+    abstract valueElementXPath: string | null;
 
-    // public linked objects
-    public exchange: localModels.Exchange;
-    public outcome: localModels.Outcome;
-    public priceElement: ElementHandle | null;
-    public valueElement: ElementHandle | null;
+    public priceElement: ElementHandle | null = null;
+    public valueElement: ElementHandle | null = null;
 
-    // private sequelize object
-    private wrappedSqlOdd: databaseModels.Odd | null;
+    private wrappedPrice: number | null = null;
+    private wrappedValue: number | null = null;
 
-    // private constructor
-    private constructor({
+    private wrappedExchange: localModels.Exchange;
+    private wrappedOutcome: localModels.Outcome;
+
+    private wrappedSqlOdd: databaseModels.Odd | null = null;
+
+    constructor({
         exchange,
         outcome,
-        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
-        updateElementsFunction: Function,
     }) {
-        this.wrappedPrice = null;
-        this.wrappedValue = null;
+        this.wrappedExchange = exchange;
+        this.wrappedOutcome = outcome;
 
-        this.wrappedUpdateElementsFunction = updateElementsFunction.bind(this);
-
-        this.exchange = exchange;
-        this.outcome = outcome;
-
-        this.priceElement = null;
-        this.valueElement = null;
-
-        this.exchange.odds.add(this);
-        this.outcome.oddSet.add(this);
-
-        this.wrappedSqlOdd = null;
+        globalModels.allOdds.add(this);
     }
 
-    // public async constructor
     static async create({
         exchange,
         outcome,
-        updateElementsFunction,
     }: {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
-        updateElementsFunction: Function,
-    }): Promise<Odd> {
-        const newOdd = new Odd({
+    }): Promise<Odd> {;
+        let newOdd;
+
+        if (exchange.name === 'DraftKings') {
+            switch (outcome.name) {
+                case 'spread_away':
+                    newOdd = new localModels.DraftKingsSpreadAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'spread_home':
+                    newOdd = new localModels.DraftKingsSpreadHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'moneyline_away':
+                    newOdd = new localModels.DraftKingsMoneylineAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'moneyline_home':
+                    newOdd = new localModels.DraftKingsMoneylineHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'total_over':
+                    newOdd = new localModels.DraftKingsTotalOver({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'total_under':
+                    newOdd = new localModels.DraftKingsTotalUnder({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                default:
+                    throw new Error(`Could not find corresponding DraftKingsOdd`);
+            }
+        } else if (exchange.name === 'FanDuel') {
+            switch (outcome.name) {
+                case 'spread_away':
+                    newOdd = new localModels.FanDuelSpreadAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'spread_home':
+                    newOdd = new localModels.FanDuelSpreadHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'moneyline_away':
+                    newOdd = new localModels.FanDuelMoneylineAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'moneyline_home':
+                    newOdd = new localModels.FanDuelMoneylineHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'total_over':
+                    newOdd = new localModels.FanDuelTotalOver({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'total_under':
+                    newOdd = new localModels.FanDuelTotalUnder({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                default:
+                    throw new Error(`Could not find corresponding FanDuelOdd`);
+            }
+        } else if (exchange.name === 'SugarHouse') {
+            switch (outcome.name) {
+                case 'spread_away':
+                    newOdd = new localModels.SugarHouseSpreadAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'spread_home':
+                    newOdd = new localModels.SugarHouseSpreadHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'moneyline_away':
+                    newOdd = new localModels.SugarHouseMoneylineAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'moneyline_home':
+                    newOdd = new localModels.SugarHouseMoneylineHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'total_over':
+                    newOdd = new localModels.SugarHouseTotalOver({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                case 'total_under':
+                    newOdd = new localModels.SugarHouseTotalUnder({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
+                    break;
+                default:
+                    throw new Error(`Could not find corresponding SugarHouseOdd`);
+            }
+        }
+
+        if (!(newOdd instanceof Odd)) {
+            throw new Error(`Did not find corresponding exchange.`);
+        }
+        
+        const exchangeGame = await globalModels.allExchangeGames.findOrCreate({
             exchange: exchange,
-            outcome: outcome,
-            updateElementsFunction: updateElementsFunction,
-        });
+            game: outcome.game,
+        })
+
+        newOdd.setExchange(exchange);
+        newOdd.setOutcome(outcome);
 
         await newOdd.initSqlOdd();
 
@@ -69,13 +185,9 @@ export class Odd {
         return newOdd;
     }
 
-    // private sequelize instance constructor
-    private async initSqlOdd(): Promise<databaseModels.Odd> {
-        const exchange = this.exchange;
-        const outcome = this.outcome;
-
-        const exchangeId = exchange.sqlExchange.get('id');
-        const outcomeId = outcome.sqlOutcome.get('id');
+    public async initSqlOdd(): Promise<databaseModels.Odd> {
+        const exchangeId = this.getExchange().sqlExchange.get('id');
+        const outcomeId = this.getOutcome().sqlOutcome.get('id');
         const value = this.getValue();
 
         await databaseModels.Odd.findOrCreate({
@@ -101,7 +213,6 @@ export class Odd {
         return this.sqlOdd;
     }
 
-    // public instance methods
     public matches({
         exchange,
         outcome,
@@ -109,76 +220,92 @@ export class Odd {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
     }): boolean {
-        const exchangeMatches = (this.exchange === exchange);
-        const outcomeMatches = (this.outcome === outcome);
+        const exchangeMatches = (this.getExchange() === exchange);
+        const outcomeMatches = (this.getOutcome() === outcome);
 
         if (exchangeMatches && outcomeMatches) {
             return true;
         }
 
         return false;
-    };
+    }
 
-    public async updateElements() {
-        await this.wrappedUpdateElementsFunction();
+    public async updateElements(): Promise<{
+        priceElement: ElementHandle | null,
+        valueElement: ElementHandle | null,
+    }> {
+        const priceElement = await this.updatePriceElement();
+        const valueElement = await this.updateValueElement();
+
+        return {
+            priceElement: priceElement,
+            valueElement: valueElement,
+        }
+    }
+
+    public async updatePriceElement(): Promise<ElementHandle | null> {
+        const priceElement = await this.updateElement(this.priceElementXPath);
+        this.priceElement = priceElement;
+        return priceElement;
+    }
+
+    public async updateValueElement(): Promise<ElementHandle | null> {
+        const valueElement = await this.updateElement(this.valueElementXPath);
+        this.valueElement = valueElement;
+        return valueElement;
     }
 
     public async updateValues(): Promise<{
         priceValue: number | null,
         valueValue: number | null,
     }> {
-        const priceElement = this.priceElement;
-        const valueElement = this.valueElement;
-
-        if (!priceElement) {
-            await this.setPrice(null);
-        } else {
-            const priceJson = await (await priceElement.getProperty('textContent')).jsonValue();
-
-            if (!priceJson) {
-                await this.setPrice(null);
-            } else {
-                const hyphenVariations = /[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]/g;
-                const nonNumericChars = /[^0-9.-]/g;
-        
-                const cleanedPriceJson = priceJson
-                    .replace(hyphenVariations, '-')
-                    .replace(nonNumericChars, '');
-        
-                const price = Number(cleanedPriceJson);
-
-                await this.setPrice(price);
-            }
-        }
-
-        if (!valueElement) {
-            await this.setValue(null);
-        } else {
-            const valueJson = await (await valueElement.getProperty('textContent')).jsonValue();
-
-            if (!valueJson) {
-                await this.setValue(null);
-            } else {
-                const hyphenVariations = /[\u2010\u2011\u2012\u2013\u2014\u2015]/g;
-                const nonNumericChars = /[^0-9.-]/g;
-        
-                const cleanedValueJson = valueJson
-                    .replace(hyphenVariations, '-')
-                    .replace(nonNumericChars, '');
-        
-                const value = Number(cleanedValueJson);
-
-                await this.setValue(value);
-            }
-        }
+        const priceValue = await this.updatePriceValue();
+        const valueValue = await this.updateValueValue();
 
         return {
-            priceValue: this.getPrice(),
-            valueValue: this.getValue(),
+            priceValue: priceValue,
+            valueValue: valueValue,
         }
     }
 
-    // getters and setters
+    public async updatePriceValue(): Promise<number | null> {
+        const priceElement = this.priceElement;
+        const priceValue = await this.updateValue(priceElement);
+        await this.setPrice(priceValue);
+        return priceValue;
+    }
+
+    public async updateValueValue(): Promise<number | null> {
+        const valueElement = this.valueElement;
+        const valueValue = await this.updateValue(valueElement);
+        await this.setValue(valueValue);
+        return valueValue;
+    }
+
+    abstract updateElement(xPath: string | null): Promise<ElementHandle | null>;
+
+    public async updateValue(element: ElementHandle | null): Promise<number | null> {
+        if (!element) {
+            return null;
+        }
+
+        const json = await (await element.getProperty('textContent')).jsonValue();
+
+        if (!json) {
+            return null;
+        }
+
+        const hyphenVariations = /[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]/g;
+        const nonNumericChars = /[^0-9.-]/g;
+
+        const cleanedJson = json
+            .replace(hyphenVariations, '-')
+            .replace(nonNumericChars, '');
+        
+        const value = Number(cleanedJson);
+        return value;
+    }
+
     public getPrice(): number | null {
         return this.wrappedPrice;
     }
@@ -191,18 +318,6 @@ export class Odd {
         });
     }
 
-    get sqlOdd(): databaseModels.Odd {
-        if (!this.wrappedSqlOdd) {
-            throw new Error(`${this.exchange.name} ${this.outcome.name} sqlOdd is null.`);
-        }
-
-        return this.wrappedSqlOdd;
-    }
-
-    set sqlOdd(sqlOdd: databaseModels.Odd) {
-        this.wrappedSqlOdd = sqlOdd;
-    }
-
     public getValue(): number | null {
         return this.wrappedValue;
     }
@@ -213,5 +328,43 @@ export class Odd {
         await this.sqlOdd.update({
             value: value,
         })
+    }
+
+    public getExchange(): localModels.Exchange {
+        if (!this.wrappedExchange) {
+            throw new Error(`Exchange is null.`);
+        }
+
+        return this.wrappedExchange;
+    }
+
+    public setExchange(exchange: localModels.Exchange) {
+        this.wrappedExchange = exchange;
+        exchange.getOdds().add(this);
+    }
+
+    public getOutcome(): localModels.Outcome {
+        if (!this.wrappedOutcome) {
+            throw new Error(`Outcome is null.`);
+        }
+
+        return this.wrappedOutcome;
+    }
+
+    public setOutcome(outcome: localModels.Outcome) {
+        this.wrappedOutcome = outcome;
+        outcome.odds.add(this);
+    }
+
+    get sqlOdd(): databaseModels.Odd {
+        if (!this.wrappedSqlOdd) {
+            throw new Error(`sqlOdd is null.`);
+        }
+
+        return this.wrappedSqlOdd;
+    }
+
+    set sqlOdd(sqlOdd: databaseModels.Odd) {
+        this.wrappedSqlOdd = sqlOdd;
     }
 }

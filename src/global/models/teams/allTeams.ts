@@ -1,18 +1,73 @@
-import * as leagues from './leagues';
+import {
+    atlantaHawks,
+    bostonCeltics,
+    brooklynNets,
+    charlotteHornets,
+    chicagoBulls,
+    clevelandCavaliers,
+    dallasMavericks,
+    denverNuggets,
+    detroitPistons,
+    goldenStateWarriors,
+    houstonRockets,
+    indianaPacers,
+    losAngelesClippers,
+    losAngelesLakers,
+    memphisGrizzlies,
+    miamiHeat,
+    milwaukeeBucks,
+    minnesotaTimberwolves,
+    newOrleansPelicans,
+    newYorkKnicks,
+    oklahomaCityThunder,
+    orlandoMagic,
+    philadelphia76ers,
+    phoenixSuns,
+    portlandTrailBlazers,
+    sacramentoKings,
+    sanAntonioSpurs,
+    torontoRaptors,
+    utahJazz,
+    washingtonWizards,
+} from './leagues';
+
 import * as localModels from '../../../local';
 
 class AllTeams extends localModels.TeamSet {
     public async init(): Promise<void> {
-        for (const team of leagues.nbaTeams) {
-            const newTeam = await localModels.Team.create({
-                regionFull: team.regionFull,
-                regionAbbr: team.regionAbbr,
-                identifierFull: team.identifierFull,
-                identifierAbbr: team.identifierAbbr,
-                altNames: team.altNames,
-            });
-    
-            this.add(newTeam);
+        this.add(atlantaHawks);
+        this.add(bostonCeltics);
+        this.add(brooklynNets);
+        this.add(charlotteHornets);
+        this.add(chicagoBulls);
+        this.add(clevelandCavaliers);
+        this.add(dallasMavericks);
+        this.add(denverNuggets);
+        this.add(detroitPistons);
+        this.add(goldenStateWarriors);
+        this.add(houstonRockets);
+        this.add(indianaPacers);
+        this.add(losAngelesClippers);
+        this.add(losAngelesLakers);
+        this.add(memphisGrizzlies);
+        this.add(miamiHeat);
+        this.add(milwaukeeBucks);
+        this.add(minnesotaTimberwolves);
+        this.add(newOrleansPelicans);
+        this.add(newYorkKnicks);
+        this.add(oklahomaCityThunder);
+        this.add(orlandoMagic);
+        this.add(philadelphia76ers);
+        this.add(phoenixSuns);
+        this.add(portlandTrailBlazers);
+        this.add(sacramentoKings);
+        this.add(sanAntonioSpurs);
+        this.add(torontoRaptors);
+        this.add(utahJazz);
+        this.add(washingtonWizards);
+
+        for (const team of this) {
+            await team.init();
         }
     }
 }

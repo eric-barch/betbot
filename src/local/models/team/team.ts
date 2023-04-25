@@ -9,66 +9,31 @@ export class Team {
     public identifierFull: string;
     public identifierAbbr: string;
 
-    // public linked objects
-    public exchangeGameTeams: localModels.ExchangeGameTeamSet;
-
-    // private sequelize objects
     private wrappedSqlTeam: databaseModels.Team | null;
-
-    // private constructor
-    private constructor({
+    
+    public constructor({
         regionFull,
         regionAbbr,
         identifierFull,
         identifierAbbr,
-        altNames,
     }: {
         regionFull: string,
         regionAbbr: string,
         identifierFull: string,
         identifierAbbr: string,
-        altNames: Array<string>,
     }) {
         this.regionFull = regionFull;
         this.regionAbbr = regionAbbr;
         this.identifierFull = identifierFull;
         this.identifierAbbr = identifierAbbr;
 
-        this.exchangeGameTeams = new localModels.ExchangeGameTeamSet;
-
         this.wrappedSqlTeam = null;
     }
 
-    // public async constructor
-    public static async create({
-        regionFull,
-        regionAbbr,
-        identifierFull,
-        identifierAbbr,
-        altNames,
-    }: {
-        regionFull: string,
-        regionAbbr: string,
-        identifierFull: string,
-        identifierAbbr: string,
-        altNames: Array<string>,
-    }): Promise<localModels.Team> {
-        const newTeam = new Team({
-            regionFull: regionFull,
-            regionAbbr: regionAbbr,
-            identifierFull: identifierFull,
-            identifierAbbr: identifierAbbr,
-            altNames: altNames,
-        });
-
-        await newTeam.initSqlTeam();
-
-        globalModels.allTeams.add(newTeam);
-
-        return newTeam;
+    public async init() {
+        await this.initSqlTeam();
     }
 
-    // private sequelize instance constructor
     private async initSqlTeam(): Promise<databaseModels.Team> {
         await databaseModels.Team.findOrCreate({
             where: {
