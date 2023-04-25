@@ -99,6 +99,7 @@ export abstract class Exchange {
             const spreadAway = await globalModels.allOutcomes.findOrCreate({
                 game: exchangeGame.getGame(),
                 name: 'spread_away',
+                team: exchangeGame.getGame().awayTeam,
             });
             await this.getOdds().findOrCreate({
                 exchange: this,
@@ -108,6 +109,7 @@ export abstract class Exchange {
             const spreadHome = await globalModels.allOutcomes.findOrCreate({
                 game: exchangeGame.getGame(),
                 name: 'spread_home',
+                team: exchangeGame.getGame().homeTeam,
             });
             await this.getOdds().findOrCreate({
                 exchange: this,
@@ -117,6 +119,7 @@ export abstract class Exchange {
             const moneylineAway = await globalModels.allOutcomes.findOrCreate({
                 game: exchangeGame.getGame(),
                 name: 'moneyline_away',
+                team: exchangeGame.getGame().awayTeam,
             });
             await this.getOdds().findOrCreate({
                 exchange: this,
@@ -126,6 +129,7 @@ export abstract class Exchange {
             const moneylineHome = await globalModels.allOutcomes.findOrCreate({
                 game: exchangeGame.getGame(),
                 name: 'moneyline_home',
+                team: exchangeGame.getGame().homeTeam,
             });
             await this.getOdds().findOrCreate({
                 exchange: this,
@@ -135,6 +139,7 @@ export abstract class Exchange {
             const totalOver = await globalModels.allOutcomes.findOrCreate({
                 game: exchangeGame.getGame(),
                 name: 'total_over',
+                team: exchangeGame.getGame().awayTeam,
             });
             await this.getOdds().findOrCreate({
                 exchange: this,
@@ -144,6 +149,7 @@ export abstract class Exchange {
             const totalUnder = await globalModels.allOutcomes.findOrCreate({
                 game: exchangeGame.getGame(),
                 name: 'total_under',
+                team: exchangeGame.getGame().homeTeam,
             });
             await this.getOdds().findOrCreate({
                 exchange: this,

@@ -4,23 +4,13 @@ import * as globalModels from '../../../global';
 import * as localModels from '../../../local';
 
 export abstract class ExchangeGame {
-    public element: ElementHandle | null;
+    private wrappedExchange: localModels.Exchange | null = null;
+    private wrappedGame: localModels.Game | null = null;
 
-    private wrappedExchange: localModels.Exchange | null;
-    private wrappedGame: localModels.Game | null;
+    public wrappedExchangeGameAwayTeam: localModels.ExchangeGameTeam | null = null;
+    public wrappedExchangeGameHomeTeam: localModels.ExchangeGameTeam | null = null;;
 
-    public wrappedExchangeGameAwayTeam: localModels.ExchangeGameTeam | null;
-    public wrappedExchangeGameHomeTeam: localModels.ExchangeGameTeam | null;
-
-    public constructor() {
-        this.element = null;
-        
-        this.wrappedExchange = null;
-        this.wrappedGame = null;
-
-        this.wrappedExchangeGameAwayTeam = null;
-        this.wrappedExchangeGameHomeTeam = null;
-
+    public constructor() {        
         globalModels.allExchangeGames.add(this);
     }
 
@@ -70,10 +60,13 @@ export abstract class ExchangeGame {
     }
 
     public async updateExchangeGameAwayTeam(): Promise<localModels.ExchangeGameTeam> {
-        const team = this.getGame().awayTeam;
+        const exchange = this.getExchange();
+        const game = this.getGame();
+        const team = game.awayTeam;
 
         const requestedExchangeGameTeam = await globalModels.allExchangeGameTeams.findOrCreate({
-            exchangeGame: this,
+            exchange: exchange,
+            game: game,
             team: team,
         });
         
@@ -81,10 +74,13 @@ export abstract class ExchangeGame {
     }
 
     public async updateExchangeGameHomeTeam(): Promise<localModels.ExchangeGameTeam> {
-        const team = this.getGame().homeTeam;
+        const exchange = this.getExchange();
+        const game = this.getGame();
+        const team = game.homeTeam;
 
         const requestedExchangeGameTeam = await globalModels.allExchangeGameTeams.findOrCreate({
-            exchangeGame: this,
+            exchange: exchange,
+            game: game,
             team: team,
         });
 

@@ -3,24 +3,50 @@ import * as localModels from '../../../local';
 import { ExchangeGameTeam } from './exchangeGameTeam';
 
 export class ExchangeGameTeamSet extends Set<ExchangeGameTeam> {
-    public async findOrCreate({
-        exchangeGame,
+    public find({
+        exchange,
+        game,
         team,
     }: {
-        exchangeGame: localModels.ExchangeGame,
+        exchange: localModels.Exchange,
+        game: localModels.Game,
         team: localModels.Team,
-    }) {
+    }): ExchangeGameTeam | null {
         for (const exchangeGameTeam of this) {
             if (exchangeGameTeam.matches({
-                exchangeGame: exchangeGame,
+                exchange: exchange,
+                game: game,
                 team: team,
             })) {
                 return exchangeGameTeam;
             }
         }
 
+        return null;
+    }
+
+    public async findOrCreate({
+        exchange,
+        game,
+        team,
+    }: {
+        exchange: localModels.Exchange,
+        game: localModels.Game,
+        team: localModels.Team,
+    }) {
+        const foundExchangeGameTeam = this.find({
+            exchange: exchange,
+            game: game,
+            team: team,
+        });
+
+        if (foundExchangeGameTeam) {
+            return foundExchangeGameTeam;
+        }
+
         const exchangeGameTeam = await ExchangeGameTeam.create({
-            exchangeGame: exchangeGame,
+            exchange: exchange,
+            game: game,
             team: team,
         });
 

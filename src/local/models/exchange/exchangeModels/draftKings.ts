@@ -104,9 +104,4 @@ export class DraftKingsExchange extends Exchange {
          * website. */
         return this.getExchangeGames();
     }
-
-    public async updateExchangeGamesFromDocument(): Promise<localModels.ExchangeGameSet | null> {
-        /**TODO: Implement. */
-        return null;
-    }
 }

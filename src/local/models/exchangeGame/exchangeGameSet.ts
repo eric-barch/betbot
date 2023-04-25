@@ -3,13 +3,13 @@ import * as localModels from '../../../local';
 import { ExchangeGame } from './exchangeGame';
 
 export class ExchangeGameSet extends Set<ExchangeGame> {
-    public async findOrCreate({
+    public find({
         exchange,
         game,
     }: {
         exchange: localModels.Exchange,
         game: localModels.Game,
-    }): Promise<ExchangeGame> {
+    }): ExchangeGame | null {
         for (const exchangeGame of this) {
             if (exchangeGame.matches({
                 exchange: exchange,
@@ -17,6 +17,25 @@ export class ExchangeGameSet extends Set<ExchangeGame> {
             })) {
                 return exchangeGame;
             }
+        }
+
+        return null;
+    }
+
+    public async findOrCreate({
+        exchange,
+        game,
+    }: {
+        exchange: localModels.Exchange,
+        game: localModels.Game,
+    }): Promise<ExchangeGame> {
+        const foundExchangeGame = this.find({
+            exchange: exchange,
+            game: game,
+        });
+
+        if (foundExchangeGame) {
+            return foundExchangeGame;
         }
 
         const newExchangeGame = await ExchangeGame.create({

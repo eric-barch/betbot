@@ -1,67 +1,56 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as localModels from '../../..';
+import * as globalModels from '../../../../global'
+import * as localModels from '../../../../local';
 
 import { Odd } from '../odd';
 
 abstract class DraftKingsOdd extends Odd {
-    private exchangeGameTeam = localModels.ExchangeGameTeam;
+    private exchangeGameTeam: localModels.DraftKingsExchangeGameTeam;
 
-    async updateElement(xPath: string | null): Promise<ElementHandle | null> {
-        if (!xPath) {
-            return null;
-        }
-
-        const exchange = this.getExchange();
-        const game = this.getOutcome().game;
-
-        const outcomeName = this.getOutcome().name;
-        let team: localModels.Team | null = null;
-
-        if (outcomeName.includes('away') || outcomeName.includes('over')) {
-            team = game.awayTeam;
-        }
-
-        if (outcomeName.includes('home') || outcomeName.includes('under')) {
-            team = game.homeTeam;
-        }
-
-        if (!team) {
-            return null;
-        }
-
-        const exchangeGame = await exchange.getExchangeGames().findOrCreate({
+    constructor({
+        exchange,
+        outcome,
+    }: {
+        exchange: localModels.Exchange,
+        outcome: localModels.Outcome,
+    }) {
+        super({
             exchange: exchange,
-            game: game,
+            outcome: outcome,
         });
 
-        let exchangeGameTeam;
+        const exchangeGameTeam = globalModels.allExchangeGameTeams.find({
+            exchange: exchange,
+            game: outcome.game,
+            team: outcome.team,
+        })
 
-        if (outcomeName.includes('away') || outcomeName.includes('over')) {
-            exchangeGameTeam = exchangeGame.getExchangeGameAwayTeam();
-        } else if (outcomeName.includes('home') || outcomeName.includes('under')) {
-            exchangeGameTeam = exchangeGame.getExchangeGameHomeTeam();
+        if (!exchangeGameTeam) {
+            throw new Error(`Did not find ExchangeGameTeam.`);
         }
 
-        if (!(exchangeGameTeam instanceof localModels.ExchangeGameTeam)) {
-            throw new Error(`Come back to this and refactor pls.`);
+        if (!(exchangeGameTeam instanceof localModels.DraftKingsExchangeGameTeam)) {
+            throw new Error(`Expected DraftKingsExchangeGameTeam.`);
         }
 
-        const exchangeGameTeamElement = exchangeGameTeam.element;
-        const className = await (await exchangeGameTeamElement?.getProperty('className'))?.jsonValue();
+        this.exchangeGameTeam = exchangeGameTeam;
+    }
+
+    async updateElement(xPath: string | null): Promise<ElementHandle | null> {
+        const exchangeGameTeamElement = this.exchangeGameTeam.element;
 
         if (!exchangeGameTeamElement) {
             return null;
         }
 
-        const element = await exchangeGameTeamElement.$(`xpath/${xPath}`);
-        const json = await (await element?.getProperty('textContent'))?.jsonValue();
+        const oddElement = await exchangeGameTeamElement.$(`xpath/${xPath}`);
 
-        if (!element) {
+        if (!oddElement) {
             return null;
         }
 
-        return element;
+        return oddElement;
     }
 }
 

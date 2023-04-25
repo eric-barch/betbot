@@ -5,6 +5,7 @@ import * as localModels from '../../../local';
 export class Outcome {
     public name: string;
     public game: localModels.Game;
+    public team: localModels.Team;
     public odds: localModels.OddSet;
     private wrappedOppositeOutcome: Outcome | null;
     public wrappedSqlOutcome: databaseModels.Outcome | null;
@@ -12,13 +13,15 @@ export class Outcome {
     private constructor({
         name,
         game,
+        team,
     }: {
         name: string,
         game: localModels.Game,
+        team: localModels.Team,
     }) {
         this.name = name;
-        
         this.game = game;
+        this.team = team;
         this.odds = new localModels.OddSet;
         this.wrappedOppositeOutcome = null;
 
@@ -29,15 +32,18 @@ export class Outcome {
     static async create({
         game,
         name,
+        team,
         oppositeOutcome,
     }: {
         game: localModels.Game,
         name: string,
+        team: localModels.Team,
         oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
         const newOutcome = new Outcome({
             name: name,
             game: game,
+            team: team,
         });
 
         if (oppositeOutcome) {

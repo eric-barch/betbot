@@ -2,12 +2,16 @@ import { ElementHandle } from "puppeteer";
 
 import { ExchangeGameTeam } from "../exchangeGameTeam";
 
-import * as localModels from '../../../../local';
+export abstract class DraftKingsExchangeGameTeam extends ExchangeGameTeam {
+    public element: ElementHandle | null = null;
 
-export class DraftKingsExchangeGameAwayTeam extends ExchangeGameTeam {
-    public async updateElement(): Promise<ElementHandle | null> {
-        const exchange = this.getExchangeGame().getExchange();
-        const game = this.getExchangeGame().getGame();
+    public async getTeamRowElements(): Promise<{
+        awayTeamRowElement: ElementHandle,
+        homeTeamRowElement: ElementHandle,
+    } | null> {
+        const exchange = this.getExchange();
+        const game = this.getGame();
+        
         const page = exchange.page;
 
         const teamRowElements = await page.$$('tbody > tr');
@@ -35,7 +39,6 @@ export class DraftKingsExchangeGameAwayTeam extends ExchangeGameTeam {
         }
 
         if (matchedTeamRowElements.length < 2) {
-            this.element = null;
             return null;
         }
     
@@ -45,73 +48,43 @@ export class DraftKingsExchangeGameAwayTeam extends ExchangeGameTeam {
         }
     
         const awayTeamRowElement = matchedTeamRowElements[0];
-    
-        if (!awayTeamRowElement) {
-            throw new Error(`Provided team does not match.`);
-        }
+        const homeTeamRowElement = matchedTeamRowElements[1];
 
-        this.element = awayTeamRowElement;
-        return awayTeamRowElement;
-    }
-
-    public setExchangeGame(exchangeGame: localModels.ExchangeGame) {
-        this.wrappedExchangeGame = exchangeGame;
-        exchangeGame.setExchangeGameAwayTeam(this);
+        return {
+            awayTeamRowElement: awayTeamRowElement,
+            homeTeamRowElement: homeTeamRowElement,
+        };
     }
 }
 
-export class DraftKingsExchangeGameHomeTeam extends ExchangeGameTeam {
+export class DraftKingsExchangeGameAwayTeam extends DraftKingsExchangeGameTeam {
     public async updateElement(): Promise<ElementHandle | null> {
-        const exchange = this.getExchangeGame().getExchange();
-        const game = this.getExchangeGame().getGame();
-        const page = exchange.page;
+        const teamRowElements = await this.getTeamRowElements();
 
-        const teamRowElements = await page.$$('tbody > tr');
-
-        const awayTeamIdentifier = game.awayTeam.identifierFull.toLowerCase();
-        const homeTeamIdentifier = game.homeTeam.identifierFull.toLowerCase();
-    
-        const regex = new RegExp(`${awayTeamIdentifier}.*${homeTeamIdentifier}`);
-    
-        const matchedTeamRowElements = [];
-
-        for (const teamRow of teamRowElements) {
-            const aElement = await teamRow.$('th > a.event-cell-link');
-    
-            if (!aElement) {
-                continue;
-            }
-    
-            const hrefString = await (await aElement.getProperty('href')).jsonValue();
-            const hrefStringClean = hrefString.trim().toLowerCase();
-    
-            if (regex.test(hrefStringClean)) {
-                matchedTeamRowElements.push(teamRow);
-            }
-        }
-
-        if (matchedTeamRowElements.length < 2) {
+        if (!teamRowElements) {
             this.element = null;
             return null;
         }
-    
-        if (matchedTeamRowElements.length > 2) {
-            throw new Error(`Did not expect more than 2 teamRowElements for ${exchange.name} ${game.regionAbbrIdentifierAbbr}`);
-            // TODO: Handle by confirming time of game.
-        }
 
-        const homeTeamRowElement = matchedTeamRowElements[1];
-        
-        if (!homeTeamRowElement) {
-            throw new Error(`Provided team does not match.`);
-        }
+        const element = teamRowElements.awayTeamRowElement;
 
-        this.element = homeTeamRowElement;
-        return homeTeamRowElement;
+        this.element = element;
+        return element;
     }
+}
 
-    public setExchangeGame(exchangeGame: localModels.ExchangeGame) {
-        this.wrappedExchangeGame = exchangeGame;
-        exchangeGame.setExchangeGameHomeTeam(this);
+export class DraftKingsExchangeGameHomeTeam extends DraftKingsExchangeGameTeam {
+    public async updateElement(): Promise<ElementHandle | null> {
+        const teamRowElements = await this.getTeamRowElements();
+
+        if (!teamRowElements) {
+            this.element = null;
+            return null;
+        }
+
+        const element = teamRowElements.homeTeamRowElement;
+
+        this.element = element;
+        return element;
     }
 }

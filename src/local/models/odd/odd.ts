@@ -14,12 +14,21 @@ export abstract class Odd {
     private wrappedPrice: number | null = null;
     private wrappedValue: number | null = null;
 
-    private wrappedExchange: localModels.Exchange | null = null;
-    private wrappedOutcome: localModels.Outcome | null = null;
+    private wrappedExchange: localModels.Exchange;
+    private wrappedOutcome: localModels.Outcome;
 
     private wrappedSqlOdd: databaseModels.Odd | null = null;
 
-    constructor() {
+    constructor({
+        exchange,
+        outcome,
+    }: {
+        exchange: localModels.Exchange,
+        outcome: localModels.Outcome,
+    }) {
+        this.wrappedExchange = exchange;
+        this.wrappedOutcome = outcome;
+
         globalModels.allOdds.add(this);
     }
 
@@ -35,22 +44,40 @@ export abstract class Odd {
         if (exchange.name === 'DraftKings') {
             switch (outcome.name) {
                 case 'spread_away':
-                    newOdd = new localModels.DraftKingsSpreadAway();
+                    newOdd = new localModels.DraftKingsSpreadAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'spread_home':
-                    newOdd = new localModels.DraftKingsSpreadHome();
+                    newOdd = new localModels.DraftKingsSpreadHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'moneyline_away':
-                    newOdd = new localModels.DraftKingsMoneylineAway();
+                    newOdd = new localModels.DraftKingsMoneylineAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'moneyline_home':
-                    newOdd = new localModels.DraftKingsMoneylineHome();
+                    newOdd = new localModels.DraftKingsMoneylineHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'total_over':
-                    newOdd = new localModels.DraftKingsTotalOver();
+                    newOdd = new localModels.DraftKingsTotalOver({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'total_under':
-                    newOdd = new localModels.DraftKingsTotalUnder();
+                    newOdd = new localModels.DraftKingsTotalUnder({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 default:
                     throw new Error(`Could not find corresponding DraftKingsOdd`);
@@ -58,22 +85,40 @@ export abstract class Odd {
         } else if (exchange.name === 'FanDuel') {
             switch (outcome.name) {
                 case 'spread_away':
-                    newOdd = new localModels.FanDuelSpreadAway();
+                    newOdd = new localModels.FanDuelSpreadAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'spread_home':
-                    newOdd = new localModels.FanDuelSpreadHome();
+                    newOdd = new localModels.FanDuelSpreadHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'moneyline_away':
-                    newOdd = new localModels.FanDuelMoneylineAway();
+                    newOdd = new localModels.FanDuelMoneylineAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'moneyline_home':
-                    newOdd = new localModels.FanDuelMoneylineHome();
+                    newOdd = new localModels.FanDuelMoneylineHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'total_over':
-                    newOdd = new localModels.FanDuelTotalOver();
+                    newOdd = new localModels.FanDuelTotalOver({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'total_under':
-                    newOdd = new localModels.FanDuelTotalUnder();
+                    newOdd = new localModels.FanDuelTotalUnder({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 default:
                     throw new Error(`Could not find corresponding FanDuelOdd`);
@@ -81,22 +126,40 @@ export abstract class Odd {
         } else if (exchange.name === 'SugarHouse') {
             switch (outcome.name) {
                 case 'spread_away':
-                    newOdd = new localModels.SugarHouseSpreadAway();
+                    newOdd = new localModels.SugarHouseSpreadAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'spread_home':
-                    newOdd = new localModels.SugarHouseSpreadHome();
+                    newOdd = new localModels.SugarHouseSpreadHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'moneyline_away':
-                    newOdd = new localModels.SugarHouseMoneylineAway();
+                    newOdd = new localModels.SugarHouseMoneylineAway({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'moneyline_home':
-                    newOdd = new localModels.SugarHouseMoneylineHome();
+                    newOdd = new localModels.SugarHouseMoneylineHome({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'total_over':
-                    newOdd = new localModels.SugarHouseTotalOver();
+                    newOdd = new localModels.SugarHouseTotalOver({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 case 'total_under':
-                    newOdd = new localModels.SugarHouseTotalUnder();
+                    newOdd = new localModels.SugarHouseTotalUnder({
+                        exchange: exchange,
+                        outcome: outcome,
+                    });
                     break;
                 default:
                     throw new Error(`Could not find corresponding SugarHouseOdd`);

@@ -2,9 +2,9 @@ import { ElementHandle } from "puppeteer";
 
 import { ExchangeGame } from "../exchangeGame";
 
-import * as localModels from '../../../../local';
-
 export class SugarHouseExchangeGame extends ExchangeGame {
+    public element: ElementHandle | null = null;
+
     public async updateElement(): Promise<ElementHandle | null> {
         const exchange = this.getExchange();
         const game = this.getGame();
