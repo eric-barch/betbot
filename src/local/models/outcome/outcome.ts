@@ -28,7 +28,6 @@ export class Outcome {
         this.wrappedSqlOutcome = null;
     }
 
-    // public async constructor
     static async create({
         game,
         name,
@@ -58,7 +57,6 @@ export class Outcome {
         return newOutcome;
     }
 
-    // private sequelize instance constructor
     public async initSqlOutcome(): Promise<databaseModels.Outcome> {
         const game = this.game;
 
@@ -82,7 +80,6 @@ export class Outcome {
         return this.sqlOutcome;
     }
 
-    // public instance methods
     public matches({
         name,
         game,
@@ -100,7 +97,15 @@ export class Outcome {
         return false;
     }
 
-    // getters and setters
+    public async checkForArbs() {
+        const odds = this.odds;
+        const oppositeOdds = this.oppositeOutcome.odds;
+
+        for (const odd of odds) {
+            await odd.checkForArbs(oppositeOdds);
+        } 
+    }
+
     get oppositeOutcome(): Outcome {
         if (!this.wrappedOppositeOutcome) {
             throw new Error(`wrappedOppositeOutcome is null.`);

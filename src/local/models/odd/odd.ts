@@ -306,6 +306,77 @@ export abstract class Odd {
         return value;
     }
 
+    public async checkForArbs(oppositeOdds: localModels.OddSet): Promise<Array<localModels.Arb> | null> {
+        const price = this.getPrice();
+        const value = this.getValue();
+
+        if (!price) {
+            return null;
+        }
+
+        const arbs = new Array<localModels.Arb>;
+
+        for (const oppositeOdd of oppositeOdds) {
+            const isArb = this.checkIfArb(oppositeOdd);
+
+            if (isArb) {
+                const newArb = await globalModels.allArbs.findOrCreate({
+                    oddA: this,
+                    oddB: oppositeOdd,
+                });
+
+                arbs.push(newArb);
+            }
+        }
+
+        return arbs;
+    }
+
+    public checkIfArb(oppositeOdd: localModels.Odd): boolean {
+        const thisImpliedProbability = this.impliedProbability;
+        let thisValue = this.getValue();
+        const oppositeImpliedProbability = oppositeOdd.impliedProbability;
+        let oppositeValue = oppositeOdd.getValue();
+
+        if (thisValue) {
+            thisValue = Math.abs(thisValue);
+        }
+
+        if (oppositeValue) {
+            oppositeValue = Math.abs(oppositeValue);
+        }
+
+        if (thisValue !== oppositeValue) {
+            return false;
+        }
+
+        const totalImpliedProbability = thisImpliedProbability + oppositeImpliedProbability;
+
+        if (totalImpliedProbability > 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    get impliedProbability(): number {
+        const price = this.getPrice();
+
+        if (!price) {
+            throw new Error(`price is null.`);
+        }
+
+        if (price < 0) {
+            const risk = -price;
+            const payout = (-price) + 100;
+            return risk/payout;
+        }
+
+        const risk = 100;
+        const payout = price + 100;
+        return risk/payout;
+    }
+
     public getPrice(): number | null {
         return this.wrappedPrice;
     }
