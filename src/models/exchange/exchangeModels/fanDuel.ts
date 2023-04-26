@@ -9,14 +9,14 @@ export class FanDuelExchange extends Exchange {
     protected wrappedExchangeGames: localModels.ExchangeGameSet = new localModels.ExchangeGameSet();
     protected wrappedOdds: localModels.OddSet = new localModels.OddSet();
 
-    public async getGames(): Promise<Array<localModels.Game>> {
+    public async updateGames(): Promise<localModels.GameSet> {
         const gamesFromJson = await this.getGamesFromJson();
         /**TODO: Implement getGamesFromDocument, then filter gamesFromJson by gamesFromDocument. */
         const gamesFromDocumetn = await this.getGamesFromDocument();
         return gamesFromJson;
     }
 
-    private async getGamesFromJson(): Promise<Array<localModels.Game>> {
+    private async getGamesFromJson(): Promise<localModels.GameSet> {
         const jsonGames = await this.scrapeJsonGames();
         const games = await this.parseJsonGames(jsonGames);
         return games;
@@ -39,8 +39,8 @@ export class FanDuelExchange extends Exchange {
         return jsonGames;
     }
 
-    private async parseJsonGames(jsonGames: Array<any>): Promise<Array<localModels.Game>> {
-        const games = new Array<localModels.Game>;
+    private async parseJsonGames(jsonGames: Array<any>): Promise<localModels.GameSet> {
+        const games = new localModels.GameSet;
 
         for (const jsonGame of jsonGames) {
             const awayTeamName = jsonGame.awayTeam.name;
@@ -56,7 +56,9 @@ export class FanDuelExchange extends Exchange {
                 startDate: startDate,
             });
 
-            games.push(game);
+            if (game) {
+                games.add(game);
+            }
         }
 
         return games;
@@ -95,10 +97,12 @@ export class FanDuelExchange extends Exchange {
                 startDate: startDate,
             });
 
-            await this.getExchangeGames().findOrCreate({
-                exchange: this,
-                game: requestedGame,
-            })
+            if (requestedGame) {
+                await this.getExchangeGames().findOrCreate({
+                    exchange: this,
+                    game: requestedGame,
+                });
+            }
         }
 
         /**TODO: At end of method, we should also DELETE games that are no longer found on the

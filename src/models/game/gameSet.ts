@@ -10,7 +10,7 @@ export class GameSet extends Set<Game> {
     }: {
         awayTeam: localModels.Team,
         homeTeam: localModels.Team,
-        startDate: Date,
+        startDate?: Date,
     }): Game | null {
         for (const game of this) {
             if (game.matches({
@@ -32,8 +32,8 @@ export class GameSet extends Set<Game> {
     }: {
         awayTeam: localModels.Team,
         homeTeam: localModels.Team,
-        startDate: Date,
-    }): Promise<Game> {         
+        startDate?: Date,
+    }): Promise<Game | null> {         
         const foundGame = this.find({
             awayTeam: awayTeam,
             homeTeam: homeTeam,
@@ -42,6 +42,10 @@ export class GameSet extends Set<Game> {
 
         if (foundGame) {
             return foundGame;
+        }
+
+        if (!startDate) {
+            return null;
         }
 
         const newGame = await Game.create({

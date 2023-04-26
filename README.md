@@ -6,7 +6,7 @@ quick (< 1 day):
 x split all findOrCreates into synchronous 'find' and asynchronous'findOrCreate'. these should all 
   exist in 'Set', not in 'AllWhatevers'.
 x ensure all sets have find and findOrCreate methods
-- confirm json games with document content
+- confirm json games with document content (complete for DK)
 - see if possible to add normal getters and setters to the abstract classes (as opposed to 
   getExchange(), for example). If possible, remove getters and setters outright
 - initialize program objects to stored database values if available. program should NOT set db value

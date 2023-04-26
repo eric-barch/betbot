@@ -1,4 +1,5 @@
 import * as chrono from 'chrono-node';
+import { ElementHandle } from 'puppeteer';
 
 import { Exchange } from '../exchange';
 import * as globalModels from '../../../global';
@@ -11,14 +12,24 @@ export class DraftKingsExchange extends Exchange {
     protected wrappedExchangeGames: localModels.ExchangeGameSet = new localModels.ExchangeGameSet();
     protected wrappedOdds: localModels.OddSet = new localModels.OddSet();
 
-    public async getGames(): Promise<Array<localModels.Game>> {
-        const gamesFromJson = await this.getGamesFromJson();
-        /**TODO: Implement getGamesFromDocument, then filter gamesFromJson by gamesFromDocument. */
-        // const games = await this.confirmGamesAgainstDocument();
-        return gamesFromJson;
+    public async updateGames(): Promise<localModels.GameSet> {
+        const gamesFromJson = await this.updateGamesFromJson();
+        const gamesFromDocument = await this.updateGamesFromDocument();
+
+        const games = new localModels.GameSet;
+
+        for (const gameFromJson of gamesFromJson) {
+            games.add(gameFromJson);
+        }
+
+        for (const gameFromDocument of gamesFromDocument) {
+            games.add(gameFromDocument);
+        }
+
+        return games;
     }
 
-    private async getGamesFromJson(): Promise<Array<localModels.Game>> {
+    private async updateGamesFromJson(): Promise<localModels.GameSet> {
         const jsonGames = await this.scrapeJsonGames();
         const games = await this.parseJsonGames(jsonGames);
         return games;
@@ -41,8 +52,8 @@ export class DraftKingsExchange extends Exchange {
         return jsonGames;
     }
 
-    private async parseJsonGames(jsonGames: Array<any>): Promise<Array<localModels.Game>> {
-        const games = new Array<localModels.Game>;
+    private async parseJsonGames(jsonGames: Array<any>): Promise<localModels.GameSet> {
+        const games = new localModels.GameSet;
 
         for (const jsonGame of jsonGames) {
             const awayTeamName = jsonGame.awayTeam.name;
@@ -58,70 +69,218 @@ export class DraftKingsExchange extends Exchange {
                 startDate: startDate,
             });
 
-            games.push(game);
+            if (game) {
+                games.add(game);
+            }
         }
 
         return games;
     }
 
-    private async confirmGamesAgainstDocument({
-        gamesFromJson,
+    private async updateGamesFromDocument(): Promise<localModels.GameSet> {
+        const games = new localModels.GameSet;
+
+        const trElements = await this.page.$$('div[class*="parlay-card"] table > tbody > tr');
+
+        for (const trElement of trElements) {
+            const trElementTeam = await this.getTrElementTeam(trElement);
+            if (!trElementTeam) {
+                continue;
+            }
+
+            const trElementGameTeams = await this.getTrElementGameTeams(trElement);
+            if (!trElementGameTeams) {
+                continue;
+            }
+
+            const startDate = await this.getStartDate({
+                trElement: trElement,
+                trElementTeam: trElementTeam,
+                trElementGameTeams: trElementGameTeams,
+            });
+
+            const game = await globalModels.allGames.findOrCreate({
+                awayTeam: trElementGameTeams.awayTeam,
+                homeTeam: trElementGameTeams.homeTeam,
+                startDate: startDate,
+            });
+
+            if (game) {
+                games.add(game);
+            }
+        }
+
+        return games;
+    }
+
+    private async getTrElementTeam(trElement: ElementHandle): Promise<localModels.Team | null> {
+        const teamNameElement = await trElement.$('xpath/th/a/div/div[2]/div/span/div/div');
+
+        if (!teamNameElement) {
+            return null;
+        }
+
+        const teamName = await (await teamNameElement.getProperty('textContent')).jsonValue();
+
+        if (!teamName) {
+            return null;
+        }
+
+        const team = globalModels.allTeams.find({ name: teamName });
+        return team;
+    }
+
+    private async getTrElementGameTeams(trElement: ElementHandle): Promise<{
+        awayTeam: localModels.Team,
+        homeTeam: localModels.Team,
+    } | null> {
+        const aElement = await trElement.$('xpath/th/a');
+
+        if (!aElement) {
+            return null;
+        }
+
+        const hrefString = await (await aElement.getProperty('href')).jsonValue();
+
+        if (typeof hrefString !== 'string') {
+            return null;
+        }
+
+        const gameTeams = this.getGameTeamsFromString(hrefString);
+
+        return gameTeams;
+    }
+
+    private getGameTeamsFromString(string: string): {
+        awayTeam: localModels.Team,
+        homeTeam: localModels.Team,
+    } | null {
+        let teamA: localModels.Team | undefined;
+        let teamAIndex: number | undefined;
+
+        let teamB: localModels.Team | undefined;
+        let teamBIndex: number | undefined;
+
+        string = string.toLowerCase().replace('sportsbook.draftkings.com', '');
+
+        for (const team of globalModels.allTeams) {
+            const index = string.indexOf(team.identifierFull.toLowerCase());
+            if (index === -1) {
+                continue;
+            }
+
+            if (!teamA) {
+                teamA = team;
+                teamAIndex = index;
+            } else {
+                teamB = team;
+                teamBIndex = index;
+            }
+        }
+
+        if (!teamA || !teamB || !teamAIndex || !teamBIndex) {
+            return null;
+        }
+
+        let awayTeam: localModels.Team;
+        let homeTeam: localModels.Team;
+
+        if (teamAIndex < teamBIndex) {
+            awayTeam = teamA;
+            homeTeam = teamB;
+        } else {
+            awayTeam = teamB;
+            homeTeam = teamA;
+        }
+
+        return {
+            awayTeam: awayTeam,
+            homeTeam: homeTeam,
+        }
+    }
+
+    private async getStartDate({
+        trElement,
+        trElementTeam,
+        trElementGameTeams,
     }: {
-        gamesFromJson: Array<localModels.Game>,
-    })/*: Promise<Array<localModels.Game>> */{
-        // let games = new Array<localModels.Game>;
+        trElement: ElementHandle,
+        trElementTeam: localModels.Team,
+        trElementGameTeams: {
+            awayTeam: localModels.Team,
+            homeTeam: localModels.Team,
+        }
+    }): Promise<Date | undefined> {
+        const dateString = await this.getDateString({
+            trElement: trElement,
+        });
 
-        // for (const gameFromJson of gamesFromJson) {
-        //     const awayTeamIdentifier = gameFromJson.awayTeam.identifierFull.toLowerCase();
-        //     const homeTeamIdentifier = gameFromJson.homeTeam.identifierFull.toLowerCase();
-        //     const regex = new RegExp(`${awayTeamIdentifier}.*${homeTeamIdentifier}`);
+        const timeString = await this.getTimeString({
+            trElementGameTeams: trElementGameTeams,
+            trElementTeam: trElementTeam,
+            trElement: trElement,
+        });
 
-        //     let awayTeamRowElement;
+        if (!dateString || !timeString) {
+            return undefined;
+        }
 
-        //     const teamRowElements = await this.page.$$('tbody > tr');
+        const startDateString = `${dateString} ${timeString}`;
+        const startDate = chrono.parseDate(startDateString);
+        return startDate;
+    }
 
-        //     for (const teamRowElement of teamRowElements) {
-        //         const gameNameElement = await teamRowElement.$('th > a.event-cell-link');
+    private async getDateString({
+        trElement,
+    }: {
+        trElement: ElementHandle,
+    }): Promise<string | null> {            
+        const dateStringElement = await trElement.$('xpath/../../thead/tr/th[1]/div/span');
         
-        //         if (!gameNameElement) {
-        //             continue;
-        //         }
-        
-        //         const gameName = await (await gameNameElement.getProperty('href')).jsonValue();
-        //         const gameNameClean = gameName.trim().toLowerCase();
-        
-        //         if (!regex.test(gameNameClean)) {
-        //             continue;
-        //         }
+        if (!dateStringElement) {
+            return null;
+        }
 
-        //         const possibleDateElement = await teamRowElement.$('xpath/../../thead/tr/th[1]/div/span/span/span');
-        //         const possibleTimeElement = await teamRowElement.$('xpath/th/a/div/div[1]/span');
+        const dateString = await (await dateStringElement.getProperty('textContent')).jsonValue();
+        return dateString;
+    }
 
-        //         if ((!possibleDateElement) || (!possibleTimeElement)) {
-        //             continue;
-        //         }
+    private async getTimeString({
+        trElementGameTeams,
+        trElementTeam,
+        trElement,
+    }: {
+        trElementGameTeams: {
+            awayTeam: localModels.Team,
+            homeTeam: localModels.Team,
+        },
+        trElementTeam: localModels.Team,
+        trElement: ElementHandle,
+    }): Promise<string | null> {
+        const awayTeam = trElementGameTeams.awayTeam;
+        const homeTeam = trElementGameTeams.homeTeam;
 
-        //         const dateText = await (await possibleDateElement.getProperty('textContent')).jsonValue();
-        //         const timeText = await (await possibleTimeElement.getProperty('textContent')).jsonValue();
+        let timeElement;
 
-        //         if ((!dateText) || (!timeText)) {
-        //             continue;
-        //         }
+        if (trElementTeam === awayTeam) {
+            timeElement = await trElement.$('xpath/th/a/div/div[1]/span');
+        }
 
-        //         const startDateText = `${dateText} ${timeText}`;
-        //         const startDate = chrono.parseDate(startDateText);
-        //         const startDateRounded = localModels.Game.roundDateToNearestInterval(startDate);
+        if (trElementTeam === homeTeam) {
+            const previousTrElement = await trElement.getProperty('previousSibling');
 
-        //         if (startDateRounded === gameFromJson.startDate) {
-        //             awayTeamRowElement = teamRowElement;
-        //             break;
-        //         }
-        //     }
-    
-        //     if (!awayTeamRowElement) {
-        //         continue;
-        //     }
+            if (!(previousTrElement instanceof ElementHandle)) {
+                return null;
+            }
 
-        // }
+            timeElement = await previousTrElement.$('xpath/th/a/div/div[1]/span');
+        }
+
+        if (!timeElement) {
+            return null;
+        }
+
+        const timeString = await (await timeElement.getProperty('textContent')).jsonValue();
+        return timeString;
     }
 }

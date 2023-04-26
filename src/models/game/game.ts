@@ -98,9 +98,14 @@ export class Game {
     }: {
         awayTeam: localModels.Team,
         homeTeam: localModels.Team,
-        startDate: Date,
+        startDate?: Date,
     }): boolean {
-        startDate = Game.roundDateToNearestInterval(startDate);
+        if (startDate) {
+            startDate = Game.roundDateToNearestInterval(startDate);
+        } else {
+            startDate = new Date();
+        }
+
 
         const awayTeamMatches = (this.awayTeam === awayTeam);
         const homeTeamMatches = (this.homeTeam === homeTeam);

@@ -11,8 +11,8 @@ export class SugarHouseExchange extends Exchange {
     protected wrappedExchangeGames: localModels.ExchangeGameSet = new localModels.ExchangeGameSet();
     protected wrappedOdds: localModels.OddSet = new localModels.OddSet();
 
-    public async getGames(): Promise<Array<localModels.Game>> {
-        const games = new Array<localModels.Game>;
+    public async updateGames(): Promise<localModels.GameSet> {
+        const games = new localModels.GameSet;
 
         const articleElements = await this.page.$$('article');
 
@@ -47,7 +47,9 @@ export class SugarHouseExchange extends Exchange {
                 startDate: startDate,
             });
 
-            games.push(game);
+            if (game) {
+                games.add(game);
+            }
         }
 
         return games;
@@ -92,10 +94,12 @@ export class SugarHouseExchange extends Exchange {
                 startDate: startDate,
             });
     
-            await this.getExchangeGames().findOrCreate({
-                exchange: this,
-                game: requestedGame,
-            });
+            if (requestedGame) {
+                await this.getExchangeGames().findOrCreate({
+                    exchange: this,
+                    game: requestedGame,
+                });
+            }
         }
 
         /**TODO: At end of method, we should also DELETE games that are no longer found on the

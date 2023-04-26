@@ -79,10 +79,10 @@ export abstract class Exchange {
         return this.page;
     }
 
-    abstract getGames(): Promise<Array<localModels.Game>>;
+    abstract updateGames(): Promise<localModels.GameSet>;
 
     public async updateExchangeGames(): Promise<localModels.ExchangeGameSet | null> {
-        const games = await this.getGames();
+        const games = await this.updateGames();
 
         for (const game of games) {
             this.getExchangeGames().findOrCreate({

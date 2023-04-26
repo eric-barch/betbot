@@ -28,24 +28,36 @@ async function main() {
     await allOdds.updateValues();
     await allOutcomes.checkForArbs();
 
-    updateSlowElements();
+    updateExchangeGameElements();
+    updateExchangeGameTeamElements();
     updateOddElements();
     updateOddValuesAndCheckForArbs();
 }
 
 main();
 
-async function updateSlowElements() {
+async function updateExchangeGameElements() {
     const start = new Date();
     await allExchangeGames.updateElements();
+    const end = new Date();
+
+    const duration = end.getTime() - start.getTime();
+
+    // console.log(`updateExchangeGameElements duration: ${duration}`);
+
+    setTimeout(updateExchangeGameElements, 10000);
+}
+
+async function updateExchangeGameTeamElements() {
+    const start = new Date();
     await allExchangeGameTeams.updateElements();
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();
 
-    // console.log(`updateSlowElements duration: ${duration}`);
+    // console.log(`updateExchangeGameTeamElements duration: ${duration}`);
 
-    setTimeout(updateSlowElements, 10000);
+    setTimeout(updateExchangeGameTeamElements, 10000);
 }
 
 async function updateOddElements() {
