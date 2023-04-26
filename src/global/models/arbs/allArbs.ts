@@ -1,4 +1,4 @@
-import * as localModels from '../../../local';
+import * as localModels from '../../../models';
 
 class AllArbs extends localModels.ArbSet {
 

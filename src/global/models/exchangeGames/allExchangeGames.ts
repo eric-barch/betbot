@@ -1,5 +1,5 @@
 import { allExchanges } from '../exchanges/allExchanges';
-import * as localModels from '../../../local';
+import * as localModels from '../../../models';
 
 class AllExchangeGames extends localModels.ExchangeGameSet {
     public async init() {

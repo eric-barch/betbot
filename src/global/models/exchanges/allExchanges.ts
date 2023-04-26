@@ -1,4 +1,4 @@
-import * as localModels from '../../../local';
+import * as localModels from '../../../models';
 
 export const draftKingsExchange = new localModels.DraftKingsExchange();
 export const fanDuelExchange = new localModels.FanDuelExchange();

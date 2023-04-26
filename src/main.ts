@@ -8,7 +8,6 @@ const allOutcomes = globalModels.allOutcomes;
 const allExchangeGames = globalModels.allExchangeGames;
 const allExchangeGameTeams = globalModels.allExchangeGameTeams;
 const allOdds = globalModels.allOdds;
-const allArbs = globalModels.allArbs;
 
 async function main() {
     await database.init();

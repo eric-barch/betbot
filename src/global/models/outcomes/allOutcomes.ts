@@ -1,5 +1,5 @@
 import { allGames } from '../games/allGames';
-import * as localModels from '../../../local';
+import * as localModels from '../../../models';
 
 class AllOutcomes extends localModels.OutcomeSet {
     public async init() {

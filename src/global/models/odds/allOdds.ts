@@ -1,5 +1,5 @@
 import { allExchanges } from '../exchanges/allExchanges';
-import * as localModels from '../../../local';
+import * as localModels from '../../../models';
 
 class AllOdds extends localModels.OddSet {
     public async init() {

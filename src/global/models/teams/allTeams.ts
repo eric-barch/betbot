@@ -31,7 +31,7 @@ import {
     washingtonWizards,
 } from './leagues';
 
-import * as localModels from '../../../local';
+import * as localModels from '../../../models';
 
 class AllTeams extends localModels.TeamSet {
     public async init(): Promise<void> {
