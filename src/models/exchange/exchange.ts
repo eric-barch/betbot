@@ -24,7 +24,6 @@ export abstract class Exchange {
     public async init(): Promise<Exchange> {
         await this.connectToExistingPage();
         await this.initSqlExchange();
-        // await this.updateExchangeGames();
         return this;
     }
 

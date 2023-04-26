@@ -78,12 +78,6 @@ export class Game {
                 startDate: this.startDate,
             },
         }).then(async ([sqlGame, created]) => {
-            if (!created) {
-                await sqlGame.update({
-                    
-                });
-            }
-
             this.wrappedSqlGame = sqlGame;
         });
 

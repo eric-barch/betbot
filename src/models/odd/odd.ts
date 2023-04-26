@@ -306,15 +306,14 @@ export abstract class Odd {
         return value;
     }
 
-    public async checkForArbs(oppositeOdds: localModels.OddSet): Promise<Array<localModels.Arb> | null> {
+    public async checkForNewArbs(oppositeOdds: localModels.OddSet): Promise<localModels.ArbSet | null> {
         const price = this.getPrice();
-        const value = this.getValue();
 
         if (!price) {
             return null;
         }
 
-        const arbs = new Array<localModels.Arb>;
+        const arbs = new localModels.ArbSet;
 
         for (const oppositeOdd of oppositeOdds) {
             const isArb = this.checkIfArb(oppositeOdd);
@@ -325,7 +324,7 @@ export abstract class Odd {
                     oddB: oppositeOdd,
                 });
 
-                arbs.push(newArb);
+                arbs.add(newArb);
             }
         }
 
