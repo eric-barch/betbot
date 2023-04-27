@@ -6,7 +6,9 @@ quick (< 1 day):
 x split all findOrCreates into synchronous 'find' and asynchronous'findOrCreate'. these should all 
   exist in 'Set', not in 'AllWhatevers'.
 x ensure all sets have find and findOrCreate methods
-- confirm json games with document content (complete for DK)
+x confirm json games with document content
+- get rid of rounding for start time. instead, take the first one found as THE start time and 
+  compare all subsequent found startTimes to confirm they are within a certain interval of that.
 - see if possible to add normal getters and setters to the abstract classes (as opposed to 
   getExchange(), for example). If possible, remove getters and setters outright
 - initialize program objects to stored database values if available. program should NOT set db value
@@ -16,7 +18,7 @@ x ensure all sets have find and findOrCreate methods
 - create database class for arbs and log over time
 
 priority:
-- delete objects from sets when no longer relevant (especially arbs)
+- delete objects from sets when no longer relevant (complete for arbs)
 - write unit tests
 - periodically re-'initialize' the objects that are currently initialized only at the start of main
 - ensure that everywhere findOrCreate is called makes sense. where possible, replace with just find.

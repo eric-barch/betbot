@@ -26,6 +26,8 @@ export class DraftKingsExchange extends Exchange {
             games.add(gameFromDocument);
         }
 
+        // delete if not still there? or should that be handled by exchangeGame?
+
         return games;
     }
 
