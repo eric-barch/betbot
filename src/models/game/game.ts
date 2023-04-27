@@ -1,3 +1,5 @@
+import * as sequelize from 'sequelize';
+
 import * as databaseModels from '../../database';
 import * as globalModels from '../../global';
 import * as localModels from '../../models';
@@ -25,10 +27,10 @@ export class Game {
         homeTeam: localModels.Team,
         startDate: Date,
     }) {
-        this.startDate = Game.roundDateToNearestInterval(startDate);
-
         this.awayTeam = awayTeam;
         this.homeTeam = homeTeam;
+        this.startDate = startDate;
+
         this.exchangeGames = new localModels.ExchangeGameSet;
         this.outcomes = new localModels.OutcomeSet;
 
@@ -58,19 +60,30 @@ export class Game {
         return newGame;
     }
 
-    // private sequelize instance constructor
     private async initSqlGame(): Promise<databaseModels.Game> {
-        const awayTeam = this.awayTeam;
-        const homeTeam = this.homeTeam;
-
-        const awayTeamId = awayTeam.sqlTeam.get('id');
-        const homeTeamId = homeTeam.sqlTeam.get('id');
-        
+        const awayTeamId = this.awayTeam.sqlTeam.get('id');
+        const homeTeamId = this.homeTeam.sqlTeam.get('id');
+    
+        const startDate = this.startDate;
+    
         await databaseModels.Game.findOrCreate({
             where: {
                 awayTeamId: awayTeamId,
                 homeTeamId: homeTeamId,
-                startDate: this.startDate,
+                [sequelize.Op.and]: [
+                    databaseModels.sequelize.where(
+                        databaseModels.sequelize.fn('YEAR', databaseModels.sequelize.col('startDate')),
+                        startDate.getFullYear()
+                    ),
+                    databaseModels.sequelize.where(
+                        databaseModels.sequelize.fn('MONTH', databaseModels.sequelize.col('startDate')),
+                        startDate.getMonth() + 1
+                    ),
+                    databaseModels.sequelize.where(
+                        databaseModels.sequelize.fn('DAY', databaseModels.sequelize.col('startDate')),
+                        startDate.getDate()
+                    ),
+                ],
             },
             defaults: {
                 awayTeamId: awayTeamId,
@@ -80,9 +93,10 @@ export class Game {
         }).then(async ([sqlGame, created]) => {
             this.wrappedSqlGame = sqlGame;
         });
-
+    
         return this.sqlGame;
     }
+    
 
     // public instance methods
     public matches({
@@ -94,18 +108,18 @@ export class Game {
         homeTeam: localModels.Team,
         startDate?: Date,
     }): boolean {
-        if (startDate) {
-            startDate = Game.roundDateToNearestInterval(startDate);
-        } else {
+        if (!startDate) {
             startDate = new Date();
         }
-
 
         const awayTeamMatches = (this.awayTeam === awayTeam);
         const homeTeamMatches = (this.homeTeam === homeTeam);
 
-        const startDateDifferenceInHours = Math.abs(this.startDate.getTime() - startDate.getTime()) / 1000 / 60 / 60;
-        const startDateMatches = (startDateDifferenceInHours <= 3);
+        const yearMatches = (this.startDate.getFullYear() === startDate.getFullYear());
+        const monthMatches = (this.startDate.getMonth() === startDate.getMonth());
+        const dateMatches = (this.startDate.getDate() === startDate.getDate());
+
+        const startDateMatches = (yearMatches && monthMatches && dateMatches);
 
         if (awayTeamMatches && homeTeamMatches && startDateMatches) {
             return true;
