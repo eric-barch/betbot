@@ -110,3 +110,8 @@ async function updateExistingArbs() {
 
     setTimeout(updateExistingArbs, 100);
 }
+
+function reportExistingArbs() {
+    console.log(`Open arbs: ${allArbs.size}`);
+    setTimeout(reportExistingArbs, 10000);
+}
