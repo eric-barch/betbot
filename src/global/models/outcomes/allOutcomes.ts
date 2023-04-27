@@ -45,9 +45,9 @@ class AllOutcomes extends localModels.OutcomeSet {
         }
     }
 
-    public async checkForArbs() {
+    public async checkForNewArbs() {
         for (const outcome of this) {
-            await outcome.checkForArbs();
+            await outcome.checkForNewArbs();
         }
     }
 }

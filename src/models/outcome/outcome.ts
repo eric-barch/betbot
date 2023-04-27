@@ -97,12 +97,12 @@ export class Outcome {
         return false;
     }
 
-    public async checkForArbs() {
+    public async checkForNewArbs() {
         const odds = this.odds;
         const oppositeOdds = this.oppositeOutcome.odds;
 
         for (const odd of odds) {
-            await odd.checkForArbs(oppositeOdds);
+            await odd.checkForNewArbs(oppositeOdds);
         } 
     }
 

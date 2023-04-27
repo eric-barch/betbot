@@ -8,8 +8,8 @@ class AllExchanges extends localModels.ExchangeSet {
     public async init() {
         /**TODO: Make these singletons. */
         this.add(draftKingsExchange);
-        // this.add(fanDuelExchange);
-        // this.add(sugarHouseExchange);
+        this.add(fanDuelExchange);
+        this.add(sugarHouseExchange);
 
         for (const exchange of this) {
             await exchange.init();

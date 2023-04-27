@@ -6,7 +6,7 @@ import * as localModels from '../../../models';
 
 export class SugarHouseExchange extends Exchange {
     public name: string = 'SugarHouse';
-    public url: string = 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home';
+    public url: string = 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches';
 
     protected wrappedExchangeGames: localModels.ExchangeGameSet = new localModels.ExchangeGameSet();
     protected wrappedOdds: localModels.OddSet = new localModels.OddSet();
