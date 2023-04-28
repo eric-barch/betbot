@@ -22,7 +22,7 @@ export abstract class Exchange {
     }
 
     public async init(): Promise<Exchange> {
-        await this.connectToExistingPage();
+        await this.connectToPage();
         await this.initSqlExchange();
         return this;
     }
@@ -47,6 +47,18 @@ export abstract class Exchange {
         });
 
         return this.sqlExchange;
+    }
+
+    public async connectToPage(): Promise<Page> {
+        let page: Page;
+
+        try {
+            page = await this.connectToExistingPage();
+        } catch {
+            page = await this.connectToNewPage();
+        }
+
+        return page;
     }
 
     public async connectToExistingPage(): Promise<Page> {
@@ -74,6 +86,25 @@ export abstract class Exchange {
 
         this.page = targetPage;
         this.page.setViewport(windowSize);
+
+        return this.page;
+    }
+
+    public async connectToNewPage(): Promise<Page> {
+        this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
+
+        const page = await this.browser.newPage();
+        await page.goto(this.url);
+
+        const windowSize = await page.evaluate(() => {
+            return {
+                width: window.outerWidth,
+                height: window.outerHeight,
+            };
+        });
+
+        this.page = page;
+        page.setViewport(windowSize);
 
         return this.page;
     }
