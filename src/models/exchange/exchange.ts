@@ -1,4 +1,4 @@
-import { Browser, Page, connect } from 'puppeteer';
+import { Browser, Page, connect, launch } from 'puppeteer';
 
 import * as databaseModels from '../../database';
 import * as globalModels from '../../global';
@@ -49,7 +49,32 @@ export abstract class Exchange {
         return this.sqlExchange;
     }
 
-    public async connectToPage(): Promise<Page> {
+    public async connectToBrowser(): Promise<Browser> {
+        try {
+            this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
+        } catch {
+            throw new Error(`Browser is not open with debugging enabled.`);
+            // const chromeExecutablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google\ Chrome';
+
+            // const browser = await launch({
+            //     headless: false,
+            //     executablePath: chromeExecutablePath,
+            //     args: [
+            //         '--remote-debugging-port=9222',
+            //         '--no-first-run',
+            //         '--no-default-browser-check',
+            //     ]
+            // });
+
+            // this.browser = browser;
+        }
+
+        return this.browser;
+    }
+
+    protected async connectToPage(): Promise<Page> {
+        await this.connectToBrowser();
+
         let page: Page;
 
         try {
@@ -61,9 +86,7 @@ export abstract class Exchange {
         return page;
     }
 
-    public async connectToExistingPage(): Promise<Page> {
-        this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
-
+    private async connectToExistingPage(): Promise<Page> {
         const targets = this.browser.targets();
         const target = targets.find(target => target.url().includes(this.url));
         
@@ -90,9 +113,7 @@ export abstract class Exchange {
         return this.page;
     }
 
-    public async connectToNewPage(): Promise<Page> {
-        this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
-
+    private async connectToNewPage(): Promise<Page> {
         const page = await this.browser.newPage();
         await page.goto(this.url);
 

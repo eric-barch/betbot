@@ -11,8 +11,8 @@ x get rid of rounding for start time. instead, take the first one found as THE s
   compare all subsequent found startTimes to confirm they are within a certain interval of that.
 x see if possible to add normal getters and setters to the abstract classes (as opposed to 
   getExchange(), for example). If possible, remove getters and setters outright
-- open new pages automatically if they don't exist in the browser
-- open browser automatically if not open
+x open new pages automatically if they don't exist in the browser
+- open browser automatically if not opencha
 - add odd histories to track changes over time in the database
 - create database class for arbs and log over time
 

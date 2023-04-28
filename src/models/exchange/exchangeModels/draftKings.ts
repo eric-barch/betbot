@@ -1,5 +1,5 @@
 import * as chrono from 'chrono-node';
-import { ElementHandle } from 'puppeteer';
+import { Page, ElementHandle } from 'puppeteer';
 
 import { Exchange } from '../exchange';
 import * as globalModels from '../../../global';
@@ -11,6 +11,12 @@ export class DraftKingsExchange extends Exchange {
 
     protected wrappedExchangeGames: localModels.ExchangeGameSet = new localModels.ExchangeGameSet();
     protected wrappedOdds: localModels.OddSet = new localModels.OddSet();
+
+    public async connectToPage(): Promise<Page> {
+        const page = await super.connectToPage();
+        await page.reload();
+        return page;
+    }
 
     public async updateGames(): Promise<localModels.GameSet> {
         const gamesFromJson = await this.updateGamesFromJson();
