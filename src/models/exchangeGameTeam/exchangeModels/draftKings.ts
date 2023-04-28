@@ -9,8 +9,8 @@ export abstract class DraftKingsExchangeGameTeam extends ExchangeGameTeam {
         awayTeamRowElement: ElementHandle,
         homeTeamRowElement: ElementHandle,
     } | null> {
-        const exchange = this.getExchange();
-        const game = this.getGame();
+        const exchange = this.exchange;
+        const game = this.game;
 
         const page = exchange.page;
 

@@ -227,7 +227,7 @@ export class FanDuelExchange extends Exchange {
             });
 
             if (requestedGame) {
-                await this.getExchangeGames().findOrCreate({
+                await this.exchangeGames.findOrCreate({
                     exchange: this,
                     game: requestedGame,
                 });
@@ -236,7 +236,7 @@ export class FanDuelExchange extends Exchange {
 
         /**TODO: At end of method, we should also DELETE games that are no longer found on the
          * website. */
-        return this.getExchangeGames();
+        return this.exchangeGames;
     }
 
     public async updateExchangeGamesFromDocument(): Promise<localModels.ExchangeGameSet | null> {

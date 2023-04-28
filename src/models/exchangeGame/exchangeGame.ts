@@ -39,8 +39,8 @@ export abstract class ExchangeGame {
             throw new Error(`Did not find corresponding exchange game.`);
         }
 
-        newExchangeGame.setExchange(exchange);
-        newExchangeGame.setGame(game);
+        newExchangeGame.exchange = exchange;
+        newExchangeGame.game = game;
 
         globalModels.allExchangeGames.add(newExchangeGame);
         return newExchangeGame;
@@ -60,8 +60,8 @@ export abstract class ExchangeGame {
     }
 
     public async updateExchangeGameAwayTeam(): Promise<localModels.ExchangeGameTeam> {
-        const exchange = this.getExchange();
-        const game = this.getGame();
+        const exchange = this.exchange;
+        const game = this.game;
         const team = game.awayTeam;
 
         const requestedExchangeGameTeam = await globalModels.allExchangeGameTeams.findOrCreate({
@@ -74,8 +74,8 @@ export abstract class ExchangeGame {
     }
 
     public async updateExchangeGameHomeTeam(): Promise<localModels.ExchangeGameTeam> {
-        const exchange = this.getExchange();
-        const game = this.getGame();
+        const exchange = this.exchange;
+        const game = this.game;
         const team = game.homeTeam;
 
         const requestedExchangeGameTeam = await globalModels.allExchangeGameTeams.findOrCreate({
@@ -94,8 +94,8 @@ export abstract class ExchangeGame {
         exchange: localModels.Exchange,
         game: localModels.Game,
     }): boolean {
-        const exchangeMatches = (this.getExchange() === exchange);
-        const gameMatches = (this.getGame() === game);
+        const exchangeMatches = (this.exchange === exchange);
+        const gameMatches = (this.game === game);
 
         if (exchangeMatches && gameMatches) {
             return true;
@@ -106,7 +106,7 @@ export abstract class ExchangeGame {
 
     abstract updateElement(): Promise<ElementHandle | null>;
 
-    public getExchange(): localModels.Exchange {
+    get exchange(): localModels.Exchange {
         if (!this.wrappedExchange) {
             throw new Error(`Exchange is null.`);
         }
@@ -114,12 +114,12 @@ export abstract class ExchangeGame {
         return this.wrappedExchange;
     }
 
-    public setExchange(exchange: localModels.Exchange) {
+    set exchange(exchange: localModels.Exchange) {
         this.wrappedExchange = exchange;
-        exchange.getExchangeGames().add(this);
+        exchange.exchangeGames.add(this);
     }
 
-    public getGame(): localModels.Game {
+    get game(): localModels.Game {
         if (!this.wrappedGame) {
             throw new Error(`Game is null.`);
         }
@@ -127,12 +127,12 @@ export abstract class ExchangeGame {
         return this.wrappedGame;
     }
     
-    public setGame(game: localModels.Game) {
+    set game(game: localModels.Game) {
         this.wrappedGame = game;
         game.exchangeGames.add(this);
     }
 
-    public getExchangeGameAwayTeam(): localModels.ExchangeGameTeam {
+    get exchangeGameAwayTeam(): localModels.ExchangeGameTeam {
         if (!this.wrappedExchangeGameAwayTeam) {
             throw new Error(`ExchangeGameAwayTeam is null.`);
         }
@@ -140,11 +140,11 @@ export abstract class ExchangeGame {
         return this.wrappedExchangeGameAwayTeam;
     }
 
-    public setExchangeGameAwayTeam(exchangeGameAwayTeam: localModels.ExchangeGameTeam | null) {
+    set exchangeGameAwayTeam(exchangeGameAwayTeam: localModels.ExchangeGameTeam | null) {
         this.wrappedExchangeGameAwayTeam = exchangeGameAwayTeam;
     }
 
-    public getExchangeGameHomeTeam(): localModels.ExchangeGameTeam {
+    get exchangeGameHomeTeam(): localModels.ExchangeGameTeam {
         if (!this.wrappedExchangeGameHomeTeam) {
             throw new Error(`ExchangeGameHomeTeam is null.`);
         }
@@ -152,7 +152,7 @@ export abstract class ExchangeGame {
         return this.wrappedExchangeGameHomeTeam;
     }
 
-    public setExchangeGameHomeTeam(exchangeGameHomeTeam: localModels.ExchangeGameTeam | null) {
+    set exchangeGameHomeTeam(exchangeGameHomeTeam: localModels.ExchangeGameTeam | null) {
         this.wrappedExchangeGameHomeTeam = exchangeGameHomeTeam;
     }
 }

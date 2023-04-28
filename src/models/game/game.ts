@@ -1,23 +1,22 @@
-import * as sequelize from 'sequelize';
+
+import { Op } from 'sequelize';
+
+import { sequelize } from '../../database';
 
 import * as databaseModels from '../../database';
 import * as globalModels from '../../global';
 import * as localModels from '../../models';
 
 export class Game {
-    // public properties
     public startDate: Date;
 
-    // public linked objects
     public awayTeam: localModels.Team;
     public homeTeam: localModels.Team;
     public exchangeGames: localModels.ExchangeGameSet;
     public outcomes: localModels.OutcomeSet;
 
-    // private sequelize object
     private wrappedSqlGame: databaseModels.Game | null;
 
-    // private constructor
     private constructor({
         awayTeam,
         homeTeam,
@@ -37,7 +36,6 @@ export class Game {
         this.wrappedSqlGame = null;
     }
 
-    // public async constructor
     static async create({
         awayTeam,
         homeTeam,
@@ -68,20 +66,20 @@ export class Game {
     
         await databaseModels.Game.findOrCreate({
             where: {
-                awayTeamId: awayTeamId,
-                homeTeamId: homeTeamId,
-                [sequelize.Op.and]: [
-                    databaseModels.sequelize.where(
-                        databaseModels.sequelize.fn('YEAR', databaseModels.sequelize.col('startDate')),
-                        startDate.getFullYear()
+                [Op.and]: [
+                    { awayTeamId: awayTeamId },
+                    { homeTeamId: homeTeamId },
+                    sequelize.where(
+                        sequelize.fn('YEAR', sequelize.col('startDate')),
+                        startDate.getUTCFullYear()
                     ),
-                    databaseModels.sequelize.where(
-                        databaseModels.sequelize.fn('MONTH', databaseModels.sequelize.col('startDate')),
-                        startDate.getMonth() + 1
+                    sequelize.where(
+                        sequelize.fn('MONTH', sequelize.col('startDate')),
+                        startDate.getUTCMonth() + 1,
                     ),
-                    databaseModels.sequelize.where(
-                        databaseModels.sequelize.fn('DAY', databaseModels.sequelize.col('startDate')),
-                        startDate.getDate()
+                    sequelize.where(
+                        sequelize.fn('DAY', sequelize.col('startDate')),
+                        startDate.getUTCDate(),
                     ),
                 ],
             },
@@ -96,9 +94,7 @@ export class Game {
     
         return this.sqlGame;
     }
-    
 
-    // public instance methods
     public matches({
         awayTeam,
         homeTeam,
@@ -128,7 +124,6 @@ export class Game {
         return false;
     }
 
-    // public static methods
     static roundDateToNearestInterval(date: Date): Date {
         const ROUND_INTERVAL = 60;
         
@@ -138,7 +133,6 @@ export class Game {
         return roundedDate;
     }
 
-    // getters and setters
     get regionAbbrIdentifierAbbr(): string {
         const regionAbbrIdentifierAbbr = `${this.awayTeam.regionAbbrIdentifierAbbr} @ ${this.homeTeam.regionAbbrIdentifierAbbr}`;
         return regionAbbrIdentifierAbbr;

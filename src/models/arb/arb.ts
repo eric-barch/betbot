@@ -144,18 +144,18 @@ export class Arb {
         const oddA = Array.from(this.oddPair)[0];
         const oddB = Array.from(this.oddPair)[1];
 
-        const gameName = oddA.getOutcome().game.regionAbbrIdentifierAbbr;
+        const gameName = oddA.outcome.game.regionAbbrIdentifierAbbr;
         const expectedReturnString = `${this.expectedReturn.toFixed(2)}%`;
 
         const titleString = `${gameName}\t${expectedReturnString}`
 
-        const oddAExchangeName = oddA.getExchange().name;
-        const oddAOutcomeName = oddA.getOutcome().name;
+        const oddAExchangeName = oddA.exchange.name;
+        const oddAOutcomeName = oddA.outcome.name;
         const oddAPrice = oddA.getPrice();
         const oddAValue = oddA.getValue();
 
-        const oddBExchangeName = oddB.getExchange().name;
-        const oddBOutcomeName = oddB.getOutcome().name;
+        const oddBExchangeName = oddB.exchange.name;
+        const oddBOutcomeName = oddB.outcome.name;
         const oddBPrice = oddB.getPrice();
         const oddBValue = oddB.getValue();
 

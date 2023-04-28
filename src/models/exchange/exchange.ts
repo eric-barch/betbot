@@ -84,73 +84,73 @@ export abstract class Exchange {
         const games = await this.updateGames();
 
         for (const game of games) {
-            this.getExchangeGames().findOrCreate({
+            this.exchangeGames.findOrCreate({
                 exchange: this,
                 game: game,
             })
         }
 
-        return this.getExchangeGames();
+        return this.exchangeGames;
     }
 
     public async updateOdds() {
-        for (const exchangeGame of this.getExchangeGames()) {
+        for (const exchangeGame of this.exchangeGames) {
             const spreadAway = await globalModels.allOutcomes.findOrCreate({
-                game: exchangeGame.getGame(),
+                game: exchangeGame.game,
                 name: 'spread_away',
-                team: exchangeGame.getGame().awayTeam,
+                team: exchangeGame.game.awayTeam,
             });
-            await this.getOdds().findOrCreate({
+            await this.odds.findOrCreate({
                 exchange: this,
                 outcome: spreadAway,
             });
 
             const spreadHome = await globalModels.allOutcomes.findOrCreate({
-                game: exchangeGame.getGame(),
+                game: exchangeGame.game,
                 name: 'spread_home',
-                team: exchangeGame.getGame().homeTeam,
+                team: exchangeGame.game.homeTeam,
             });
-            await this.getOdds().findOrCreate({
+            await this.odds.findOrCreate({
                 exchange: this,
                 outcome: spreadHome,
             });
 
             const moneylineAway = await globalModels.allOutcomes.findOrCreate({
-                game: exchangeGame.getGame(),
+                game: exchangeGame.game,
                 name: 'moneyline_away',
-                team: exchangeGame.getGame().awayTeam,
+                team: exchangeGame.game.awayTeam,
             });
-            await this.getOdds().findOrCreate({
+            await this.odds.findOrCreate({
                 exchange: this,
                 outcome: moneylineAway,
             });
 
             const moneylineHome = await globalModels.allOutcomes.findOrCreate({
-                game: exchangeGame.getGame(),
+                game: exchangeGame.game,
                 name: 'moneyline_home',
-                team: exchangeGame.getGame().homeTeam,
+                team: exchangeGame.game.homeTeam,
             });
-            await this.getOdds().findOrCreate({
+            await this.odds.findOrCreate({
                 exchange: this,
                 outcome: moneylineHome,
             });
 
             const totalOver = await globalModels.allOutcomes.findOrCreate({
-                game: exchangeGame.getGame(),
+                game: exchangeGame.game,
                 name: 'total_over',
-                team: exchangeGame.getGame().awayTeam,
+                team: exchangeGame.game.awayTeam,
             });
-            await this.getOdds().findOrCreate({
+            await this.odds.findOrCreate({
                 exchange: this,
                 outcome: totalOver,
             });
 
             const totalUnder = await globalModels.allOutcomes.findOrCreate({
-                game: exchangeGame.getGame(),
+                game: exchangeGame.game,
                 name: 'total_under',
-                team: exchangeGame.getGame().homeTeam,
+                team: exchangeGame.game.homeTeam,
             });
-            await this.getOdds().findOrCreate({
+            await this.odds.findOrCreate({
                 exchange: this,
                 outcome: totalUnder,
             });
@@ -196,7 +196,7 @@ export abstract class Exchange {
         this.wrappedPage = page;
     }
 
-    public getExchangeGames() {
+    get exchangeGames() {
         if (!this.wrappedExchangeGames) {
             throw new Error(`wrappedExchangeGames is null.`);
         }
@@ -204,7 +204,7 @@ export abstract class Exchange {
         return this.wrappedExchangeGames;
     }
 
-    public getOdds() {
+    get odds() {
         if (!this.wrappedOdds) {
             throw new Error(`wrappedOdds is null.`);
         }

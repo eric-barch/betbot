@@ -6,8 +6,8 @@ export class SugarHouseExchangeGame extends ExchangeGame {
     public element: ElementHandle | null = null;
 
     public async updateElement(): Promise<ElementHandle | null> {
-        const exchange = this.getExchange();
-        const game = this.getGame();
+        const exchange = this.exchange;
+        const game = this.game;
 
         const page = exchange.page;
 

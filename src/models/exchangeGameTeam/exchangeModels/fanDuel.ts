@@ -9,7 +9,7 @@ export abstract class FanDuelExchangeGameTeam extends ExchangeGameTeam {
     protected abstract xPathFromExchangeGame: string;
 
     public async updateElement(): Promise<ElementHandle | null> {
-        const exchangeGame = this.getExchangeGame();
+        const exchangeGame = this.exchangeGame;
 
         /**TODO: This is so hacky. May need to implement actual abstract factory to avoid having 
          * to do this. */
@@ -34,7 +34,7 @@ export abstract class FanDuelExchangeGameTeam extends ExchangeGameTeam {
         return teamElement;
     }
 
-    public getExchangeGame(): localModels.ExchangeGame {
+    get exchangeGame(): localModels.ExchangeGame {
         if (!this.wrappedExchangeGame) {
             throw new Error(`ExchangeGame is null.`);
         }
@@ -42,9 +42,9 @@ export abstract class FanDuelExchangeGameTeam extends ExchangeGameTeam {
         return this.wrappedExchangeGame;
     }
 
-    public setExchangeGame(exchangeGame: localModels.ExchangeGame) {
+    set exchangeGame(exchangeGame: localModels.ExchangeGame) {
         this.wrappedExchangeGame = exchangeGame;
-        exchangeGame.setExchangeGameAwayTeam(this);
+        exchangeGame.exchangeGameAwayTeam = this;
     }
 }
 

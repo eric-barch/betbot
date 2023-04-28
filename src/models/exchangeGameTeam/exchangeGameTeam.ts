@@ -75,21 +75,21 @@ export abstract class ExchangeGameTeam {
 
         // Add EGT to EG somewhere around here as away or home team.
 
-        newExchangeGameTeam.setExchange(exchange);
-        newExchangeGameTeam.setGame(game);
-        newExchangeGameTeam.setTeam(team);
+        newExchangeGameTeam.exchange = exchange;
+        newExchangeGameTeam.game = game;
+        newExchangeGameTeam.team = team;
 
         const exchangeGame = await globalModels.allExchangeGames.findOrCreate({
             exchange: exchange,
             game: game,
         });
 
-        newExchangeGameTeam.setExchangeGame(exchangeGame);
+        newExchangeGameTeam.exchangeGame = exchangeGame;
 
         if (awayOrHome === 'away') {
-            exchangeGame.setExchangeGameAwayTeam(newExchangeGameTeam);
+            exchangeGame.exchangeGameAwayTeam = newExchangeGameTeam;
         } else if (awayOrHome === 'home') {
-            exchangeGame.setExchangeGameHomeTeam(newExchangeGameTeam);
+            exchangeGame.exchangeGameHomeTeam = newExchangeGameTeam;
         }
 
         globalModels.allExchangeGameTeams.add(newExchangeGameTeam);
@@ -105,9 +105,9 @@ export abstract class ExchangeGameTeam {
         game: localModels.Game,
         team: localModels.Team,
     }) {
-        const exchangeMatches = (this.getExchange() === exchange);
-        const gameMatches = (this.getGame() === game);
-        const teamMatches = (this.getTeam() === team);
+        const exchangeMatches = (this.exchange === exchange);
+        const gameMatches = (this.game === game);
+        const teamMatches = (this.team === team);
 
         if (exchangeMatches && gameMatches && teamMatches) {
             return true;
@@ -118,7 +118,7 @@ export abstract class ExchangeGameTeam {
 
     abstract updateElement(): Promise<ElementHandle | null>;
 
-    public getExchange(): localModels.Exchange {
+    get exchange(): localModels.Exchange {
         if (!this.wrappedExchange) {
             throw new Error(`Exchange is null.`);
         }
@@ -126,11 +126,11 @@ export abstract class ExchangeGameTeam {
         return this.wrappedExchange;
     }
 
-    public setExchange(exchange: localModels.Exchange) {
+    set exchange(exchange: localModels.Exchange) {
         this.wrappedExchange = exchange;
     }
 
-    public getGame(): localModels.Game {
+    get game(): localModels.Game {
         if (!this.wrappedGame) {
             throw new Error(`Game is null.`);
         }
@@ -138,11 +138,11 @@ export abstract class ExchangeGameTeam {
         return this.wrappedGame;
     }
 
-    public setGame(game: localModels.Game) {
+    set game(game: localModels.Game) {
         this.wrappedGame = game;
     }
 
-    public getTeam(): localModels.Team {
+    get team(): localModels.Team {
         if (!this.wrappedTeam) {
             throw new Error(`Team is null.`);
         }
@@ -150,11 +150,11 @@ export abstract class ExchangeGameTeam {
         return this.wrappedTeam;
     }
 
-    public setTeam(team: localModels.Team) {
+    set team(team: localModels.Team) {
         this.wrappedTeam = team;
     }
 
-    public getExchangeGame(): localModels.ExchangeGame {
+    get exchangeGame(): localModels.ExchangeGame {
         if (!this.wrappedExchangeGame) {
             throw new Error(`ExchangeGame is null.`)
         }
@@ -162,7 +162,7 @@ export abstract class ExchangeGameTeam {
         return this.wrappedExchangeGame;
     }
 
-    public setExchangeGame(exchangeGame: localModels.ExchangeGame) {
+    set exchangeGame(exchangeGame: localModels.ExchangeGame) {
         this.wrappedExchangeGame = exchangeGame;
     }
 }

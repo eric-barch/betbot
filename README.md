@@ -7,7 +7,7 @@ x split all findOrCreates into synchronous 'find' and asynchronous'findOrCreate'
   exist in 'Set', not in 'AllWhatevers'.
 x ensure all sets have find and findOrCreate methods
 x confirm json games with document content
-- get rid of rounding for start time. instead, take the first one found as THE start time and 
+x get rid of rounding for start time. instead, take the first one found as THE start time and 
   compare all subsequent found startTimes to confirm they are within a certain interval of that.
 - see if possible to add normal getters and setters to the abstract classes (as opposed to 
   getExchange(), for example). If possible, remove getters and setters outright
@@ -16,6 +16,8 @@ x confirm json games with document content
   with logging data over time.
 - add odd histories to track changes over time in the database
 - create database class for arbs and log over time
+- open new pages automatically if they don't exist in the browser
+- open browser automatically if not open
 
 priority:
 - delete objects from sets when no longer relevant (complete for arbs)

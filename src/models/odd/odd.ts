@@ -175,8 +175,8 @@ export abstract class Odd {
             game: outcome.game,
         })
 
-        newOdd.setExchange(exchange);
-        newOdd.setOutcome(outcome);
+        newOdd.exchange = exchange;
+        newOdd.outcome = outcome;
 
         await newOdd.initSqlOdd();
 
@@ -186,8 +186,8 @@ export abstract class Odd {
     }
 
     public async initSqlOdd(): Promise<databaseModels.Odd> {
-        const exchangeId = this.getExchange().sqlExchange.get('id');
-        const outcomeId = this.getOutcome().sqlOutcome.get('id');
+        const exchangeId = this.exchange.sqlExchange.get('id');
+        const outcomeId = this.outcome.sqlOutcome.get('id');
         const value = this.getValue();
 
         await databaseModels.Odd.findOrCreate({
@@ -220,8 +220,8 @@ export abstract class Odd {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
     }): boolean {
-        const exchangeMatches = (this.getExchange() === exchange);
-        const outcomeMatches = (this.getOutcome() === outcome);
+        const exchangeMatches = (this.exchange === exchange);
+        const outcomeMatches = (this.outcome === outcome);
 
         if (exchangeMatches && outcomeMatches) {
             return true;
@@ -408,7 +408,7 @@ export abstract class Odd {
         })
     }
 
-    public getExchange(): localModels.Exchange {
+    get exchange(): localModels.Exchange {
         if (!this.wrappedExchange) {
             throw new Error(`Exchange is null.`);
         }
@@ -416,12 +416,12 @@ export abstract class Odd {
         return this.wrappedExchange;
     }
 
-    public setExchange(exchange: localModels.Exchange) {
+    set exchange(exchange: localModels.Exchange) {
         this.wrappedExchange = exchange;
-        exchange.getOdds().add(this);
+        exchange.odds.add(this);
     }
 
-    public getOutcome(): localModels.Outcome {
+    get outcome(): localModels.Outcome {
         if (!this.wrappedOutcome) {
             throw new Error(`Outcome is null.`);
         }
@@ -429,7 +429,7 @@ export abstract class Odd {
         return this.wrappedOutcome;
     }
 
-    public setOutcome(outcome: localModels.Outcome) {
+    set outcome(outcome: localModels.Outcome) {
         this.wrappedOutcome = outcome;
         outcome.odds.add(this);
     }

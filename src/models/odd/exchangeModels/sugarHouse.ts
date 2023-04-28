@@ -19,7 +19,7 @@ abstract class SugarHouseOdd extends Odd {
             exchange: exchange,
             outcome: outcome,
         });
-        const game = this.getOutcome().game;
+        const game = this.outcome.game;
 
         const exchangeGame = globalModels.allExchangeGames.find({
             exchange: exchange,
