@@ -24,10 +24,10 @@ export class Arb {
         
         this.oddPair = [oddA, oddB];
 
-        this.lastOddAPrice = oddA.getPrice();
-        this.lastOddAValue = oddA.getValue();
-        this.lastOddBPrice = oddB.getPrice();
-        this.lastOddBValue = oddB.getValue();
+        this.lastOddAPrice = oddA.price;
+        this.lastOddAValue = oddA.value;
+        this.lastOddBPrice = oddB.price;
+        this.lastOddBValue = oddB.value;
 
         console.log('NEW ARB:');
         console.log(this.toString());
@@ -60,10 +60,10 @@ export class Arb {
         const oddA = this.oddPair[0];
         const oddB = this.oddPair[1];
 
-        const oddAPrice = oddA.getPrice();
-        const oddAValue = oddA.getValue();
-        const oddBPrice = oddB.getPrice();
-        const oddBValue = oddB.getValue();
+        const oddAPrice = oddA.price;
+        const oddAValue = oddA.value;
+        const oddBPrice = oddB.price;
+        const oddBValue = oddB.value;
 
         const oddAPriceMatches = (this.lastOddAPrice === oddAPrice);
         const oddAValueMatches = (this.lastOddAValue === oddAValue);
@@ -103,8 +103,8 @@ export class Arb {
         const oddA = this.oddPair[0];
         const oddB = this.oddPair[1];
 
-        const oddAValue = oddA.getValue();
-        const oddBValue = oddB.getValue();
+        const oddAValue = oddA.value;
+        const oddBValue = oddB.value;
         let valuesMatch: boolean;
         
         if (oddAValue && oddBValue) {
@@ -114,7 +114,7 @@ export class Arb {
         }
 
         const positiveReturn = (this.expectedReturn > 0);
-        const nonNullPrices = (oddA.getPrice() && oddB.getPrice());
+        const nonNullPrices = (oddA.price && oddB.price);
 
         if (!valuesMatch) {
             const deletedAt = new Date();
@@ -151,13 +151,13 @@ export class Arb {
 
         const oddAExchangeName = oddA.exchange.name;
         const oddAOutcomeName = oddA.outcome.name;
-        const oddAPrice = oddA.getPrice();
-        const oddAValue = oddA.getValue();
+        const oddAPrice = oddA.price;
+        const oddAValue = oddA.value;
 
         const oddBExchangeName = oddB.exchange.name;
         const oddBOutcomeName = oddB.outcome.name;
-        const oddBPrice = oddB.getPrice();
-        const oddBValue = oddB.getValue();
+        const oddBPrice = oddB.price;
+        const oddBValue = oddB.value;
 
         const data = [
             { exchange: oddAExchangeName, outcome: oddAOutcomeName, price: oddAPrice, value: oddAValue },

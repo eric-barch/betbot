@@ -188,7 +188,6 @@ export abstract class Odd {
     public async initSqlOdd(): Promise<databaseModels.Odd> {
         const exchangeId = this.exchange.sqlExchange.get('id');
         const outcomeId = this.outcome.sqlOutcome.get('id');
-        const value = this.getValue();
 
         await databaseModels.Odd.findOrCreate({
             where: {
@@ -198,13 +197,10 @@ export abstract class Odd {
             defaults: {
                 exchangeId: exchangeId,
                 outcomeId: outcomeId,
-                value: value,
             },
         }).then(async ([sqlOdd, created]) => {
             if (!created) {
-                await sqlOdd.update({
 
-                });
             }
 
             this.sqlOdd = sqlOdd;
@@ -259,8 +255,13 @@ export abstract class Odd {
         priceValue: number | null,
         valueValue: number | null,
     }> {
-        const priceValue = await this.updatePriceValue();
-        const valueValue = await this.updateValueValue();
+        const priceValue = await this.getPriceValue();
+        const valueValue = await this.getValueValue();
+
+        await this.setPriceAndValue({
+            price: priceValue,
+            value: valueValue,
+        });
 
         return {
             priceValue: priceValue,
@@ -268,23 +269,21 @@ export abstract class Odd {
         }
     }
 
-    public async updatePriceValue(): Promise<number | null> {
+    public async getPriceValue(): Promise<number | null> {
         const priceElement = this.priceElement;
-        const priceValue = await this.updateValue(priceElement);
-        await this.setPrice(priceValue);
+        const priceValue = await this.getValue(priceElement);
         return priceValue;
     }
 
-    public async updateValueValue(): Promise<number | null> {
+    public async getValueValue(): Promise<number | null> {
         const valueElement = this.valueElement;
-        const valueValue = await this.updateValue(valueElement);
-        await this.setValue(valueValue);
+        const valueValue = await this.getValue(valueElement);
         return valueValue;
     }
 
     abstract updateElement(xPath: string | null): Promise<ElementHandle | null>;
 
-    public async updateValue(element: ElementHandle | null): Promise<number | null> {
+    public async getValue(element: ElementHandle | null): Promise<number | null> {
         if (!element) {
             return null;
         }
@@ -307,7 +306,7 @@ export abstract class Odd {
     }
 
     public async checkForNewArbs(oppositeOdds: localModels.OddSet): Promise<localModels.ArbSet | null> {
-        const price = this.getPrice();
+        const price = this.price;
 
         if (!price) {
             return null;
@@ -333,9 +332,9 @@ export abstract class Odd {
 
     public checkIfArb(oppositeOdd: localModels.Odd): boolean {
         const thisImpliedProbability = this.impliedProbability;
-        let thisValue = this.getValue();
+        let thisValue = this.value;
         const oppositeImpliedProbability = oppositeOdd.impliedProbability;
-        let oppositeValue = oppositeOdd.getValue();
+        let oppositeValue = oppositeOdd.value;
 
         if (!thisImpliedProbability) {
             return false;
@@ -367,7 +366,7 @@ export abstract class Odd {
     }
 
     get impliedProbability(): number | null {
-        const price = this.getPrice();
+        const price = this.price;
 
         if (!price) {
             return null;
@@ -384,26 +383,26 @@ export abstract class Odd {
         return risk/payout;
     }
 
-    public getPrice(): number | null {
+    get price(): number | null {
         return this.wrappedPrice;
     }
 
-    public async setPrice(price: number | null) {
-        this.wrappedPrice = price;
-
-        await this.sqlOdd.update({
-            price: price,
-        });
-    }
-
-    public getValue(): number | null {
+    get value(): number | null {
         return this.wrappedValue;
     }
 
-    public async setValue(value: number | null) {
+    public async setPriceAndValue({
+        price,
+        value,
+    }: {
+        price: number | null,
+        value: number | null,
+    }) {
+        this.wrappedPrice = price;
         this.wrappedValue = value;
 
         await this.sqlOdd.update({
+            price: price,
             value: value,
         })
     }

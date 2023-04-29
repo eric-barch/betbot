@@ -1,6 +1,6 @@
 import { sequelize } from './instance';
 
-import { Exchange, Game, Odd, Outcome, Team } from './models';
+import { Exchange, Game, Odd, OldOdd, Outcome, Team } from './models';
 
 export async function init(): Promise<void> {
     try {
@@ -11,26 +11,20 @@ export async function init(): Promise<void> {
     }
     
     // Exchange associations
-    // Exchange.belongsToMany(Game, {
-    //     through: 'exchange_games',
-    //     foreignKey: 'exchangeId',
-    //     otherKey: 'gameId',
-    // });
     Exchange.hasMany(Odd, { foreignKey: 'exchangeId'});
     
     // Game associations 
-    // Game.belongsToMany(Exchange, {
-    //     through: 'exchange_games',
-    //     foreignKey: 'gameId',
-    //     otherKey: 'exchangeId',
-    // });
     Game.hasMany(Outcome, { foreignKey: 'gameId' });
     Game.belongsTo(Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
     Game.belongsTo(Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
     
     // Odd associations
+    Odd.hasMany(OldOdd, { foreignKey: 'oddId' });
     Odd.belongsTo(Exchange, { foreignKey: 'exchangeId' });
     Odd.belongsTo(Outcome, { foreignKey: 'outcomeId' });
+    
+    // OldOdd associations
+    OldOdd.belongsTo(Odd, { foreignKey: 'oddId' });
 
     // Outcome associations
     Outcome.belongsTo(Game, { foreignKey: 'gameId' });
