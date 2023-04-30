@@ -17,6 +17,8 @@ export abstract class Exchange {
         this.wrappedExchangeGames = new localModels.ExchangeGameSet();
         this.wrappedOdds = new localModels.OddSet();
         this.wrappedSqlExchange = null;
+
+        globalModels.allExchanges.add(this);
     }
 
     public async init(): Promise<Exchange> {

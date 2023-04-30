@@ -4,17 +4,13 @@ import { DraftKingsExchange } from '../../../models/primary/exchange/exchange/ex
 import { FanDuelExchange } from '../../../models/primary/exchange/exchange/exchangeModels/fanDuel';
 import { SugarHouseExchange } from '../../../models/primary/exchange/exchange/exchangeModels/sugarHouse';
 
+/**TODO: make these singletons. */
 export const draftKingsExchange = new DraftKingsExchange();
 export const fanDuelExchange = new FanDuelExchange();
 export const sugarHouseExchange = new SugarHouseExchange();
 
 class AllExchanges extends localModels.ExchangeSet {
     public async init() {
-        /**TODO: Make these singletons. */
-        this.add(draftKingsExchange);
-        this.add(fanDuelExchange);
-        this.add(sugarHouseExchange);
-
         for (const exchange of this) {
             await exchange.init();
         }

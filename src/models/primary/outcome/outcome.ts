@@ -2,47 +2,51 @@ import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
 import * as localModels from '../..';
 
+export enum OutcomeType {
+    SpreadAway = 'spread_away',
+    SpreadHome = 'spread_home',
+    MoneylineAway = 'moneyline_away',
+    MoneylineHome = 'moneyline_home',
+    TotalOver = 'total_over',
+    TotalUnder = 'total_under'
+}
+
 export class Outcome {
-    public name: string;
-    public game: localModels.Game;
-    public team: localModels.Team;
-    public odds: localModels.OddSet;
+    private wrappedType: OutcomeType;
+    private wrappedGame: localModels.Game;
+    private wrappedOdds: localModels.OddSet;
     private wrappedOppositeOutcome: Outcome | null;
-    public wrappedSqlOutcome: databaseModels.Outcome | null;
+    private wrappedSqlOutcome: databaseModels.Outcome | null;
 
     private constructor({
-        name,
+        type,
         game,
-        team,
     }: {
-        name: string,
+        type: OutcomeType,
         game: localModels.Game,
-        team: localModels.Team,
     }) {
-        this.name = name;
-        this.game = game;
-        this.team = team;
-        this.odds = new localModels.OddSet;
+        this.wrappedType = type;
+        this.wrappedGame = game;
+        this.wrappedOdds = new localModels.OddSet();
         this.wrappedOppositeOutcome = null;
-
         this.wrappedSqlOutcome = null;
+
+        game.outcomes.add(this);
+        globalModels.allOutcomes.add(this);
     }
 
     static async create({
+        type,
         game,
-        name,
-        team,
         oppositeOutcome,
     }: {
+        type: OutcomeType,
         game: localModels.Game,
-        name: string,
-        team: localModels.Team,
         oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
         const newOutcome = new Outcome({
-            name: name,
+            type: type,
             game: game,
-            team: team,
         });
 
         if (oppositeOutcome) {
@@ -51,50 +55,68 @@ export class Outcome {
 
         await newOutcome.initSqlOutcome();
 
-        game.outcomes.add(newOutcome);
-        globalModels.allOutcomes.add(newOutcome);
-
         return newOutcome;
     }
 
     public async initSqlOutcome(): Promise<databaseModels.Outcome> {
-        const game = this.game;
-
-        const gameId = game.sqlGame.get('id');
+        const type = this.type;
+        const gameId = this.game.sqlGame.get('id');
 
         await databaseModels.Outcome.findOrCreate({
             where: {
+                type: type,
                 gameId: gameId,
-                name: this.name,
             }
         }).then(async ([sqlOutcome, created]) => {
-            if (!created) {
-                await sqlOutcome.update({
-
-                });
-            }
-
-            this.sqlOutcome = sqlOutcome;
+            this.wrappedSqlOutcome = sqlOutcome;
         })
 
         return this.sqlOutcome;
     }
 
     public matches({
-        name,
+        type,
         game,
     }: {
-        name: string,
+        type: OutcomeType,
         game: localModels.Game,
     }) {
-        const nameMatches = (this.name === name);
+        const typeMatches = (this.type === type);
         const gameMatches = (this.game === game);
 
-        if (nameMatches && gameMatches) {
+        if (typeMatches && gameMatches) {
             return true;
         }
 
         return false;
+    }
+
+    get type(): OutcomeType {
+        return this.wrappedType;
+    }
+
+    get game(): localModels.Game {
+        return this.wrappedGame;
+    }
+
+    get team(): localModels.Team {
+        if (this.type === OutcomeType.SpreadAway ||
+            this.type === OutcomeType.MoneylineAway ||
+            this.type === OutcomeType.TotalOver) {
+                return this.game.awayTeam;
+        }
+        
+        if (this.type === OutcomeType.SpreadHome ||
+            this.type === OutcomeType.MoneylineHome ||
+            this.type === OutcomeType.TotalUnder) {
+                return this.game.homeTeam;
+        }
+
+        throw new Error(`Did not find corresponding outcome team.`);
+    }
+
+    get odds(): localModels.OddSet {
+        return this.wrappedOdds;
     }
 
     get oppositeOutcome(): Outcome {
@@ -112,13 +134,9 @@ export class Outcome {
 
     get sqlOutcome(): databaseModels.Outcome {
         if (!this.wrappedSqlOutcome) {
-            throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.name} sqlOutcome is null.`)
+            throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.type} sqlOutcome is null.`)
         }
 
         return this.wrappedSqlOutcome;
-    }
-
-    set sqlOutcome(sqlOutcome: databaseModels.Outcome) {
-        this.wrappedSqlOutcome = sqlOutcome;
     }
 }

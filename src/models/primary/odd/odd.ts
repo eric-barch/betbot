@@ -2,32 +2,48 @@ import { ElementHandle } from 'puppeteer';
 
 import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
-import * as localModels from '../..';
+import * as localModels from '../../../models';
 
 export abstract class Odd {
-    abstract priceElementXPath: string;
-    abstract valueElementXPath: string | null;
+    private wrappedPrice: number | null;
+    private wrappedValue: number | null;
 
-    public priceElement: ElementHandle | null = null;
-    public valueElement: ElementHandle | null = null;
-
-    private wrappedPrice: number | null = null;
-    private wrappedValue: number | null = null;
-
+    public priceElement: ElementHandle | null;
+    public valueElement: ElementHandle | null;
+    
     private wrappedExchange: localModels.Exchange;
     private wrappedOutcome: localModels.Outcome;
-
-    private wrappedSqlOdd: databaseModels.Odd | null = null;
+    private wrappedSqlOdd: databaseModels.Odd | null;
 
     constructor({
         exchange,
         outcome,
+        price,
+        value,
     }: {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
+        price: number | null,
+        value: number | null,
     }) {
+        if (price) {
+            this.wrappedPrice = price;
+        } else {
+            this.wrappedPrice = null;
+        }
+
+        if (value) {
+            this.wrappedValue = value;
+        } else {
+            this.wrappedValue = null;
+        }
+
+        this.priceElement = null;
+        this.valueElement = null;
+
         this.wrappedExchange = exchange;
         this.wrappedOutcome = outcome;
+        this.wrappedSqlOdd = null;
 
         globalModels.allOdds.add(this);
     }
@@ -35,54 +51,72 @@ export abstract class Odd {
     static async create({
         exchange,
         outcome,
+        price,
+        value,
     }: {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
+        price?: number | null,
+        value?: number | null,
     }): Promise<Odd> {;
-        let newOdd;
+        let newOdd: localModels.Odd;
 
-        if (exchange.name === 'DraftKings') {
+        if (exchange === globalModels.draftKingsExchange) {
+            /**TODO: would be better to switch on whether the outcome extends a SpreadAwayOutcome, 
+             * a SpreadHomeOutcome, etc. instead of the string of the name. */
             switch (outcome.name) {
                 case 'spread_away':
                     newOdd = new localModels.DraftKingsSpreadAway({
                         exchange: exchange,
                         outcome: outcome,
+                        price: price,
+                        value: value,
                     });
                     break;
                 case 'spread_home':
                     newOdd = new localModels.DraftKingsSpreadHome({
                         exchange: exchange,
                         outcome: outcome,
+                        price: price,
+                        value: value,
                     });
                     break;
                 case 'moneyline_away':
                     newOdd = new localModels.DraftKingsMoneylineAway({
                         exchange: exchange,
                         outcome: outcome,
+                        price: price,
+                        value: value,
                     });
                     break;
                 case 'moneyline_home':
                     newOdd = new localModels.DraftKingsMoneylineHome({
                         exchange: exchange,
                         outcome: outcome,
+                        price: price,
+                        value: value,
                     });
                     break;
                 case 'total_over':
                     newOdd = new localModels.DraftKingsTotalOver({
                         exchange: exchange,
                         outcome: outcome,
+                        price: price,
+                        value: value,
                     });
                     break;
                 case 'total_under':
                     newOdd = new localModels.DraftKingsTotalUnder({
                         exchange: exchange,
                         outcome: outcome,
+                        price: price,
+                        value: value,
                     });
                     break;
                 default:
-                    throw new Error(`Could not find corresponding DraftKingsOdd`);
+                    throw new Error(`Did not find corresponding DraftKingsOdd`);
             }
-        } else if (exchange.name === 'FanDuel') {
+        } else if (exchange === globalModels.fanDuelExchange) {
             switch (outcome.name) {
                 case 'spread_away':
                     newOdd = new localModels.FanDuelSpreadAway({
@@ -123,7 +157,7 @@ export abstract class Odd {
                 default:
                     throw new Error(`Could not find corresponding FanDuelOdd`);
             }
-        } else if (exchange.name === 'SugarHouse') {
+        } else if (exchange === globalModels.sugarHouseExchange) {
             switch (outcome.name) {
                 case 'spread_away':
                     newOdd = new localModels.SugarHouseSpreadAway({
@@ -173,7 +207,7 @@ export abstract class Odd {
         const exchangeGame = await globalModels.allExchangeGames.findOrCreate({
             exchange: exchange,
             game: outcome.game,
-        })
+        });
 
         newOdd.exchange = exchange;
         newOdd.outcome = outcome;
@@ -390,22 +424,12 @@ export abstract class Odd {
         return this.wrappedExchange;
     }
 
-    set exchange(exchange: localModels.Exchange) {
-        this.wrappedExchange = exchange;
-        exchange.odds.add(this);
-    }
-
     get outcome(): localModels.Outcome {
         if (!this.wrappedOutcome) {
             throw new Error(`Outcome is null.`);
         }
 
         return this.wrappedOutcome;
-    }
-
-    set outcome(outcome: localModels.Outcome) {
-        this.wrappedOutcome = outcome;
-        outcome.odds.add(this);
     }
 
     get sqlOdd(): databaseModels.Odd {

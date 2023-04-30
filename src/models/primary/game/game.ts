@@ -30,6 +30,8 @@ export class Game {
         this.wrappedExchangeGames = new localModels.ExchangeGameSet;
         this.wrappedOutcomes = new localModels.OutcomeSet;
         this.wrappedSqlGame = null;
+
+        globalModels.allGames.add(this);
     }
 
     static async create({
@@ -48,8 +50,6 @@ export class Game {
         });
 
         await newGame.initSqlGame();
-
-        globalModels.allGames.add(newGame);
 
         return newGame;
     }

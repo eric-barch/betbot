@@ -11,13 +11,19 @@ abstract class DraftKingsOdd extends Odd {
     constructor({
         exchange,
         outcome,
+        price,
+        value,
     }: {
         exchange: localModels.Exchange,
         outcome: localModels.Outcome,
+        price: number | null,
+        value: number | null,
     }) {
         super({
             exchange: exchange,
             outcome: outcome,
+            price: price,
+            value: value,
         });
 
         const exchangeGameTeam = globalModels.allExchangeGameTeams.find({

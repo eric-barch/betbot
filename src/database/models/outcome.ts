@@ -13,7 +13,7 @@ export class Outcome extends sqlz.Model<
     declare id: sqlz.CreationOptional<number>;
 
     // column headers
-    declare name: string;
+    declare type: string;
 
     // timestamps
     declare createdAt: sqlz.CreationOptional<Date>;
@@ -54,7 +54,7 @@ Outcome.init({
         autoIncrement: true,
         primaryKey: true
     },
-    name: new sqlz.DataTypes.STRING(128),
+    type: new sqlz.DataTypes.STRING(128),
     createdAt: sqlz.DataTypes.DATE,
     updatedAt: sqlz.DataTypes.DATE,
 }, {
