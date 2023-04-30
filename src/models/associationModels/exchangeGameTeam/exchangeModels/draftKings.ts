@@ -12,7 +12,7 @@ export abstract class DraftKingsExchangeGameTeam extends ExchangeGameTeam {
         const exchange = this.exchange;
         const game = this.game;
 
-        const page = exchange.page;
+        const page = exchange.connectionManager.page;
 
         const teamRowElements = await page.$$('tbody > tr');
 

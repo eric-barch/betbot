@@ -4,7 +4,7 @@ import * as localModels from '../../../models';
 class AllOdds extends localModels.OddSet {
     public async init() {
         for (const exchange of allExchanges) {
-            await exchange.updateOdds();
+            await exchange.initOdds();
         }
     }
 }

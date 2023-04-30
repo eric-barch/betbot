@@ -1,26 +1,35 @@
 import * as chrono from 'chrono-node';
-import { Page, ElementHandle } from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
 
+import * as localModels from '../../../..';
+import * as globalModels from '../../../../../global';
 import { Exchange } from '../exchange';
-import * as globalModels from '../../../../global';
-import * as localModels from '../../..';
+import { ConnectionManager } from '../connectionManager';
 
 export class DraftKingsExchange extends Exchange {
-    public name: string = 'DraftKings';
-    public url: string = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
+    public name: string;
+    public url: string;
+    protected wrappedConnectionManager: ConnectionManager;
 
-    protected wrappedExchangeGames: localModels.ExchangeGameSet = new localModels.ExchangeGameSet();
-    protected wrappedOdds: localModels.OddSet = new localModels.OddSet();
-
-    public async connectToPage(): Promise<Page> {
-        const page = await super.connectToPage();
-        await page.reload();
-        return page;
+    constructor() {
+        super();
+        this.name = 'DraftKings';
+        this.url = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
+        this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
     }
 
-    public async updateGames(): Promise<localModels.GameSet> {
-        const gamesFromJson = await this.updateGamesFromJson();
-        const gamesFromDocument = await this.updateGamesFromDocument();
+    /**base exchange class init method is overwritten because DK seems to need refreshing 
+     * immediately after initial connection to ensure correct labeling in DOM */
+    public async init(): Promise<Exchange> {
+        await super.connectionManager.connect();
+        // await this.connectionManager.page.reload();
+        await this.initSqlExchange();
+        return this;
+    }
+
+    public async getGames(): Promise<localModels.GameSet> {
+        const gamesFromJson = await this.getGamesFromJson();
+        const gamesFromDocument = await this.getGamesFromDocument();
 
         const games = new localModels.GameSet;
 
@@ -32,19 +41,17 @@ export class DraftKingsExchange extends Exchange {
             games.add(gameFromDocument);
         }
 
-        // delete if not still there? or should that be handled by exchangeGame?
-
         return games;
     }
 
-    private async updateGamesFromJson(): Promise<localModels.GameSet> {
+    private async getGamesFromJson(): Promise<localModels.GameSet> {
         const jsonGames = await this.scrapeJsonGames();
         const games = await this.parseJsonGames(jsonGames);
         return games;
     }
 
     private async scrapeJsonGames(): Promise<Array<any>> {
-        const gameScriptElements = await this.page.$$('script[type="application/ld+json"]');
+        const gameScriptElements = await this.connectionManager.page.$$('script[type="application/ld+json"]');
 
         const jsonGames = new Array;
 
@@ -85,18 +92,20 @@ export class DraftKingsExchange extends Exchange {
         return games;
     }
 
-    private async updateGamesFromDocument(): Promise<localModels.GameSet> {
+    private async getGamesFromDocument(): Promise<localModels.GameSet> {
         const games = new localModels.GameSet;
 
-        const trElements = await this.page.$$('div[class*="parlay-card"] table > tbody > tr');
+        const trElements = await this.connectionManager.page.$$('div[class*="parlay-card"] table > tbody > tr');
 
         for (const trElement of trElements) {
             const trElementTeam = await this.getTrElementTeam(trElement);
+
             if (!trElementTeam) {
                 continue;
             }
 
             const trElementGameTeams = await this.getTrElementGameTeams(trElement);
+
             if (!trElementGameTeams) {
                 continue;
             }

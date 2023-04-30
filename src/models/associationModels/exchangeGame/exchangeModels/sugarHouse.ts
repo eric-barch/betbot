@@ -9,7 +9,7 @@ export class SugarHouseExchangeGame extends ExchangeGame {
         const exchange = this.exchange;
         const game = this.game;
 
-        const page = exchange.page;
+        const page = exchange.connectionManager.page;
 
         const awayTeamIdentifier = game.awayTeam.identifierFull.toLowerCase();
         const homeTeamIdentifier = game.homeTeam.identifierFull.toLowerCase();

@@ -178,14 +178,18 @@ export abstract class Odd {
         newOdd.exchange = exchange;
         newOdd.outcome = outcome;
 
-        await newOdd.initSqlOdd();
-
         globalModels.allOdds.add(newOdd);
 
         return newOdd;
     }
 
-    public async initSqlOdd(): Promise<databaseModels.Odd> {
+    public async initSqlOdd({
+        price,
+        value,
+    }: {
+        price: number | null,
+        value: number | null,
+    }): Promise<databaseModels.Odd> {
         const exchangeId = this.exchange.sqlExchange.get('id');
         const outcomeId = this.outcome.sqlOutcome.get('id');
 
@@ -197,10 +201,15 @@ export abstract class Odd {
             defaults: {
                 exchangeId: exchangeId,
                 outcomeId: outcomeId,
+                price: price,
+                value: value,
             },
         }).then(async ([sqlOdd, created]) => {
             if (!created) {
-
+                await sqlOdd.update({
+                    price: price,
+                    value: value,
+                });
             }
 
             this.sqlOdd = sqlOdd;
@@ -341,10 +350,36 @@ export abstract class Odd {
         this.wrappedPrice = price;
         this.wrappedValue = value;
 
-        await this.sqlOdd.update({
-            price: price,
-            value: value,
-        })
+        if (!this.wrappedSqlOdd) {
+            await this.initSqlOdd({
+                price: price,
+                value: value,
+            })
+        } else {
+            const oldPrice = this.sqlOdd.price;
+            const oldValue = this.sqlOdd.value;
+
+            const priceMatches = (oldPrice === price);
+            const valueMatches = (oldValue === value);
+
+            if (!priceMatches || !valueMatches) {
+                const oldUpdatedAt = this.sqlOdd.updatedAt;
+                const oddId = this.sqlOdd.id;
+
+                await this.sqlOdd.update({
+                    price: price,
+                    value: value,
+                });
+
+                await databaseModels.OldOdd.create({
+                    price: oldPrice,
+                    value: oldValue,
+                    startTime: oldUpdatedAt,
+                    endTime: this.sqlOdd.updatedAt,
+                    oddId: oddId,
+                });
+            }
+        }
     }
 
     get exchange(): localModels.Exchange {

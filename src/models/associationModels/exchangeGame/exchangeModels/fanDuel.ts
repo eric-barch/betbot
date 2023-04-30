@@ -9,7 +9,7 @@ export class FanDuelExchangeGame extends ExchangeGame {
         const exchange = this.exchange;
         const game = this.game;
 
-        const page = exchange.page;
+        const page = exchange.connectionManager.page;
 
         const gameTitleElements = await page.$$(`[title="${game.regionFullIdentifierFull}"]`);
 

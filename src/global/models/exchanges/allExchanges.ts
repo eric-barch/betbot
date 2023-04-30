@@ -1,8 +1,12 @@
 import * as localModels from '../../../models';
 
-export const draftKingsExchange = new localModels.DraftKingsExchange();
-export const fanDuelExchange = new localModels.FanDuelExchange();
-export const sugarHouseExchange = new localModels.SugarHouseExchange();
+import { DraftKingsExchange } from '../../../models/primaryModels/exchange/exchange/exchangeModels/draftKings';
+import { FanDuelExchange } from '../../../models/primaryModels/exchange/exchange/exchangeModels/fanDuel';
+import { SugarHouseExchange } from '../../../models/primaryModels/exchange/exchange/exchangeModels/sugarHouse';
+
+export const draftKingsExchange = new DraftKingsExchange();
+export const fanDuelExchange = new FanDuelExchange();
+export const sugarHouseExchange = new SugarHouseExchange();
 
 class AllExchanges extends localModels.ExchangeSet {
     public async init() {

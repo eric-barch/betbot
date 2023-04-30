@@ -14,7 +14,6 @@ export class Exchange extends sqlz.Model<
 
   // column headers
   declare name: string;
-  declare url: string;
 
   // timestamps
   declare createdAt: sqlz.CreationOptional<Date>;
@@ -70,7 +69,6 @@ Exchange.init({
       primaryKey: true
   },
   name: new sqlz.DataTypes.STRING(128),
-  url: new sqlz.DataTypes.STRING(128),
   createdAt: sqlz.DataTypes.DATE,
   updatedAt: sqlz.DataTypes.DATE,
 }, {
