@@ -8,7 +8,6 @@ const allOutcomes = globalModels.allOutcomes;
 const allExchangeGames = globalModels.allExchangeGames;
 const allExchangeGameTeams = globalModels.allExchangeGameTeams;
 const allOdds = globalModels.allOdds;
-const allArbs = globalModels.allArbs;
 
 async function main() {
     await database.init();
@@ -27,14 +26,11 @@ async function main() {
     await allOdds.updateElements();
 
     await allOdds.updateValues();
-    await allOutcomes.checkForNewArbs();
 
     updateExchangeGameElements();
     updateExchangeGameTeamElements();
     updateOddElements();
     updateOddValues();
-    checkForNewArbs();
-    updateExistingArbs();
 }
 
 main();
@@ -85,33 +81,4 @@ async function updateOddValues() {
     // console.log(`updateOddValues duration: ${duration}`);
 
     setTimeout(updateOddValues, 100);
-}
-
-async function checkForNewArbs() {
-    const start = new Date();
-    await allOutcomes.checkForNewArbs();
-    const end = new Date();
-
-    const duration = end.getTime() - start.getTime();
-
-    // console.log(`checkForNewArbs duration: ${duration});
-
-    setTimeout(checkForNewArbs, 100);
-}
-
-async function updateExistingArbs() {
-    const start = new Date();
-    await allArbs.update();
-    const end = new Date();
-
-    const duration = end.getTime() - start.getTime();
-
-    // console.log(`updateExistingArbs duration: ${duration}`);
-
-    setTimeout(updateExistingArbs, 100);
-}
-
-function reportExistingArbs() {
-    console.log(`Open arbs: ${allArbs.size}`);
-    setTimeout(reportExistingArbs, 10000);
 }
