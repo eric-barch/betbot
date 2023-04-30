@@ -1,46 +1,42 @@
-import { Browser, Page, connect, launch } from 'puppeteer';
+import { ConnectionManager } from './connectionManager';
 
-import * as databaseModels from '../../../database';
-import * as globalModels from '../../../global';
-import * as localModels from '../..';
+import * as databaseModels from '../../../../database';
+import * as globalModels from '../../../../global';
+import * as localModels from '../../../../models';
 
 export abstract class Exchange {
     public abstract name: string;
     public abstract url: string;
 
-    protected abstract wrappedExchangeGames: localModels.ExchangeGameSet | null;
-    protected abstract wrappedOdds: localModels.OddSet | null;
+    protected wrappedExchangeGames: localModels.ExchangeGameSet;
+    protected wrappedOdds: localModels.OddSet;
 
-    private wrappedBrowser: Browser | null;
-    private wrappedPage: Page | null;
+    protected abstract wrappedConnectionManager: ConnectionManager;
     private wrappedSqlExchange: databaseModels.Exchange | null;
 
     public constructor() {
-        this.wrappedBrowser = null;
-        this.wrappedPage = null;
+        this.wrappedExchangeGames = new localModels.ExchangeGameSet();
+        this.wrappedOdds = new localModels.OddSet();
         this.wrappedSqlExchange = null;
     }
 
     public async init(): Promise<Exchange> {
-        await this.connectToPage();
+        await this.connectionManager.connect();
         await this.initSqlExchange();
         return this;
     }
 
-    private async initSqlExchange(): Promise<databaseModels.Exchange> {
+    protected async initSqlExchange(): Promise<databaseModels.Exchange> {
         await databaseModels.Exchange.findOrCreate({
             where: {
                 name: this.name,
             },
             defaults: {
                 name: this.name,
-                url: this.url,
             },
         }).then(async ([sqlExchange, created]) => {
             if (!created) {
-                await sqlExchange.update({
-                    url: this.url,
-                });
+                
             }
 
             this.sqlExchange = sqlExchange;
@@ -49,91 +45,10 @@ export abstract class Exchange {
         return this.sqlExchange;
     }
 
-    public async connectToBrowser(): Promise<Browser> {
-        try {
-            this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
-        } catch {
-            throw new Error(`Browser is not open with debugging enabled.`);
-            // const chromeExecutablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google\ Chrome';
-
-            // const browser = await launch({
-            //     headless: false,
-            //     executablePath: chromeExecutablePath,
-            //     args: [
-            //         '--remote-debugging-port=9222',
-            //         '--no-first-run',
-            //         '--no-default-browser-check',
-            //     ]
-            // });
-
-            // this.browser = browser;
-        }
-
-        return this.browser;
-    }
-
-    protected async connectToPage(): Promise<Page> {
-        await this.connectToBrowser();
-
-        let page: Page;
-
-        try {
-            page = await this.connectToExistingPage();
-        } catch {
-            page = await this.connectToNewPage();
-        }
-
-        return page;
-    }
-
-    private async connectToExistingPage(): Promise<Page> {
-        const targets = this.browser.targets();
-        const target = targets.find(target => target.url().includes(this.url));
-        
-        if (!target) {
-            throw new Error('Expected Target.');
-        }
-
-        const targetPage = await target.page();
-        
-        if (!targetPage) {
-            throw new Error('Expected page.');
-        }
-
-        const windowSize = await targetPage.evaluate(() => {
-            return {
-                width: window.outerWidth,
-                height: window.outerHeight,
-            };
-        });
-
-        this.page = targetPage;
-        this.page.setViewport(windowSize);
-
-        return this.page;
-    }
-
-    private async connectToNewPage(): Promise<Page> {
-        const page = await this.browser.newPage();
-        await page.goto(this.url);
-
-        const windowSize = await page.evaluate(() => {
-            return {
-                width: window.outerWidth,
-                height: window.outerHeight,
-            };
-        });
-
-        this.page = page;
-        page.setViewport(windowSize);
-
-        return this.page;
-    }
-
-    abstract updateGames(): Promise<localModels.GameSet>;
+    abstract getGames(): Promise<localModels.GameSet>;
 
     public async updateExchangeGames(): Promise<localModels.ExchangeGameSet | null> {
-        const games = await this.updateGames();
+        const games = await this.getGames();
 
         for (const game of games) {
             this.exchangeGames.findOrCreate({
@@ -142,10 +57,20 @@ export abstract class Exchange {
             })
         }
 
+        for (const exchangeGame of this.exchangeGames) {
+            if (!games.has(exchangeGame.game)) {
+                this.exchangeGames.delete(exchangeGame);
+            }
+        }
+
         return this.exchangeGames;
     }
 
-    public async updateOdds() {
+    /**TODO: only method that still needs to be refactored. ideally do not create odd until it 
+     * is found on the page (or it is determined that it is not on the page, in which case it would
+     * get null).
+    */
+    public async initOdds() {
         for (const exchangeGame of this.exchangeGames) {
             const spreadAway = await globalModels.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
@@ -209,23 +134,6 @@ export abstract class Exchange {
         }
     }
 
-    public async close(): Promise<void> {
-        this.browser.close();
-    }
-
-    // getters and setters
-    get browser(): Browser {
-        if (!this.wrappedBrowser) {
-            throw new Error(`${this.name} browser is null.`)
-        }
-
-        return this.wrappedBrowser;
-    }
-
-    set browser(browser: Browser) {
-        this.wrappedBrowser = browser;
-    }
-
     get nameStripped(): string {
         return this.name.replace(/[^a-zA-Z0-9]/g, '');
     }
@@ -234,18 +142,6 @@ export abstract class Exchange {
         let alphanumericString = this.nameStripped;
         let firstCharLower = alphanumericString.charAt(0).toLowerCase() + alphanumericString.slice(1);
         return firstCharLower;
-    }
-
-    get page(): Page {
-        if (!this.wrappedPage) {
-            throw new Error(`${this.name} page is null.`);
-        }
-        
-        return this.wrappedPage;
-    }
-
-    set page(page: Page) {
-        this.wrappedPage = page;
     }
 
     get exchangeGames() {
@@ -262,6 +158,10 @@ export abstract class Exchange {
         }
 
         return this.wrappedOdds;
+    }
+
+    get connectionManager(): ConnectionManager {
+        return this.wrappedConnectionManager;
     }
 
     get sqlExchange(): databaseModels.Exchange {

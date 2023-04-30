@@ -47,16 +47,3 @@ Odd.init({
     sequelize,
     tableName: 'odds',
 });
-
-Odd.addHook('afterUpdate', async (odd: Odd, options) => {
-    if (!odd.isNewRecord && odd.changed()) {
-        const oldData = odd.previous();
-
-        await OldOdd.create({
-            price: oldData.price,
-            value: oldData.value,
-            updatedAt: oldData.updatedAt,
-            oddId: odd.id,
-        });
-    }
-});

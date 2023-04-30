@@ -2,20 +2,26 @@ import * as chrono from 'chrono-node';
 
 import { ElementHandle } from 'puppeteer';
 
+import { ConnectionManager } from '../connectionManager';
 import { Exchange } from '../exchange';
-import * as globalModels from '../../../../global';
-import * as localModels from '../../..';
+import * as globalModels from '../../../../../global';
+import * as localModels from '../../../..';
 
 export class FanDuelExchange extends Exchange {
     public name: string = 'FanDuel';
     public url: string = 'https://sportsbook.fanduel.com/navigation/nba';
+    protected wrappedConnectionManager: ConnectionManager;
 
-    protected wrappedExchangeGames: localModels.ExchangeGameSet = new localModels.ExchangeGameSet();
-    protected wrappedOdds: localModels.OddSet = new localModels.OddSet();
+    constructor() {
+        super();
+        this.name = 'FanDuel';
+        this.url = 'https://sportsbook.fanduel.com/navigation/nba';
+        this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
+    }
 
-    public async updateGames(): Promise<localModels.GameSet> {
-        const gamesFromJson = await this.updateGamesFromJson();
-        const gamesFromDocument = await this.updateGamesFromDocument();
+    public async getGames(): Promise<localModels.GameSet> {
+        const gamesFromJson = await this.getGamesFromJson();
+        const gamesFromDocument = await this.getGamesFromDocument();
 
         const games = new localModels.GameSet;
 
@@ -27,19 +33,17 @@ export class FanDuelExchange extends Exchange {
             games.add(gameFromDocument);
         }
 
-        // delete if not still there? or should that be handled by exchangeGame?
-
         return games;
     }
 
-    private async updateGamesFromJson(): Promise<localModels.GameSet> {
+    private async getGamesFromJson(): Promise<localModels.GameSet> {
         const jsonGames = await this.scrapeJsonGames();
         const games = await this.parseJsonGames(jsonGames);
         return games;
     }
 
     private async scrapeJsonGames(): Promise<Array<any>> {
-        const gamesScriptElement = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
+        const gamesScriptElement = await this.connectionManager.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
 
         if (!gamesScriptElement) {
             throw new Error(`Did not find jsonGamesScriptElement for FanDuel.`);
@@ -80,7 +84,7 @@ export class FanDuelExchange extends Exchange {
         return games;
     }
 
-    private async updateGamesFromDocument(): Promise<localModels.GameSet> {
+    private async getGamesFromDocument(): Promise<localModels.GameSet> {
         const games = new localModels.GameSet;
 
         const gameLinkElements = await this.getGameLinkElements();
@@ -115,7 +119,7 @@ export class FanDuelExchange extends Exchange {
 
         const matchPattern = new RegExp(`(${teamIdentifiersJoined}).*@.*(${teamIdentifiersJoined})`, `i`);
 
-        const linkElements = await this.page.$$('a');
+        const linkElements = await this.connectionManager.page.$$('a');
         
         let firstGameLinkElement;
 
@@ -133,7 +137,7 @@ export class FanDuelExchange extends Exchange {
         }
 
         const gameLinkClassName = await (await firstGameLinkElement.getProperty('className')).jsonValue();
-        const gameLinkElements = await this.page.$$(`a[class='${gameLinkClassName}']`);
+        const gameLinkElements = await this.connectionManager.page.$$(`a[class='${gameLinkClassName}']`);
         return gameLinkElements;
     }
 
@@ -195,52 +199,5 @@ export class FanDuelExchange extends Exchange {
 
         const startDate = chrono.parseDate(startDateStringClean);
         return startDate;
-    }
-
-    public async updateExchangeGamesFromJson(): Promise<localModels.ExchangeGameSet | null> {
-        const gamesScriptElement = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
-
-        if (!gamesScriptElement) {
-            throw new Error(`Did not find jsonGamesScriptElement for FanDuel.`);
-        }
-    
-        const textContent = await (await gamesScriptElement.getProperty('textContent')).jsonValue();
-    
-        if (!textContent) {
-            throw new Error(`Found no text in FanDuel jsonGamesScriptElement.`);
-        }
-
-        const jsonGames = JSON.parse(textContent);
-
-        for (const jsonGame of jsonGames) {
-            const awayTeamName = jsonGame.awayTeam.name;
-            const homeTeamName = jsonGame.homeTeam.name;
-
-            const awayTeam = globalModels.allTeams.find({ name: awayTeamName });
-            const homeTeam = globalModels.allTeams.find({ name: homeTeamName });
-            const startDate = new Date(jsonGame.startDate);
-
-            const requestedGame = await globalModels.allGames.findOrCreate({
-                awayTeam: awayTeam,
-                homeTeam: homeTeam,
-                startDate: startDate,
-            });
-
-            if (requestedGame) {
-                await this.exchangeGames.findOrCreate({
-                    exchange: this,
-                    game: requestedGame,
-                });
-            }
-        }
-
-        /**TODO: At end of method, we should also DELETE games that are no longer found on the
-         * website. */
-        return this.exchangeGames;
-    }
-
-    public async updateExchangeGamesFromDocument(): Promise<localModels.ExchangeGameSet | null> {
-        /**TODO: Implement. */
-        return null;
     }
 }

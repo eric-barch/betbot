@@ -12,9 +12,10 @@ export class OldOdd extends sqlz.Model<
 
     declare price: number | null;
     declare value: number | null;
+    declare startTime: Date;
+    declare endTime: Date;
 
     declare createdAt: sqlz.CreationOptional<Date>;
-    declare updatedAt: sqlz.CreationOptional<Date>;
 
     declare oddId: sqlz.ForeignKey<Odd['id']>;
 
@@ -33,9 +34,11 @@ OldOdd.init({
     },
     price: sqlz.DataTypes.INTEGER,
     value: sqlz.DataTypes.FLOAT,
+    startTime: sqlz.DataTypes.DATE,
+    endTime: sqlz.DataTypes.DATE,
     createdAt: sqlz.DataTypes.DATE,
-    updatedAt: sqlz.DataTypes.DATE,
 }, {
     sequelize,
     tableName: 'oldOdds',
+    updatedAt: false,
 })
