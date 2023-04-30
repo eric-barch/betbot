@@ -2,7 +2,7 @@ import { ElementHandle } from 'puppeteer';
 
 import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
-import * as localModels from '../../../models';
+import * as localModels from '../..';
 
 export abstract class Odd {
     abstract priceElementXPath: string;

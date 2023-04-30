@@ -1,8 +1,8 @@
 import * as localModels from '../../../models';
 
-import { DraftKingsExchange } from '../../../models/primaryModels/exchange/exchange/exchangeModels/draftKings';
-import { FanDuelExchange } from '../../../models/primaryModels/exchange/exchange/exchangeModels/fanDuel';
-import { SugarHouseExchange } from '../../../models/primaryModels/exchange/exchange/exchangeModels/sugarHouse';
+import { DraftKingsExchange } from '../../../models/primary/exchange/exchange/exchangeModels/draftKings';
+import { FanDuelExchange } from '../../../models/primary/exchange/exchange/exchangeModels/fanDuel';
+import { SugarHouseExchange } from '../../../models/primary/exchange/exchange/exchangeModels/sugarHouse';
 
 export const draftKingsExchange = new DraftKingsExchange();
 export const fanDuelExchange = new FanDuelExchange();

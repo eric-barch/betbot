@@ -1,7 +1,7 @@
 import { ElementHandle } from 'puppeteer';
 
 import * as globalModels from '../../../../global';
-import * as localModels from '../../../../models';
+import * as localModels from '../../..';
 
 import { Odd } from '../odd';
 

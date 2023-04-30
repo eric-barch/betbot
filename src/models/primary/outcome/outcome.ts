@@ -1,6 +1,6 @@
 import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
-import * as localModels from '../../../models';
+import * as localModels from '../..';
 
 export class Outcome {
     public name: string;

@@ -2,7 +2,7 @@ import { ConnectionManager } from './connectionManager';
 
 import * as databaseModels from '../../../../database';
 import * as globalModels from '../../../../global';
-import * as localModels from '../../../../models';
+import * as localModels from '../../..';
 
 export abstract class Exchange {
     public abstract name: string;

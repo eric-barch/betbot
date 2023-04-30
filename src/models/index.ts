@@ -1,2 +1,2 @@
-export * from './primaryModels';
-export * from './associationModels';
+export * from './primary';
+export * from './association';
