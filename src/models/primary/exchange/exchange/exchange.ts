@@ -35,10 +35,6 @@ export abstract class Exchange {
                 name: this.name,
             },
         }).then(async ([sqlExchange, created]) => {
-            if (!created) {
-                
-            }
-
             this.sqlExchange = sqlExchange;
         });
 
@@ -50,6 +46,7 @@ export abstract class Exchange {
     public async updateExchangeGames(): Promise<localModels.ExchangeGameSet | null> {
         const games = await this.getGames();
 
+        /**TODO: is there a more efficient way to do this? */
         for (const game of games) {
             this.exchangeGames.findOrCreate({
                 exchange: this,
@@ -66,11 +63,7 @@ export abstract class Exchange {
         return this.exchangeGames;
     }
 
-    /**TODO: only method that still needs to be refactored. ideally do not create odd until it 
-     * is found on the page (or it is determined that it is not on the page, in which case it would
-     * get null).
-    */
-    public async initOdds() {
+    public async initOdds(): Promise<localModels.OddSet> {
         for (const exchangeGame of this.exchangeGames) {
             const spreadAway = await globalModels.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
@@ -132,6 +125,8 @@ export abstract class Exchange {
                 outcome: totalUnder,
             });
         }
+
+        return this.odds;
     }
 
     get nameStripped(): string {
@@ -144,19 +139,11 @@ export abstract class Exchange {
         return firstCharLower;
     }
 
-    get exchangeGames() {
-        if (!this.wrappedExchangeGames) {
-            throw new Error(`wrappedExchangeGames is null.`);
-        }
-
+    get exchangeGames(): localModels.ExchangeGameSet {
         return this.wrappedExchangeGames;
     }
 
-    get odds() {
-        if (!this.wrappedOdds) {
-            throw new Error(`wrappedOdds is null.`);
-        }
-
+    get odds(): localModels.OddSet {
         return this.wrappedOdds;
     }
 
@@ -166,7 +153,7 @@ export abstract class Exchange {
 
     get sqlExchange(): databaseModels.Exchange {
         if (!this.wrappedSqlExchange) {
-            throw new Error(`${this.name} sqlExchange is null.`)
+            throw new Error(`${this.name}.sqlExchange is null.`)
         } 
         
         return this.wrappedSqlExchange;
