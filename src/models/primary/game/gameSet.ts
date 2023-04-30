@@ -45,7 +45,7 @@ export class GameSet extends Set<Game> {
         }
 
         if (!startDate) {
-            return null;
+            throw new Error(`Did not find game and startDate was not provided to create new one.`);
         }
 
         const newGame = await Game.create({
