@@ -1,20 +1,18 @@
 
-import { Op } from 'sequelize';
-
-import { sequelize } from '../../../database';
+import * as sqlz from 'sequelize';
 
 import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
-import * as localModels from '../..';
+import * as localModels from '../../../models';
+
+const sequelize = databaseModels.sequelize;
 
 export class Game {
-    public startDate: Date;
-
-    public awayTeam: localModels.Team;
-    public homeTeam: localModels.Team;
-    public exchangeGames: localModels.ExchangeGameSet;
-    public outcomes: localModels.OutcomeSet;
-
+    private wrappedStartDate: Date;
+    private wrappedAwayTeam: localModels.Team;
+    private wrappedHomeTeam: localModels.Team;
+    private wrappedExchangeGames: localModels.ExchangeGameSet;
+    private wrappedOutcomes: localModels.OutcomeSet;
     private wrappedSqlGame: databaseModels.Game | null;
 
     private constructor({
@@ -26,13 +24,11 @@ export class Game {
         homeTeam: localModels.Team,
         startDate: Date,
     }) {
-        this.awayTeam = awayTeam;
-        this.homeTeam = homeTeam;
-        this.startDate = startDate;
-
-        this.exchangeGames = new localModels.ExchangeGameSet;
-        this.outcomes = new localModels.OutcomeSet;
-
+        this.wrappedAwayTeam = awayTeam;
+        this.wrappedHomeTeam = homeTeam;
+        this.wrappedStartDate = startDate;
+        this.wrappedExchangeGames = new localModels.ExchangeGameSet;
+        this.wrappedOutcomes = new localModels.OutcomeSet;
         this.wrappedSqlGame = null;
     }
 
@@ -61,12 +57,11 @@ export class Game {
     private async initSqlGame(): Promise<databaseModels.Game> {
         const awayTeamId = this.awayTeam.sqlTeam.get('id');
         const homeTeamId = this.homeTeam.sqlTeam.get('id');
-    
         const startDate = this.startDate;
     
         await databaseModels.Game.findOrCreate({
             where: {
-                [Op.and]: [
+                [sqlz.Op.and]: [
                     { awayTeamId: awayTeamId },
                     { homeTeamId: homeTeamId },
                     sequelize.where(
@@ -124,15 +119,11 @@ export class Game {
         return false;
     }
 
-    static roundDateToNearestInterval(date: Date): Date {
-        const ROUND_INTERVAL = 60;
-        
-        const roundedMinutes = Math.round(date.getMinutes() / ROUND_INTERVAL) * ROUND_INTERVAL;
-        const roundedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), roundedMinutes, 0);
-
-        return roundedDate;
+    get regionAbbr(): string {
+        const regionAbbr = `${this.awayTeam.regionAbbr} @ ${this.homeTeam.regionAbbr}`;
+        return regionAbbr;
     }
-
+    
     get regionAbbrIdentifierAbbr(): string {
         const regionAbbrIdentifierAbbr = `${this.awayTeam.regionAbbrIdentifierAbbr} @ ${this.homeTeam.regionAbbrIdentifierAbbr}`;
         return regionAbbrIdentifierAbbr;
@@ -148,15 +139,31 @@ export class Game {
         return regionFullIdentifierFull;
     }
 
-    get sqlGame(): databaseModels.Game {
-        if (this.wrappedSqlGame) {
-            return this.wrappedSqlGame;
-        } else {
-            throw new Error(`${this.regionAbbrIdentifierAbbr} sqlGame is null.`);
-        }
+    get startDate(): Date {
+        return this.wrappedStartDate;
     }
 
-    set sqlGame(sqlGame: databaseModels.Game) {
-        this.wrappedSqlGame = sqlGame;
+    get awayTeam(): localModels.Team {
+        return this.wrappedAwayTeam;
+    }
+
+    get homeTeam(): localModels.Team {
+        return this.wrappedHomeTeam;
+    }
+
+    get exchangeGames(): localModels.ExchangeGameSet {
+        return this.wrappedExchangeGames;
+    }
+
+    get outcomes(): localModels.OutcomeSet {
+        return this.wrappedOutcomes;
+    }
+
+    get sqlGame(): databaseModels.Game {
+        if (!this.wrappedSqlGame) {
+            throw new Error(`${this.regionAbbrIdentifierAbbr}.sqlGame is null.`);
+        }
+
+        return this.wrappedSqlGame;
     }
 }

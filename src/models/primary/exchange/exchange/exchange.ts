@@ -10,7 +10,6 @@ export abstract class Exchange {
 
     protected wrappedExchangeGames: localModels.ExchangeGameSet;
     protected wrappedOdds: localModels.OddSet;
-
     protected abstract wrappedConnectionManager: ConnectionManager;
     private wrappedSqlExchange: databaseModels.Exchange | null;
 
@@ -35,7 +34,7 @@ export abstract class Exchange {
                 name: this.name,
             },
         }).then(async ([sqlExchange, created]) => {
-            this.sqlExchange = sqlExchange;
+            this.wrappedSqlExchange = sqlExchange;
         });
 
         return this.sqlExchange;
@@ -157,9 +156,5 @@ export abstract class Exchange {
         } 
         
         return this.wrappedSqlExchange;
-    }
-
-    set sqlExchange(sqlExchange: databaseModels.Exchange) {
-        this.wrappedSqlExchange = sqlExchange;
     }
 }
