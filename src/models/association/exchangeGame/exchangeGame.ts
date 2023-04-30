@@ -1,7 +1,7 @@
 import { ElementHandle } from 'puppeteer';
 
 import * as globalModels from '../../../global';
-import * as localModels from '../../../models';
+import * as localModels from '../..';
 
 export abstract class ExchangeGame {
     private wrappedExchange: localModels.Exchange | null = null;

@@ -5,7 +5,7 @@ import { sequelize } from '../../../database';
 
 import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
-import * as localModels from '../../../models';
+import * as localModels from '../..';
 
 export class Game {
     public startDate: Date;

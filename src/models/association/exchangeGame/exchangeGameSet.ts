@@ -1,4 +1,4 @@
-import * as localModels from '../../../models';
+import * as localModels from '../..';
 
 import { ExchangeGame } from './exchangeGame';
 
