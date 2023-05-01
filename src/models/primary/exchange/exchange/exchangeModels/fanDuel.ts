@@ -1,39 +1,20 @@
-import * as chrono from 'chrono-node';
-
+import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import { ConnectionManager } from '../connectionManager';
 import { Exchange } from '../exchange';
 import * as global from '../../../../../global';
-import * as models from '../../../..';
+import * as models from '../../../../../models';
 
 export class FanDuelExchange extends Exchange {
-    protected wrappedName: string = 'FanDuel';
-    protected wrappedUrl: string = 'https://sportsbook.fanduel.com/navigation/nba';
-    protected wrappedConnectionManager: ConnectionManager;
-
     constructor() {
-        super();
-        this.wrappedName = 'FanDuel';
-        this.wrappedUrl = 'https://sportsbook.fanduel.com/navigation/nba';
-        this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
+        super({
+            name: 'FanDuel',
+            url: 'https://sportsbook.fanduel.com/navigation/nba',
+        });
     }
 
     public async getGames(): Promise<models.GameSet> {
-        const gamesFromJson = await this.getGamesFromJson();
-        const gamesFromDocument = await this.getGamesFromDocument();
-
-        const games = new models.GameSet;
-
-        for (const gameFromJson of gamesFromJson) {
-            games.add(gameFromJson);
-        }
-
-        for (const gameFromDocument of gamesFromDocument) {
-            games.add(gameFromDocument);
-        }
-
-        return games;
+        return await this.getGamesFromDocument();
     }
 
     private async getGamesFromJson(): Promise<models.GameSet> {
@@ -197,7 +178,7 @@ export class FanDuelExchange extends Exchange {
         const regex = /(AM|PM).*$/i;
         const startDateStringClean = startDateStringDirty.replace(regex, '$1');
 
-        const startDate = chrono.parseDate(startDateStringClean);
+        const startDate = parseDate(startDateStringClean);
         return startDate;
     }
 }

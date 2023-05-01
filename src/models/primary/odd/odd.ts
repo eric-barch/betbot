@@ -198,14 +198,14 @@ export abstract class Odd {
                 value: value,
             },
         }).then(async ([sqlOdd, created]) => {
+            this.wrappedSqlOdd = sqlOdd;
+
             if (!created) {
-                await sqlOdd.update({
+                await this.updatePriceAndValue({
                     price: price,
                     value: value,
-                });
+                })
             }
-
-            this.wrappedSqlOdd = sqlOdd;
         });
 
         return this.sqlOdd;
@@ -354,6 +354,8 @@ export abstract class Odd {
                 endTime: this.sqlOdd.updatedAt,
                 oddId: oddId,
             });
+
+            console.log('New odd.');
         }
     }
 

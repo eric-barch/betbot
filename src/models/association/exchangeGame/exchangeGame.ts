@@ -4,10 +4,10 @@ import * as global from '../../../global';
 import * as models from '../../../models';
 
 export abstract class ExchangeGame {
-    private wrappedExchange: models.Exchange;
-    private wrappedGame: models.Game;
-    public wrappedExchangeGameAwayTeam: models.ExchangeGameTeam | null;
-    public wrappedExchangeGameHomeTeam: models.ExchangeGameTeam | null;
+    protected wrappedExchange: models.Exchange;
+    protected wrappedGame: models.Game;
+    protected wrappedExchangeGameAwayTeam: models.ExchangeGameTeam | null;
+    protected wrappedExchangeGameHomeTeam: models.ExchangeGameTeam | null;
 
     protected constructor({
         exchange,

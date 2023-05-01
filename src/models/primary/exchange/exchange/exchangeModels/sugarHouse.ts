@@ -1,21 +1,16 @@
-import * as chrono from 'chrono-node';
+import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
 import { Exchange } from '../exchange';
 import * as global from '../../../../../global';
-import * as models from '../../../..';
-import { ConnectionManager } from '../connectionManager';
+import * as models from '../../../../../models';
 
 export class SugarHouseExchange extends Exchange {
-    protected wrappedName: string;
-    protected wrappedUrl: string;
-    protected wrappedConnectionManager: ConnectionManager;
-
     constructor() {
-        super();
-        this.wrappedName = 'SugarHouse';
-        this.wrappedUrl = 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home';
-        this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
+        super({
+            name: 'SugarHouse',
+            url: 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home',
+        });
     }
 
     public async getGames(): Promise<models.GameSet> {
@@ -70,7 +65,7 @@ export class SugarHouseExchange extends Exchange {
         if (!startDateString) {
             startDate = new Date();
         } else {
-            startDate = chrono.parseDate(startDateString);
+            startDate = parseDate(startDateString);
         }
 
         return {

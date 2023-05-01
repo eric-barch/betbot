@@ -1,21 +1,16 @@
-import * as chrono from 'chrono-node';
+import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import * as models from '../../../..';
-import * as global from '../../../../../global';
 import { Exchange } from '../exchange';
-import { ConnectionManager } from '../connectionManager';
+import * as global from '../../../../../global';
+import * as models from '../../../../../models';
 
 export class DraftKingsExchange extends Exchange {
-    protected wrappedName: string;
-    protected wrappedUrl: string;
-    protected wrappedConnectionManager: ConnectionManager;
-
     constructor() {
-        super();
-        this.wrappedName = 'DraftKings';
-        this.wrappedUrl = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
-        this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
+        super({
+            name: 'DraftKings',
+            url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
+        });
     }
 
     /**base exchange class init method is overwritten because DK seems to need refreshing 
@@ -28,20 +23,7 @@ export class DraftKingsExchange extends Exchange {
     }
 
     public async getGames(): Promise<models.GameSet> {
-        const gamesFromJson = await this.getGamesFromJson();
-        const gamesFromDocument = await this.getGamesFromDocument();
-
-        const games = new models.GameSet;
-
-        for (const gameFromJson of gamesFromJson) {
-            games.add(gameFromJson);
-        }
-
-        for (const gameFromDocument of gamesFromDocument) {
-            games.add(gameFromDocument);
-        }
-
-        return games;
+        return await this.getGamesFromDocument();
     }
 
     private async getGamesFromJson(): Promise<models.GameSet> {
@@ -243,7 +225,7 @@ export class DraftKingsExchange extends Exchange {
         }
 
         const startDateString = `${dateString} ${timeString}`;
-        const startDate = chrono.parseDate(startDateString);
+        const startDate = parseDate(startDateString);
         return startDate;
     }
 
