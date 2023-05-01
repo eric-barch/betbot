@@ -1,8 +1,21 @@
 import { ElementHandle } from "puppeteer";
 
-import { ExchangeGame } from "../exchangeGame";
+import * as localModels from '../../../../models';
 
-export class DraftKingsExchangeGame extends ExchangeGame {
+export class DraftKingsExchangeGame extends localModels.ExchangeGame {
+    public constructor({
+        exchange,
+        game,
+    }: {
+        exchange: localModels.Exchange,
+        game: localModels.Game,
+    }) {
+        super({
+            exchange: exchange,
+            game: game,
+        });
+    }
+
     public async updateElement(): Promise<ElementHandle | null> {
         return null;
     }

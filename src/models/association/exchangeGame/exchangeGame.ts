@@ -1,16 +1,25 @@
 import { ElementHandle } from 'puppeteer';
 
 import * as globalModels from '../../../global';
-import * as localModels from '../..';
+import * as localModels from '../../../models';
 
 export abstract class ExchangeGame {
-    private wrappedExchange: localModels.Exchange | null = null;
-    private wrappedGame: localModels.Game | null = null;
+    private wrappedExchange: localModels.Exchange;
+    private wrappedGame: localModels.Game;
+    public wrappedExchangeGameAwayTeam: localModels.ExchangeGameTeam | null;
+    public wrappedExchangeGameHomeTeam: localModels.ExchangeGameTeam | null;
 
-    public wrappedExchangeGameAwayTeam: localModels.ExchangeGameTeam | null = null;
-    public wrappedExchangeGameHomeTeam: localModels.ExchangeGameTeam | null = null;;
-
-    public constructor() {        
+    protected constructor({
+        exchange,
+        game,
+    }: {
+        exchange: localModels.Exchange,
+        game: localModels.Game,
+    }) {
+        this.wrappedExchange = exchange;
+        this.wrappedGame = game;
+        this.wrappedExchangeGameAwayTeam = null;
+        this.wrappedExchangeGameHomeTeam = null;
         globalModels.allExchangeGames.add(this);
     }
 
@@ -23,26 +32,29 @@ export abstract class ExchangeGame {
     }) {
         let newExchangeGame;
 
-        switch (exchange.name) {
-            case 'DraftKings':
-                newExchangeGame = new localModels.DraftKingsExchangeGame();
+        switch (exchange) {
+            case globalModels.draftKingsExchange:
+                newExchangeGame = new localModels.DraftKingsExchangeGame({
+                    exchange: exchange,
+                    game: game,
+                });
                 break;
-            case 'FanDuel':
-                newExchangeGame = new localModels.FanDuelExchangeGame();
+            case globalModels.fanDuelExchange:
+                newExchangeGame = new localModels.FanDuelExchangeGame({
+                    exchange: exchange,
+                    game: game,
+                });
                 break;
-            case 'SugarHouse':
-                newExchangeGame = new localModels.SugarHouseExchangeGame();
+            case globalModels.sugarHouseExchange:
+                newExchangeGame = new localModels.SugarHouseExchangeGame({
+                    exchange: exchange,
+                    game: game,
+                });
                 break;
+            default:
+                throw new Error(`Did not find exchange.`);
         }
 
-        if (!newExchangeGame) {
-            throw new Error(`Did not find corresponding exchange game.`);
-        }
-
-        newExchangeGame.exchange = exchange;
-        newExchangeGame.game = game;
-
-        globalModels.allExchangeGames.add(newExchangeGame);
         return newExchangeGame;
     }
 
@@ -107,26 +119,20 @@ export abstract class ExchangeGame {
     abstract updateElement(): Promise<ElementHandle | null>;
 
     get exchange(): localModels.Exchange {
-        if (!this.wrappedExchange) {
-            throw new Error(`Exchange is null.`);
-        }
-
         return this.wrappedExchange;
     }
 
+    /**TODO: Is this used? */
     set exchange(exchange: localModels.Exchange) {
         this.wrappedExchange = exchange;
         exchange.exchangeGames.add(this);
     }
 
     get game(): localModels.Game {
-        if (!this.wrappedGame) {
-            throw new Error(`Game is null.`);
-        }
-
         return this.wrappedGame;
     }
     
+    /**TODO: Is this used? */
     set game(game: localModels.Game) {
         this.wrappedGame = game;
         game.exchangeGames.add(this);
