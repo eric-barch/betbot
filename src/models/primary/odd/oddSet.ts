@@ -1,15 +1,14 @@
-import * as localModels from '../..';
-
 import { Odd } from "./odd";
+import * as models from '../../../models';
 
 export class OddSet extends Set<Odd> {
     public find({
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
-    }): Odd | null {
+        exchange: models.Exchange,
+        outcome: models.Outcome,
+    }): Odd {
         for (const odd of this) {
             if (odd.matches({
                 exchange: exchange,
@@ -19,45 +18,47 @@ export class OddSet extends Set<Odd> {
             }
         }
 
-        return null;
+        throw new Error(`Did not find odd.`);
     }
 
     public async findOrCreate({
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
     }): Promise<Odd> {
-        const foundOdd = this.find({
-            exchange: exchange,
-            outcome: outcome,
-        });
+        let odd;
 
-        if (foundOdd) {
-            return foundOdd;
+        try {
+            odd = this.find({
+                exchange: exchange,
+                outcome: outcome,
+            });
+        } catch {
+            odd = await Odd.create({
+                exchange: exchange,
+                outcome: outcome,
+            });
         }
 
-        const newOdd = await Odd.create({
-            exchange: exchange,
-            outcome: outcome,
-        });
-        
-        this.add(newOdd);
-        return newOdd;
+        this.add(odd);
+        return odd;
     }
 
-    public async updateElements() {
+    public async getElements(): Promise<OddSet> {
         for (const odd of this) {
-            await odd.updateElements();
+            await odd.getElements();
         }
 
         return this;
     }
 
-    public async updateValues() {
+    public async getValues(): Promise<OddSet> {
         for (const odd of this) {
-            await odd.updateValues();
+            await odd.getValues();
         }
+
+        return this;
     }
 }

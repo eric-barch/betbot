@@ -1,43 +1,56 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as globalModels from '../../../../global';
-import * as localModels from '../../..';
+import * as global from '../../../../global';
+import * as models from '../../..';
 
 import { Odd } from '../odd';
 
 abstract class SugarHouseOdd extends Odd {
-    private exchangeGame: localModels.SugarHouseExchangeGame;
+    protected abstract priceElementXPathFromExchangeGame: string;
+    protected abstract valueElementXPathFromExchangeGame: string | null;
+    private exchangeGame: models.SugarHouseExchangeGame;
 
     constructor({
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
     }) {
         super({
             exchange: exchange,
             outcome: outcome,
         });
-        const game = this.outcome.game;
 
-        const exchangeGame = globalModels.allExchangeGames.find({
+        const exchangeGame = global.allExchangeGames.find({
             exchange: exchange,
-            game: game,
+            game: outcome.game,
         });
 
         if (!exchangeGame) {
             throw new Error(`Did not find ExchangeGame.`);
         }
 
-        if (!(exchangeGame instanceof localModels.SugarHouseExchangeGame)) {
+        if (!(exchangeGame instanceof models.SugarHouseExchangeGame)) {
             throw new Error(`Expected SugarHouseExchangeGame.`);
         }
 
         this.exchangeGame = exchangeGame;
     }
 
-    async updateElement(xPath: string): Promise<ElementHandle | null> {
+    protected async getPriceElement(): Promise<ElementHandle | null> {
+        const priceElement = await this.getElement(this.priceElementXPathFromExchangeGame);
+        this.priceElement = priceElement;
+        return priceElement;
+    }
+
+    protected async getValueElement(): Promise<ElementHandle | null> {
+        const valueElement = await this.getElement(this.valueElementXPathFromExchangeGame);
+        this.valueElement = valueElement;
+        return valueElement;
+    }
+
+    private async getElement(xPathFromExchangeGame: string | null): Promise<ElementHandle | null> {
         const exchangeGameElement = this.exchangeGame.element;
 
         if (!exchangeGameElement) {
@@ -45,7 +58,7 @@ abstract class SugarHouseOdd extends Odd {
         }
 
         const className = await (await exchangeGameElement.getProperty('className')).jsonValue();
-        const oddElement = await exchangeGameElement.$(`xpath/${xPath}`);
+        const oddElement = await exchangeGameElement.$(`xpath/${xPathFromExchangeGame}`);
 
         if (!oddElement) {
             return null;
@@ -56,31 +69,31 @@ abstract class SugarHouseOdd extends Odd {
 }
 
 export class SugarHouseSpreadAway extends SugarHouseOdd {
-    public priceElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[1]/div[1]/button/div[2]/ul/li';
-    public valueElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[1]/div[1]/button/div[1]';
+    protected priceElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[1]/div[1]/button/div[2]/ul/li';
+    protected valueElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[1]/div[1]/button/div[1]';
 }
 
 export class SugarHouseSpreadHome extends SugarHouseOdd {
-    public priceElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[1]/div[2]/button/div[2]/ul/li';
-    public valueElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[1]/div[2]/button/div[1]';
+    protected priceElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[1]/div[2]/button/div[2]/ul/li';
+    protected valueElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[1]/div[2]/button/div[1]';
 }
 
 export class SugarHouseMoneylineAway extends SugarHouseOdd {
-    public priceElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[2]/div[1]/button/div/ul/li';
-    public valueElementXPath: null = null;
+    protected priceElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[2]/div[1]/button/div/ul/li';
+    protected valueElementXPathFromExchangeGame: null = null;
 }
 
 export class SugarHouseMoneylineHome extends SugarHouseOdd {
-    public priceElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[2]/div[2]/button/div/ul/li';
-    public valueElementXPath: null = null;
+    protected priceElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[2]/div[2]/button/div/ul/li';
+    protected valueElementXPathFromExchangeGame: null = null;
 }
 
 export class SugarHouseTotalOver extends SugarHouseOdd {
-    public priceElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[3]/div[1]/button/div[2]/ul/li';
-    public valueElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[3]/div[1]/button/div[1]';
+    protected priceElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[3]/div[1]/button/div[2]/ul/li';
+    protected valueElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[3]/div[1]/button/div[1]';
 }
 
 export class SugarHouseTotalUnder extends SugarHouseOdd {
-    public priceElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[3]/div[2]/button/div[2]/ul/li';
-    public valueElementXPath: string = 'div/div/div/div[1]/div[4]/div/div[3]/div[2]/button/div[1]';
+    protected priceElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[3]/div[2]/button/div[2]/ul/li';
+    protected valueElementXPathFromExchangeGame: string = 'div/div/div/div[1]/div[4]/div/div[3]/div[2]/button/div[1]';
 }

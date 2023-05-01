@@ -1,9 +1,27 @@
 import { ElementHandle } from "puppeteer";
 
-import { ExchangeGameTeam } from "../exchangeGameTeam";
+import { ExchangeGameTeam } from '../exchangeGameTeam';
+import * as models from '../../../../models';
 
 export abstract class DraftKingsExchangeGameTeam extends ExchangeGameTeam {
-    public element: ElementHandle | null = null;
+    public element: ElementHandle | null;
+
+    public constructor({
+        exchange,
+        game,
+        team,
+    }: {
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
+    }) {
+        super({
+            exchange: exchange,
+            game: game,
+            team: team,
+        });
+        this.element = null;
+    }
 
     public async getTeamRowElements(): Promise<{
         awayTeamRowElement: ElementHandle,

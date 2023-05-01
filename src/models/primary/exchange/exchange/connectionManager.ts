@@ -1,10 +1,10 @@
 import { Browser, Page, connect } from 'puppeteer';
+
 import { Exchange } from './exchange';
 
 export class ConnectionManager {
     public url: string;
     private wrappedExchange: Exchange;
-
     private wrappedBrowser: Browser | null;
     private wrappedPage: Page | null;
 
@@ -26,25 +26,7 @@ export class ConnectionManager {
     }
 
     public async connectToBrowser(): Promise<Browser> {
-        try {
-            this.browser = await connect({ browserURL: 'http://127.0.0.1:9222' });
-        } catch {
-            throw new Error(`Browser is not open with debugging enabled.`);
-            // const chromeExecutablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google\ Chrome';
-
-            // const browser = await launch({
-            //     headless: false,
-            //     executablePath: chromeExecutablePath,
-            //     args: [
-            //         '--remote-debugging-port=9222',
-            //         '--no-first-run',
-            //         '--no-default-browser-check',
-            //     ]
-            // });
-
-            // this.browser = browser;
-        }
-
+        this.wrappedBrowser = await connect({ browserURL: 'http://127.0.0.1:9222' });
         return this.browser;
     }
 
@@ -79,14 +61,14 @@ export class ConnectionManager {
             };
         });
 
-        this.page = targetPage;
+        this.wrappedPage = targetPage;
         this.page.setViewport(windowSize);
 
         return this.page;
     }
 
     private async connectToNewPage(): Promise<Page> {
-        this.page = await this.browser.newPage();
+        this.wrappedPage = await this.browser.newPage();
         await this.page.goto(this.url);
 
         const windowSize = await this.page.evaluate(() => {
@@ -117,19 +99,11 @@ export class ConnectionManager {
         return this.wrappedBrowser;
     }
 
-    set browser(browser: Browser) {
-        this.wrappedBrowser = browser;
-    }
-
     get page(): Page {
         if (!this.wrappedPage) {
             throw new Error(`${this.exchange.name} page is null.`);
         }
         
         return this.wrappedPage;
-    }
-
-    set page(page: Page) {
-        this.wrappedPage = page;
     }
 }

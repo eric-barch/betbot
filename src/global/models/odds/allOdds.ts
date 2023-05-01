@@ -1,10 +1,10 @@
 import { allExchanges } from '../exchanges/allExchanges';
-import * as localModels from '../../../models';
+import * as models from '../../../models';
 
-class AllOdds extends localModels.OddSet {
+class AllOdds extends models.OddSet {
     public async init() {
         for (const exchange of allExchanges) {
-            await exchange.initOdds();
+            await exchange.updateOdds();
         }
     }
 }

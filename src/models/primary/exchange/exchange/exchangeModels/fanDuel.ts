@@ -4,26 +4,26 @@ import { ElementHandle } from 'puppeteer';
 
 import { ConnectionManager } from '../connectionManager';
 import { Exchange } from '../exchange';
-import * as globalModels from '../../../../../global';
-import * as localModels from '../../../..';
+import * as global from '../../../../../global';
+import * as models from '../../../..';
 
 export class FanDuelExchange extends Exchange {
-    public name: string = 'FanDuel';
-    public url: string = 'https://sportsbook.fanduel.com/navigation/nba';
+    protected wrappedName: string = 'FanDuel';
+    protected wrappedUrl: string = 'https://sportsbook.fanduel.com/navigation/nba';
     protected wrappedConnectionManager: ConnectionManager;
 
     constructor() {
         super();
-        this.name = 'FanDuel';
-        this.url = 'https://sportsbook.fanduel.com/navigation/nba';
+        this.wrappedName = 'FanDuel';
+        this.wrappedUrl = 'https://sportsbook.fanduel.com/navigation/nba';
         this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
     }
 
-    public async getGames(): Promise<localModels.GameSet> {
+    public async getGames(): Promise<models.GameSet> {
         const gamesFromJson = await this.getGamesFromJson();
         const gamesFromDocument = await this.getGamesFromDocument();
 
-        const games = new localModels.GameSet;
+        const games = new models.GameSet;
 
         for (const gameFromJson of gamesFromJson) {
             games.add(gameFromJson);
@@ -36,7 +36,7 @@ export class FanDuelExchange extends Exchange {
         return games;
     }
 
-    private async getGamesFromJson(): Promise<localModels.GameSet> {
+    private async getGamesFromJson(): Promise<models.GameSet> {
         const jsonGames = await this.scrapeJsonGames();
         const games = await this.parseJsonGames(jsonGames);
         return games;
@@ -59,18 +59,18 @@ export class FanDuelExchange extends Exchange {
         return jsonGames;
     }
 
-    private async parseJsonGames(jsonGames: Array<any>): Promise<localModels.GameSet> {
-        const games = new localModels.GameSet;
+    private async parseJsonGames(jsonGames: Array<any>): Promise<models.GameSet> {
+        const games = new models.GameSet;
 
         for (const jsonGame of jsonGames) {
             const awayTeamName = jsonGame.awayTeam.name;
             const homeTeamName = jsonGame.homeTeam.name;
 
-            const awayTeam = globalModels.allTeams.find({ name: awayTeamName });
-            const homeTeam = globalModels.allTeams.find({ name: homeTeamName });
+            const awayTeam = global.allTeams.find({ name: awayTeamName });
+            const homeTeam = global.allTeams.find({ name: homeTeamName });
             const startDate = new Date(jsonGame.startDate);
 
-            const game = await globalModels.allGames.findOrCreate({
+            const game = await global.allGames.findOrCreate({
                 awayTeam: awayTeam,
                 homeTeam: homeTeam,
                 startDate: startDate,
@@ -84,8 +84,8 @@ export class FanDuelExchange extends Exchange {
         return games;
     }
 
-    private async getGamesFromDocument(): Promise<localModels.GameSet> {
-        const games = new localModels.GameSet;
+    private async getGamesFromDocument(): Promise<models.GameSet> {
+        const games = new models.GameSet;
 
         const gameLinkElements = await this.getGameLinkElements();
 
@@ -98,7 +98,7 @@ export class FanDuelExchange extends Exchange {
 
             const startDate = await this.getStartDate(gameLinkElement);
 
-            const game = await globalModels.allGames.findOrCreate({
+            const game = await global.allGames.findOrCreate({
                 awayTeam: gameTeams.awayTeam,
                 homeTeam: gameTeams.homeTeam,
                 startDate: startDate,
@@ -113,7 +113,7 @@ export class FanDuelExchange extends Exchange {
     }
 
     private async getGameLinkElements() {
-        const teamArray = Array.from(globalModels.allTeams);
+        const teamArray = Array.from(global.allTeams);
         const teamIdentifiers = teamArray.map(team => team.identifierFull.toLowerCase());
         const teamIdentifiersJoined = teamIdentifiers.join(`|`);
 
@@ -142,12 +142,12 @@ export class FanDuelExchange extends Exchange {
     }
 
     private async getGameTeams(gameLinkElement: ElementHandle<HTMLAnchorElement>): Promise<{
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
     } | null> {
         const title = await (await gameLinkElement.getProperty('title')).jsonValue();
 
-        const teamArray = Array.from(globalModels.allTeams);
+        const teamArray = Array.from(global.allTeams);
         const teamIdentifiers = teamArray.map(team => team.identifierFull.toLowerCase());
         const teamIdentifiersJoined = teamIdentifiers.join(`|`);
 
@@ -166,8 +166,8 @@ export class FanDuelExchange extends Exchange {
         const awayTeamIdentifier = allMatches[0];
         const homeTeamIdentifier = allMatches[1];
 
-        const awayTeam = globalModels.allTeams.find({ name: awayTeamIdentifier });
-        const homeTeam = globalModels.allTeams.find({ name: homeTeamIdentifier });
+        const awayTeam = global.allTeams.find({ name: awayTeamIdentifier });
+        const homeTeam = global.allTeams.find({ name: homeTeamIdentifier });
 
         return {
             awayTeam: awayTeam,

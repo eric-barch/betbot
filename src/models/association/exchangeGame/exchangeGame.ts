@@ -1,54 +1,69 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as globalModels from '../../../global';
-import * as localModels from '../..';
+import * as global from '../../../global';
+import * as models from '../../../models';
 
 export abstract class ExchangeGame {
-    private wrappedExchange: localModels.Exchange | null = null;
-    private wrappedGame: localModels.Game | null = null;
+    private wrappedExchange: models.Exchange;
+    private wrappedGame: models.Game;
+    public wrappedExchangeGameAwayTeam: models.ExchangeGameTeam | null;
+    public wrappedExchangeGameHomeTeam: models.ExchangeGameTeam | null;
 
-    public wrappedExchangeGameAwayTeam: localModels.ExchangeGameTeam | null = null;
-    public wrappedExchangeGameHomeTeam: localModels.ExchangeGameTeam | null = null;;
+    protected constructor({
+        exchange,
+        game,
+    }: {
+        exchange: models.Exchange,
+        game: models.Game,
+    }) {
+        this.wrappedExchange = exchange;
+        this.wrappedGame = game;
+        this.wrappedExchangeGameAwayTeam = null;
+        this.wrappedExchangeGameHomeTeam = null;
 
-    public constructor() {        
-        globalModels.allExchangeGames.add(this);
+        exchange.exchangeGames.add(this);
+        game.exchangeGames.add(this);
+        global.allExchangeGames.add(this);
     }
 
     static async create({
         exchange,
         game,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
+        exchange: models.Exchange,
+        game: models.Game,
     }) {
         let newExchangeGame;
 
-        switch (exchange.name) {
-            case 'DraftKings':
-                newExchangeGame = new localModels.DraftKingsExchangeGame();
+        switch (exchange) {
+            case global.draftKingsExchange:
+                newExchangeGame = new models.DraftKingsExchangeGame({
+                    exchange: exchange,
+                    game: game,
+                });
                 break;
-            case 'FanDuel':
-                newExchangeGame = new localModels.FanDuelExchangeGame();
+            case global.fanDuelExchange:
+                newExchangeGame = new models.FanDuelExchangeGame({
+                    exchange: exchange,
+                    game: game,
+                });
                 break;
-            case 'SugarHouse':
-                newExchangeGame = new localModels.SugarHouseExchangeGame();
+            case global.sugarHouseExchange:
+                newExchangeGame = new models.SugarHouseExchangeGame({
+                    exchange: exchange,
+                    game: game,
+                });
                 break;
+            default:
+                throw new Error(`Did not find exchange.`);
         }
 
-        if (!newExchangeGame) {
-            throw new Error(`Did not find corresponding exchange game.`);
-        }
-
-        newExchangeGame.exchange = exchange;
-        newExchangeGame.game = game;
-
-        globalModels.allExchangeGames.add(newExchangeGame);
         return newExchangeGame;
     }
 
     public async updateExchangeGameTeams(): Promise<{
-        exchangeGameAwayTeam: localModels.ExchangeGameTeam,
-        exchangeGameHomeTeam: localModels.ExchangeGameTeam,
+        exchangeGameAwayTeam: models.ExchangeGameTeam,
+        exchangeGameHomeTeam: models.ExchangeGameTeam,
     }> {
         const exchangeGameAwayTeam = await this.updateExchangeGameAwayTeam();
         const exchangeGameHomeTeam = await this.updateExchangeGameHomeTeam();
@@ -59,12 +74,12 @@ export abstract class ExchangeGame {
         };
     }
 
-    public async updateExchangeGameAwayTeam(): Promise<localModels.ExchangeGameTeam> {
+    public async updateExchangeGameAwayTeam(): Promise<models.ExchangeGameTeam> {
         const exchange = this.exchange;
         const game = this.game;
         const team = game.awayTeam;
 
-        const requestedExchangeGameTeam = await globalModels.allExchangeGameTeams.findOrCreate({
+        const requestedExchangeGameTeam = await global.allExchangeGameTeams.findOrCreate({
             exchange: exchange,
             game: game,
             team: team,
@@ -73,12 +88,12 @@ export abstract class ExchangeGame {
         return requestedExchangeGameTeam;
     }
 
-    public async updateExchangeGameHomeTeam(): Promise<localModels.ExchangeGameTeam> {
+    public async updateExchangeGameHomeTeam(): Promise<models.ExchangeGameTeam> {
         const exchange = this.exchange;
         const game = this.game;
         const team = game.homeTeam;
 
-        const requestedExchangeGameTeam = await globalModels.allExchangeGameTeams.findOrCreate({
+        const requestedExchangeGameTeam = await global.allExchangeGameTeams.findOrCreate({
             exchange: exchange,
             game: game,
             team: team,
@@ -91,8 +106,8 @@ export abstract class ExchangeGame {
         exchange,
         game,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
+        exchange: models.Exchange,
+        game: models.Game,
     }): boolean {
         const exchangeMatches = (this.exchange === exchange);
         const gameMatches = (this.game === game);
@@ -106,33 +121,15 @@ export abstract class ExchangeGame {
 
     abstract updateElement(): Promise<ElementHandle | null>;
 
-    get exchange(): localModels.Exchange {
-        if (!this.wrappedExchange) {
-            throw new Error(`Exchange is null.`);
-        }
-
+    get exchange(): models.Exchange {
         return this.wrappedExchange;
     }
 
-    set exchange(exchange: localModels.Exchange) {
-        this.wrappedExchange = exchange;
-        exchange.exchangeGames.add(this);
-    }
-
-    get game(): localModels.Game {
-        if (!this.wrappedGame) {
-            throw new Error(`Game is null.`);
-        }
-
+    get game(): models.Game {
         return this.wrappedGame;
     }
-    
-    set game(game: localModels.Game) {
-        this.wrappedGame = game;
-        game.exchangeGames.add(this);
-    }
 
-    get exchangeGameAwayTeam(): localModels.ExchangeGameTeam {
+    get exchangeGameAwayTeam(): models.ExchangeGameTeam {
         if (!this.wrappedExchangeGameAwayTeam) {
             throw new Error(`ExchangeGameAwayTeam is null.`);
         }
@@ -140,11 +137,11 @@ export abstract class ExchangeGame {
         return this.wrappedExchangeGameAwayTeam;
     }
 
-    set exchangeGameAwayTeam(exchangeGameAwayTeam: localModels.ExchangeGameTeam | null) {
+    set exchangeGameAwayTeam(exchangeGameAwayTeam: models.ExchangeGameTeam | null) {
         this.wrappedExchangeGameAwayTeam = exchangeGameAwayTeam;
     }
 
-    get exchangeGameHomeTeam(): localModels.ExchangeGameTeam {
+    get exchangeGameHomeTeam(): models.ExchangeGameTeam {
         if (!this.wrappedExchangeGameHomeTeam) {
             throw new Error(`ExchangeGameHomeTeam is null.`);
         }
@@ -152,7 +149,7 @@ export abstract class ExchangeGame {
         return this.wrappedExchangeGameHomeTeam;
     }
 
-    set exchangeGameHomeTeam(exchangeGameHomeTeam: localModels.ExchangeGameTeam | null) {
+    set exchangeGameHomeTeam(exchangeGameHomeTeam: models.ExchangeGameTeam | null) {
         this.wrappedExchangeGameHomeTeam = exchangeGameHomeTeam;
     }
 }

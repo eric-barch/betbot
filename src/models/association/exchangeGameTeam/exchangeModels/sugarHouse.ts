@@ -1,16 +1,25 @@
 import { ElementHandle } from "puppeteer";
 
-import { ExchangeGameTeam } from "../exchangeGameTeam";
+import { ExchangeGameTeam } from '../exchangeGameTeam';
+import * as models from '../../../../models';
 
-import * as localModels from '../../..';
-
-export class SugarHouseExchangeGameAwayTeam extends ExchangeGameTeam {
-    public async updateElement(): Promise<ElementHandle | null> {
-        return null;
+export class SugarHouseExchangeGameTeam extends ExchangeGameTeam {
+    constructor({
+        exchange,
+        game,
+        team,
+    }: {
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
+    }) {
+        super({
+            exchange: exchange,
+            game: game,
+            team: team,
+        });
     }
-}
 
-export class SugarHouseExchangeGameHomeTeam extends ExchangeGameTeam {
     public async updateElement(): Promise<ElementHandle | null> {
         return null;
     }

@@ -1,15 +1,14 @@
-import * as localModels from '../..';
-
 import { ExchangeGame } from './exchangeGame';
+import * as models from '../../../models';
 
 export class ExchangeGameSet extends Set<ExchangeGame> {
     public find({
         exchange,
         game,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
-    }): ExchangeGame | null {
+        exchange: models.Exchange,
+        game: models.Game,
+    }): ExchangeGame {
         for (const exchangeGame of this) {
             if (exchangeGame.matches({
                 exchange: exchange,
@@ -19,32 +18,32 @@ export class ExchangeGameSet extends Set<ExchangeGame> {
             }
         }
 
-        return null;
+        throw new Error(`Did not find exchangeGame.`);
     }
 
     public async findOrCreate({
         exchange,
         game,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
+        exchange: models.Exchange,
+        game: models.Game,
     }): Promise<ExchangeGame> {
-        const foundExchangeGame = this.find({
-            exchange: exchange,
-            game: game,
-        });
+        let exchangeGame;
 
-        if (foundExchangeGame) {
-            return foundExchangeGame;
+        try {
+            exchangeGame = this.find({
+                exchange: exchange,
+                game: game,
+            });
+        } catch {
+            exchangeGame = await ExchangeGame.create({
+                exchange: exchange,
+                game: game,
+            });
         }
 
-        const newExchangeGame = await ExchangeGame.create({
-            exchange: exchange,
-            game: game,
-        });
-
-        this.add(newExchangeGame);
-        return newExchangeGame;
+        this.add(exchangeGame);
+        return exchangeGame;
     }
 
     public async updateElements(): Promise<ExchangeGameSet> {

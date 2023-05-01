@@ -1,13 +1,11 @@
-import * as databaseModels from '../../../database';
+import * as database from '../../../database';
 
 export class Team {
-    // public properties
-    public regionFull: string;
-    public regionAbbr: string;
-    public identifierFull: string;
-    public identifierAbbr: string;
-
-    private wrappedSqlTeam: databaseModels.Team | null;
+    private wrappedRegionFull: string;
+    private wrappedRegionAbbr: string;
+    private wrappedIdentifierFull: string;
+    private wrappedIdentifierAbbr: string;
+    private wrappedSqlTeam: database.Team | null;
     
     public constructor({
         regionFull,
@@ -20,20 +18,21 @@ export class Team {
         identifierFull: string,
         identifierAbbr: string,
     }) {
-        this.regionFull = regionFull;
-        this.regionAbbr = regionAbbr;
-        this.identifierFull = identifierFull;
-        this.identifierAbbr = identifierAbbr;
+        this.wrappedRegionFull = regionFull;
+        this.wrappedRegionAbbr = regionAbbr;
+        this.wrappedIdentifierFull = identifierFull;
+        this.wrappedIdentifierAbbr = identifierAbbr;
 
         this.wrappedSqlTeam = null;
     }
 
-    public async init() {
+    public async init(): Promise<Team> {
         await this.initSqlTeam();
+        return this;
     }
 
-    private async initSqlTeam(): Promise<databaseModels.Team> {
-        await databaseModels.Team.findOrCreate({
+    private async initSqlTeam(): Promise<database.Team> {
+        await database.Team.findOrCreate({
             where: {
                 regionFull: this.regionFull,
                 identifierFull: this.identifierFull,
@@ -52,31 +51,43 @@ export class Team {
                 });
             }
 
-            this.sqlTeam = sqlTeam;
+            this.wrappedSqlTeam = sqlTeam;
         });
 
         return this.sqlTeam;
     }
 
-    // public instance methods
-    // TODO: Can make this better/simpler
     public matches({
         name,
     }: {
         name: string,
     }): boolean {
-        if (
-            name.includes(this.regionFullIdentifierFull)||
-            name.includes(this.regionAbbrIdentifierFull) ||
-            name.includes(this.regionAbbrIdentifierAbbr)
-        ) {
+        const nameLowerCase = name.toLowerCase();
+        const identifierFullLowerCase = this.wrappedIdentifierFull.toLowerCase();
+
+        if (nameLowerCase.includes(identifierFullLowerCase)) {
             return true;
         }
         
         return false;
     }
 
-    // getters and setters
+    get regionFull(): string {
+        return this.wrappedRegionFull;
+    }
+
+    get regionAbbr(): string {
+        return this.wrappedRegionAbbr;
+    }
+
+    get identifierFull(): string {
+        return this.wrappedIdentifierFull;
+    }
+
+    get identifierAbbr(): string {
+        return this.wrappedIdentifierAbbr;
+    }
+
     get regionFullIdentifierFull(): string {
         const regionFullIdentifierFull = `${this.regionFull} ${this.identifierFull}`;
         return regionFullIdentifierFull;
@@ -92,15 +103,11 @@ export class Team {
         return regionAbbrIdentifierAbbr;
     }
 
-    get sqlTeam(): databaseModels.Team {
+    get sqlTeam(): database.Team {
         if (!this.wrappedSqlTeam) {
             throw new Error(`${this.regionFullIdentifierFull} sqlTeamj is null.`);
         }
 
         return this.wrappedSqlTeam;
-    }
-
-    set sqlTeam(sqlTeam: databaseModels.Team) {
-        this.wrappedSqlTeam = sqlTeam;
     }
 }

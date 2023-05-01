@@ -1,9 +1,25 @@
-import { ElementHandle } from "puppeteer";
+import { ElementHandle } from 'puppeteer';
 
-import { ExchangeGame } from "../exchangeGame";
+import { ExchangeGame } from '../exchangeGame';
+import * as models from '../../../../models';
 
 export class FanDuelExchangeGame extends ExchangeGame {
-    public element: ElementHandle | null = null;
+    public element: ElementHandle | null;
+
+    constructor({
+        exchange,
+        game,
+    }: {
+        exchange: models.Exchange,
+        game: models.Game,
+    }) {
+        super({
+            exchange: exchange,
+            game: game,
+        });
+
+        this.element = null;
+    }
 
     public async updateElement(): Promise<ElementHandle | null> {
         const exchange = this.exchange;

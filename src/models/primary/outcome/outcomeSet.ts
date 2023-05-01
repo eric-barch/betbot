@@ -1,21 +1,20 @@
-import * as localModels from '../..';
-
 import { Outcome } from './outcome';
+import * as models from '../../../models';
 
 export class OutcomeSet extends Set<Outcome> {
     public find({
         game,
-        name,
+        type,
         oppositeOutcome,
     }: {
-        game: localModels.Game,
-        name: string,
+        game: models.Game,
+        type: models.OutcomeType,
         oppositeOutcome?: Outcome,
-    }): Outcome | null {
+    }): Outcome {
         for (const outcome of this) {
             if (outcome.matches({
                 game: game,
-                name: name,
+                type: type,
             })) {
                 if (oppositeOutcome) {
                     outcome.oppositeOutcome = oppositeOutcome;
@@ -25,37 +24,35 @@ export class OutcomeSet extends Set<Outcome> {
             }
         }
 
-        return null;
+        throw new Error(`Did not find outcome.`);
     }
 
     public async findOrCreate({
         game,
-        name,
-        team,
+        type,
         oppositeOutcome,
     }: {
-        game: localModels.Game,
-        name: string,
-        team: localModels.Team,
+        game: models.Game,
+        type: models.OutcomeType,
         oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
-        const foundOutcome = this.find({
-            game: game,
-            name: name,
-            oppositeOutcome: oppositeOutcome,
-        })
+        let outcome;
 
-        if (foundOutcome) {
-            return foundOutcome;
+        try {
+            outcome = this.find({
+                game: game,
+                type: type,
+                oppositeOutcome: oppositeOutcome,
+            });
+        } catch {
+            outcome = await Outcome.create({
+                game: game,
+                type: type,
+                oppositeOutcome: oppositeOutcome,
+            });
         }
 
-        const newOutcome = await Outcome.create({
-            game: game,
-            name: name,
-            team: team,
-            oppositeOutcome: oppositeOutcome,
-        });
-
-        return newOutcome;
+        this.add(outcome);
+        return outcome;
     }
 }

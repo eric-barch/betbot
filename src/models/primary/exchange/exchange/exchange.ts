@@ -1,22 +1,20 @@
 import { ConnectionManager } from './connectionManager';
 
-import * as databaseModels from '../../../../database';
-import * as globalModels from '../../../../global';
-import * as localModels from '../../..';
+import * as database from '../../../../database';
+import * as global from '../../../../global';
+import * as models from '../../../../models';
 
 export abstract class Exchange {
-    public abstract name: string;
-    public abstract url: string;
-
-    protected wrappedExchangeGames: localModels.ExchangeGameSet;
-    protected wrappedOdds: localModels.OddSet;
-
+    protected abstract wrappedName: string;
+    protected abstract wrappedUrl: string;
+    protected wrappedExchangeGames: models.ExchangeGameSet;
+    protected wrappedOdds: models.OddSet;
     protected abstract wrappedConnectionManager: ConnectionManager;
-    private wrappedSqlExchange: databaseModels.Exchange | null;
+    private wrappedSqlExchange: database.Exchange | null;
 
     public constructor() {
-        this.wrappedExchangeGames = new localModels.ExchangeGameSet();
-        this.wrappedOdds = new localModels.OddSet();
+        this.wrappedExchangeGames = new models.ExchangeGameSet();
+        this.wrappedOdds = new models.OddSet();
         this.wrappedSqlExchange = null;
     }
 
@@ -26,8 +24,8 @@ export abstract class Exchange {
         return this;
     }
 
-    protected async initSqlExchange(): Promise<databaseModels.Exchange> {
-        await databaseModels.Exchange.findOrCreate({
+    protected async initSqlExchange(): Promise<database.Exchange> {
+        await database.Exchange.findOrCreate({
             where: {
                 name: this.name,
             },
@@ -35,21 +33,18 @@ export abstract class Exchange {
                 name: this.name,
             },
         }).then(async ([sqlExchange, created]) => {
-            if (!created) {
-                
-            }
-
-            this.sqlExchange = sqlExchange;
+            this.wrappedSqlExchange = sqlExchange;
         });
 
         return this.sqlExchange;
     }
 
-    abstract getGames(): Promise<localModels.GameSet>;
+    abstract getGames(): Promise<models.GameSet>;
 
-    public async updateExchangeGames(): Promise<localModels.ExchangeGameSet | null> {
+    public async updateExchangeGames(): Promise<models.ExchangeGameSet> {
         const games = await this.getGames();
 
+        /**TODO: is there a more efficient way to do this? */
         for (const game of games) {
             this.exchangeGames.findOrCreate({
                 exchange: this,
@@ -66,72 +61,72 @@ export abstract class Exchange {
         return this.exchangeGames;
     }
 
-    /**TODO: only method that still needs to be refactored. ideally do not create odd until it 
-     * is found on the page (or it is determined that it is not on the page, in which case it would
-     * get null).
-    */
-    public async initOdds() {
+    public async updateOdds(): Promise<models.OddSet> {
         for (const exchangeGame of this.exchangeGames) {
-            const spreadAway = await globalModels.allOutcomes.findOrCreate({
+            const spreadAway = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                name: 'spread_away',
-                team: exchangeGame.game.awayTeam,
+                type: models.OutcomeType.SpreadAway,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: spreadAway,
             });
 
-            const spreadHome = await globalModels.allOutcomes.findOrCreate({
+            const spreadHome = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                name: 'spread_home',
-                team: exchangeGame.game.homeTeam,
+                type: models.OutcomeType.SpreadHome,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: spreadHome,
             });
 
-            const moneylineAway = await globalModels.allOutcomes.findOrCreate({
+            const moneylineAway = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                name: 'moneyline_away',
-                team: exchangeGame.game.awayTeam,
+                type: models.OutcomeType.MoneylineAway,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: moneylineAway,
             });
 
-            const moneylineHome = await globalModels.allOutcomes.findOrCreate({
+            const moneylineHome = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                name: 'moneyline_home',
-                team: exchangeGame.game.homeTeam,
+                type: models.OutcomeType.MoneylineHome,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: moneylineHome,
             });
 
-            const totalOver = await globalModels.allOutcomes.findOrCreate({
+            const totalOver = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                name: 'total_over',
-                team: exchangeGame.game.awayTeam,
+                type: models.OutcomeType.TotalOver,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: totalOver,
             });
 
-            const totalUnder = await globalModels.allOutcomes.findOrCreate({
+            const totalUnder = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                name: 'total_under',
-                team: exchangeGame.game.homeTeam,
+                type: models.OutcomeType.TotalUnder,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: totalUnder,
             });
         }
+
+        return this.odds;
+    }
+
+    get name(): string {
+        return this.wrappedName;
+    }
+
+    get url(): string {
+        return this.wrappedUrl;
     }
 
     get nameStripped(): string {
@@ -144,19 +139,11 @@ export abstract class Exchange {
         return firstCharLower;
     }
 
-    get exchangeGames() {
-        if (!this.wrappedExchangeGames) {
-            throw new Error(`wrappedExchangeGames is null.`);
-        }
-
+    get exchangeGames(): models.ExchangeGameSet {
         return this.wrappedExchangeGames;
     }
 
-    get odds() {
-        if (!this.wrappedOdds) {
-            throw new Error(`wrappedOdds is null.`);
-        }
-
+    get odds(): models.OddSet {
         return this.wrappedOdds;
     }
 
@@ -164,15 +151,11 @@ export abstract class Exchange {
         return this.wrappedConnectionManager;
     }
 
-    get sqlExchange(): databaseModels.Exchange {
+    get sqlExchange(): database.Exchange {
         if (!this.wrappedSqlExchange) {
-            throw new Error(`${this.name} sqlExchange is null.`)
+            throw new Error(`${this.name}.sqlExchange is null.`)
         } 
         
         return this.wrappedSqlExchange;
-    }
-
-    set sqlExchange(sqlExchange: databaseModels.Exchange) {
-        this.wrappedSqlExchange = sqlExchange;
     }
 }

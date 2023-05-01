@@ -1,19 +1,35 @@
 import { ElementHandle } from "puppeteer";
 
-import { ExchangeGameTeam } from "../exchangeGameTeam";
-
-import * as localModels from '../../..';
+import { ExchangeGameTeam } from '../exchangeGameTeam';
+import * as models from '../../../../models';
 
 export abstract class FanDuelExchangeGameTeam extends ExchangeGameTeam {
-    public element: ElementHandle | null = null;
+    public element: ElementHandle | null;
     protected abstract xPathFromExchangeGame: string;
+
+    constructor({
+        exchange,
+        game,
+        team,
+    }: {
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
+    }) {
+        super({
+            exchange,
+            game,
+            team,
+        });
+        this.element = null;
+    }
 
     public async updateElement(): Promise<ElementHandle | null> {
         const exchangeGame = this.exchangeGame;
 
         /**TODO: This is so hacky. May need to implement actual abstract factory to avoid having 
          * to do this. */
-        if (!(exchangeGame instanceof localModels.FanDuelExchangeGame)) {
+        if (!(exchangeGame instanceof models.FanDuelExchangeGame)) {
             throw new Error(`Expected instance of FanDuelExchangeGame.`);
         }
 
@@ -34,7 +50,7 @@ export abstract class FanDuelExchangeGameTeam extends ExchangeGameTeam {
         return teamElement;
     }
 
-    get exchangeGame(): localModels.ExchangeGame {
+    get exchangeGame(): models.ExchangeGame {
         if (!this.wrappedExchangeGame) {
             throw new Error(`ExchangeGame is null.`);
         }
@@ -42,7 +58,7 @@ export abstract class FanDuelExchangeGameTeam extends ExchangeGameTeam {
         return this.wrappedExchangeGame;
     }
 
-    set exchangeGame(exchangeGame: localModels.ExchangeGame) {
+    set exchangeGame(exchangeGame: models.ExchangeGame) {
         this.wrappedExchangeGame = exchangeGame;
         exchangeGame.exchangeGameAwayTeam = this;
     }

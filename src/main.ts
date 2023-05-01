@@ -1,13 +1,13 @@
 import * as database from './database';
-import * as globalModels from './global';
+import * as global from './global';
 
-const allTeams = globalModels.allTeams;
-const allExchanges = globalModels.allExchanges;
-const allGames = globalModels.allGames;
-const allOutcomes = globalModels.allOutcomes;
-const allExchangeGames = globalModels.allExchangeGames;
-const allExchangeGameTeams = globalModels.allExchangeGameTeams;
-const allOdds = globalModels.allOdds;
+const allTeams = global.allTeams;
+const allExchanges = global.allExchanges;
+const allGames = global.allGames;
+const allOutcomes = global.allOutcomes;
+const allExchangeGames = global.allExchangeGames;
+const allExchangeGameTeams = global.allExchangeGameTeams;
+const allOdds = global.allOdds;
 
 async function main() {
     await database.init();
@@ -23,9 +23,9 @@ async function main() {
 
     await allExchangeGames.updateElements();
     await allExchangeGameTeams.updateElements();
-    await allOdds.updateElements();
+    await allOdds.getElements();
 
-    await allOdds.updateValues();
+    await allOdds.getValues();
 
     updateExchangeGameElements();
     updateExchangeGameTeamElements();
@@ -61,7 +61,7 @@ async function updateExchangeGameTeamElements() {
 
 async function updateOddElements() {
     const start = new Date();
-    await allOdds.updateElements();
+    await allOdds.getElements();
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();
@@ -73,7 +73,7 @@ async function updateOddElements() {
 
 async function updateOddValues() {
     const start = new Date();
-    await allOdds.updateValues();
+    await allOdds.getValues();
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();
