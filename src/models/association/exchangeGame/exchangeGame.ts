@@ -6,8 +6,8 @@ import * as models from '../../../models';
 export abstract class ExchangeGame {
     private wrappedExchange: models.Exchange;
     private wrappedGame: models.Game;
-    public wrappedExchangeGameAwayTeam: models.ExchangeGameTeam | null;
-    public wrappedExchangeGameHomeTeam: models.ExchangeGameTeam | null;
+    protected wrappedExchangeGameAwayTeam: models.ExchangeGameTeam | null;
+    protected wrappedExchangeGameHomeTeam: models.ExchangeGameTeam | null;
 
     protected constructor({
         exchange,
