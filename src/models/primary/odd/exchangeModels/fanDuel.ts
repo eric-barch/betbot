@@ -1,9 +1,8 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as global from '../../../../global';
-import * as models from '../../..';
-
 import { Odd } from '../odd';
+import * as global from '../../../../global';
+import * as models from '../../../../models';
 
 abstract class FanDuelOdd extends Odd {
     protected abstract priceElementXPathFromExchangeGameTeam: string;

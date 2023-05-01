@@ -1,9 +1,8 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as global from '../../../../global';
-import * as models from '../../..';
-
 import { Odd } from '../odd';
+import * as global from '../../../../global';
+import * as models from '../../../../models';
 
 abstract class SugarHouseOdd extends Odd {
     protected abstract priceElementXPathFromExchangeGame: string;
@@ -57,7 +56,6 @@ abstract class SugarHouseOdd extends Odd {
             return null;
         }
 
-        const className = await (await exchangeGameElement.getProperty('className')).jsonValue();
         const oddElement = await exchangeGameElement.$(`xpath/${xPathFromExchangeGame}`);
 
         if (!oddElement) {
