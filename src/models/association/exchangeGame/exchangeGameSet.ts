@@ -1,6 +1,5 @@
-import * as localModels from '../..';
-
 import { ExchangeGame } from './exchangeGame';
+import * as localModels from '../../../models';
 
 export class ExchangeGameSet extends Set<ExchangeGame> {
     public find({
