@@ -9,6 +9,9 @@ const allExchangeGames = global.allExchangeGames;
 const allExchangeGameTeams = global.allExchangeGameTeams;
 const allOdds = global.allOdds;
 
+/**TODO: not sure that db is correctly creating oldOdds if it finds changes to existing db odds upon
+ * initialization. */
+
 async function main() {
     await database.init();
 
