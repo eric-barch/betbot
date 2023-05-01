@@ -1,6 +1,6 @@
 import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
-import * as localModels from '../..';
+import * as localModels from '../../../models';
 
 export enum OutcomeType {
     SpreadAway = 'spread_away',

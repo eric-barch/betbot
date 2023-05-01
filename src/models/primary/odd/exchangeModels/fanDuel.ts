@@ -6,6 +6,8 @@ import * as localModels from '../../..';
 import { Odd } from '../odd';
 
 abstract class FanDuelOdd extends Odd {
+    protected abstract priceElementXPathFromExchangeGameTeam: string;
+    protected abstract valueElementXPathFromExchangeGameTeam: string | null;
     private exchangeGameTeam: localModels.FanDuelExchangeGameTeam;
 
     constructor({
@@ -37,16 +39,30 @@ abstract class FanDuelOdd extends Odd {
         this.exchangeGameTeam = exchangeGameTeam;
     }
 
-    async updateElement(xPath: string): Promise<ElementHandle | null> {
+    protected async getPriceElement(): Promise<ElementHandle | null> {
+        const priceElement = await this.getElement(this.priceElementXPathFromExchangeGameTeam);
+        this.priceElement = priceElement;
+        return priceElement;
+    }
+
+    protected async getValueElement(): Promise<ElementHandle | null> {
+        const valueElement = await this.getElement(this.valueElementXPathFromExchangeGameTeam);
+        this.valueElement = valueElement;
+        return valueElement;
+    }
+
+    private async getElement(xPathFromExchangeGameTeam: string | null): Promise<ElementHandle | null> {
+        if (!xPathFromExchangeGameTeam) {
+            return null;
+        }
+        
         const exchangeGameTeamElement = this.exchangeGameTeam.element;
 
         if (!exchangeGameTeamElement) {
             return null;
         }
 
-        const className = await (await exchangeGameTeamElement.getProperty('className')).jsonValue();
-
-        const oddElement = await exchangeGameTeamElement.$(`xpath/${xPath}`);
+        const oddElement = await exchangeGameTeamElement.$(`xpath/${xPathFromExchangeGameTeam}`);
 
         if (!oddElement) {
             return null;
@@ -57,31 +73,31 @@ abstract class FanDuelOdd extends Odd {
 }
 
 export class FanDuelSpreadAway extends FanDuelOdd {
-    public priceElementXPath: string = 'div[1]/span[2]';
-    public valueElementXPath: string = 'div[1]/span[1]';
+    protected priceElementXPathFromExchangeGameTeam: string = 'div[1]/span[2]';
+    protected valueElementXPathFromExchangeGameTeam: string = 'div[1]/span[1]';
 }
 
 export class FanDuelSpreadHome extends FanDuelOdd {
-    public priceElementXPath: string = 'div[1]/span[2]';
-    public valueElementXPath: string = 'div[1]/span[1]';
+    protected priceElementXPathFromExchangeGameTeam: string = 'div[1]/span[2]';
+    protected valueElementXPathFromExchangeGameTeam: string = 'div[1]/span[1]';
 }
 
 export class FanDuelMoneylineAway extends FanDuelOdd {
-    public priceElementXPath: string = 'div[2]/span';
-    public valueElementXPath: null = null;
+    protected priceElementXPathFromExchangeGameTeam: string = 'div[2]/span';
+    protected valueElementXPathFromExchangeGameTeam: null = null;
 }
 
 export class FanDuelMoneylineHome extends FanDuelOdd {
-    public priceElementXPath: string = 'div[2]/span';
-    public valueElementXPath: null = null;
+    protected priceElementXPathFromExchangeGameTeam: string = 'div[2]/span';
+    protected valueElementXPathFromExchangeGameTeam: null = null;
 }
 
 export class FanDuelTotalOver extends FanDuelOdd {
-    public priceElementXPath: string = 'div[3]/span[2]';
-    public valueElementXPath: string = 'div[3]/span[1]';
+    protected priceElementXPathFromExchangeGameTeam: string = 'div[3]/span[2]';
+    protected valueElementXPathFromExchangeGameTeam: string = 'div[3]/span[1]';
 }
 
 export class FanDuelTotalUnder extends FanDuelOdd {
-    public priceElementXPath: string = 'div[3]/span[2]';
-    public valueElementXPath: string = 'div[3]/span[1]';
+    protected priceElementXPathFromExchangeGameTeam: string = 'div[3]/span[2]';
+    protected valueElementXPathFromExchangeGameTeam: string = 'div[3]/span[1]';
 }

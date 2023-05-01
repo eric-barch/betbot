@@ -5,17 +5,17 @@ import { Outcome } from './outcome';
 export class OutcomeSet extends Set<Outcome> {
     public find({
         game,
-        name,
+        type,
         oppositeOutcome,
     }: {
         game: localModels.Game,
-        name: string,
+        type: localModels.OutcomeType,
         oppositeOutcome?: Outcome,
     }): Outcome | null {
         for (const outcome of this) {
             if (outcome.matches({
                 game: game,
-                name: name,
+                type: type,
             })) {
                 if (oppositeOutcome) {
                     outcome.oppositeOutcome = oppositeOutcome;
@@ -30,18 +30,16 @@ export class OutcomeSet extends Set<Outcome> {
 
     public async findOrCreate({
         game,
-        name,
-        team,
+        type,
         oppositeOutcome,
     }: {
         game: localModels.Game,
-        name: string,
-        team: localModels.Team,
+        type: localModels.OutcomeType,
         oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
         const foundOutcome = this.find({
             game: game,
-            name: name,
+            type: type,
             oppositeOutcome: oppositeOutcome,
         })
 
@@ -51,8 +49,7 @@ export class OutcomeSet extends Set<Outcome> {
 
         const newOutcome = await Outcome.create({
             game: game,
-            name: name,
-            team: team,
+            type: type,
             oppositeOutcome: oppositeOutcome,
         });
 

@@ -1,7 +1,6 @@
 import * as databaseModels from '../../../database';
 
 export class Team {
-    // public properties
     public regionFull: string;
     public regionAbbr: string;
     public identifierFull: string;
@@ -28,8 +27,9 @@ export class Team {
         this.wrappedSqlTeam = null;
     }
 
-    public async init() {
+    public async init(): Promise<Team> {
         await this.initSqlTeam();
+        return this;
     }
 
     private async initSqlTeam(): Promise<databaseModels.Team> {
@@ -52,14 +52,13 @@ export class Team {
                 });
             }
 
-            this.sqlTeam = sqlTeam;
+            this.wrappedSqlTeam = sqlTeam;
         });
 
         return this.sqlTeam;
     }
 
-    // public instance methods
-    // TODO: Can make this better/simpler
+    /**TODO: Can make this better/simpler */
     public matches({
         name,
     }: {
@@ -76,7 +75,6 @@ export class Team {
         return false;
     }
 
-    // getters and setters
     get regionFullIdentifierFull(): string {
         const regionFullIdentifierFull = `${this.regionFull} ${this.identifierFull}`;
         return regionFullIdentifierFull;
@@ -98,9 +96,5 @@ export class Team {
         }
 
         return this.wrappedSqlTeam;
-    }
-
-    set sqlTeam(sqlTeam: databaseModels.Team) {
-        this.wrappedSqlTeam = sqlTeam;
     }
 }

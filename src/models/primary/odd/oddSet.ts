@@ -49,7 +49,7 @@ export class OddSet extends Set<Odd> {
 
     public async updateElements() {
         for (const odd of this) {
-            await odd.updateElements();
+            await odd.getElements();
         }
 
         return this;
@@ -57,7 +57,7 @@ export class OddSet extends Set<Odd> {
 
     public async updateValues() {
         for (const odd of this) {
-            await odd.updateValues();
+            await odd.getValues();
         }
     }
 }

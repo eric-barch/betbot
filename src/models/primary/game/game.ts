@@ -1,5 +1,4 @@
-
-import * as sqlz from 'sequelize';
+import { Op } from 'sequelize';
 
 import * as databaseModels from '../../../database';
 import * as globalModels from '../../../global';
@@ -34,7 +33,7 @@ export class Game {
         globalModels.allGames.add(this);
     }
 
-    static async create({
+    public static async create({
         awayTeam,
         homeTeam,
         startDate,
@@ -61,7 +60,7 @@ export class Game {
     
         await databaseModels.Game.findOrCreate({
             where: {
-                [sqlz.Op.and]: [
+                [Op.and]: [
                     { awayTeamId: awayTeamId },
                     { homeTeamId: homeTeamId },
                     sequelize.where(
