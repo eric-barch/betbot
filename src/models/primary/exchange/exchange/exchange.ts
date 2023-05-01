@@ -1,20 +1,20 @@
 import { ConnectionManager } from './connectionManager';
 
 import * as databaseModels from '../../../../database';
-import * as globalModels from '../../../../global';
-import * as localModels from '../../../../models';
+import * as global from '../../../../global';
+import * as models from '../../../../models';
 
 export abstract class Exchange {
     public abstract name: string;
     public abstract url: string;
-    protected wrappedExchangeGames: localModels.ExchangeGameSet;
-    protected wrappedOdds: localModels.OddSet;
+    protected wrappedExchangeGames: models.ExchangeGameSet;
+    protected wrappedOdds: models.OddSet;
     protected abstract wrappedConnectionManager: ConnectionManager;
     private wrappedSqlExchange: databaseModels.Exchange | null;
 
     public constructor() {
-        this.wrappedExchangeGames = new localModels.ExchangeGameSet();
-        this.wrappedOdds = new localModels.OddSet();
+        this.wrappedExchangeGames = new models.ExchangeGameSet();
+        this.wrappedOdds = new models.OddSet();
         this.wrappedSqlExchange = null;
     }
 
@@ -39,9 +39,9 @@ export abstract class Exchange {
         return this.sqlExchange;
     }
 
-    abstract getGames(): Promise<localModels.GameSet>;
+    abstract getGames(): Promise<models.GameSet>;
 
-    public async updateExchangeGames(): Promise<localModels.ExchangeGameSet> {
+    public async updateExchangeGames(): Promise<models.ExchangeGameSet> {
         const games = await this.getGames();
 
         /**TODO: is there a more efficient way to do this? */
@@ -61,56 +61,56 @@ export abstract class Exchange {
         return this.exchangeGames;
     }
 
-    public async initOdds(): Promise<localModels.OddSet> {
+    public async initOdds(): Promise<models.OddSet> {
         for (const exchangeGame of this.exchangeGames) {
-            const spreadAway = await globalModels.allOutcomes.findOrCreate({
+            const spreadAway = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                type: localModels.OutcomeType.SpreadAway,
+                type: models.OutcomeType.SpreadAway,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: spreadAway,
             });
 
-            const spreadHome = await globalModels.allOutcomes.findOrCreate({
+            const spreadHome = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                type: localModels.OutcomeType.SpreadHome,
+                type: models.OutcomeType.SpreadHome,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: spreadHome,
             });
 
-            const moneylineAway = await globalModels.allOutcomes.findOrCreate({
+            const moneylineAway = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                type: localModels.OutcomeType.MoneylineAway,
+                type: models.OutcomeType.MoneylineAway,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: moneylineAway,
             });
 
-            const moneylineHome = await globalModels.allOutcomes.findOrCreate({
+            const moneylineHome = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                type: localModels.OutcomeType.MoneylineHome,
+                type: models.OutcomeType.MoneylineHome,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: moneylineHome,
             });
 
-            const totalOver = await globalModels.allOutcomes.findOrCreate({
+            const totalOver = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                type: localModels.OutcomeType.TotalOver,
+                type: models.OutcomeType.TotalOver,
             });
             await this.odds.findOrCreate({
                 exchange: this,
                 outcome: totalOver,
             });
 
-            const totalUnder = await globalModels.allOutcomes.findOrCreate({
+            const totalUnder = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
-                type: localModels.OutcomeType.TotalUnder,
+                type: models.OutcomeType.TotalUnder,
             });
             await this.odds.findOrCreate({
                 exchange: this,
@@ -131,11 +131,11 @@ export abstract class Exchange {
         return firstCharLower;
     }
 
-    get exchangeGames(): localModels.ExchangeGameSet {
+    get exchangeGames(): models.ExchangeGameSet {
         return this.wrappedExchangeGames;
     }
 
-    get odds(): localModels.OddSet {
+    get odds(): models.OddSet {
         return this.wrappedOdds;
     }
 

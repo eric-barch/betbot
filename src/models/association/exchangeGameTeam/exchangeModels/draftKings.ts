@@ -1,8 +1,8 @@
 import { ElementHandle } from "puppeteer";
 
-import * as localModels from '../../../../models';
+import * as models from '../../../../models';
 
-export abstract class DraftKingsExchangeGameTeam extends localModels.ExchangeGameTeam {
+export abstract class DraftKingsExchangeGameTeam extends models.ExchangeGameTeam {
     public element: ElementHandle | null;
 
     public constructor({
@@ -10,9 +10,9 @@ export abstract class DraftKingsExchangeGameTeam extends localModels.ExchangeGam
         game,
         team,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
-        team: localModels.Team,
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
     }) {
         super({
             exchange: exchange,

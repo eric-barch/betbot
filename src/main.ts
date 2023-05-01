@@ -1,13 +1,13 @@
 import * as database from './database';
-import * as globalModels from './global';
+import * as global from './global';
 
-const allTeams = globalModels.allTeams;
-const allExchanges = globalModels.allExchanges;
-const allGames = globalModels.allGames;
-const allOutcomes = globalModels.allOutcomes;
-const allExchangeGames = globalModels.allExchangeGames;
-const allExchangeGameTeams = globalModels.allExchangeGameTeams;
-const allOdds = globalModels.allOdds;
+const allTeams = global.allTeams;
+const allExchanges = global.allExchanges;
+const allGames = global.allGames;
+const allOutcomes = global.allOutcomes;
+const allExchangeGames = global.allExchangeGames;
+const allExchangeGameTeams = global.allExchangeGameTeams;
+const allOdds = global.allOdds;
 
 async function main() {
     await database.init();

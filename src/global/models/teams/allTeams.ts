@@ -31,9 +31,9 @@ import {
     washingtonWizards,
 } from './leagues';
 
-import * as localModels from '../../../models';
+import * as models from '../../../models';
 
-class AllTeams extends localModels.TeamSet {
+class AllTeams extends models.TeamSet {
     public async init(): Promise<void> {
         this.add(atlantaHawks);
         this.add(bostonCeltics);

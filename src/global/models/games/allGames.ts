@@ -1,7 +1,7 @@
 import { allExchanges } from '../exchanges';
-import * as localModels from '../../../models';
+import * as models from '../../../models';
 
-class AllGames extends localModels.GameSet {
+class AllGames extends models.GameSet {
     public async init() {
         for (const exchange of allExchanges) {
             await exchange.getGames();

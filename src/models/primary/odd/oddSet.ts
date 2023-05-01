@@ -1,4 +1,4 @@
-import * as localModels from '../..';
+import * as models from '../..';
 
 import { Odd } from "./odd";
 
@@ -7,8 +7,8 @@ export class OddSet extends Set<Odd> {
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
     }): Odd | null {
         for (const odd of this) {
             if (odd.matches({
@@ -26,8 +26,8 @@ export class OddSet extends Set<Odd> {
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
     }): Promise<Odd> {
         const foundOdd = this.find({
             exchange: exchange,

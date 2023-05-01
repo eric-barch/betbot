@@ -1,6 +1,6 @@
 import * as databaseModels from '../../../database';
-import * as globalModels from '../../../global';
-import * as localModels from '../../../models';
+import * as global from '../../../global';
+import * as models from '../../../models';
 
 export enum OutcomeType {
     SpreadAway = 'spread_away',
@@ -13,8 +13,8 @@ export enum OutcomeType {
 
 export class Outcome {
     private wrappedType: OutcomeType;
-    private wrappedGame: localModels.Game;
-    private wrappedOdds: localModels.OddSet;
+    private wrappedGame: models.Game;
+    private wrappedOdds: models.OddSet;
     private wrappedOppositeOutcome: Outcome | null;
     private wrappedSqlOutcome: databaseModels.Outcome | null;
 
@@ -23,16 +23,16 @@ export class Outcome {
         game,
     }: {
         type: OutcomeType,
-        game: localModels.Game,
+        game: models.Game,
     }) {
         this.wrappedType = type;
         this.wrappedGame = game;
-        this.wrappedOdds = new localModels.OddSet();
+        this.wrappedOdds = new models.OddSet();
         this.wrappedOppositeOutcome = null;
         this.wrappedSqlOutcome = null;
 
         game.outcomes.add(this);
-        globalModels.allOutcomes.add(this);
+        global.allOutcomes.add(this);
     }
 
     static async create({
@@ -41,7 +41,7 @@ export class Outcome {
         oppositeOutcome,
     }: {
         type: OutcomeType,
-        game: localModels.Game,
+        game: models.Game,
         oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
         const newOutcome = new Outcome({
@@ -79,7 +79,7 @@ export class Outcome {
         game,
     }: {
         type: OutcomeType,
-        game: localModels.Game,
+        game: models.Game,
     }) {
         const typeMatches = (this.type === type);
         const gameMatches = (this.game === game);
@@ -95,11 +95,11 @@ export class Outcome {
         return this.wrappedType;
     }
 
-    get game(): localModels.Game {
+    get game(): models.Game {
         return this.wrappedGame;
     }
 
-    get team(): localModels.Team {
+    get team(): models.Team {
         if (this.type === OutcomeType.SpreadAway ||
             this.type === OutcomeType.MoneylineAway ||
             this.type === OutcomeType.TotalOver) {
@@ -115,7 +115,7 @@ export class Outcome {
         throw new Error(`Did not find corresponding outcome team.`);
     }
 
-    get odds(): localModels.OddSet {
+    get odds(): models.OddSet {
         return this.wrappedOdds;
     }
 

@@ -1,14 +1,14 @@
 import { ElementHandle } from "puppeteer";
 
-import * as localModels from '../../../../models';
+import * as models from '../../../../models';
 
-export class DraftKingsExchangeGame extends localModels.ExchangeGame {
+export class DraftKingsExchangeGame extends models.ExchangeGame {
     public constructor({
         exchange,
         game,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
+        exchange: models.Exchange,
+        game: models.Game,
     }) {
         super({
             exchange: exchange,

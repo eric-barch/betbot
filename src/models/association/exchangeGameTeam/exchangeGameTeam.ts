@@ -1,7 +1,7 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as globalModels from '../../../global';
-import * as localModels from '../../../models';
+import * as global from '../../../global';
+import * as models from '../../../models';
 
 enum AwayOrHome {
     Away = 'away',
@@ -9,28 +9,28 @@ enum AwayOrHome {
 }
 
 export abstract class ExchangeGameTeam {
-    protected wrappedExchange: localModels.Exchange;
-    protected wrappedGame: localModels.Game;
-    protected wrappedTeam: localModels.Team;
-    protected wrappedExchangeGame: localModels.ExchangeGame | null;
+    protected wrappedExchange: models.Exchange;
+    protected wrappedGame: models.Game;
+    protected wrappedTeam: models.Team;
+    protected wrappedExchangeGame: models.ExchangeGame | null;
 
     protected constructor({
         exchange,
         game,
         team,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
-        team: localModels.Team,
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
     }) {
         this.wrappedExchange = exchange;
         this.wrappedGame = game;
         this.wrappedTeam = team;
-        this.wrappedExchangeGame = globalModels.allExchangeGames.find({
+        this.wrappedExchangeGame = global.allExchangeGames.find({
             exchange: exchange,
             game: game,
         });
-        globalModels.allExchangeGameTeams.add(this);
+        global.allExchangeGameTeams.add(this);
     }
 
     static async create({
@@ -38,9 +38,9 @@ export abstract class ExchangeGameTeam {
         game,
         team,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
-        team: localModels.Team,
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
     }) {
         let awayOrHome: AwayOrHome | undefined;
 
@@ -56,17 +56,17 @@ export abstract class ExchangeGameTeam {
         let newExchangeGameTeam;
 
         switch (exchange) {
-            case globalModels.draftKingsExchange:
+            case global.draftKingsExchange:
                 switch(awayOrHome) {
                     case AwayOrHome.Away:
-                        newExchangeGameTeam = new localModels.DraftKingsExchangeGameAwayTeam({
+                        newExchangeGameTeam = new models.DraftKingsExchangeGameAwayTeam({
                             exchange: exchange,
                             game: game,
                             team: team,
                         });
                         break;
                     case AwayOrHome.Home:
-                        newExchangeGameTeam = new localModels.DraftKingsExchangeGameHomeTeam({
+                        newExchangeGameTeam = new models.DraftKingsExchangeGameHomeTeam({
                             exchange: exchange,
                             game: game,
                             team: team,
@@ -76,17 +76,17 @@ export abstract class ExchangeGameTeam {
                         throw new Error(`Did not match away or home team.`);
                 }
                 break;
-            case globalModels.fanDuelExchange:
+            case global.fanDuelExchange:
                 switch(awayOrHome) {
                     case AwayOrHome.Away:
-                        newExchangeGameTeam = new localModels.FanDuelExchangeGameAwayTeam({
+                        newExchangeGameTeam = new models.FanDuelExchangeGameAwayTeam({
                             exchange: exchange,
                             game: game,
                             team: team,
                         });
                         break;
                     case AwayOrHome.Home:
-                        newExchangeGameTeam = new localModels.FanDuelExchangeGameHomeTeam({
+                        newExchangeGameTeam = new models.FanDuelExchangeGameHomeTeam({
                             exchange: exchange,
                             game: game,
                             team: team,
@@ -94,17 +94,17 @@ export abstract class ExchangeGameTeam {
                         break;
                 }
                 break;
-            case globalModels.sugarHouseExchange:
+            case global.sugarHouseExchange:
                 switch(awayOrHome) {
                     case AwayOrHome.Away:
-                        newExchangeGameTeam = new localModels.SugarHouseExchangeGameTeam({
+                        newExchangeGameTeam = new models.SugarHouseExchangeGameTeam({
                             exchange: exchange,
                             game: game,
                             team: team,
                         });
                         break;
                     case AwayOrHome.Home:
-                        newExchangeGameTeam = new localModels.SugarHouseExchangeGameTeam({
+                        newExchangeGameTeam = new models.SugarHouseExchangeGameTeam({
                             exchange: exchange,
                             game: game,
                             team: team,
@@ -131,7 +131,7 @@ export abstract class ExchangeGameTeam {
                 throw new Error(`Did not link exchangeGame away or home team.`);
         }
 
-        globalModels.allExchangeGameTeams.add(newExchangeGameTeam);
+        global.allExchangeGameTeams.add(newExchangeGameTeam);
         return newExchangeGameTeam;
     }
 
@@ -140,9 +140,9 @@ export abstract class ExchangeGameTeam {
         game,
         team,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
-        team: localModels.Team,
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
     }) {
         const exchangeMatches = (this.exchange === exchange);
         const gameMatches = (this.game === game);
@@ -157,19 +157,19 @@ export abstract class ExchangeGameTeam {
 
     abstract updateElement(): Promise<ElementHandle | null>;
 
-    get exchange(): localModels.Exchange {
+    get exchange(): models.Exchange {
         return this.wrappedExchange;
     }
 
-    get game(): localModels.Game {
+    get game(): models.Game {
         return this.wrappedGame;
     }
 
-    get team(): localModels.Team {
+    get team(): models.Team {
         return this.wrappedTeam;
     }
 
-    get exchangeGame(): localModels.ExchangeGame {
+    get exchangeGame(): models.ExchangeGame {
         if (!this.wrappedExchangeGame) {
             throw new Error(`ExchangeGame is null.`)
         }

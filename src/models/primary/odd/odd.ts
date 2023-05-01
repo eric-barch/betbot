@@ -1,24 +1,24 @@
 import { ElementHandle } from 'puppeteer';
 
 import * as databaseModels from '../../../database';
-import * as globalModels from '../../../global';
-import * as localModels from '../../../models';
+import * as global from '../../../global';
+import * as models from '../../../models';
 
 export abstract class Odd {
     protected wrappedPrice: number | null;
     protected wrappedValue: number | null;
     public priceElement: ElementHandle | null;
     public valueElement: ElementHandle | null;
-    protected wrappedExchange: localModels.Exchange;
-    protected wrappedOutcome: localModels.Outcome;
+    protected wrappedExchange: models.Exchange;
+    protected wrappedOutcome: models.Outcome;
     protected wrappedSqlOdd: databaseModels.Odd | null;
 
     constructor({
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
     }) {
         this.wrappedPrice = null;
         this.wrappedValue = null;
@@ -30,7 +30,7 @@ export abstract class Odd {
         this.wrappedOutcome = outcome;
         this.wrappedSqlOdd = null;
 
-        globalModels.allOdds.add(this);
+        global.allOdds.add(this);
     }
 
     public static async create({
@@ -39,48 +39,48 @@ export abstract class Odd {
         price,
         value,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
         price?: number | null,
         value?: number | null,
     }): Promise<Odd> {;
-        let newOdd: localModels.Odd;
+        let newOdd: models.Odd;
 
         switch (exchange) {
-            case globalModels.draftKingsExchange:
+            case global.draftKingsExchange:
                 switch (outcome.type) {
-                    case localModels.OutcomeType.SpreadAway:
-                        newOdd = new localModels.DraftKingsSpreadAway({
+                    case models.OutcomeType.SpreadAway:
+                        newOdd = new models.DraftKingsSpreadAway({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.SpreadHome:
-                        newOdd = new localModels.DraftKingsSpreadHome({
+                    case models.OutcomeType.SpreadHome:
+                        newOdd = new models.DraftKingsSpreadHome({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.MoneylineAway:
-                        newOdd = new localModels.DraftKingsMoneylineAway({
+                    case models.OutcomeType.MoneylineAway:
+                        newOdd = new models.DraftKingsMoneylineAway({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.MoneylineHome:
-                        newOdd = new localModels.DraftKingsMoneylineHome({
+                    case models.OutcomeType.MoneylineHome:
+                        newOdd = new models.DraftKingsMoneylineHome({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.TotalOver:
-                        newOdd = new localModels.DraftKingsTotalOver({
+                    case models.OutcomeType.TotalOver:
+                        newOdd = new models.DraftKingsTotalOver({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.TotalUnder:
-                        newOdd = new localModels.DraftKingsTotalUnder({
+                    case models.OutcomeType.TotalUnder:
+                        newOdd = new models.DraftKingsTotalUnder({
                             exchange: exchange,
                             outcome: outcome,
                         });
@@ -89,40 +89,40 @@ export abstract class Odd {
                         throw new Error(`Did not find corresponding DraftKings odd.`);
                 }
                 break;
-            case globalModels.fanDuelExchange:
+            case global.fanDuelExchange:
                 switch (outcome.type) {
-                    case localModels.OutcomeType.SpreadAway:
-                        newOdd = new localModels.FanDuelSpreadAway({
+                    case models.OutcomeType.SpreadAway:
+                        newOdd = new models.FanDuelSpreadAway({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.SpreadHome:
-                        newOdd = new localModels.FanDuelSpreadHome({
+                    case models.OutcomeType.SpreadHome:
+                        newOdd = new models.FanDuelSpreadHome({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.MoneylineAway:
-                        newOdd = new localModels.FanDuelMoneylineAway({
+                    case models.OutcomeType.MoneylineAway:
+                        newOdd = new models.FanDuelMoneylineAway({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.MoneylineHome:
-                        newOdd = new localModels.FanDuelMoneylineHome({
+                    case models.OutcomeType.MoneylineHome:
+                        newOdd = new models.FanDuelMoneylineHome({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.TotalOver:
-                        newOdd = new localModels.FanDuelTotalOver({
+                    case models.OutcomeType.TotalOver:
+                        newOdd = new models.FanDuelTotalOver({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.TotalUnder:
-                        newOdd = new localModels.FanDuelTotalUnder({
+                    case models.OutcomeType.TotalUnder:
+                        newOdd = new models.FanDuelTotalUnder({
                             exchange: exchange,
                             outcome: outcome,
                         });
@@ -131,40 +131,40 @@ export abstract class Odd {
                         throw new Error(`Did not find corresponding FanDuel odd.`);
                 }
                 break;
-            case globalModels.sugarHouseExchange:
+            case global.sugarHouseExchange:
                 switch (outcome.type) {
-                    case localModels.OutcomeType.SpreadAway:
-                        newOdd = new localModels.SugarHouseSpreadAway({
+                    case models.OutcomeType.SpreadAway:
+                        newOdd = new models.SugarHouseSpreadAway({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.SpreadHome:
-                        newOdd = new localModels.SugarHouseSpreadHome({
+                    case models.OutcomeType.SpreadHome:
+                        newOdd = new models.SugarHouseSpreadHome({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.MoneylineAway:
-                        newOdd = new localModels.SugarHouseMoneylineAway({
+                    case models.OutcomeType.MoneylineAway:
+                        newOdd = new models.SugarHouseMoneylineAway({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.MoneylineHome:
-                        newOdd = new localModels.SugarHouseMoneylineHome({
+                    case models.OutcomeType.MoneylineHome:
+                        newOdd = new models.SugarHouseMoneylineHome({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.TotalOver:
-                        newOdd = new localModels.SugarHouseTotalOver({
+                    case models.OutcomeType.TotalOver:
+                        newOdd = new models.SugarHouseTotalOver({
                             exchange: exchange,
                             outcome: outcome,
                         });
                         break;
-                    case localModels.OutcomeType.TotalUnder:
-                        newOdd = new localModels.SugarHouseTotalUnder({
+                    case models.OutcomeType.TotalUnder:
+                        newOdd = new models.SugarHouseTotalUnder({
                             exchange: exchange,
                             outcome: outcome,
                         });
@@ -219,8 +219,8 @@ export abstract class Odd {
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
     }): boolean {
         const exchangeMatches = (this.exchange === exchange);
         const outcomeMatches = (this.outcome === outcome);
@@ -379,11 +379,11 @@ export abstract class Odd {
         return risk/payout;
     }
 
-    get exchange(): localModels.Exchange {
+    get exchange(): models.Exchange {
         return this.wrappedExchange;
     }
 
-    get outcome(): localModels.Outcome {
+    get outcome(): models.Outcome {
         return this.wrappedOutcome;
     }
 

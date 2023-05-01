@@ -1,4 +1,4 @@
-import * as localModels from '../..';
+import * as models from '../..';
 
 import { ExchangeGameTeam } from './exchangeGameTeam';
 
@@ -8,9 +8,9 @@ export class ExchangeGameTeamSet extends Set<ExchangeGameTeam> {
         game,
         team,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
-        team: localModels.Team,
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
     }): ExchangeGameTeam | null {
         for (const exchangeGameTeam of this) {
             if (exchangeGameTeam.matches({
@@ -30,9 +30,9 @@ export class ExchangeGameTeamSet extends Set<ExchangeGameTeam> {
         game,
         team,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
-        team: localModels.Team,
+        exchange: models.Exchange,
+        game: models.Game,
+        team: models.Team,
     }) {
         const foundExchangeGameTeam = this.find({
             exchange: exchange,

@@ -1,28 +1,28 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as globalModels from '../../../../global'
-import * as localModels from '../../..';
+import * as global from '../../../../global'
+import * as models from '../../..';
 
 import { Odd } from '../odd';
 
 abstract class DraftKingsOdd extends Odd {
     protected abstract priceElementXPathFromExchangeGameTeam: string;
     protected abstract valueElementXPathFromExchangeGameTeam: string | null;
-    private exchangeGameTeam: localModels.DraftKingsExchangeGameTeam;
+    private exchangeGameTeam: models.DraftKingsExchangeGameTeam;
 
     constructor({
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
     }) {
         super({
             exchange: exchange,
             outcome: outcome,
         });
 
-        const exchangeGameTeam = globalModels.allExchangeGameTeams.find({
+        const exchangeGameTeam = global.allExchangeGameTeams.find({
             exchange: exchange,
             game: outcome.game,
             team: outcome.team,
@@ -32,7 +32,7 @@ abstract class DraftKingsOdd extends Odd {
             throw new Error(`Did not find ExchangeGameTeam.`);
         }
 
-        if (!(exchangeGameTeam instanceof localModels.DraftKingsExchangeGameTeam)) {
+        if (!(exchangeGameTeam instanceof models.DraftKingsExchangeGameTeam)) {
             throw new Error(`Expected DraftKingsExchangeGameTeam.`);
         }
 

@@ -1,13 +1,13 @@
 import { ExchangeGame } from './exchangeGame';
-import * as localModels from '../../../models';
+import * as models from '../../../models';
 
 export class ExchangeGameSet extends Set<ExchangeGame> {
     public find({
         exchange,
         game,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
+        exchange: models.Exchange,
+        game: models.Game,
     }): ExchangeGame | null {
         for (const exchangeGame of this) {
             if (exchangeGame.matches({
@@ -25,8 +25,8 @@ export class ExchangeGameSet extends Set<ExchangeGame> {
         exchange,
         game,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
+        exchange: models.Exchange,
+        game: models.Game,
     }): Promise<ExchangeGame> {
         const foundExchangeGame = this.find({
             exchange: exchange,

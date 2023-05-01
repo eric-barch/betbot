@@ -1,4 +1,4 @@
-import * as localModels from '../..';
+import * as models from '../..';
 
 import { Outcome } from './outcome';
 
@@ -8,8 +8,8 @@ export class OutcomeSet extends Set<Outcome> {
         type,
         oppositeOutcome,
     }: {
-        game: localModels.Game,
-        type: localModels.OutcomeType,
+        game: models.Game,
+        type: models.OutcomeType,
         oppositeOutcome?: Outcome,
     }): Outcome | null {
         for (const outcome of this) {
@@ -33,8 +33,8 @@ export class OutcomeSet extends Set<Outcome> {
         type,
         oppositeOutcome,
     }: {
-        game: localModels.Game,
-        type: localModels.OutcomeType,
+        game: models.Game,
+        type: models.OutcomeType,
         oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
         const foundOutcome = this.find({

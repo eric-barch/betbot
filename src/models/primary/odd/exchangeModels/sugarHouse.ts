@@ -1,28 +1,28 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as globalModels from '../../../../global';
-import * as localModels from '../../..';
+import * as global from '../../../../global';
+import * as models from '../../..';
 
 import { Odd } from '../odd';
 
 abstract class SugarHouseOdd extends Odd {
     protected abstract priceElementXPathFromExchangeGame: string;
     protected abstract valueElementXPathFromExchangeGame: string | null;
-    private exchangeGame: localModels.SugarHouseExchangeGame;
+    private exchangeGame: models.SugarHouseExchangeGame;
 
     constructor({
         exchange,
         outcome,
     }: {
-        exchange: localModels.Exchange,
-        outcome: localModels.Outcome,
+        exchange: models.Exchange,
+        outcome: models.Outcome,
     }) {
         super({
             exchange: exchange,
             outcome: outcome,
         });
 
-        const exchangeGame = globalModels.allExchangeGames.find({
+        const exchangeGame = global.allExchangeGames.find({
             exchange: exchange,
             game: outcome.game,
         });
@@ -31,7 +31,7 @@ abstract class SugarHouseOdd extends Odd {
             throw new Error(`Did not find ExchangeGame.`);
         }
 
-        if (!(exchangeGame instanceof localModels.SugarHouseExchangeGame)) {
+        if (!(exchangeGame instanceof models.SugarHouseExchangeGame)) {
             throw new Error(`Expected SugarHouseExchangeGame.`);
         }
 

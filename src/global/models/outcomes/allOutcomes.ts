@@ -1,9 +1,9 @@
 import { allGames } from '../games/allGames';
 import { OutcomeType } from '../../../models';
-import * as localModels from '../../../models';
+import * as models from '../../../models';
 
 
-class AllOutcomes extends localModels.OutcomeSet {
+class AllOutcomes extends models.OutcomeSet {
     public async init() {
         for (const game of allGames) {
             const spreadAway = await this.findOrCreate({

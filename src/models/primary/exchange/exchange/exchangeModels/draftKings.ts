@@ -1,8 +1,8 @@
 import * as chrono from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import * as localModels from '../../../..';
-import * as globalModels from '../../../../../global';
+import * as models from '../../../..';
+import * as global from '../../../../../global';
 import { Exchange } from '../exchange';
 import { ConnectionManager } from '../connectionManager';
 
@@ -27,11 +27,11 @@ export class DraftKingsExchange extends Exchange {
         return this;
     }
 
-    public async getGames(): Promise<localModels.GameSet> {
+    public async getGames(): Promise<models.GameSet> {
         const gamesFromJson = await this.getGamesFromJson();
         const gamesFromDocument = await this.getGamesFromDocument();
 
-        const games = new localModels.GameSet;
+        const games = new models.GameSet;
 
         for (const gameFromJson of gamesFromJson) {
             games.add(gameFromJson);
@@ -44,7 +44,7 @@ export class DraftKingsExchange extends Exchange {
         return games;
     }
 
-    private async getGamesFromJson(): Promise<localModels.GameSet> {
+    private async getGamesFromJson(): Promise<models.GameSet> {
         const jsonGames = await this.scrapeJsonGames();
         const games = await this.parseJsonGames(jsonGames);
         return games;
@@ -67,18 +67,18 @@ export class DraftKingsExchange extends Exchange {
         return jsonGames;
     }
 
-    private async parseJsonGames(jsonGames: Array<any>): Promise<localModels.GameSet> {
-        const games = new localModels.GameSet;
+    private async parseJsonGames(jsonGames: Array<any>): Promise<models.GameSet> {
+        const games = new models.GameSet;
 
         for (const jsonGame of jsonGames) {
             const awayTeamName = jsonGame.awayTeam.name;
             const homeTeamName = jsonGame.homeTeam.name;
 
-            const awayTeam = globalModels.allTeams.find({ name: awayTeamName });
-            const homeTeam = globalModels.allTeams.find({ name: homeTeamName });
+            const awayTeam = global.allTeams.find({ name: awayTeamName });
+            const homeTeam = global.allTeams.find({ name: homeTeamName });
             const startDate = new Date(jsonGame.startDate);
 
-            const game = await globalModels.allGames.findOrCreate({
+            const game = await global.allGames.findOrCreate({
                 awayTeam: awayTeam,
                 homeTeam: homeTeam,
                 startDate: startDate,
@@ -92,8 +92,8 @@ export class DraftKingsExchange extends Exchange {
         return games;
     }
 
-    private async getGamesFromDocument(): Promise<localModels.GameSet> {
-        const games = new localModels.GameSet;
+    private async getGamesFromDocument(): Promise<models.GameSet> {
+        const games = new models.GameSet;
 
         const trElements = await this.connectionManager.page.$$('div[class*="parlay-card"] table > tbody > tr');
 
@@ -116,7 +116,7 @@ export class DraftKingsExchange extends Exchange {
                 trElementGameTeams: trElementGameTeams,
             });
 
-            const game = await globalModels.allGames.findOrCreate({
+            const game = await global.allGames.findOrCreate({
                 awayTeam: trElementGameTeams.awayTeam,
                 homeTeam: trElementGameTeams.homeTeam,
                 startDate: startDate,
@@ -130,7 +130,7 @@ export class DraftKingsExchange extends Exchange {
         return games;
     }
 
-    private async getTrElementTeam(trElement: ElementHandle): Promise<localModels.Team | null> {
+    private async getTrElementTeam(trElement: ElementHandle): Promise<models.Team | null> {
         const teamNameElement = await trElement.$('xpath/th/a/div/div[2]/div/span/div/div');
 
         if (!teamNameElement) {
@@ -143,13 +143,13 @@ export class DraftKingsExchange extends Exchange {
             return null;
         }
 
-        const team = globalModels.allTeams.find({ name: teamName });
+        const team = global.allTeams.find({ name: teamName });
         return team;
     }
 
     private async getTrElementGameTeams(trElement: ElementHandle): Promise<{
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
     } | null> {
         const aElement = await trElement.$('xpath/th/a');
 
@@ -169,18 +169,18 @@ export class DraftKingsExchange extends Exchange {
     }
 
     private getGameTeamsFromString(string: string): {
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
     } | null {
-        let teamA: localModels.Team | undefined;
+        let teamA: models.Team | undefined;
         let teamAIndex: number | undefined;
 
-        let teamB: localModels.Team | undefined;
+        let teamB: models.Team | undefined;
         let teamBIndex: number | undefined;
 
         string = string.toLowerCase().replace('sportsbook.draftkings.com', '');
 
-        for (const team of globalModels.allTeams) {
+        for (const team of global.allTeams) {
             const index = string.indexOf(team.identifierFull.toLowerCase());
             if (index === -1) {
                 continue;
@@ -199,8 +199,8 @@ export class DraftKingsExchange extends Exchange {
             return null;
         }
 
-        let awayTeam: localModels.Team;
-        let homeTeam: localModels.Team;
+        let awayTeam: models.Team;
+        let homeTeam: models.Team;
 
         if (teamAIndex < teamBIndex) {
             awayTeam = teamA;
@@ -222,10 +222,10 @@ export class DraftKingsExchange extends Exchange {
         trElementGameTeams,
     }: {
         trElement: ElementHandle,
-        trElementTeam: localModels.Team,
+        trElementTeam: models.Team,
         trElementGameTeams: {
-            awayTeam: localModels.Team,
-            homeTeam: localModels.Team,
+            awayTeam: models.Team,
+            homeTeam: models.Team,
         }
     }): Promise<Date | undefined> {
         const dateString = await this.getDateString({
@@ -268,10 +268,10 @@ export class DraftKingsExchange extends Exchange {
         trElement,
     }: {
         trElementGameTeams: {
-            awayTeam: localModels.Team,
-            homeTeam: localModels.Team,
+            awayTeam: models.Team,
+            homeTeam: models.Team,
         },
-        trElementTeam: localModels.Team,
+        trElementTeam: models.Team,
         trElement: ElementHandle,
     }): Promise<string | null> {
         const awayTeam = trElementGameTeams.awayTeam;

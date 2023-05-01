@@ -1,16 +1,16 @@
 import { ElementHandle } from "puppeteer";
 
-import * as localModels from '../../../../models';
+import * as models from '../../../../models';
 
-export class SugarHouseExchangeGame extends localModels.ExchangeGame {
+export class SugarHouseExchangeGame extends models.ExchangeGame {
     public element: ElementHandle | null;
 
     constructor({
         exchange,
         game,
     }: {
-        exchange: localModels.Exchange,
-        game: localModels.Game,
+        exchange: models.Exchange,
+        game: models.Game,
     }) {
         super({
             exchange: exchange,

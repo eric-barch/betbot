@@ -2,8 +2,8 @@ import * as chrono from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
 import { Exchange } from '../exchange';
-import * as globalModels from '../../../../../global';
-import * as localModels from '../../../..';
+import * as global from '../../../../../global';
+import * as models from '../../../..';
 import { ConnectionManager } from '../connectionManager';
 
 export class SugarHouseExchange extends Exchange {
@@ -18,8 +18,8 @@ export class SugarHouseExchange extends Exchange {
         this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
     }
 
-    public async getGames(): Promise<localModels.GameSet> {
-        const games = new localModels.GameSet;
+    public async getGames(): Promise<models.GameSet> {
+        const games = new models.GameSet;
 
         const articleElements = await this.connectionManager.page.$$('article');
 
@@ -30,7 +30,7 @@ export class SugarHouseExchange extends Exchange {
             const homeTeam = gameSearchObjects.homeTeam;
             const startDate = gameSearchObjects.startDate;
     
-            const game = await globalModels.allGames.findOrCreate({
+            const game = await global.allGames.findOrCreate({
                 awayTeam: awayTeam,
                 homeTeam: homeTeam,
                 startDate: startDate,
@@ -45,8 +45,8 @@ export class SugarHouseExchange extends Exchange {
     }
 
     public async getGameSearchObjects(articleElement: ElementHandle): Promise<{
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
         startDate: Date,
     }> {
         const gameIdentifyingStrings = await this.getGameIdentifyingStrings(articleElement);
@@ -63,8 +63,8 @@ export class SugarHouseExchange extends Exchange {
             throw new Error(`homeTeamName is null.`);
         }
 
-        const awayTeam = globalModels.allTeams.find({ name: awayTeamName });
-        const homeTeam = globalModels.allTeams.find({ name: homeTeamName });
+        const awayTeam = global.allTeams.find({ name: awayTeamName });
+        const homeTeam = global.allTeams.find({ name: homeTeamName });
         let startDate: Date;
 
         if (!startDateString) {

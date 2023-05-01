@@ -1,4 +1,4 @@
-import * as localModels from '../..';
+import * as models from '../..';
 
 import { Game } from './game';
 
@@ -8,8 +8,8 @@ export class GameSet extends Set<Game> {
         homeTeam,
         startDate,
     }: {
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
         startDate?: Date,
     }): Game | null {
         for (const game of this) {
@@ -30,8 +30,8 @@ export class GameSet extends Set<Game> {
         homeTeam,
         startDate,
     }: {
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
         startDate?: Date,
     }): Promise<Game | null> {         
         const foundGame = this.find({

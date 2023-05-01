@@ -1,17 +1,17 @@
 import { Op } from 'sequelize';
 
 import * as databaseModels from '../../../database';
-import * as globalModels from '../../../global';
-import * as localModels from '../../../models';
+import * as global from '../../../global';
+import * as models from '../../../models';
 
 const sequelize = databaseModels.sequelize;
 
 export class Game {
     private wrappedStartDate: Date;
-    private wrappedAwayTeam: localModels.Team;
-    private wrappedHomeTeam: localModels.Team;
-    private wrappedExchangeGames: localModels.ExchangeGameSet;
-    private wrappedOutcomes: localModels.OutcomeSet;
+    private wrappedAwayTeam: models.Team;
+    private wrappedHomeTeam: models.Team;
+    private wrappedExchangeGames: models.ExchangeGameSet;
+    private wrappedOutcomes: models.OutcomeSet;
     private wrappedSqlGame: databaseModels.Game | null;
 
     private constructor({
@@ -19,18 +19,18 @@ export class Game {
         homeTeam,
         startDate,
     }: {
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
         startDate: Date,
     }) {
         this.wrappedAwayTeam = awayTeam;
         this.wrappedHomeTeam = homeTeam;
         this.wrappedStartDate = startDate;
-        this.wrappedExchangeGames = new localModels.ExchangeGameSet;
-        this.wrappedOutcomes = new localModels.OutcomeSet;
+        this.wrappedExchangeGames = new models.ExchangeGameSet;
+        this.wrappedOutcomes = new models.OutcomeSet;
         this.wrappedSqlGame = null;
 
-        globalModels.allGames.add(this);
+        global.allGames.add(this);
     }
 
     public static async create({
@@ -38,8 +38,8 @@ export class Game {
         homeTeam,
         startDate,
     }: {
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
         startDate: Date,
     }): Promise<Game> {
         const newGame = new Game({
@@ -94,8 +94,8 @@ export class Game {
         homeTeam,
         startDate,
     }: {
-        awayTeam: localModels.Team,
-        homeTeam: localModels.Team,
+        awayTeam: models.Team,
+        homeTeam: models.Team,
         startDate?: Date,
     }): boolean {
         if (!startDate) {
@@ -142,19 +142,19 @@ export class Game {
         return this.wrappedStartDate;
     }
 
-    get awayTeam(): localModels.Team {
+    get awayTeam(): models.Team {
         return this.wrappedAwayTeam;
     }
 
-    get homeTeam(): localModels.Team {
+    get homeTeam(): models.Team {
         return this.wrappedHomeTeam;
     }
 
-    get exchangeGames(): localModels.ExchangeGameSet {
+    get exchangeGames(): models.ExchangeGameSet {
         return this.wrappedExchangeGames;
     }
 
-    get outcomes(): localModels.OutcomeSet {
+    get outcomes(): models.OutcomeSet {
         return this.wrappedOutcomes;
     }
 
