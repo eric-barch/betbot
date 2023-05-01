@@ -5,16 +5,25 @@ import * as global from '../../../../global';
 import * as models from '../../../../models';
 
 export abstract class Exchange {
-    protected abstract wrappedName: string;
-    protected abstract wrappedUrl: string;
+    protected wrappedName: string;
+    protected wrappedUrl: string;
     protected wrappedExchangeGames: models.ExchangeGameSet;
     protected wrappedOdds: models.OddSet;
-    protected abstract wrappedConnectionManager: ConnectionManager;
+    protected wrappedConnectionManager: ConnectionManager;
     private wrappedSqlExchange: database.Exchange | null;
 
-    public constructor() {
+    public constructor({
+        name,
+        url,
+    }: {
+        name: string,
+        url: string,
+    }) {
+        this.wrappedName = name;
+        this.wrappedUrl = url;
         this.wrappedExchangeGames = new models.ExchangeGameSet();
         this.wrappedOdds = new models.OddSet();
+        this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
         this.wrappedSqlExchange = null;
     }
 

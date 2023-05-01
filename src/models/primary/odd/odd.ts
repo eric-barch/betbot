@@ -354,6 +354,8 @@ export abstract class Odd {
                 endTime: this.sqlOdd.updatedAt,
                 oddId: oddId,
             });
+
+            console.log('New odd.');
         }
     }
 
