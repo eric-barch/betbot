@@ -11,7 +11,7 @@ export class ExchangeGameTeamSet extends Set<ExchangeGameTeam> {
         exchange: models.Exchange,
         game: models.Game,
         team: models.Team,
-    }): ExchangeGameTeam | null {
+    }): ExchangeGameTeam {
         for (const exchangeGameTeam of this) {
             if (exchangeGameTeam.matches({
                 exchange: exchange,
@@ -22,7 +22,7 @@ export class ExchangeGameTeamSet extends Set<ExchangeGameTeam> {
             }
         }
 
-        return null;
+        throw new Error(`Did not find exchangeGameTeam.`)
     }
 
     public async findOrCreate({
@@ -34,21 +34,21 @@ export class ExchangeGameTeamSet extends Set<ExchangeGameTeam> {
         game: models.Game,
         team: models.Team,
     }) {
-        const foundExchangeGameTeam = this.find({
-            exchange: exchange,
-            game: game,
-            team: team,
-        });
+        let exchangeGameTeam: ExchangeGameTeam;
 
-        if (foundExchangeGameTeam) {
-            return foundExchangeGameTeam;
+        try {
+            exchangeGameTeam = this.find({
+                exchange: exchange,
+                game: game,
+                team: team,
+            });
+        } catch {
+            exchangeGameTeam = await ExchangeGameTeam.create({
+                exchange: exchange,
+                game: game,
+                team: team,
+            });
         }
-
-        const exchangeGameTeam = await ExchangeGameTeam.create({
-            exchange: exchange,
-            game: game,
-            team: team,
-        });
 
         this.add(exchangeGameTeam);
         return exchangeGameTeam;

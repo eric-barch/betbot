@@ -1,4 +1,4 @@
-import * as databaseModels from '../../../database';
+import * as database from '../../../database';
 import * as global from '../../../global';
 import * as models from '../../../models';
 
@@ -16,7 +16,7 @@ export class Outcome {
     private wrappedGame: models.Game;
     private wrappedOdds: models.OddSet;
     private wrappedOppositeOutcome: Outcome | null;
-    private wrappedSqlOutcome: databaseModels.Outcome | null;
+    private wrappedSqlOutcome: database.Outcome | null;
 
     private constructor({
         type,
@@ -58,11 +58,11 @@ export class Outcome {
         return newOutcome;
     }
 
-    public async initSqlOutcome(): Promise<databaseModels.Outcome> {
+    public async initSqlOutcome(): Promise<database.Outcome> {
         const type = this.type;
         const gameId = this.game.sqlGame.get('id');
 
-        await databaseModels.Outcome.findOrCreate({
+        await database.Outcome.findOrCreate({
             where: {
                 type: type,
                 gameId: gameId,
@@ -132,7 +132,7 @@ export class Outcome {
         oppositeOutcome.wrappedOppositeOutcome = this;
     }
 
-    get sqlOutcome(): databaseModels.Outcome {
+    get sqlOutcome(): database.Outcome {
         if (!this.wrappedSqlOutcome) {
             throw new Error(`${this.game.regionAbbrIdentifierAbbr} ${this.type} sqlOutcome is null.`)
         }

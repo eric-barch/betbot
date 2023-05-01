@@ -1,8 +1,9 @@
 import { ElementHandle } from "puppeteer";
 
+import { ExchangeGameTeam } from '../exchangeGameTeam';
 import * as models from '../../../../models';
 
-export abstract class FanDuelExchangeGameTeam extends models.ExchangeGameTeam {
+export abstract class FanDuelExchangeGameTeam extends ExchangeGameTeam {
     public element: ElementHandle | null;
     protected abstract xPathFromExchangeGame: string;
 

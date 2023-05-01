@@ -1,8 +1,9 @@
 import { ElementHandle } from "puppeteer";
 
+import { ExchangeGameTeam } from '../exchangeGameTeam';
 import * as models from '../../../../models';
 
-export abstract class DraftKingsExchangeGameTeam extends models.ExchangeGameTeam {
+export abstract class DraftKingsExchangeGameTeam extends ExchangeGameTeam {
     public element: ElementHandle | null;
 
     public constructor({

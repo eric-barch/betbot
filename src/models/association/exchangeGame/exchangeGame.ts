@@ -20,6 +20,9 @@ export abstract class ExchangeGame {
         this.wrappedGame = game;
         this.wrappedExchangeGameAwayTeam = null;
         this.wrappedExchangeGameHomeTeam = null;
+
+        exchange.exchangeGames.add(this);
+        game.exchangeGames.add(this);
         global.allExchangeGames.add(this);
     }
 
@@ -122,20 +125,8 @@ export abstract class ExchangeGame {
         return this.wrappedExchange;
     }
 
-    /**TODO: Is this used? */
-    set exchange(exchange: models.Exchange) {
-        this.wrappedExchange = exchange;
-        exchange.exchangeGames.add(this);
-    }
-
     get game(): models.Game {
         return this.wrappedGame;
-    }
-    
-    /**TODO: Is this used? */
-    set game(game: models.Game) {
-        this.wrappedGame = game;
-        game.exchangeGames.add(this);
     }
 
     get exchangeGameAwayTeam(): models.ExchangeGameTeam {

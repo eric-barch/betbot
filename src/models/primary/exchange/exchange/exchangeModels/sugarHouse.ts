@@ -7,14 +7,14 @@ import * as models from '../../../..';
 import { ConnectionManager } from '../connectionManager';
 
 export class SugarHouseExchange extends Exchange {
-    public name: string;
-    public url: string;
+    protected wrappedName: string;
+    protected wrappedUrl: string;
     protected wrappedConnectionManager: ConnectionManager;
 
     constructor() {
         super();
-        this.name = 'SugarHouse';
-        this.url = 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home';
+        this.wrappedName = 'SugarHouse';
+        this.wrappedUrl = 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home';
         this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
     }
 

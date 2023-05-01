@@ -8,14 +8,14 @@ import * as global from '../../../../../global';
 import * as models from '../../../..';
 
 export class FanDuelExchange extends Exchange {
-    public name: string = 'FanDuel';
-    public url: string = 'https://sportsbook.fanduel.com/navigation/nba';
+    protected wrappedName: string = 'FanDuel';
+    protected wrappedUrl: string = 'https://sportsbook.fanduel.com/navigation/nba';
     protected wrappedConnectionManager: ConnectionManager;
 
     constructor() {
         super();
-        this.name = 'FanDuel';
-        this.url = 'https://sportsbook.fanduel.com/navigation/nba';
+        this.wrappedName = 'FanDuel';
+        this.wrappedUrl = 'https://sportsbook.fanduel.com/navigation/nba';
         this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
     }
 

@@ -1,16 +1,16 @@
 import { ConnectionManager } from './connectionManager';
 
-import * as databaseModels from '../../../../database';
+import * as database from '../../../../database';
 import * as global from '../../../../global';
 import * as models from '../../../../models';
 
 export abstract class Exchange {
-    public abstract name: string;
-    public abstract url: string;
+    protected abstract wrappedName: string;
+    protected abstract wrappedUrl: string;
     protected wrappedExchangeGames: models.ExchangeGameSet;
     protected wrappedOdds: models.OddSet;
     protected abstract wrappedConnectionManager: ConnectionManager;
-    private wrappedSqlExchange: databaseModels.Exchange | null;
+    private wrappedSqlExchange: database.Exchange | null;
 
     public constructor() {
         this.wrappedExchangeGames = new models.ExchangeGameSet();
@@ -24,8 +24,8 @@ export abstract class Exchange {
         return this;
     }
 
-    protected async initSqlExchange(): Promise<databaseModels.Exchange> {
-        await databaseModels.Exchange.findOrCreate({
+    protected async initSqlExchange(): Promise<database.Exchange> {
+        await database.Exchange.findOrCreate({
             where: {
                 name: this.name,
             },
@@ -61,7 +61,7 @@ export abstract class Exchange {
         return this.exchangeGames;
     }
 
-    public async initOdds(): Promise<models.OddSet> {
+    public async updateOdds(): Promise<models.OddSet> {
         for (const exchangeGame of this.exchangeGames) {
             const spreadAway = await global.allOutcomes.findOrCreate({
                 game: exchangeGame.game,
@@ -121,6 +121,14 @@ export abstract class Exchange {
         return this.odds;
     }
 
+    get name(): string {
+        return this.wrappedName;
+    }
+
+    get url(): string {
+        return this.wrappedUrl;
+    }
+
     get nameStripped(): string {
         return this.name.replace(/[^a-zA-Z0-9]/g, '');
     }
@@ -143,7 +151,7 @@ export abstract class Exchange {
         return this.wrappedConnectionManager;
     }
 
-    get sqlExchange(): databaseModels.Exchange {
+    get sqlExchange(): database.Exchange {
         if (!this.wrappedSqlExchange) {
             throw new Error(`${this.name}.sqlExchange is null.`)
         } 

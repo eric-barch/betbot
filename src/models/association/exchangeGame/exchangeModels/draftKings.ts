@@ -1,8 +1,9 @@
 import { ElementHandle } from "puppeteer";
 
+import { ExchangeGame } from '../exchangeGame';
 import * as models from '../../../../models';
 
-export class DraftKingsExchangeGame extends models.ExchangeGame {
+export class DraftKingsExchangeGame extends ExchangeGame {
     public constructor({
         exchange,
         game,

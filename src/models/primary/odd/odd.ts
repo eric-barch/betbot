@@ -1,17 +1,17 @@
 import { ElementHandle } from 'puppeteer';
 
-import * as databaseModels from '../../../database';
+import * as database from '../../../database';
 import * as global from '../../../global';
 import * as models from '../../../models';
 
 export abstract class Odd {
     protected wrappedPrice: number | null;
     protected wrappedValue: number | null;
-    public priceElement: ElementHandle | null;
-    public valueElement: ElementHandle | null;
+    protected priceElement: ElementHandle | null;
+    protected valueElement: ElementHandle | null;
     protected wrappedExchange: models.Exchange;
     protected wrappedOutcome: models.Outcome;
-    protected wrappedSqlOdd: databaseModels.Odd | null;
+    protected wrappedSqlOdd: database.Odd | null;
 
     constructor({
         exchange,
@@ -22,27 +22,23 @@ export abstract class Odd {
     }) {
         this.wrappedPrice = null;
         this.wrappedValue = null;
-
         this.priceElement = null;
         this.valueElement = null;
-
         this.wrappedExchange = exchange;
         this.wrappedOutcome = outcome;
         this.wrappedSqlOdd = null;
 
+        exchange.odds.add(this);
+        outcome.odds.add(this);
         global.allOdds.add(this);
     }
 
     public static async create({
         exchange,
         outcome,
-        price,
-        value,
     }: {
         exchange: models.Exchange,
         outcome: models.Outcome,
-        price?: number | null,
-        value?: number | null,
     }): Promise<Odd> {;
         let newOdd: models.Odd;
 
@@ -186,11 +182,11 @@ export abstract class Odd {
     }: {
         price: number | null,
         value: number | null,
-    }): Promise<databaseModels.Odd> {
+    }): Promise<database.Odd> {
         const exchangeId = this.exchange.sqlExchange.get('id');
         const outcomeId = this.outcome.sqlOutcome.get('id');
 
-        await databaseModels.Odd.findOrCreate({
+        await database.Odd.findOrCreate({
             where: {
                 exchangeId: exchangeId,
                 outcomeId: outcomeId,
@@ -311,6 +307,9 @@ export abstract class Odd {
         price: number | null,
         value: number | null,
     }): Promise<void> {
+        this.wrappedPrice = price;
+        this.wrappedValue = value;
+
         if (!this.wrappedSqlOdd) {
             await this.initSqlOdd({
                 price: price,
@@ -333,9 +332,6 @@ export abstract class Odd {
         price: number | null,
         value: number | null,
     }) {
-        this.wrappedPrice = price;
-        this.wrappedValue = value;
-
         const oldPrice = this.sqlOdd.price;
         const oldValue = this.sqlOdd.value;
 
@@ -351,7 +347,7 @@ export abstract class Odd {
                 value: value,
             });
 
-            await databaseModels.OldOdd.create({
+            await database.OldOdd.create({
                 price: oldPrice,
                 value: oldValue,
                 startTime: oldUpdatedAt,
@@ -387,7 +383,7 @@ export abstract class Odd {
         return this.wrappedOutcome;
     }
 
-    get sqlOdd(): databaseModels.Odd {
+    get sqlOdd(): database.Odd {
         if (!this.wrappedSqlOdd) {
             throw new Error(`sqlOdd is null.`);
         }

@@ -1,8 +1,9 @@
 import { ElementHandle } from "puppeteer";
 
+import { ExchangeGameTeam } from '../exchangeGameTeam';
 import * as models from '../../../../models';
 
-export class SugarHouseExchangeGameTeam extends models.ExchangeGameTeam {
+export class SugarHouseExchangeGameTeam extends ExchangeGameTeam {
     constructor({
         exchange,
         game,

@@ -1,10 +1,10 @@
 import { Op } from 'sequelize';
 
-import * as databaseModels from '../../../database';
+import * as database from '../../../database';
 import * as global from '../../../global';
 import * as models from '../../../models';
 
-const sequelize = databaseModels.sequelize;
+const sequelize = database.sequelize;
 
 export class Game {
     private wrappedStartDate: Date;
@@ -12,7 +12,7 @@ export class Game {
     private wrappedHomeTeam: models.Team;
     private wrappedExchangeGames: models.ExchangeGameSet;
     private wrappedOutcomes: models.OutcomeSet;
-    private wrappedSqlGame: databaseModels.Game | null;
+    private wrappedSqlGame: database.Game | null;
 
     private constructor({
         awayTeam,
@@ -53,12 +53,12 @@ export class Game {
         return newGame;
     }
 
-    private async initSqlGame(): Promise<databaseModels.Game> {
+    private async initSqlGame(): Promise<database.Game> {
         const awayTeamId = this.awayTeam.sqlTeam.get('id');
         const homeTeamId = this.homeTeam.sqlTeam.get('id');
         const startDate = this.startDate;
     
-        await databaseModels.Game.findOrCreate({
+        await database.Game.findOrCreate({
             where: {
                 [Op.and]: [
                     { awayTeamId: awayTeamId },
@@ -158,7 +158,7 @@ export class Game {
         return this.wrappedOutcomes;
     }
 
-    get sqlGame(): databaseModels.Game {
+    get sqlGame(): database.Game {
         if (!this.wrappedSqlGame) {
             throw new Error(`${this.regionAbbrIdentifierAbbr}.sqlGame is null.`);
         }

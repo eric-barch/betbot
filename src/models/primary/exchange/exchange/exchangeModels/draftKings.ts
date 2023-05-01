@@ -7,14 +7,14 @@ import { Exchange } from '../exchange';
 import { ConnectionManager } from '../connectionManager';
 
 export class DraftKingsExchange extends Exchange {
-    public name: string;
-    public url: string;
+    protected wrappedName: string;
+    protected wrappedUrl: string;
     protected wrappedConnectionManager: ConnectionManager;
 
     constructor() {
         super();
-        this.name = 'DraftKings';
-        this.url = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
+        this.wrappedName = 'DraftKings';
+        this.wrappedUrl = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
         this.wrappedConnectionManager = new ConnectionManager({ exchange: this });
     }
 

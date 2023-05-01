@@ -23,9 +23,9 @@ async function main() {
 
     await allExchangeGames.updateElements();
     await allExchangeGameTeams.updateElements();
-    await allOdds.updateElements();
+    await allOdds.getElements();
 
-    await allOdds.updateValues();
+    await allOdds.getValues();
 
     updateExchangeGameElements();
     updateExchangeGameTeamElements();
@@ -61,7 +61,7 @@ async function updateExchangeGameTeamElements() {
 
 async function updateOddElements() {
     const start = new Date();
-    await allOdds.updateElements();
+    await allOdds.getElements();
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();
@@ -73,7 +73,7 @@ async function updateOddElements() {
 
 async function updateOddValues() {
     const start = new Date();
-    await allOdds.updateValues();
+    await allOdds.getValues();
     const end = new Date();
 
     const duration = end.getTime() - start.getTime();

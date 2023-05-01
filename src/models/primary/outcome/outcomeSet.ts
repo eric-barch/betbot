@@ -1,6 +1,5 @@
-import * as models from '../..';
-
 import { Outcome } from './outcome';
+import * as models from '../../../models';
 
 export class OutcomeSet extends Set<Outcome> {
     public find({
@@ -11,7 +10,7 @@ export class OutcomeSet extends Set<Outcome> {
         game: models.Game,
         type: models.OutcomeType,
         oppositeOutcome?: Outcome,
-    }): Outcome | null {
+    }): Outcome {
         for (const outcome of this) {
             if (outcome.matches({
                 game: game,
@@ -25,7 +24,7 @@ export class OutcomeSet extends Set<Outcome> {
             }
         }
 
-        return null;
+        throw new Error(`Did not find outcome.`);
     }
 
     public async findOrCreate({
@@ -37,22 +36,23 @@ export class OutcomeSet extends Set<Outcome> {
         type: models.OutcomeType,
         oppositeOutcome?: Outcome,
     }): Promise<Outcome> {
-        const foundOutcome = this.find({
-            game: game,
-            type: type,
-            oppositeOutcome: oppositeOutcome,
-        })
+        let outcome;
 
-        if (foundOutcome) {
-            return foundOutcome;
+        try {
+            outcome = this.find({
+                game: game,
+                type: type,
+                oppositeOutcome: oppositeOutcome,
+            });
+        } catch {
+            outcome = await Outcome.create({
+                game: game,
+                type: type,
+                oppositeOutcome: oppositeOutcome,
+            });
         }
 
-        const newOutcome = await Outcome.create({
-            game: game,
-            type: type,
-            oppositeOutcome: oppositeOutcome,
-        });
-
-        return newOutcome;
+        this.add(outcome);
+        return outcome;
     }
 }

@@ -6,16 +6,14 @@ export class TeamSet extends Set<Team> {
     }: {
         name: string,
     }) {
-        const nameLowerCase = name.toLowerCase();
-
         for (const team of this) {
-            const teamIdentifier = team.identifierFull.toLowerCase();
-
-            if (nameLowerCase.includes(teamIdentifier)) {
+            if (team.matches({
+                name: name,
+            })) {
                 return team;
             }
         }
 
-        throw new Error(`Did not find team matching \"${name}\"`);
+        throw new Error(`Did not find team.`);
     }
 }

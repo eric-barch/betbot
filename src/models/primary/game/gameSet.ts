@@ -1,6 +1,5 @@
-import * as models from '../..';
-
 import { Game } from './game';
+import * as models from '../../../models';
 
 export class GameSet extends Set<Game> {
     public find({
@@ -11,7 +10,7 @@ export class GameSet extends Set<Game> {
         awayTeam: models.Team,
         homeTeam: models.Team,
         startDate?: Date,
-    }): Game | null {
+    }): Game {
         for (const game of this) {
             if (game.matches({
                 awayTeam: awayTeam,
@@ -22,7 +21,7 @@ export class GameSet extends Set<Game> {
             }
         }
 
-        return null;
+        throw new Error(`Did not find game.`);
     }
 
     public async findOrCreate({
@@ -33,29 +32,28 @@ export class GameSet extends Set<Game> {
         awayTeam: models.Team,
         homeTeam: models.Team,
         startDate?: Date,
-    }): Promise<Game | null> {         
-        const foundGame = this.find({
-            awayTeam: awayTeam,
-            homeTeam: homeTeam,
-            startDate: startDate,
-        });
+    }): Promise<Game | null> {
+        let game: Game;
 
-        if (foundGame) {
-            return foundGame;
+        try {
+            game = this.find({
+                awayTeam: awayTeam,
+                homeTeam: homeTeam,
+                startDate: startDate,
+            });
+        } catch {
+            if (!startDate) {
+                throw new Error(`Did not find game and startDate was not provided to create new one.`);
+            }
+
+            game = await Game.create({
+                awayTeam: awayTeam,
+                homeTeam: homeTeam,
+                startDate: startDate,
+            });
         }
-
-        if (!startDate) {
-            throw new Error(`Did not find game and startDate was not provided to create new one.`);
-        }
-
-        const newGame = await Game.create({
-            awayTeam: awayTeam,
-            homeTeam: homeTeam,
-            startDate: startDate,
-        });
         
-        this.add(newGame);
-
-        return newGame;
+        this.add(game);
+        return game;
     }
 }
