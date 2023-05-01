@@ -1,12 +1,27 @@
 import { ElementHandle } from "puppeteer";
 
-import { ExchangeGameTeam } from "../exchangeGameTeam";
+import * as localModels from '../../../../models';
 
-import * as localModels from '../../..';
-
-export abstract class FanDuelExchangeGameTeam extends ExchangeGameTeam {
-    public element: ElementHandle | null = null;
+export abstract class FanDuelExchangeGameTeam extends localModels.ExchangeGameTeam {
+    public element: ElementHandle | null;
     protected abstract xPathFromExchangeGame: string;
+
+    constructor({
+        exchange,
+        game,
+        team,
+    }: {
+        exchange: localModels.Exchange,
+        game: localModels.Game,
+        team: localModels.Team,
+    }) {
+        super({
+            exchange,
+            game,
+            team,
+        });
+        this.element = null;
+    }
 
     public async updateElement(): Promise<ElementHandle | null> {
         const exchangeGame = this.exchangeGame;

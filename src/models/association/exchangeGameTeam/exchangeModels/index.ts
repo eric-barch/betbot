@@ -11,8 +11,7 @@ import {
 } from "./fanDuel";
 
 import {
-    SugarHouseExchangeGameAwayTeam,
-    SugarHouseExchangeGameHomeTeam,
+    SugarHouseExchangeGameTeam,
 } from "./sugarHouse";
 
 export {
@@ -24,6 +23,5 @@ export {
     FanDuelExchangeGameAwayTeam,
     FanDuelExchangeGameHomeTeam,
 
-    SugarHouseExchangeGameAwayTeam,
-    SugarHouseExchangeGameHomeTeam,
+    SugarHouseExchangeGameTeam,
 }
