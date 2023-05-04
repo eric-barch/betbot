@@ -32,7 +32,6 @@ export class Outcome {
         this.wrappedSqlOutcome = null;
 
         game.outcomes.add(this);
-        global.allOutcomes.add(this);
     }
 
     static async create({
@@ -54,7 +53,7 @@ export class Outcome {
         }
 
         await newOutcome.initSqlOutcome();
-
+        global.allOutcomes.add(newOutcome);
         return newOutcome;
     }
 

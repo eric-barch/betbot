@@ -22,7 +22,6 @@ export class Team {
         this.wrappedRegionAbbr = regionAbbr;
         this.wrappedIdentifierFull = identifierFull;
         this.wrappedIdentifierAbbr = identifierAbbr;
-
         this.wrappedSqlTeam = null;
     }
 

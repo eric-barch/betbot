@@ -30,7 +30,6 @@ export abstract class ExchangeGameTeam {
             exchange: exchange,
             game: game,
         });
-        global.allExchangeGameTeams.add(this);
     }
 
     static async create({
