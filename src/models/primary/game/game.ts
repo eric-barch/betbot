@@ -29,8 +29,6 @@ export class Game {
         this.wrappedExchangeGames = new models.ExchangeGameSet;
         this.wrappedOutcomes = new models.OutcomeSet;
         this.wrappedSqlGame = null;
-
-        global.allGames.add(this);
     }
 
     public static async create({
@@ -49,7 +47,7 @@ export class Game {
         });
 
         await newGame.initSqlGame();
-
+        global.allGames.add(newGame);
         return newGame;
     }
 

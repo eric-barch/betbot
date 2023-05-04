@@ -23,7 +23,6 @@ export abstract class ExchangeGame {
 
         exchange.exchangeGames.add(this);
         game.exchangeGames.add(this);
-        global.allExchangeGames.add(this);
     }
 
     static async create({
@@ -58,6 +57,7 @@ export abstract class ExchangeGame {
                 throw new Error(`Did not find exchange.`);
         }
 
+        global.allExchangeGames.add(newExchangeGame);
         return newExchangeGame;
     }
 

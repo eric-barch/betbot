@@ -30,7 +30,6 @@ export abstract class Odd {
 
         exchange.odds.add(this);
         outcome.odds.add(this);
-        global.allOdds.add(this);
     }
 
     public static async create({
@@ -173,6 +172,7 @@ export abstract class Odd {
                 throw new Error(`Did not find corresponding exchange.`)
         }
 
+        global.allOdds.add(newOdd);
         return newOdd;
     }
 
