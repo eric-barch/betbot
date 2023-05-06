@@ -1,0 +1,55 @@
+Date : 2023-05-05 23:52:19
+Directory : /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src
+Total : 21 files,  1061 codes, 34 comments, 84 blanks, all 1179 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| TypeScript |         21 |      1,061 |         34 |         84 |      1,179 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                   |         21 |      1,061 |         34 |         84 |      1,179 |
+| . (Files)                                                                                                           |          1 |         11 |          6 |          6 |         23 |
+| db                                                                                                                  |          8 |        227 |         28 |         34 |        289 |
+| db (Files)                                                                                                          |          6 |        195 |         28 |         30 |        253 |
+| db/exchangeLeague                                                                                                   |          2 |         32 |          0 |          4 |         36 |
+| global                                                                                                              |         12 |        823 |          0 |         44 |        867 |
+| global (Files)                                                                                                      |          1 |          4 |          0 |          0 |          4 |
+| global/exchangeLeagues                                                                                              |          2 |         57 |          0 |         11 |         68 |
+| global/exchanges                                                                                                    |          2 |         53 |          0 |          8 |         61 |
+| global/leagues                                                                                                      |          2 |         53 |          0 |          8 |         61 |
+| global/teams                                                                                                        |          5 |        656 |          0 |         17 |        673 |
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                            | language   | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/db/exchange.ts                            | TypeScript |         49 |          5 |          7 |         61 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/db/exchangeLeague/exchangeLeague.ts       | TypeScript |         30 |          0 |          3 |         33 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/db/exchangeLeague/index.ts                | TypeScript |          2 |          0 |          1 |          3 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/db/index.ts                               | TypeScript |         15 |          0 |          1 |         16 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/db/instance.ts                            | TypeScript |          7 |          0 |          1 |          8 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/db/instanceMethods.ts                     | TypeScript |         28 |          4 |          8 |         40 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/db/league.ts                              | TypeScript |         60 |          7 |          7 |         74 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/db/team.ts                                | TypeScript |         36 |         12 |          6 |         54 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/exchangeLeagues/exchangeLeagues.ts | TypeScript |         55 |          0 |         10 |         65 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/exchangeLeagues/index.ts           | TypeScript |          2 |          0 |          1 |          3 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/exchanges/exchanges.ts             | TypeScript |         41 |          0 |          7 |         48 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/exchanges/index.ts                 | TypeScript |         12 |          0 |          1 |         13 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/index.ts                           | TypeScript |          4 |          0 |          0 |          4 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/leagues/index.ts                   | TypeScript |         12 |          0 |          1 |         13 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/leagues/leagues.ts                 | TypeScript |         41 |          0 |          7 |         48 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/teams/index.ts                     | TypeScript |         12 |          0 |          1 |         13 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/teams/mlbTeamData.ts               | TypeScript |        183 |          0 |          2 |        185 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/teams/nbaTeamData.ts               | TypeScript |        183 |          0 |          1 |        184 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/teams/nflTeamData.ts               | TypeScript |        195 |          0 |          4 |        199 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/global/teams/teams.ts                     | TypeScript |         83 |          0 |          9 |         92 |
+| /Users/ericbarch/Documents/Development/AutomaticSportsBetting/betbot3/src/main.ts                                   | TypeScript |         11 |          6 |          6 |         23 |
+| Total                                                                                                               |            |      1,061 |         34 |         84 |      1,179 |
++---------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

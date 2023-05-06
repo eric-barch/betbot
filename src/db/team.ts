@@ -39,14 +39,6 @@ Team.init({
     nameAbbr: new s.DataTypes.STRING(128),
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
-    // leagueId: {
-    //     type: s.DataTypes.INTEGER.UNSIGNED,
-    //     allowNull: false,
-    //     references: {
-    //         model: 'League',
-    //         key: 'id',
-    //     },
-    // },
 }, {
     sequelize,
     tableName: 'Teams',

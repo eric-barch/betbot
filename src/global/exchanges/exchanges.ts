@@ -17,7 +17,7 @@ export async function init() {
 
     sugarHouse = await initExchange({
         name: 'SugarHouse',
-        baseUrl: 'https://ct.playsugarhouse.com/',
+        baseUrl: 'https://ct.playsugarhouse.com/&page=sportsbook',
     })
 }
 
@@ -30,17 +30,17 @@ async function initExchange({
 }): Promise<db.Exchange> {
     const [exchange, created] = await db.Exchange.findOrCreate({
         where: {
-            name: name,
+            name,
         },
         defaults: {
-            name: name,
-            baseUrl: baseUrl,
+            name,
+            baseUrl,
         }
     });
 
     if (!created) {
         await exchange.update({
-            baseUrl: baseUrl,
+            baseUrl,
         });
     }
 

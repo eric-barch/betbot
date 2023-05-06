@@ -8,17 +8,24 @@ export async function init(): Promise<void> {
     await initDbConnection();
 
     // Exchange associations
-    Exchange.belongsToMany(League, {through: ExchangeLeague});
+    Exchange.belongsToMany(League, { through: ExchangeLeague, foreignKey: 'exchangeId' });
+    Exchange.hasMany(ExchangeLeague, { foreignKey: 'exchangeId' });
 
     // League associations
-    League.belongsToMany(Exchange, {through: ExchangeLeague});
+    League.belongsToMany(Exchange, {through: ExchangeLeague, foreignKey: 'leagueId' });
     League.hasMany(Team, { foreignKey: 'leagueId' });
+    League.hasMany(ExchangeLeague, { foreignKey: 'leagueId' });
 
     // Team associations
     Team.belongsTo(League, { foreignKey: 'leagueId' });
 
+    // ExchangeLeague associations
+    ExchangeLeague.belongsTo(Exchange, { foreignKey: 'exchangeId' });
+    ExchangeLeague.belongsTo(League, { foreignKey: 'leagueId' });
+
     await sequelize.sync({
         alter: true,
+        logging: false,
     });
     console.log(`MySQL table setup successful.`);
 }

@@ -3,6 +3,7 @@ import * as s from 'sequelize';
 import { sequelize } from './instance';
 import { Exchange } from './exchange';
 import { Team } from './team';
+import { ExchangeLeague } from './exchangeLeague';
 
 export class League extends s.Model<
     s.InferAttributes<League, { omit: 'exchanges' }>,
@@ -38,6 +39,18 @@ export class League extends s.Model<
     declare hasTeams: s.HasManyHasAssociationsMixin<Team, number>;
     declare countTeams: s.HasManyCountAssociationsMixin;
     declare createTeam: s.HasManyCreateAssociationMixin<Team, 'leagueId'>;
+
+    // hasMany(ExchangeLeague)
+    declare getExchangeLeagues: s.HasManyGetAssociationsMixin<ExchangeLeague>;
+    declare addExchangeLeague: s.HasManyAddAssociationMixin<ExchangeLeague, number>;
+    declare addExchangeLeagues: s.HasManyAddAssociationsMixin<ExchangeLeague, number>;
+    declare setExchangeLeagues: s.HasManySetAssociationsMixin<ExchangeLeague, number>;
+    declare removeExchangeLeague: s.HasManyRemoveAssociationMixin<ExchangeLeague, number>;
+    declare removeExchangeLeagues: s.HasManyRemoveAssociationsMixin<ExchangeLeague, number>;
+    declare hasExchangeLeague: s.HasManyHasAssociationMixin<ExchangeLeague, number>;
+    declare hasExchangeLeagues: s.HasManyHasAssociationsMixin<ExchangeLeague, number>;
+    declare countExchangeLeagues: s.HasManyCountAssociationsMixin;
+    declare createExchangeLeague: s.HasManyCreateAssociationMixin<ExchangeLeague, 'leagueId'>;
 
     // declare static associations: {
     //     exchanges: s.Association<League, Exchange>;
