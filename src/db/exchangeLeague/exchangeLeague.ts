@@ -1,8 +1,8 @@
 import * as s from 'sequelize';
 
-import { sequelize } from './instance';
-import { Exchange } from './exchange';
-import { League } from './league';
+import { sequelize } from '../instance';
+import { Exchange } from '../exchange';
+import { League } from '../league';
 
 export class ExchangeLeague extends s.Model<
     s.InferAttributes<ExchangeLeague, { omit: 'exchange' | 'league'}>,
