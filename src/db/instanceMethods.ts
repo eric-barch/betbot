@@ -1,27 +1,28 @@
 import { sequelize } from './instance';
-import { Exchange } from './exchange';
-import { League } from './league';
-import { Team } from './team';
-import { ExchangeLeague } from './exchangeLeague';
+import * as db from '../db';
 
 export async function init(): Promise<void> {
     await initDbConnection();
 
     // Exchange associations
-    Exchange.belongsToMany(League, { through: ExchangeLeague, foreignKey: 'exchangeId' });
-    Exchange.hasMany(ExchangeLeague, { foreignKey: 'exchangeId' });
+    db.Exchange.belongsToMany(db.League, { through: db.ExchangeLeague, foreignKey: 'exchangeId' });
+    db.Exchange.hasMany(db.ExchangeLeague, { foreignKey: 'exchangeId' });
 
     // League associations
-    League.belongsToMany(Exchange, {through: ExchangeLeague, foreignKey: 'leagueId' });
-    League.hasMany(Team, { foreignKey: 'leagueId' });
-    League.hasMany(ExchangeLeague, { foreignKey: 'leagueId' });
-
-    // Team associations
-    Team.belongsTo(League, { foreignKey: 'leagueId' });
+    db.League.belongsToMany(db.Exchange, {through: db.ExchangeLeague, foreignKey: 'leagueId' });
+    db.League.hasMany(db.Team, { foreignKey: 'leagueId' });
+    db.League.hasMany(db.ExchangeLeague, { foreignKey: 'leagueId' });
 
     // ExchangeLeague associations
-    ExchangeLeague.belongsTo(Exchange, { foreignKey: 'exchangeId' });
-    ExchangeLeague.belongsTo(League, { foreignKey: 'leagueId' });
+    db.ExchangeLeague.belongsTo(db.Exchange, { foreignKey: 'exchangeId' });
+    db.ExchangeLeague.belongsTo(db.League, { foreignKey: 'leagueId' });
+    db.ExchangeLeague.hasMany(db.ExchangeLeaguePage, { foreignKey: 'exchangeLeagueId' });
+
+    // ExchangeLeaguePage associations
+    db.ExchangeLeaguePage.belongsTo(db.ExchangeLeague, { foreignKey: 'exchangeLeagueId' });
+
+    // Team associations
+    db.Team.belongsTo(db.League, { foreignKey: 'leagueId' });
 
     await sequelize.sync({
         alter: true,

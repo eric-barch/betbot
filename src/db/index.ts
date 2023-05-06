@@ -3,6 +3,7 @@ import { init } from './instanceMethods';
 import { Exchange } from './exchange';
 import { League } from './league';
 import { ExchangeLeague } from './exchangeLeague';
+import { ExchangeLeaguePage } from './exchangeLeaguePage';
 import { Team } from './team';
 import { close } from './instanceMethods';
 
@@ -12,6 +13,7 @@ export {
     Exchange,
     League,
     ExchangeLeague,
+    ExchangeLeaguePage,
     Team,
     close,
 };
