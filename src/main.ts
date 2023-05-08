@@ -7,6 +7,8 @@ async function main() {
     await global.exchanges.init();
     await global.leagues.init();
     await global.exchangeLeagues.init();
+    await global.exchangeLeaguePages.init();
+
     await global.teams.init();
 
     // console.log(global.exchanges.draftKings);

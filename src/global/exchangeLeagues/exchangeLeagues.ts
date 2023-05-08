@@ -83,11 +83,13 @@ async function initExchangeLeague({
 
     const [exchangeLeague, created] = await db.ExchangeLeague.findOrCreate({
         where: {
-            exchangeId: exchangeId,
-            leagueId: leagueId,
+            exchangeId,
+            leagueId,
         },
         defaults: {
-            urlExtension: urlExtension,
+            exchangeId,
+            leagueId,
+            urlExtension,
         }
     });
 

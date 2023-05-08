@@ -4,14 +4,15 @@ import { sequelize } from '../instance';
 import * as db from '../../db';
 
 export class ExchangeLeaguePage extends s.Model<
-    s.InferAttributes<ExchangeLeaguePage>,
-    s.InferCreationAttributes<ExchangeLeaguePage>
+    s.InferAttributes<ExchangeLeaguePage, { omit: 'exchangeLeague' }>,
+    s.InferCreationAttributes<ExchangeLeaguePage, { omit: 'exchangeLeague' }>
 > {
     declare id: s.CreationOptional<number>;
-    declare urlExtension: string;
+    declare pageName: string;
+    declare urlExtension: string | null;
     declare createdAt: s.CreationOptional<Date>;
     declare updatedAt: s.CreationOptional<Date>;
-    declare exchangeLeagueId: s.ForeignKey<db.Exchange>;
+    declare exchangeLeagueId: s.ForeignKey<db.ExchangeLeague['id']>;
     declare exchangeLeague?: s.NonAttribute<db.ExchangeLeague>;
 
     // belongsTo(ExchangeLeague)
@@ -26,6 +27,7 @@ ExchangeLeaguePage.init({
         autoIncrement: true,
         primaryKey: true,
     },
+    pageName: new s.DataTypes.STRING(128),
     urlExtension: new s.DataTypes.STRING(128),
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
