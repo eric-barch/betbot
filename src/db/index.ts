@@ -5,6 +5,7 @@ import { League } from './league';
 import { ExchangeLeague } from './exchangeLeague';
 import { ExchangeLeaguePage } from './exchangeLeaguePage';
 import { Team } from './team';
+import { Game } from './game';
 import { close } from './instanceMethods';
 
 export {
@@ -15,5 +16,6 @@ export {
     ExchangeLeague,
     ExchangeLeaguePage,
     Team,
+    Game,
     close,
 };

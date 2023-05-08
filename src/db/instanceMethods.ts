@@ -24,6 +24,10 @@ export async function init(): Promise<void> {
     // Team associations
     db.Team.belongsTo(db.League, { foreignKey: 'leagueId' });
 
+    // Game associations
+    db.Game.belongsTo(db.Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
+    db.Game.belongsTo(db.Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
+
     await sequelize.sync({
         alter: true,
         logging: false,
