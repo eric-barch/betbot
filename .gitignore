@@ -1,3 +1,3 @@
-.VSCodeCounter
-node_modules
-out
+.VSCodeCounter/
+node_modules/
+out/
