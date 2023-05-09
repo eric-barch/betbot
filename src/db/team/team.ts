@@ -7,7 +7,7 @@ export class Team extends s.Model<
     s.InferAttributes<Team, { omit: 'league' }>,
     s.InferCreationAttributes<Team, { omit: 'league' } >
 > {
-    declare id: s.CreationOptional<Date>;
+    declare id: s.CreationOptional<number>;
     declare regionFull: string;
     declare regionAbbr: string;
     declare nameFull: string;
@@ -25,6 +25,25 @@ export class Team extends s.Model<
     // declare static associations: {
     //     league: s.Association<Team, League>;
     // }
+
+    static async findTeam(unformattedString: string): Promise<Team> {
+        const query = `
+            SELECT * FROM teams
+            WHERE LOWER(:unformattedString) LIKE CONCAT('%', LOWER(nameFull), '%')
+            LIMIT 1;
+        `;
+
+        const [team] = await sequelize.query(query, {
+            replacements: { unformattedString },
+            type: s.QueryTypes.SELECT,
+        });
+
+        if (!team || !(team instanceof Team)) {
+            throw new Error(`Did not find team.`);
+        }
+
+        return team;
+    }
 }
 
 Team.init({

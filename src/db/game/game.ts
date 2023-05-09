@@ -13,8 +13,8 @@ export class Game extends s.Model<
     declare updatedAt: s.CreationOptional<Date>;
     declare awayTeamId: s.ForeignKey<db.Team['id']>;
     declare homeTeamId: s.ForeignKey<db.Team['id']>;
-    declare awayTeam?: s.NonAttribute<db.Team>;
-    declare homeTeam?: s.NonAttribute<db.Team>;
+    declare awayTeam: db.Team;
+    declare homeTeam: db.Team;
 
     // belongsTo(Team)
     declare createTeam: s.BelongsToCreateAssociationMixin<db.Team>;
