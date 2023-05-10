@@ -1,46 +1,53 @@
 import { sequelize } from './instance';
-import * as db from '../db';
+import { Exchange } from './exchange';
+import { League } from './league';
+import { Team } from './team';
+import { PageType } from './pageType';
+import { ExchangeLeague } from './exchangeLeague';
+import { ExchangeLeaguePage } from './exchangeLeaguePage';
+import { Game } from './game';
 
 export async function init(): Promise<void> {
     await initDbConnection();
 
     // Exchange associations
-    db.Exchange.belongsToMany(db.League, { through: db.ExchangeLeague, foreignKey: 'exchangeId' });
-    db.Exchange.hasMany(db.ExchangeLeague, { foreignKey: 'exchangeId' });
+    Exchange.belongsToMany(League, { through: ExchangeLeague, foreignKey: 'exchangeId' });
+    Exchange.hasMany(ExchangeLeague, { foreignKey: 'exchangeId' });
 
     // League associations
-    db.League.belongsToMany(db.Exchange, {through: db.ExchangeLeague, foreignKey: 'leagueId' });
-    db.League.hasMany(db.Team, { foreignKey: 'leagueId' });
-    db.League.hasMany(db.ExchangeLeague, { foreignKey: 'leagueId' });
+    League.belongsToMany(Exchange, {through: ExchangeLeague, foreignKey: 'leagueId' });
+    League.hasMany(Team, { foreignKey: 'leagueId' });
+    League.hasMany(ExchangeLeague, { foreignKey: 'leagueId' });
 
     // ExchangeLeague associations
-    db.ExchangeLeague.belongsTo(db.Exchange, { foreignKey: 'exchangeId' });
-    db.ExchangeLeague.belongsTo(db.League, { foreignKey: 'leagueId' });
-    db.ExchangeLeague.hasMany(db.ExchangeLeaguePage, { foreignKey: 'exchangeLeagueId' });
+    ExchangeLeague.belongsTo(Exchange, { foreignKey: 'exchangeId' });
+    ExchangeLeague.belongsTo(League, { foreignKey: 'leagueId' });
+    ExchangeLeague.hasMany(ExchangeLeaguePage, { foreignKey: 'exchangeLeagueId' });
 
     // ExchangeLeaguePage associations
-    db.ExchangeLeaguePage.belongsTo(db.ExchangeLeague, { foreignKey: 'exchangeLeagueId' });
+    ExchangeLeaguePage.belongsTo(ExchangeLeague, { foreignKey: 'exchangeLeagueId' });
+    ExchangeLeaguePage.belongsTo(PageType, { foreignKey: 'pageTypeId' });
 
     // Team associations
-    db.Team.belongsTo(db.League, { foreignKey: 'leagueId' });
+    Team.belongsTo(League, { foreignKey: 'leagueId' });
 
     // Game associations
-    db.Game.belongsTo(db.Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
-    db.Game.belongsTo(db.Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
+    Game.belongsTo(Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
+    Game.belongsTo(Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
 
     await sequelize.sync({
-        alter: true,
+        force: true,
         logging: false,
     });
-    console.log(`MySQL table setup successful.`);
+    console.log(`MySQL tables set up successfully.`);
 }
 
 async function initDbConnection(): Promise<void> {
     await sequelize.authenticate();
-    console.log(`MySQL connection established successfully.`);
+    console.log(`\nMySQL connection established successfully.`);
 }
 
 export async function close(): Promise<void> {
     await sequelize.close();
-    console.log(`MySQL connection closed successfully.`)
+    console.log(`\nMySQL connection closed successfully.\n`)
 }

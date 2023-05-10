@@ -5,20 +5,22 @@ export let nba: db.League;
 export let nfl: db.League;
 
 export async function init() {
-    mlb = await initLeague({
-        name: 'Major League Baseball',
-        abbreviation: 'MLB',
-    });
+    console.log();
+
+    // mlb = await initLeague({
+    //     name: 'Major League Baseball',
+    //     abbreviation: 'MLB',
+    // });
 
     nba = await initLeague({
         name: 'National Basketball Association',
         abbreviation: 'NBA',
     });
 
-    nfl = await initLeague({
-        name: 'National Football League',
-        abbreviation: 'NFL',
-    });
+    // nfl = await initLeague({
+    //     name: 'National Football League',
+    //     abbreviation: 'NFL',
+    // });
 }
 
 async function initLeague({
@@ -30,11 +32,11 @@ async function initLeague({
 }): Promise<db.League> {
     const [league, created] = await db.League.findOrCreate({
         where: {
-            name: name,
+            name,
         },
         defaults: {
-            name: name,
-            abbreviation: abbreviation,
+            name,
+            abbreviation,
         }
     });
 
@@ -43,6 +45,8 @@ async function initLeague({
             abbreviation: abbreviation,
         });
     }
+
+    console.log(`${abbreviation} initialized.`);
 
     return league;
 }

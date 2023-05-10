@@ -1,102 +1,46 @@
 import * as db from '../../db';
-import * as global from '../../global';
-
-export let draftKingsMlbGames: db.ExchangeLeaguePage;
-export let draftKingsNbaGames: db.ExchangeLeaguePage;
-export let draftKingsNflGames: db.ExchangeLeaguePage;
-
-export let fanDuelMlbGames: db.ExchangeLeaguePage;
-export let fanDuelNbaGames: db.ExchangeLeaguePage;
-export let fanDuelNflGames: db.ExchangeLeaguePage;
-
-export let sugarHouseMlbGames: db.ExchangeLeaguePage;
-export let sugarHouseNbaGames: db.ExchangeLeaguePage;
-export let sugarHouseNflGames: db.ExchangeLeaguePage;
 
 export async function init() {
-    draftKingsMlbGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.draftKingsMlb,
-        pageName: 'games',
-        urlExtension: '?category=game-lines&subcategory=game',
-    });
+    console.log();
 
-    draftKingsNbaGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.draftKingsNba,
-        pageName: 'games',
-        urlExtension: '?category=game-lines&subcategory=game',
-    });
+    const exchangeLeagues = await db.ExchangeLeague.findAll();
+    const pageTypes = await db.PageType.findAll();
 
-    draftKingsNflGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.draftKingsNfl,
-        pageName: 'games',
-        urlExtension: '?category=game-lines&subcategory=game',
-    });
-
-    fanDuelMlbGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.fanDuelMlb,
-        pageName: 'games',
-        urlExtension: null,
-    });
-
-    fanDuelNbaGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.fanDuelNba,
-        pageName: 'games',
-        urlExtension: null,
-    });
-
-    fanDuelNflGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.fanDuelNfl,
-        pageName: 'games',
-        urlExtension: null,
-    });
-
-    sugarHouseMlbGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.sugarHouseMlb,
-        pageName: 'games',
-        urlExtension: '&type=matches',
-    });
-
-    sugarHouseNbaGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.sugarHouseNba,
-        pageName: 'games',
-        urlExtension: '&type=matches',
-    });
-
-    sugarHouseNflGames = await initExchangeLeaguePage({
-        exchangeLeague: global.exchangeLeagues.sugarHouseNfl,
-        pageName: 'games',
-        urlExtension: '&type=matches',
-    });
+    for (const exchangeLeague of exchangeLeagues) {
+        for (const pageType of pageTypes) {
+            await initExchangeLeaguePage({
+                exchangeLeague,
+                pageType,
+            });
+        }
+    }
 }
 
 async function initExchangeLeaguePage({
     exchangeLeague,
-    pageName,
-    urlExtension,
+    pageType,
 }: {
     exchangeLeague: db.ExchangeLeague,
-    pageName: string,
-    urlExtension: string | null,
+    pageType: db.PageType,
 }): Promise<db.ExchangeLeaguePage> {
     const exchangeLeagueId = exchangeLeague.id;
+    const pageTypeId = pageType.id;
 
     const [exchangeLeaguePage, created] = await db.ExchangeLeaguePage.findOrCreate({
         where: {
             exchangeLeagueId,
-            pageName,
+            pageTypeId,
         },
         defaults: {
             exchangeLeagueId,
-            pageName,
-            urlExtension,
+            pageTypeId,
         }
     });
 
-    if (!created) {
-        await exchangeLeaguePage.update({
-            urlExtension,
-        });
-    }
+    const exchangeName = (await exchangeLeague.getExchange()).name;
+    const leagueAbbreviation = (await exchangeLeague.getLeague()).abbreviation;
+
+    console.log(`${exchangeName} ${leagueAbbreviation} '${pageType.name}' ExchangeLeaguePage initialized.`);
 
     return exchangeLeaguePage;
 }

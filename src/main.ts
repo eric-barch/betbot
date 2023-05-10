@@ -6,18 +6,13 @@ async function main() {
 
     await global.exchanges.init();
     await global.leagues.init();
+    await global.teams.init();
+    await global.pageTypes.init();
+
     await global.exchangeLeagues.init();
     await global.exchangeLeaguePages.init();
-
-    await global.teams.init();
-
-    // console.log(global.exchanges.draftKings);
-    // console.log(global.exchanges.fanDuel);
-    // console.log(global.exchanges.sugarHouse);
-
-    // console.log(global.leagues.mlb);
-    // console.log(global.leagues.nba);
-    // console.log(global.leagues.nfl);
+    
+    await global.games.init();
 
     await db.close();
 }

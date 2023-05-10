@@ -5,6 +5,8 @@ export let fanDuel: db.Exchange;
 export let sugarHouse: db.Exchange;
 
 export async function init() {
+    console.log();
+
     draftKings = await initExchange({
         name: 'DraftKings',
         baseUrl: 'https://sportsbook.draftkings.com/',
@@ -43,6 +45,8 @@ async function initExchange({
             baseUrl,
         });
     }
+
+    console.log(`${name} initialized.`);
 
     return exchange;
 }

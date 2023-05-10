@@ -1,31 +1,3 @@
-import {
-    init,
+import { init } from './exchangeLeagues';
 
-    draftKingsMlb,
-    draftKingsNba,
-    draftKingsNfl,
-
-    fanDuelMlb,
-    fanDuelNba,
-    fanDuelNfl,
-
-    sugarHouseMlb,
-    sugarHouseNba,
-    sugarHouseNfl,
-} from './exchangeLeagues';
-
-export {
-    init,
-
-    draftKingsMlb,
-    draftKingsNba,
-    draftKingsNfl,
-
-    fanDuelMlb,
-    fanDuelNba,
-    fanDuelNfl,
-
-    sugarHouseMlb,
-    sugarHouseNba,
-    sugarHouseNfl,
-};
+export { init };

@@ -1,7 +1,7 @@
 import * as s from 'sequelize';
 
-import { sequelize } from '../instance';
-import * as db from '../../db';
+import { sequelize } from './instance';
+import { Team } from './team';
 
 export class Game extends s.Model<
     s.InferAttributes<Game, { omit: 'awayTeam' | 'homeTeam' }>,
@@ -11,15 +11,15 @@ export class Game extends s.Model<
     declare startDate: Date;
     declare createdAt: s.CreationOptional<Date>;
     declare updatedAt: s.CreationOptional<Date>;
-    declare awayTeamId: s.ForeignKey<db.Team['id']>;
-    declare homeTeamId: s.ForeignKey<db.Team['id']>;
-    declare awayTeam: db.Team;
-    declare homeTeam: db.Team;
+    declare awayTeamId: s.ForeignKey<Team['id']>;
+    declare homeTeamId: s.ForeignKey<Team['id']>;
+    declare awayTeam: Team;
+    declare homeTeam: Team;
 
     // belongsTo(Team)
-    declare createTeam: s.BelongsToCreateAssociationMixin<db.Team>;
-    declare getTeam: s.BelongsToGetAssociationMixin<db.Team>;
-    declare setTeam: s.BelongsToSetAssociationMixin<db.Team, number>;
+    declare createTeam: s.BelongsToCreateAssociationMixin<Team>;
+    declare getTeam: s.BelongsToGetAssociationMixin<Team>;
+    declare setTeam: s.BelongsToSetAssociationMixin<Team, number>;
 }
 
 Game.init({

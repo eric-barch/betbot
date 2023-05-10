@@ -3,19 +3,19 @@ import * as p from 'puppeteer';
 import * as s from 'sequelize';
 
 import * as db from '../../db';
-import * as parsers from '../../parsers';
+import * as pageParsers from '../../pageParsers';
 
 interface GameTeams {
     awayTeam: db.Team;
     homeTeam: db.Team;
 }
 
-export class DraftKingsGamesPageParser extends parsers.GamesPageParser {
-    protected wrappedWebpageConnector: parsers.WebpageConnector;
+export class DraftKingsGamesPageParser extends pageParsers.GamesPageParser {
+    protected wrappedWebpageConnector: pageParsers.WebpageConnector;
 
     constructor() {
         super();
-        this.wrappedWebpageConnector = new parsers.WebpageConnector({
+        this.wrappedWebpageConnector = new pageParsers.WebpageConnector({
             url: 'foo',
         })
     }
