@@ -10,7 +10,6 @@ export class Exchange extends s.Model<
 > {
     declare id: s.CreationOptional<number>;
     declare name: string;
-    declare baseUrl: string;
     declare createdAt: s.CreationOptional<Date>;
     declare updatedAt: s.CreationOptional<Date>;
     declare leagues?: s.NonAttribute<League[]>;
@@ -38,11 +37,6 @@ export class Exchange extends s.Model<
     declare hasExchangeLeagues: s.HasManyHasAssociationsMixin<ExchangeLeague, number>;
     declare countExchangeLeagues: s.HasManyCountAssociationsMixin;
     declare createExchangeLeague: s.HasManyCreateAssociationMixin<ExchangeLeague, 'exchangeId'>;
-    
-
-    // declare static associations: {
-    //     leagues: s.Association<Exchange, League>;
-    // }
 }
 
 Exchange.init({
@@ -52,7 +46,6 @@ Exchange.init({
         primaryKey: true
     },
     name: new s.DataTypes.STRING(128),
-    baseUrl: new s.DataTypes.STRING(128),
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
 }, {

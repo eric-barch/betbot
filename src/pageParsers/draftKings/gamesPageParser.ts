@@ -2,6 +2,7 @@ import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 import * as s from 'sequelize';
 
+import { WebpageConnector } from '../../pageParsers/abstract/webpageConnector';
 import * as db from '../../db';
 import * as pageParsers from '../../pageParsers';
 
@@ -10,23 +11,22 @@ interface GameTeams {
     homeTeam: db.Team;
 }
 
-export class DraftKingsGamesPageParser extends pageParsers.GamesPageParser {
-    protected wrappedWebpageConnector: pageParsers.WebpageConnector;
+export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
+    protected wrappedWebpageConnector: WebpageConnector;
 
     constructor() {
         super();
-        this.wrappedWebpageConnector = new pageParsers.WebpageConnector({
-            url: 'foo',
+        this.wrappedWebpageConnector = new WebpageConnector({
+            url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
         })
     }
 
     public async getGames(): Promise<Array<db.Game>> {
-        const gamesFromJson = await this.getGamesFromJson();
-        const gamesFromDocument = await this.getGamesFromDocument();
-        return gamesFromDocument;
+        await this.initGamesFromJson();
+        return await this.getGamesFromDocument();
     }
 
-    private async getGamesFromJson(): Promise<Array<db.Game>> {
+    private async initGamesFromJson(): Promise<Array<db.Game>> {
         const jsonGames = await this.scrapeJsonGames();
         const games = await this.parseJsonGames(jsonGames);
         return games;
@@ -34,6 +34,10 @@ export class DraftKingsGamesPageParser extends pageParsers.GamesPageParser {
 
     private async scrapeJsonGames(): Promise<Array<any>> {
         const gameScriptElements = await this.wrappedWebpageConnector.page.$$('script[type="application/ld+json"]');
+
+        if (gameScriptElements.length < 1) {
+            throw new Error(`Did not find jsonGameScriptElements for DraftKings.`);
+        }
 
         const jsonGames = new Array;
 
@@ -56,8 +60,8 @@ export class DraftKingsGamesPageParser extends pageParsers.GamesPageParser {
             const awayTeamName = jsonGame.awayTeam.name;
             const homeTeamName = jsonGame.homeTeam.name;
 
-            const awayTeam = await db.Team.findTeam(awayTeamName);
-            const homeTeam = await db.Team.findTeam(homeTeamName);
+            const awayTeam = await db.Team.findByString({ unformattedString: awayTeamName });
+            const homeTeam = await db.Team.findByString({ unformattedString: homeTeamName });
             const startDate = new Date(jsonGame.startDate);
 
             const [game, created] = await db.Game.findOrCreate({
@@ -178,7 +182,7 @@ export class DraftKingsGamesPageParser extends pageParsers.GamesPageParser {
             throw new Error(`teamName is null.`);
         }
 
-        const team = db.Team.findTeam(teamName);
+        const team = db.Team.findByString({ unformattedString: teamName });
 
         return team;
     }

@@ -5,7 +5,7 @@ export class WebpageConnector {
     private wrappedBrowser: p.Browser | undefined;
     private wrappedPage: p.Page | undefined;
 
-    public constructor({
+    constructor({
         url,
     }: {
         url: string,
@@ -35,7 +35,7 @@ export class WebpageConnector {
 
     private async connectToExistingPage(): Promise<p.Page> {
         const targets = this.browser.targets();
-        const target = targets.find(target => target.url().includes(this.wrappedUrl));
+        const target = targets.find(target => target.url().includes(this.url));
         
         if (!target) {
             throw new Error('Expected Target.');
@@ -62,7 +62,7 @@ export class WebpageConnector {
 
     private async connectToNewPage(): Promise<p.Page> {
         this.wrappedPage = await this.browser.newPage();
-        await this.page.goto(this.wrappedUrl);
+        await this.page.goto(this.url);
 
         const windowSize = await this.page.evaluate(() => {
             return {
@@ -78,6 +78,14 @@ export class WebpageConnector {
 
     public async close(): Promise<void> {
         await this.browser.close();
+    }
+
+    get url(): string {
+        if (!this.wrappedUrl) {
+            throw new Error(`wrappedUrl is undefined.`);
+        }
+
+        return this.wrappedUrl;
     }
 
     get browser(): p.Browser {

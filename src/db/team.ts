@@ -26,23 +26,22 @@ export class Team extends s.Model<
     //     league: s.Association<Team, League>;
     // }
 
-    static async findTeam(unformattedString: string): Promise<Team> {
-        const query = `
-            SELECT * FROM teams
-            WHERE LOWER(:unformattedString) LIKE CONCAT('%', LOWER(nameFull), '%')
-            LIMIT 1;
-        `;
+    public static async findByString({
+        unformattedString,
+    }: {
+        unformattedString: string,
+    }) {
+        const allTeams = await Team.findAll();
 
-        const [team] = await sequelize.query(query, {
-            replacements: { unformattedString },
-            type: s.QueryTypes.SELECT,
-        });
+        for (const team of allTeams) {
+            const regex = new RegExp(`\\b${team.nameFull}\\b`, 'i');
 
-        if (!team || !(team instanceof Team)) {
-            throw new Error(`Did not find team.`);
+            if (regex.test(unformattedString)) {
+                return team;
+            }
         }
 
-        return team;
+        throw new Error(`Did not find matching team.`);
     }
 }
 

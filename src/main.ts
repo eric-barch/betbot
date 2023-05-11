@@ -13,8 +13,6 @@ async function main() {
     await global.exchangeLeaguePages.init();
     
     await global.games.init();
-
-    await db.close();
 }
 
 main();

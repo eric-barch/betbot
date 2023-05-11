@@ -1,3 +1,3 @@
-import { FanDuelGamesPageParser } from './gamesPageParser';
+import { FanDuelNbaGamesPageParser } from './gamesPageParser';
 
-export { FanDuelGamesPageParser };
+export { FanDuelNbaGamesPageParser as FanDuelNbaGamesPageParser };

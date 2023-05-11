@@ -5,7 +5,7 @@ import { Exchange } from './exchange';
 import { League } from './league';
 
 export class ExchangeLeague extends s.Model<
-    s.InferAttributes<ExchangeLeague, { omit: 'exchange' | 'league'}>,
+    s.InferAttributes<ExchangeLeague, { omit: 'exchange' | 'league' }>,
     s.InferCreationAttributes<ExchangeLeague, { omit: 'exchange' | 'league' }>
 > {
     declare id: s.CreationOptional<number>;
@@ -13,8 +13,8 @@ export class ExchangeLeague extends s.Model<
     declare updatedAt: s.CreationOptional<Date>;
     declare exchangeId: s.ForeignKey<Exchange['id']>;
     declare leagueId: s.ForeignKey<League['id']>;
-    declare exchange?: s.NonAttribute<Exchange>;
-    declare league?: s.NonAttribute<League>;
+    declare exchange: s.NonAttribute<Exchange>;
+    declare league: s.NonAttribute<League>;
 
     // belongsTo(Exchange)
     declare createExchange: s.BelongsToCreateAssociationMixin<Exchange>;

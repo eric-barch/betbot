@@ -1,3 +1,9 @@
-import { init } from './pageTypes';
+import {
+    init,
+    gamesPage
+} from './pageTypes';
 
-export { init };
+export {
+    init,
+    gamesPage
+};

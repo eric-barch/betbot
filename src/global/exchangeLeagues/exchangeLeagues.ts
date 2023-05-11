@@ -1,4 +1,5 @@
 import * as db from '../../db';
+import * as global from '../../global';
 
 export async function init() {
     console.log();
@@ -8,6 +9,14 @@ export async function init() {
 
     for (const exchange of exchanges) {
         for (const league of leagues) {
+            let urlSegment: string;
+
+            if (exchange.id === global.exchanges.draftKings.id &&
+                    league.id === global.leagues.nba.id) {
+                
+            }
+
+
             await initExchangeLeague({
                 exchange,
                 league,

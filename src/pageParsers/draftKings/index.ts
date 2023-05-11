@@ -1,3 +1,3 @@
-import { DraftKingsGamesPageParser } from './gamesPageParser';
+import { DraftKingsNbaGamesPageParser } from './gamesPageParser';
 
-export { DraftKingsGamesPageParser };
+export { DraftKingsNbaGamesPageParser };

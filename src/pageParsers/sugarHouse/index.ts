@@ -1,3 +1,3 @@
 import { SugarHouseGamesPageParser } from './gamesPageParser';
 
-export { SugarHouseGamesPageParser };
+export { SugarHouseGamesPageParser as SugarHouseNbaGamesPageParser };
