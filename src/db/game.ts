@@ -20,6 +20,44 @@ export class Game extends s.Model<
     declare createTeam: s.BelongsToCreateAssociationMixin<Team>;
     declare getTeam: s.BelongsToGetAssociationMixin<Team>;
     declare setTeam: s.BelongsToSetAssociationMixin<Team, number>;
+
+    static async findByTeamIdsAndStartDate({
+        awayTeamId,
+        homeTeamId,
+        startDate,
+    }: {
+        awayTeamId: number,
+        homeTeamId: number,
+        startDate: Date,
+    }): Promise<Game> {
+        const [game, created] = await this.findOrCreate({
+            where: {
+                [s.Op.and]: [
+                    { awayTeamId },
+                    { homeTeamId },
+                    sequelize.where(
+                        sequelize.fn('YEAR', sequelize.col('startDate')),
+                        startDate.getUTCFullYear()
+                    ),
+                    sequelize.where(
+                        sequelize.fn('MONTH', sequelize.col('startDate')),
+                        startDate.getUTCMonth() + 1,
+                    ),
+                    sequelize.where(
+                        sequelize.fn('DAY', sequelize.col('startDate')),
+                        startDate.getUTCDate(),
+                    ),
+                ],
+            },
+            defaults: {
+                awayTeamId,
+                homeTeamId,
+                startDate,
+            },
+        });
+
+        return game;
+    }
 }
 
 Game.init({

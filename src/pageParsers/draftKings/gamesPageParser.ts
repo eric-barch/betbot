@@ -2,7 +2,6 @@ import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 import * as s from 'sequelize';
 
-import { WebpageConnector } from '../../pageParsers/abstract/webpageConnector';
 import * as db from '../../db';
 import * as pageParsers from '../../pageParsers';
 
@@ -12,11 +11,11 @@ interface GameTeams {
 }
 
 export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
-    protected wrappedWebpageConnector: WebpageConnector;
+    protected wrappedWebpageConnector: pageParsers.WebpageConnector;
 
     constructor() {
         super();
-        this.wrappedWebpageConnector = new WebpageConnector({
+        this.wrappedWebpageConnector = new pageParsers.WebpageConnector({
             url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
         })
     }
@@ -28,8 +27,7 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
 
     private async initGamesFromJson(): Promise<Array<db.Game>> {
         const jsonGames = await this.scrapeJsonGames();
-        const games = await this.parseJsonGames(jsonGames);
-        return games;
+        return await this.parseJsonGames(jsonGames);
     }
 
     private async scrapeJsonGames(): Promise<Array<any>> {
@@ -57,45 +55,33 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
         const games = new Array<db.Game>;
 
         for (const jsonGame of jsonGames) {
-            const awayTeamName = jsonGame.awayTeam.name;
-            const homeTeamName = jsonGame.homeTeam.name;
 
-            const awayTeam = await db.Team.findByString({ unformattedString: awayTeamName });
-            const homeTeam = await db.Team.findByString({ unformattedString: homeTeamName });
+            const awayTeamId = (await this.getAwayTeamFromJsonGame(jsonGame)).id;
+            const homeTeamId = (await this.getHomeTeamFromJsonGame(jsonGame)).id;
             const startDate = new Date(jsonGame.startDate);
 
-            const [game, created] = await db.Game.findOrCreate({
-                where: {
-                    [s.Op.and]: [
-                        { awayTeamId: awayTeam.id },
-                        { homeTeamId: homeTeam.id },
-                        db.sequelize.where(
-                            db.sequelize.fn('YEAR', db.sequelize.col('startDate')),
-                            startDate.getUTCFullYear()
-                        ),
-                        db.sequelize.where(
-                            db.sequelize.fn('MONTH', db.sequelize.col('startDate')),
-                            startDate.getUTCMonth() + 1,
-                        ),
-                        db.sequelize.where(
-                            db.sequelize.fn('DAY', db.sequelize.col('startDate')),
-                            startDate.getUTCDate(),
-                        ),
-                    ],
-                },
-                defaults: {
-                    awayTeamId: awayTeam.id,
-                    homeTeamId: homeTeam.id,
-                    startDate: startDate,
-                },
+            const game = await db.Game.findByTeamIdsAndStartDate({
+                awayTeamId,
+                homeTeamId,
+                startDate,
             });
 
-            if (game) {
-                games.push(game);
-            }
+            games.push(game);
         }
 
         return games;
+    }
+
+    private async getAwayTeamFromJsonGame(jsonGame: any): Promise<db.Team> {
+        const awayTeamName = jsonGame.awayTeam.name;
+        const awayTeam = await db.Team.findByString({ unformattedString: awayTeamName });
+        return awayTeam;
+    }
+
+    private async getHomeTeamFromJsonGame(jsonGame: any): Promise<db.Team> {
+        const homeTeamName = jsonGame.homeTeam.name;
+        const homeTeam = await db.Team.findByString({ unformattedString: homeTeamName });
+        return homeTeam;
     }
 
     private async getGamesFromDocument(): Promise<Array<db.Game>> {
@@ -104,29 +90,27 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
         const rowElements = await this.wrappedWebpageConnector.page.$$('div[class*="parlay-card"] table > tbody > tr');
 
         for (const rowElement of rowElements) {
-            let rowElementTeam;
-
             try {
-                rowElementTeam = await this.getRowElementTeam(rowElement);
+                var rowElementTeam = await this.getRowElementTeam(rowElement);
             } catch {
                 continue;
             }
-
-            let rowElementGameTeams;
             
             try {
-                rowElementGameTeams = await this.getRowElementGameTeams(rowElement);
+                var rowElementGameTeams = await this.getRowElementGameTeams(rowElement);
             } catch {
                 continue;
             }
 
-            const awayTeam = rowElementGameTeams.awayTeam;
-            const homeTeam = rowElementGameTeams.homeTeam;
+            const awayTeamId = rowElementGameTeams.awayTeam.id;
+            const homeTeamId = rowElementGameTeams.homeTeam.id;
 
-            let startDate;
+            if (!awayTeamId || !homeTeamId) {
+                continue;
+            }
 
             try {
-                startDate = await this.getStartDate({
+                var startDate = await this.getStartDate({
                     rowElement,
                     rowElementTeam,
                     rowElementGameTeams,
@@ -135,35 +119,13 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
                 continue;
             }
 
-            const [game, created] = await db.Game.findOrCreate({
-                where: {
-                    [s.Op.and]: [
-                        { awayTeamId: awayTeam.id },
-                        { homeTeamId: homeTeam.id },
-                        db.sequelize.where(
-                            db.sequelize.fn('YEAR', db.sequelize.col('startDate')),
-                            startDate.getUTCFullYear()
-                        ),
-                        db.sequelize.where(
-                            db.sequelize.fn('MONTH', db.sequelize.col('startDate')),
-                            startDate.getUTCMonth() + 1,
-                        ),
-                        db.sequelize.where(
-                            db.sequelize.fn('DAY', db.sequelize.col('startDate')),
-                            startDate.getUTCDate(),
-                        ),
-                    ],
-                },
-                defaults: {
-                    awayTeamId: awayTeam.id,
-                    homeTeamId: homeTeam.id,
-                    startDate: startDate,
-                },
-            });
+            const game = await db.Game.findByTeamIdsAndStartDate({
+                awayTeamId,
+                homeTeamId,
+                startDate,
+            })
 
-            if (game) {
-                games.push(game);
-            }
+            games.push(game);
         }
 
         return games;

@@ -8,7 +8,6 @@ export async function init() {
     for (const exchangeLeaguePage of exchangeLeaguePages) {
         const gamesPageParser = await exchangeLeaguePage.getGamesPageParser();
         await gamesPageParser.getGames();
-        console.log();
     }
 
     // const parsers = new Array<pageParsers.PageParser>;
