@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelize } from '../instance';
+import { sequelizeInstance } from '../sequelizeInstance';
 
 export class PageType extends s.Model<
     s.InferAttributes<PageType>,
@@ -22,6 +22,6 @@ PageType.init({
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
 }, {
-    sequelize,
+    sequelize: sequelizeInstance,
     tableName: 'PageTypes',
 })

@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelize } from '../instance';
+import { sequelizeInstance } from '../sequelizeInstance';
 import { ExchangeLeague } from './exchangeLeague';
 import { PageType } from './pageType';
 import * as global from '../../global';
@@ -117,6 +117,6 @@ ExchangeLeaguePage.init({
     exchangeLeagueId: s.DataTypes.INTEGER.UNSIGNED,
     pageTypeId: s.DataTypes.INTEGER.UNSIGNED,
 }, {
-    sequelize,
+    sequelize: sequelizeInstance,
     tableName: 'ExchangeLeaguePages',
 })

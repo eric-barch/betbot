@@ -36,16 +36,16 @@ export class SugarHouseGamesPageParser extends pageParsers.GamesPageParser {
                     [s.Op.and]: [
                         { awayTeamId },
                         { homeTeamId },
-                        db.sequelize.where(
-                            db.sequelize.fn('YEAR', db.sequelize.col('startDate')),
+                        db.sequelizeInstanceWrapper.instance.where(
+                            db.sequelizeInstanceWrapper.instance.fn('YEAR', db.sequelizeInstanceWrapper.instance.col('startDate')),
                             startDate.getUTCFullYear()
                         ),
-                        db.sequelize.where(
-                            db.sequelize.fn('MONTH', db.sequelize.col('startDate')),
+                        db.sequelizeInstanceWrapper.instance.where(
+                            db.sequelizeInstanceWrapper.instance.fn('MONTH', db.sequelizeInstanceWrapper.instance.col('startDate')),
                             startDate.getUTCMonth() + 1,
                         ),
-                        db.sequelize.where(
-                            db.sequelize.fn('DAY', db.sequelize.col('startDate')),
+                        db.sequelizeInstanceWrapper.instance.where(
+                            db.sequelizeInstanceWrapper.instance.fn('DAY', db.sequelizeInstanceWrapper.instance.col('startDate')),
                             startDate.getUTCDate(),
                         ),
                     ],

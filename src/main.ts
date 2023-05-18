@@ -2,7 +2,7 @@ import * as db from './db';
 import * as global from './global';
 
 async function main() {
-    await db.init();
+    await db.sequelizeInstanceWrapper.init();
 
     await global.exchanges.init();
     await global.leagues.init();

@@ -1,34 +1,25 @@
 import { Sequelize } from 'sequelize';
+import { sequelizeInstance } from './sequelizeInstance';
 import {
     Exchange, League, Team, PageType, ExchangeLeague, ExchangeLeaguePage, Game 
 } from './models';
 
-export class SequelizeInstance {
-    private sequelize: Sequelize;
+class SequelizeInstanceWrapper {
+    private wrappedInstance: Sequelize;
 
     constructor() {
-        this.sequelize = new Sequelize(
-            'betbot',
-            'root',
-            'f9R#@hY82l',
-            {
-                host: 'localhost',
-                port: 3306,
-                dialect: 'mysql',
-                logging: false,
-            }
-        )
+        this.wrappedInstance = sequelizeInstance;
     }
 
     public async init(): Promise<void> {
         await this.connectToMySql();
         await this.associateModels();
-        await this.sequelize.sync({ alter: true });
+        await this.wrappedInstance.sync({ alter: true });
         console.log(`Sequelize initiated successfully.`);
     }
 
     private async connectToMySql(): Promise<void> {
-        await this.sequelize.authenticate();
+        await this.wrappedInstance.authenticate();
     }
 
     private async associateModels(): Promise<void> {
@@ -57,4 +48,10 @@ export class SequelizeInstance {
         Game.belongsTo(Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
         Game.belongsTo(Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
     }
+
+    get instance(): Sequelize {
+        return this.wrappedInstance;
+    }
 }
+
+export const sequelizeInstanceWrapper = new SequelizeInstanceWrapper();
