@@ -6,8 +6,8 @@ import * as db from '../../db';
 import * as pageParsers from '../../pageParsers';
 
 interface GameTeams {
-    awayTeam: db.Team;
-    homeTeam: db.Team;
+    awayTeam: db.models.Team;
+    homeTeam: db.models.Team;
 }
 
 export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
@@ -20,12 +20,12 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
         })
     }
 
-    public async getGames(): Promise<Array<db.Game>> {
+    public async getGames(): Promise<Array<db.models.Game>> {
         await this.initGamesFromJson();
         return await this.getGamesFromDocument();
     }
 
-    private async initGamesFromJson(): Promise<Array<db.Game>> {
+    private async initGamesFromJson(): Promise<Array<db.models.Game>> {
         const jsonGames = await this.scrapeJsonGames();
         return await this.parseJsonGames(jsonGames);
     }
@@ -51,8 +51,8 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
         return jsonGames;
     }
 
-    private async parseJsonGames(jsonGames: Array<any>): Promise<Array<db.Game>> {
-        const games = new Array<db.Game>;
+    private async parseJsonGames(jsonGames: Array<any>): Promise<Array<db.models.Game>> {
+        const games = new Array<db.models.Game>;
 
         for (const jsonGame of jsonGames) {
 
@@ -60,7 +60,7 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
             const homeTeamId = (await this.getHomeTeamFromJsonGame(jsonGame)).id;
             const startDate = new Date(jsonGame.startDate);
 
-            const game = await db.Game.findByTeamIdsAndStartDate({
+            const game = await db.models.Game.findByTeamIdsAndStartDate({
                 awayTeamId,
                 homeTeamId,
                 startDate,
@@ -72,20 +72,20 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
         return games;
     }
 
-    private async getAwayTeamFromJsonGame(jsonGame: any): Promise<db.Team> {
+    private async getAwayTeamFromJsonGame(jsonGame: any): Promise<db.models.Team> {
         const awayTeamName = jsonGame.awayTeam.name;
-        const awayTeam = await db.Team.findByString({ unformattedString: awayTeamName });
+        const awayTeam = await db.models.Team.findByString({ unformattedString: awayTeamName });
         return awayTeam;
     }
 
-    private async getHomeTeamFromJsonGame(jsonGame: any): Promise<db.Team> {
+    private async getHomeTeamFromJsonGame(jsonGame: any): Promise<db.models.Team> {
         const homeTeamName = jsonGame.homeTeam.name;
-        const homeTeam = await db.Team.findByString({ unformattedString: homeTeamName });
+        const homeTeam = await db.models.Team.findByString({ unformattedString: homeTeamName });
         return homeTeam;
     }
 
-    private async getGamesFromDocument(): Promise<Array<db.Game>> {
-        const games = new Array<db.Game>;
+    private async getGamesFromDocument(): Promise<Array<db.models.Game>> {
+        const games = new Array<db.models.Game>;
 
         const rowElements = await this.wrappedWebpageConnector.page.$$('div[class*="parlay-card"] table > tbody > tr');
 
@@ -119,7 +119,7 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
                 continue;
             }
 
-            const game = await db.Game.findByTeamIdsAndStartDate({
+            const game = await db.models.Game.findByTeamIdsAndStartDate({
                 awayTeamId,
                 homeTeamId,
                 startDate,
@@ -131,7 +131,7 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
         return games;
     }
 
-    private async getRowElementTeam(rowElement: p.ElementHandle): Promise<db.Team> {
+    private async getRowElementTeam(rowElement: p.ElementHandle): Promise<db.models.Team> {
         const teamNameElement = await rowElement.$('xpath/th/a/div/div[2]/div/span/div/div');
 
         if (!teamNameElement) {
@@ -144,7 +144,7 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
             throw new Error(`teamName is null.`);
         }
 
-        const team = db.Team.findByString({ unformattedString: teamName });
+        const team = db.models.Team.findByString({ unformattedString: teamName });
 
         return team;
     }
@@ -168,15 +168,15 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
     }
 
     private async getGameTeamsFromString(string: string): Promise<GameTeams> {
-        let teamA: db.Team | undefined;
+        let teamA: db.models.Team | undefined;
         let teamAIndex: number | undefined;
 
-        let teamB: db.Team | undefined;
+        let teamB: db.models.Team | undefined;
         let teamBIndex: number | undefined;
 
         string = string.toLowerCase().replace('sportsbook.draftkings.com', '');
 
-        const allTeams = await db.Team.findAll({
+        const allTeams = await db.models.Team.findAll({
             where: {
                 leagueId: 1,
             }
@@ -201,8 +201,8 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
             throw new Error(`Something is null that shouldn't be.`);
         }
 
-        let awayTeam: db.Team;
-        let homeTeam: db.Team;
+        let awayTeam: db.models.Team;
+        let homeTeam: db.models.Team;
 
         if (teamAIndex < teamBIndex) {
             awayTeam = teamA;
@@ -224,7 +224,7 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
         rowElementGameTeams,
     }: {
         rowElement: p.ElementHandle,
-        rowElementTeam: db.Team,
+        rowElementTeam: db.models.Team,
         rowElementGameTeams: GameTeams,
     }): Promise<Date> {
         const dateString = await this.getDateString({
@@ -268,7 +268,7 @@ export class DraftKingsNbaGamesPageParser extends pageParsers.GamesPageParser {
         rowElement,
     }: {
         rowElementGameTeams: GameTeams;
-        rowElementTeam: db.Team,
+        rowElementTeam: db.models.Team,
         rowElement: p.ElementHandle,
     }): Promise<string> {
         const awayTeam = rowElementGameTeams.awayTeam;

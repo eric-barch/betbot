@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelizeInstance';
+import { sequelizeInstance } from '../sequelizeInstance/instance';
 import { Team } from './team';
 
 export class Game extends s.Model<

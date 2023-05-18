@@ -1,11 +1,12 @@
-import { Sequelize } from 'sequelize';
-import { sequelizeInstance } from './sequelizeInstance';
+import * as s from 'sequelize';
+
+import { sequelizeInstance } from './instance';
 import {
     Exchange, League, Team, PageType, ExchangeLeague, ExchangeLeaguePage, Game 
-} from './models';
+} from '../models';
 
 class SequelizeInstanceWrapper {
-    private wrappedInstance: Sequelize;
+    private wrappedInstance: s.Sequelize;
 
     constructor() {
         this.wrappedInstance = sequelizeInstance;
@@ -49,7 +50,7 @@ class SequelizeInstanceWrapper {
         Game.belongsTo(Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
     }
 
-    get instance(): Sequelize {
+    get instance(): s.Sequelize {
         return this.wrappedInstance;
     }
 }

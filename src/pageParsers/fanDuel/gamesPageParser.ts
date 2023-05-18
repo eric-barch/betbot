@@ -16,12 +16,12 @@ export class FanDuelNbaGamesPageParser extends pageParsers.GamesPageParser {
         })
     }
 
-    public async getGames(): Promise<Array<db.Game>> {
+    public async getGames(): Promise<Array<db.models.Game>> {
         await this.initGamesFromJson();
         return await this.getGamesFromDocument();
     }
 
-    private async initGamesFromJson(): Promise<Array<db.Game>> {
+    private async initGamesFromJson(): Promise<Array<db.models.Game>> {
         const jsonGames = await this.scrapeJsonGames();
         const games = await this.parseJsonGames(jsonGames);
         return games;
@@ -44,18 +44,18 @@ export class FanDuelNbaGamesPageParser extends pageParsers.GamesPageParser {
         return jsonGames;
     }
 
-    private async parseJsonGames(jsonGames: Array<any>): Promise<Array<db.Game>> {
-        const games = new Array<db.Game>;
+    private async parseJsonGames(jsonGames: Array<any>): Promise<Array<db.models.Game>> {
+        const games = new Array<db.models.Game>;
 
         for (const jsonGame of jsonGames) {
             const awayTeamName = jsonGame.awayTeam.name;
             const homeTeamName = jsonGame.homeTeam.name;
 
-            const awayTeam = await db.Team.findByString({ unformattedString: awayTeamName });
-            const homeTeam = await db.Team.findByString({ unformattedString: homeTeamName });
+            const awayTeam = await db.models.Team.findByString({ unformattedString: awayTeamName });
+            const homeTeam = await db.models.Team.findByString({ unformattedString: homeTeamName });
             const startDate = new Date(jsonGame.startDate);
 
-            const [game, created] = await db.Game.findOrCreate({
+            const [game, created] = await db.models.Game.findOrCreate({
                 where: {
                     [s.Op.and]: [
                         { awayTeamId: awayTeam.id },
@@ -89,8 +89,8 @@ export class FanDuelNbaGamesPageParser extends pageParsers.GamesPageParser {
         return games;
     }
 
-    private async getGamesFromDocument(): Promise<Array<db.Game>> {
-        const games = new Array<db.Game>;
+    private async getGamesFromDocument(): Promise<Array<db.models.Game>> {
+        const games = new Array<db.models.Game>;
 
         const gameLinkElements = await this.getGameLinkElements();
 
@@ -108,7 +108,7 @@ export class FanDuelNbaGamesPageParser extends pageParsers.GamesPageParser {
                 startDate = new Date();
             }
 
-            const [game, created] = await db.Game.findOrCreate({
+            const [game, created] = await db.models.Game.findOrCreate({
                 where: {
                     [s.Op.and]: [
                         { awayTeamId },
@@ -143,7 +143,7 @@ export class FanDuelNbaGamesPageParser extends pageParsers.GamesPageParser {
     }
 
     private async getGameLinkElements(): Promise<Array<p.ElementHandle<HTMLAnchorElement>>> {
-        const teams = await db.Team.findAll();
+        const teams = await db.models.Team.findAll();
         const teamNames = teams.map(team => team.nameFull);
         const teamNamesJoined = teamNames.join(`|`);
         const regex = new RegExp(`(${teamNamesJoined}).*@.*(${teamNamesJoined})`, `i`);
@@ -172,12 +172,12 @@ export class FanDuelNbaGamesPageParser extends pageParsers.GamesPageParser {
     }
 
     private async getGameTeams(gameLinkElement: p.ElementHandle<HTMLAnchorElement>): Promise<{
-        awayTeam: db.Team,
-        homeTeam: db.Team,
+        awayTeam: db.models.Team,
+        homeTeam: db.models.Team,
     }> {
         const title = await (await gameLinkElement.getProperty('title')).jsonValue();
 
-        const teams = await db.Team.findAll();
+        const teams = await db.models.Team.findAll();
         const teamNames = teams.map(team => team.nameFull.toLowerCase());
         const teamNamesJoined = teamNames.join(`|`);
 
@@ -196,8 +196,8 @@ export class FanDuelNbaGamesPageParser extends pageParsers.GamesPageParser {
         const awayTeamNameFull = allMatches[0];
         const homeTeamNameFull = allMatches[1];
 
-        const awayTeam = await db.Team.findByString({ unformattedString: awayTeamNameFull });
-        const homeTeam = await db.Team.findByString({ unformattedString: homeTeamNameFull });
+        const awayTeam = await db.models.Team.findByString({ unformattedString: awayTeamNameFull });
+        const homeTeam = await db.models.Team.findByString({ unformattedString: homeTeamNameFull });
 
         return {
             awayTeam: awayTeam,

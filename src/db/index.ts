@@ -1,3 +1,7 @@
-export * from './sequelizeInstanceWrapper';
-export * from './models';
+import { sequelizeInstanceWrapper } from './sequelizeInstance/wrapper';
+
+export { 
+    sequelizeInstanceWrapper 
+};
+export * as models from './models';
 

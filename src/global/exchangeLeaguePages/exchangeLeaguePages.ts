@@ -3,8 +3,8 @@ import * as db from '../../db';
 export async function init() {
     console.log();
 
-    const exchangeLeagues = await db.ExchangeLeague.findAll();
-    const pageTypes = await db.PageType.findAll();
+    const exchangeLeagues = await db.models.ExchangeLeague.findAll();
+    const pageTypes = await db.models.PageType.findAll();
 
     for (const exchangeLeague of exchangeLeagues) {
         for (const pageType of pageTypes) {
@@ -20,13 +20,13 @@ async function initExchangeLeaguePage({
     exchangeLeague,
     pageType,
 }: {
-    exchangeLeague: db.ExchangeLeague,
-    pageType: db.PageType,
-}): Promise<db.ExchangeLeaguePage> {
+    exchangeLeague: db.models.ExchangeLeague,
+    pageType: db.models.PageType,
+}): Promise<db.models.ExchangeLeaguePage> {
     const exchangeLeagueId = exchangeLeague.id;
     const pageTypeId = pageType.id;
 
-    const [exchangeLeaguePage, created] = await db.ExchangeLeaguePage.findOrCreate({
+    const [exchangeLeaguePage, created] = await db.models.ExchangeLeaguePage.findOrCreate({
         where: {
             exchangeLeagueId,
             pageTypeId,

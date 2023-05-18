@@ -1,8 +1,8 @@
 import * as db from '../../db';
 
-export let draftKings: db.Exchange;
-export let fanDuel: db.Exchange;
-export let sugarHouse: db.Exchange;
+export let draftKings: db.models.Exchange;
+export let fanDuel: db.models.Exchange;
+export let sugarHouse: db.models.Exchange;
 
 export async function init() {
     console.log();
@@ -24,8 +24,8 @@ async function initExchange({
     name,
 }: {
     name: string,
-}): Promise<db.Exchange> {
-    const [exchange, created] = await db.Exchange.findOrCreate({
+}): Promise<db.models.Exchange> {
+    const [exchange, created] = await db.models.Exchange.findOrCreate({
         where: {
             name,
         },

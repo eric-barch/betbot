@@ -1,7 +1,17 @@
-export * from './exchange';
-export * from './exchangeLeague';
-export * from './exchangeLeaguePage';
-export * from './game';
-export * from './league';
-export * from './pageType';
-export * from './team';
+import { Exchange } from './exchange';
+import { ExchangeLeague } from './exchangeLeague';
+import { ExchangeLeaguePage } from './exchangeLeaguePage';
+import { Game } from './game';
+import { League } from './league';
+import { PageType } from './pageType';
+import { Team } from './team';
+
+export {
+    Exchange,
+    ExchangeLeague,
+    ExchangeLeaguePage,
+    Game,
+    League,
+    PageType,
+    Team,
+}

@@ -1,8 +1,8 @@
 import * as db from '../../db';
 
-export let mlb: db.League;
-export let nba: db.League;
-export let nfl: db.League;
+export let mlb: db.models.League;
+export let nba: db.models.League;
+export let nfl: db.models.League;
 
 export async function init() {
     console.log();
@@ -29,8 +29,8 @@ async function initLeague({
 }: {
     name: string,
     abbreviation: string,
-}): Promise<db.League> {
-    const [league, created] = await db.League.findOrCreate({
+}): Promise<db.models.League> {
+    const [league, created] = await db.models.League.findOrCreate({
         where: {
             name,
         },

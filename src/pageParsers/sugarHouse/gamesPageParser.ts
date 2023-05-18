@@ -15,12 +15,12 @@ export class SugarHouseGamesPageParser extends pageParsers.GamesPageParser {
         });
     }
 
-    public async getGames(): Promise<Array<db.Game>> {
+    public async getGames(): Promise<Array<db.models.Game>> {
         return await this.getGamesFromDocument();
     }
 
-    private async getGamesFromDocument(): Promise<Array<db.Game>> {
-        const games = new Array<db.Game>;
+    private async getGamesFromDocument(): Promise<Array<db.models.Game>> {
+        const games = new Array<db.models.Game>;
 
         const articleElements = await this.wrappedWebpageConnector.page.$$('article');
 
@@ -31,7 +31,7 @@ export class SugarHouseGamesPageParser extends pageParsers.GamesPageParser {
             const homeTeamId = gameKey.homeTeamId;
             const startDate = gameKey.startDate;
 
-            const [game, created] = await db.Game.findOrCreate({
+            const [game, created] = await db.models.Game.findOrCreate({
                 where: {
                     [s.Op.and]: [
                         { awayTeamId },
@@ -72,8 +72,8 @@ export class SugarHouseGamesPageParser extends pageParsers.GamesPageParser {
     }> {
         const teamNames = await this.getTeamNames(articleElement);
 
-        const awayTeam = await db.Team.findByString({ unformattedString: teamNames.awayTeamName });
-        const homeTeam = await db.Team.findByString({ unformattedString: teamNames.homeTeamName });
+        const awayTeam = await db.models.Team.findByString({ unformattedString: teamNames.awayTeamName });
+        const homeTeam = await db.models.Team.findByString({ unformattedString: teamNames.homeTeamName });
         
         let startDateString: string | undefined;
 

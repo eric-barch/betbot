@@ -3,7 +3,7 @@ import * as db from '../../db';
 export async function init() {
     console.log();
 
-    const exchangeLeaguePages = await db.ExchangeLeaguePage.findAll();
+    const exchangeLeaguePages = await db.models.ExchangeLeaguePage.findAll();
 
     for (const exchangeLeaguePage of exchangeLeaguePages) {
         const gamesPageParser = await exchangeLeaguePage.getGamesPageParser();

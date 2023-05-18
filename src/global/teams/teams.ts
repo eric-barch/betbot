@@ -11,14 +11,14 @@ export interface TeamDatum {
     nameAbbr: string,
 }
 
-export let mlbTeams: Map<string, db.Team> = new Map();
-export let nbaTeams: Map<string, db.Team> = new Map();
-export let nflTeams: Map<string, db.Team> = new Map();
+export let mlbTeams: Map<string, db.models.Team> = new Map();
+export let nbaTeams: Map<string, db.models.Team> = new Map();
+export let nflTeams: Map<string, db.models.Team> = new Map();
 
 export async function init() {
     console.log();
 
-    const leagues = await db.League.findAll();
+    const leagues = await db.models.League.findAll();
     
     for (const league of leagues) {
         switch (league.abbreviation) {
@@ -54,12 +54,12 @@ async function initLeagueTeams({
     teamData,
     league,
 }: {
-    teamsMapReference: Map<string, db.Team>,
+    teamsMapReference: Map<string, db.models.Team>,
     teamData: Array<TeamDatum>,
-    league: db.League
+    league: db.models.League
 }) {
-    const findOrCreateTeam = async (teamInfo: TeamDatum, league: db.League) => {
-        const [team, created] = await db.Team.findOrCreate({
+    const findOrCreateTeam = async (teamInfo: TeamDatum, league: db.models.League) => {
+        const [team, created] = await db.models.Team.findOrCreate({
             where: {
                 regionFull: teamInfo.regionFull,
                 nameFull: teamInfo.nameFull,

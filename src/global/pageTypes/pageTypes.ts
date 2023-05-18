@@ -1,6 +1,6 @@
 import * as db from '../../db';
 
-export let gamesPage: db.PageType;
+export let gamesPage: db.models.PageType;
 
 export async function init() {
     console.log();
@@ -14,8 +14,8 @@ async function initPageType({
     name,
 }: {
     name: string,
-}): Promise<db.PageType> {
-    const [pageType, created] = await db.PageType.findOrCreate({
+}): Promise<db.models.PageType> {
+    const [pageType, created] = await db.models.PageType.findOrCreate({
         where: {
             name,
         },
