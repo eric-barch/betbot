@@ -3,7 +3,7 @@ import * as s from 'sequelize';
 import { sequelizeInstance } from './instance';
 import {
     Exchange, League, Team, PageType, ExchangeLeague, ExchangeLeaguePage, Game 
-} from '../models';
+} from '../models/_index';
 
 class SequelizeInstanceWrapper {
     private wrappedInstance: s.Sequelize;

@@ -1,5 +1,5 @@
-import * as db from '../../db';
-import * as global from '../../global';
+import * as db from '../../db/_index';
+import * as global from '../_index';
 
 export async function init() {
     console.log();

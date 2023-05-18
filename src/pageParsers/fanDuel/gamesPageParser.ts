@@ -2,9 +2,9 @@ import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 import * as s from 'sequelize';
 
-import { WebpageConnector } from '../../pageParsers';
-import * as db from '../../db';
-import * as pageParsers from '../../pageParsers';
+import { WebpageConnector } from '../_index';
+import * as db from '../../db/_index';
+import * as pageParsers from '../_index';
 
 export class FanDuelNbaGamesPageParser extends pageParsers.GamesPageParser {
     protected wrappedWebpageConnector: pageParsers.WebpageConnector;

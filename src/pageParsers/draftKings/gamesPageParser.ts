@@ -2,8 +2,8 @@ import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 import * as s from 'sequelize';
 
-import * as db from '../../db';
-import * as pageParsers from '../../pageParsers';
+import * as db from '../../db/_index';
+import * as pageParsers from '../_index';
 
 interface GameTeams {
     awayTeam: db.models.Team;

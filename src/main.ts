@@ -1,5 +1,5 @@
-import * as db from './db';
-import * as global from './global';
+import * as db from './db/_index';
+import * as global from './global/_index';
 
 async function main() {
     await db.sequelizeInstanceWrapper.init();

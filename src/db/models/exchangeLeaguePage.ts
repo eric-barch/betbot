@@ -3,8 +3,8 @@ import * as s from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance/instance';
 import { ExchangeLeague } from './exchangeLeague';
 import { PageType } from './pageType';
-import * as global from '../../global';
-import * as pageParsers from '../../pageParsers';
+import * as global from '../../global/_index';
+import * as pageParsers from '../../pageParsers/_index';
 
 class ExchangeLeaguePageKey {
     public exchangeId: number;

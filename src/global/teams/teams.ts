@@ -1,4 +1,4 @@
-import * as db from '../../db';
+import * as db from '../../db/_index';
 import { mlbTeamData } from './mlbTeamData';
 import { nbaTeamData } from './nbaTeamData';
 import { nflTeamData } from './nflTeamData';
