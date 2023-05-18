@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelize } from './instance';
+import { sequelize } from '../instance';
 import { Exchange } from './exchange';
 import { ExchangeLeague } from './exchangeLeague';
 import { Team } from './team';

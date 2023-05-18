@@ -7,14 +7,5 @@ export {
     init,
     close,
 };
-
-export * from './exchange';
-export * from './league';
-export * from './team';
-export * from './pageType';
-
-export * from './exchangeLeague';
-export * from './exchangeLeaguePage';
-
-export * from './game';
+export * from './models';
 

@@ -1,11 +1,7 @@
 import { sequelize } from './instance';
-import { Exchange } from './exchange';
-import { League } from './league';
-import { Team } from './team';
-import { PageType } from './pageType';
-import { ExchangeLeague } from './exchangeLeague';
-import { ExchangeLeaguePage } from './exchangeLeaguePage';
-import { Game } from './game';
+import {
+    Exchange, League, Team, PageType, ExchangeLeague, ExchangeLeaguePage, Game 
+} from './models';
 
 export async function init(): Promise<void> {
     await initDbConnection();
@@ -36,7 +32,7 @@ export async function init(): Promise<void> {
     Game.belongsTo(Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
 
     await sequelize.sync({
-        force: true,
+        alter: true,
         logging: false,
     });
     console.log(`MySQL tables set up successfully.`);

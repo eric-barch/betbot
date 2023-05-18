@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelize } from './instance';
+import { sequelize } from '../instance';
 
 export class PageType extends s.Model<
     s.InferAttributes<PageType>,
