@@ -1,17 +1,9 @@
 import * as p from 'puppeteer';
 
 export class WebpageConnection {
-    private wrappedUrl: string;
+    private wrappedUrl: string | undefined;
     private wrappedBrowser: p.Browser | undefined;
     private wrappedPage: p.Page | undefined;
-
-    constructor({
-        url,
-    }: {
-        url: string,
-    }) {
-        this.wrappedUrl = url;
-    }
 
     public async connect(): Promise<void> {
         await this.connectToBrowser();
@@ -80,15 +72,11 @@ export class WebpageConnection {
         await this.browser.close();
     }
 
-    get url(): string {
-        if (!this.wrappedUrl) {
-            throw new Error(`wrappedUrl is undefined.`);
-        }
-
-        return this.wrappedUrl;
+    set url(url: string) {
+        this.wrappedUrl = url;
     }
 
-    get browser(): p.Browser {
+    private get browser(): p.Browser {
         if (!this.wrappedBrowser) {
             throw new Error(`wrappedBrowser is null.`);
         }

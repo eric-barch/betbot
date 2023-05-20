@@ -1,9 +1,8 @@
 import * as s from 'sequelize';
 
 import { sequelizeInstance } from './instance';
-import {
-    Exchange, League, Team, PageType, ExchangeLeague, ExchangeLeaguePageType, Game 
-} from '../models';
+
+import * as models from '../models';
 
 class SequelizeInstanceWrapper {
     private wrappedInstance: s.Sequelize;
@@ -25,24 +24,24 @@ class SequelizeInstanceWrapper {
 
     private async associateModels(): Promise<void> {
         // Exchange associations
-        Exchange.belongsToMany(League, { through: ExchangeLeague, foreignKey: 'exchangeId' });
+        models.Exchange.belongsToMany(models.League, { through: models.ExchangeLeague, foreignKey: 'exchangeId' });
 
         // League associations
-        League.belongsToMany(Exchange, {through: ExchangeLeague, foreignKey: 'leagueId' });
-        League.hasMany(Team, { foreignKey: 'leagueId' });
+        models.League.belongsToMany(models.Exchange, {through: models.ExchangeLeague, foreignKey: 'leagueId' });
+        models.League.hasMany(models.Team, { foreignKey: 'leagueId' });
 
         // ExchangeLeague associations
-        ExchangeLeague.belongsToMany(PageType, { through: ExchangeLeaguePageType, foreignKey: 'exchangeLeagueId' });
+        models.ExchangeLeague.belongsToMany(models.PageType, { through: models.ExchangeLeaguePage, foreignKey: 'exchangeLeagueId' });
 
         // PageType associations
-        PageType.belongsToMany(ExchangeLeague, { through: ExchangeLeaguePageType, foreignKey: 'pageTypeId' });
+        models.PageType.belongsToMany(models.ExchangeLeague, { through: models.ExchangeLeaguePage, foreignKey: 'pageTypeId' });
 
         // Team associations
-        Team.belongsTo(League, { foreignKey: 'leagueId' });
+        models.Team.belongsTo(models.League, { foreignKey: 'leagueId' });
 
         // Game associations
-        Game.belongsTo(Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
-        Game.belongsTo(Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
+        models.Game.belongsTo(models.Team, { as: 'awayTeam', foreignKey: 'awayTeamId' });
+        models.Game.belongsTo(models.Team, { as: 'homeTeam', foreignKey: 'homeTeamId' });
     }
 
     get instance(): s.Sequelize {

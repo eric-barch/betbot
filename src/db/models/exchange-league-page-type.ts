@@ -6,9 +6,9 @@ import { PageType } from './page-type';
 
 import * as parsers from '../../parsers';
 
-export class ExchangeLeaguePageType extends s.Model<
-    s.InferAttributes<ExchangeLeaguePageType, { omit: 'exchangeLeague' | 'pageType' }>,
-    s.InferCreationAttributes<ExchangeLeaguePageType, { omit: 'exchangeLeague' | 'pageType' }>
+export class ExchangeLeaguePage extends s.Model<
+    s.InferAttributes<ExchangeLeaguePage, { omit: 'exchangeLeague' | 'pageType' }>,
+    s.InferCreationAttributes<ExchangeLeaguePage, { omit: 'exchangeLeague' | 'pageType' }>
 > {
     declare id: s.CreationOptional<number>;
     declare createdAt: s.CreationOptional<Date>;
@@ -35,7 +35,7 @@ export class ExchangeLeaguePageType extends s.Model<
         const leagueId = (await exchangeLeague.getLeague()).id;
         const pageTypeId = this.pageTypeId;
 
-        const parser = parsers.getParser({
+        const parser = parsers.ParserFactory.getParser({
             exchangeId,
             leagueId,
             pageTypeId,
@@ -45,7 +45,7 @@ export class ExchangeLeaguePageType extends s.Model<
     }
 }
 
-ExchangeLeaguePageType.init({
+ExchangeLeaguePage.init({
     id: {
         type: s.DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,

@@ -4,7 +4,7 @@ import * as parsers from '../../parsers';
 export async function init() {
     console.log();
 
-    const exchangeLeaguePages = await db.models.ExchangeLeaguePageType.findAll();
+    const exchangeLeaguePages = await db.models.ExchangeLeaguePage.findAll();
 
     for (const exchangeLeaguePage of exchangeLeaguePages) {
         const gamesPageParser  = await exchangeLeaguePage.getParser();

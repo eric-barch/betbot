@@ -22,11 +22,11 @@ async function initExchangeLeaguePage({
 }: {
     exchangeLeague: db.models.ExchangeLeague,
     pageType: db.models.PageType,
-}): Promise<db.models.ExchangeLeaguePageType> {
+}): Promise<db.models.ExchangeLeaguePage> {
     const exchangeLeagueId = exchangeLeague.id;
     const pageTypeId = pageType.id;
 
-    const [exchangeLeaguePage, created] = await db.models.ExchangeLeaguePageType.findOrCreate({
+    const [exchangeLeaguePage, created] = await db.models.ExchangeLeaguePage.findOrCreate({
         where: {
             exchangeLeagueId,
             pageTypeId,

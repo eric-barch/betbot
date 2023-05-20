@@ -2,19 +2,13 @@ import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 import * as s from 'sequelize';
 
-import { GamesPageParser } from '../games-page-parser';
-import { WebpageConnection } from '../webpage-connection';
+import * as baseModels from '../../base-models';
+import * as db from '../../../db';
 
-import * as db from '../../db';
-
-export class SugarHouseNbaGamesPageParser extends GamesPageParser {
-    protected wrappedWebpageConnector: WebpageConnection;
-
+export class SugarHouseNbaGamesPageParser extends baseModels.GamesPageParser {
     constructor() {
         super();
-        this.wrappedWebpageConnector = new WebpageConnection({
-            url: 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home'
-        });
+        this.url = 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home';
     }
 
     public async getGames(): Promise<Array<db.models.Game>> {
@@ -24,7 +18,7 @@ export class SugarHouseNbaGamesPageParser extends GamesPageParser {
     private async getGamesFromDocument(): Promise<Array<db.models.Game>> {
         const games = new Array<db.models.Game>;
 
-        const articleElements = await this.wrappedWebpageConnector.page.$$('article');
+        const articleElements = await this.page.$$('article');
 
         for (const articleElement of articleElements) {
             const gameKey = await this.getGameKey(articleElement);

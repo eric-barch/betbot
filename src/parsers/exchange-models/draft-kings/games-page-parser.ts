@@ -1,24 +1,18 @@
 import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 
-import { GamesPageParser } from '../games-page-parser';
-import { WebpageConnection } from '../webpage-connection';
-
-import * as db from '../../db';
+import * as baseModels from '../../base-models';
+import * as db from '../../../db';
 
 interface GameTeams {
     awayTeam: db.models.Team;
     homeTeam: db.models.Team;
 }
 
-export class DraftKingsNbaGamesPageParser extends GamesPageParser {
-    protected wrappedWebpageConnector: WebpageConnection;
-
+export class DraftKingsNbaGamesPageParser extends baseModels.GamesPageParser {
     constructor() {
         super();
-        this.wrappedWebpageConnector = new WebpageConnection({
-            url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
-        })
+        this.url = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
     }
 
     public async getGames(): Promise<Array<db.models.Game>> {
@@ -32,7 +26,7 @@ export class DraftKingsNbaGamesPageParser extends GamesPageParser {
     }
 
     private async scrapeJsonGames(): Promise<Array<any>> {
-        const gameScriptElements = await this.wrappedWebpageConnector.page.$$('script[type="application/ld+json"]');
+        const gameScriptElements = await this.page.$$('script[type="application/ld+json"]');
 
         if (gameScriptElements.length < 1) {
             throw new Error(`Did not find jsonGameScriptElements for DraftKings.`);
@@ -88,7 +82,7 @@ export class DraftKingsNbaGamesPageParser extends GamesPageParser {
     private async getGamesFromDocument(): Promise<Array<db.models.Game>> {
         const games = new Array<db.models.Game>;
 
-        const rowElements = await this.wrappedWebpageConnector.page.$$('div[class*="parlay-card"] table > tbody > tr');
+        const rowElements = await this.page.$$('div[class*="parlay-card"] table > tbody > tr');
 
         for (const rowElement of rowElements) {
             try {

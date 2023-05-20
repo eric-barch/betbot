@@ -2,19 +2,13 @@ import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 import * as s from 'sequelize';
 
-import { GamesPageParser } from '../games-page-parser';
-import { WebpageConnection } from '../webpage-connection';
+import * as baseModels from '../../base-models';
+import * as db from '../../../db';
 
-import * as db from '../../db';
-
-export class FanDuelNbaGamesPageParser extends GamesPageParser {
-    protected wrappedWebpageConnector: WebpageConnection;
-    
+export class FanDuelNbaGamesPageParser extends baseModels.GamesPageParser {
     constructor() {
         super();
-        this.wrappedWebpageConnector = new WebpageConnection({
-            url: 'https://sportsbook.fanduel.com/navigation/nba',
-        })
+        this.url = 'https://sportsbook.fanduel.com/navigation/nba';
     }
 
     public async getGames(): Promise<Array<db.models.Game>> {
@@ -29,7 +23,7 @@ export class FanDuelNbaGamesPageParser extends GamesPageParser {
     }
 
     private async scrapeJsonGames(): Promise<Array<any>> {
-        const gamesScriptElement = await this.wrappedWebpageConnector.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
+        const gamesScriptElement = await this.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
 
         if (!gamesScriptElement) {
             throw new Error(`Did not find jsonGamesScriptElement for FanDuel.`);
@@ -149,7 +143,7 @@ export class FanDuelNbaGamesPageParser extends GamesPageParser {
         const teamNamesJoined = teamNames.join(`|`);
         const regex = new RegExp(`(${teamNamesJoined}).*@.*(${teamNamesJoined})`, `i`);
 
-        const linkElements = await this.wrappedWebpageConnector.page.$$('a');
+        const linkElements = await this.page.$$('a');
 
         let firstGameLinkElement;
 
@@ -167,7 +161,7 @@ export class FanDuelNbaGamesPageParser extends GamesPageParser {
         }
 
         const gameLinkClassName = await (await firstGameLinkElement.getProperty('className')).jsonValue();
-        const gameLinkElements = await this.wrappedWebpageConnector.page.$$(`a[class='${gameLinkClassName}']`);
+        const gameLinkElements = await this.page.$$(`a[class='${gameLinkClassName}']`);
 
         return gameLinkElements;
     }
