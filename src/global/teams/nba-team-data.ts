@@ -1,4 +1,4 @@
-import { TeamDatum } from './all-teams';
+import { TeamDatum } from './team-datum';
 
 export const nbaTeamData: Array<TeamDatum> = [{
         key: 'atlantaHawks',

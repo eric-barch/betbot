@@ -1,4 +1,4 @@
-import { TeamDatum } from './all-teams';
+import { TeamDatum } from './team-datum';
 
 export const nflTeamData: Array<TeamDatum> = [{
         key: 'arizonaCardinals',

@@ -20,20 +20,20 @@ export class ParserFactory {
         }) {
             case {
                 exchangeId: global.draftKings.id,
-                leagueId: global.leagues.nba.id,
-                pageTypeId: global.pageTypes.gamesPage.id,
+                leagueId: global.nba.id,
+                pageTypeId: global.gamesPageType.id,
             }:
                 return new exchangeModels.DraftKingsNbaGamesPageParser();
             case {
                 exchangeId: global.fanDuel.id,
-                leagueId: global.leagues.nba.id,
-                pageTypeId: global.pageTypes.gamesPage.id,
+                leagueId: global.nba.id,
+                pageTypeId: global.gamesPageType.id,
             }:
                 return new exchangeModels.FanDuelNbaGamesPageParser();
             case {
                 exchangeId: global.sugarHouse.id,
-                leagueId: global.leagues.nba.id,
-                pageTypeId: global.pageTypes.gamesPage.id,
+                leagueId: global.nba.id,
+                pageTypeId: global.gamesPageType.id,
             }:
                 return new exchangeModels.SugarHouseNbaGamesPageParser();
             default:
