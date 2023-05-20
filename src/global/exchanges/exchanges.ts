@@ -1,4 +1,4 @@
-import * as db from '../../db/_index';
+import * as db from '../../db';
 
 export let draftKings: db.models.Exchange;
 export let fanDuel: db.models.Exchange;

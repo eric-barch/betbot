@@ -1,7 +1,7 @@
-import * as db from '../../db/_index';
-import { mlbTeamData } from './mlbTeamData';
-import { nbaTeamData } from './nbaTeamData';
-import { nflTeamData } from './nflTeamData';
+import * as db from '../../db';
+import { mlbTeamData } from './mlb-team-data';
+import { nbaTeamData } from './nba-team-data';
+import { nflTeamData } from './nfl-team-data';
 
 export interface TeamDatum {
     key: string,

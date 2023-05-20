@@ -1,8 +1,8 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelizeInstance/instance';
+import { sequelizeInstance } from '../sequelize-instance';
 import { League } from './league';
-import { ExchangeLeague } from './exchangeLeague';
+import { ExchangeLeague } from './exchange-league';
 
 export class Exchange extends s.Model<
     s.InferAttributes<Exchange, { omit: 'leagues' }>,
@@ -12,7 +12,7 @@ export class Exchange extends s.Model<
     declare name: string;
     declare createdAt: s.CreationOptional<Date>;
     declare updatedAt: s.CreationOptional<Date>;
-    declare leagues?: s.NonAttribute<League[]>;
+    declare leagues: s.NonAttribute<League[]>;
 
     // belongsToMany(League)
     declare getLeagues: s.BelongsToManyGetAssociationsMixin<League>;
@@ -25,18 +25,6 @@ export class Exchange extends s.Model<
     declare hasLeagues: s.BelongsToManyHasAssociationsMixin<League, number>;
     declare countLeagues: s.BelongsToManyCountAssociationsMixin;
     declare createLeague: s.BelongsToManyCreateAssociationMixin<League>;
-
-    // hasMany(ExchangeLeague)
-    declare getExchangeLeagues: s.HasManyGetAssociationsMixin<ExchangeLeague>;
-    declare addExchangeLeague: s.HasManyAddAssociationMixin<ExchangeLeague, number>;
-    declare addExchangeLeagues: s.HasManyAddAssociationsMixin<ExchangeLeague, number>;
-    declare setExchangeLeagues: s.HasManySetAssociationsMixin<ExchangeLeague, number>;
-    declare removeExchangeLeague: s.HasManyRemoveAssociationMixin<ExchangeLeague, number>;
-    declare removeExchangeLeagues: s.HasManyRemoveAssociationsMixin<ExchangeLeague, number>;
-    declare hasExchangeLeague: s.HasManyHasAssociationMixin<ExchangeLeague, number>;
-    declare hasExchangeLeagues: s.HasManyHasAssociationsMixin<ExchangeLeague, number>;
-    declare countExchangeLeagues: s.HasManyCountAssociationsMixin;
-    declare createExchangeLeague: s.HasManyCreateAssociationMixin<ExchangeLeague, 'exchangeId'>;
 }
 
 Exchange.init({

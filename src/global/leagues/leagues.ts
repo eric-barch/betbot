@@ -1,4 +1,4 @@
-import * as db from '../../db/_index';
+import * as db from '../../db';
 
 export let mlb: db.models.League;
 export let nba: db.models.League;

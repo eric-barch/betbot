@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelizeInstance/instance';
+import { sequelizeInstance } from '../sequelize-instance';
 import { League } from './league';
 
 export class Team extends s.Model<
@@ -22,21 +22,17 @@ export class Team extends s.Model<
     declare getLeague: s.BelongsToGetAssociationMixin<League>;
     declare setLeague: s.BelongsToSetAssociationMixin<League, number>;
 
-    // declare static associations: {
-    //     league: s.Association<Team, League>;
-    // }
-
-    public static async findByString({
-        unformattedString,
+    public static async findByUnformattedName({
+        unformattedName,
     }: {
-        unformattedString: string,
+        unformattedName: string,
     }) {
         const allTeams = await Team.findAll();
 
         for (const team of allTeams) {
             const regex = new RegExp(`\\b${team.nameFull}\\b`, 'i');
 
-            if (regex.test(unformattedString)) {
+            if (regex.test(unformattedName)) {
                 return team;
             }
         }

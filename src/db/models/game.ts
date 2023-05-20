@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelizeInstance/instance';
+import { sequelizeInstance } from '../sequelize-instance';
 import { Team } from './team';
 
 export class Game extends s.Model<
@@ -16,12 +16,17 @@ export class Game extends s.Model<
     declare awayTeam: Team;
     declare homeTeam: Team;
 
-    // belongsTo(Team)
-    declare createTeam: s.BelongsToCreateAssociationMixin<Team>;
-    declare getTeam: s.BelongsToGetAssociationMixin<Team>;
-    declare setTeam: s.BelongsToSetAssociationMixin<Team, number>;
+    // belongsTo(AwayTeam)
+    declare createAwayTeam: s.BelongsToCreateAssociationMixin<Team>;
+    declare getAwayTeam: s.BelongsToGetAssociationMixin<Team>;
+    declare setAwayTeam: s.BelongsToSetAssociationMixin<Team, number>;
 
-    static async findByTeamIdsAndStartDate({
+    // belongsTo(HomeTeam)
+    declare createHomeTeam: s.BelongsToCreateAssociationMixin<Team>;
+    declare getHomeTeam: s.BelongsToGetAssociationMixin<Team>;
+    declare setHomeTeam: s.BelongsToSetAssociationMixin<Team, number>;
+
+    static async findByAwayTeamIdHomeTeamIdStartDate({
         awayTeamId,
         homeTeamId,
         startDate,

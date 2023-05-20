@@ -1,32 +1,18 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelizeInstance/instance';
+import { sequelizeInstance } from '../sequelize-instance';
 import { Exchange } from './exchange';
-import { ExchangeLeague } from './exchangeLeague';
 import { Team } from './team';
 
 export class League extends s.Model<
-    s.InferAttributes<League, { omit: 'exchanges' }>,
-    s.InferCreationAttributes<League, { omit: 'exchanges' }>
+    s.InferAttributes<League>,
+    s.InferCreationAttributes<League>
 > {
     declare id: s.CreationOptional<number>;
     declare name: string;
     declare abbreviation: string;
     declare createdAt: s.CreationOptional<Date>;
     declare updatedAt: s.CreationOptional<Date>;
-    declare exchanges?: s.NonAttribute<Exchange[]>;
-
-    // belongsToMany(Exchange)
-    declare getExchanges: s.BelongsToManyGetAssociationsMixin<Exchange>;
-    declare addExchange: s.BelongsToManyAddAssociationMixin<Exchange, number>;
-    declare addExchanges: s.BelongsToManyAddAssociationsMixin<Exchange, number>;
-    declare setExchanges: s.BelongsToManySetAssociationsMixin<Exchange, number>;
-    declare removeExchange: s.BelongsToManyRemoveAssociationMixin<Exchange, number>;
-    declare removeExchanges: s.BelongsToManyRemoveAssociationsMixin<Exchange, number>;
-    declare hasExchange: s.BelongsToManyHasAssociationMixin<Exchange, number>;
-    declare hasExchanges: s.BelongsToManyHasAssociationsMixin<Exchange, number>;
-    declare countExchanges: s.BelongsToManyCountAssociationsMixin;
-    declare createExchange: s.BelongsToManyCreateAssociationMixin<Exchange>;
 
     // hasMany(Team)
     declare getTeams: s.HasManyGetAssociationsMixin<Team>;
@@ -40,22 +26,17 @@ export class League extends s.Model<
     declare countTeams: s.HasManyCountAssociationsMixin;
     declare createTeam: s.HasManyCreateAssociationMixin<Team, 'leagueId'>;
 
-    // hasMany(ExchangeLeague)
-    declare getExchangeLeagues: s.HasManyGetAssociationsMixin<ExchangeLeague>;
-    declare addExchangeLeague: s.HasManyAddAssociationMixin<ExchangeLeague, number>;
-    declare addExchangeLeagues: s.HasManyAddAssociationsMixin<ExchangeLeague, number>;
-    declare setExchangeLeagues: s.HasManySetAssociationsMixin<ExchangeLeague, number>;
-    declare removeExchangeLeague: s.HasManyRemoveAssociationMixin<ExchangeLeague, number>;
-    declare removeExchangeLeagues: s.HasManyRemoveAssociationsMixin<ExchangeLeague, number>;
-    declare hasExchangeLeague: s.HasManyHasAssociationMixin<ExchangeLeague, number>;
-    declare hasExchangeLeagues: s.HasManyHasAssociationsMixin<ExchangeLeague, number>;
-    declare countExchangeLeagues: s.HasManyCountAssociationsMixin;
-    declare createExchangeLeague: s.HasManyCreateAssociationMixin<ExchangeLeague, 'leagueId'>;
-
-    // declare static associations: {
-    //     exchanges: s.Association<League, Exchange>;
-    //     teams: s.Association<League, Team>;
-    // }
+    // belongsToMany(Exchange)
+    declare getExchanges: s.BelongsToManyGetAssociationsMixin<Exchange>;
+    declare addExchange: s.BelongsToManyAddAssociationMixin<Exchange, number>;
+    declare addExchanges: s.BelongsToManyAddAssociationsMixin<Exchange, number>;
+    declare setExchanges: s.BelongsToManySetAssociationsMixin<Exchange, number>;
+    declare removeExchange: s.BelongsToManyRemoveAssociationMixin<Exchange, number>;
+    declare removeExchanges: s.BelongsToManyRemoveAssociationsMixin<Exchange, number>;
+    declare hasExchange: s.BelongsToManyHasAssociationMixin<Exchange, number>;
+    declare hasExchanges: s.BelongsToManyHasAssociationsMixin<Exchange, number>;
+    declare countExchanges: s.BelongsToManyCountAssociationsMixin;
+    declare createExchange: s.BelongsToManyCreateAssociationMixin<Exchange>;
 }
 
 League.init({
