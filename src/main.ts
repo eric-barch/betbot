@@ -4,15 +4,15 @@ import * as global from './global';
 async function main() {
     await db.sequelizeInstanceWrapper.init();
 
-    await global.exchanges.init();
-    await global.leagues.init();
-    await global.teams.init();
-    await global.pageTypes.init();
+    await global.AllExchanges.init();
+    await global.AllLeagues.init();
+    await global.AllTeams.init();
+    await global.AllPageTypes.init();
 
-    await global.exchangeLeagues.init();
-    await global.exchangeLeaguePages.init();
+    await global.AllExchangeLeagues.init();
+    await global.AllExchangeLeaguePages.init();
     
-    await global.games.init();
+    await global.AllGames.init();
 }
 
 main();

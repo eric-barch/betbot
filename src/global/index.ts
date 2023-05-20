@@ -1,9 +1,7 @@
-export * as exchanges from './exchanges';
-export * as leagues from './leagues';
-export * as teams from './teams';
-export * as pageTypes from './page-types';
-
-export * as exchangeLeagues from './exchange-leagues';
-export * as exchangeLeaguePages from './exchange-league-pages';
-
-export * as games from './games';
+export * from './exchanges';
+export * from './leagues';
+export * from './teams';
+export * from './page-types';
+export * from './exchange-leagues';
+export *  from './exchange-league-pages';
+export * from './games';

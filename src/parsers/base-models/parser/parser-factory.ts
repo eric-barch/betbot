@@ -19,19 +19,19 @@ export class ParserFactory {
             pageTypeId,
         }) {
             case {
-                exchangeId: global.exchanges.draftKings.id,
+                exchangeId: global.draftKings.id,
                 leagueId: global.leagues.nba.id,
                 pageTypeId: global.pageTypes.gamesPage.id,
             }:
                 return new exchangeModels.DraftKingsNbaGamesPageParser();
             case {
-                exchangeId: global.exchanges.fanDuel.id,
+                exchangeId: global.fanDuel.id,
                 leagueId: global.leagues.nba.id,
                 pageTypeId: global.pageTypes.gamesPage.id,
             }:
                 return new exchangeModels.FanDuelNbaGamesPageParser();
             case {
-                exchangeId: global.exchanges.sugarHouse.id,
+                exchangeId: global.sugarHouse.id,
                 leagueId: global.leagues.nba.id,
                 pageTypeId: global.pageTypes.gamesPage.id,
             }:

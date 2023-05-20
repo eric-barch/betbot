@@ -1,3 +1,1 @@
-import { init } from './games';
-
-export { init };
+export * from './all-games';

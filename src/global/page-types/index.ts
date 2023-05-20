@@ -1,9 +1,1 @@
-import {
-    init,
-    gamesPage
-} from './page-types';
-
-export {
-    init,
-    gamesPage
-};
+export * from './all-page-types';

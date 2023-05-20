@@ -1,3 +1,1 @@
-import { init } from './exchange-league-pages';
-
-export { init };
+export * from './all-exchange-league-pages';
