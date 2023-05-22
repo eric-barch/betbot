@@ -1,16 +1,17 @@
 import { allExchangeLeagues } from '../exchange-leagues';
 import { allPageTypes } from '../page-types';
+import { IGlobal } from '../i-global';
 
 import * as db from '../../db';
 
-class AllExchangeLeaguePageTypes {
+class AllExchangeLeaguePageTypes implements IGlobal<db.models.ExchangeLeaguePageType> {
     private wrappedActive: Array<db.models.ExchangeLeaguePageType>;
 
     constructor() {
         this.wrappedActive = new Array<db.models.ExchangeLeaguePageType>;
     }
 
-    public async init() {
+    public async init(): Promise<Array<db.models.ExchangeLeaguePageType>> {
         const exchangeLeagues = allExchangeLeagues.active;
         const pageTypes = allPageTypes.active;
     
@@ -22,6 +23,8 @@ class AllExchangeLeaguePageTypes {
                 });
             }
         }
+
+        return this.wrappedActive;
     }
 
     private async initExchangeLeaguePage({
@@ -45,7 +48,7 @@ class AllExchangeLeaguePageTypes {
             }
         });
 
-        this.active.push(exchangeLeaguePageType);
+        this.wrappedActive.push(exchangeLeaguePageType);
     
         return exchangeLeaguePageType;
     }

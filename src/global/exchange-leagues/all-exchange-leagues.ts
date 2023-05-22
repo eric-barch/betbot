@@ -1,16 +1,17 @@
 import { allExchanges } from '../exchanges';
 import { allLeagues } from '../leagues';
+import { IGlobal } from '../i-global';
 
 import * as db from '../../db';
 
-class AllExchangeLeagues {
+class AllExchangeLeagues implements IGlobal<db.models.ExchangeLeague> {
     private wrappedActive: Array<db.models.ExchangeLeague>;
 
     constructor() {
         this.wrappedActive = new Array<db.models.ExchangeLeague>;
     }
 
-    public async init() {    
+    public async init(): Promise<Array<db.models.ExchangeLeague>> {
         const exchanges = allExchanges.active;
         const leagues = allLeagues.active;
     
@@ -22,6 +23,8 @@ class AllExchangeLeagues {
                 });
             }
         }
+
+        return this.wrappedActive;
     }
 
     private async initExchangeLeague({
@@ -45,7 +48,7 @@ class AllExchangeLeagues {
             }
         });
 
-        this.active.push(exchangeLeague);
+        this.wrappedActive.push(exchangeLeague);
     
         return exchangeLeague;
     }

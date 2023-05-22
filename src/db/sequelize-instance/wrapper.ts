@@ -15,7 +15,6 @@ class SequelizeInstanceWrapper {
         await this.connectToMySql();
         await this.associateModels();
         await this.wrappedInstance.sync({ alter: true });
-        console.log(`Sequelize initiated successfully.`);
     }
 
     private async connectToMySql(): Promise<void> {

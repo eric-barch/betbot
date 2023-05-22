@@ -1,28 +1,34 @@
+import { IGlobal } from '../i-global';
+
 import * as db from '../../db';
 
-class AllExchanges {
+class AllExchanges implements IGlobal<db.models.Exchange> {
     private wrappedDraftKings: db.models.Exchange | undefined;
     private wrappedFanDuel: db.models.Exchange | undefined;
     private wrappedSugarHouse: db.models.Exchange | undefined;
-
     private wrappedActive: Array<db.models.Exchange>;
 
     constructor() {
         this.wrappedActive = new Array<db.models.Exchange>;
     }
 
-    public async init() {    
+    public async init(): Promise<Array<db.models.Exchange>> {    
         this.wrappedDraftKings = await this.initExchange({
             name: 'DraftKings',
         });
+        this.wrappedActive.push(this.wrappedDraftKings);
     
         this.wrappedFanDuel = await this.initExchange({
             name: 'FanDuel',
         });
+        this.wrappedActive.push(this.wrappedFanDuel);
     
         this.wrappedSugarHouse = await this.initExchange({
             name: 'SugarHouse',
-        })
+        });
+        this.wrappedActive.push(this.wrappedSugarHouse);
+
+        return this.wrappedActive;
     }
 
     private async initExchange({
@@ -38,8 +44,6 @@ class AllExchanges {
                 name,
             }
         });
-
-        this.active.push(exchange);
     
         return exchange;
     }

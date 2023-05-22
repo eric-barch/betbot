@@ -1,37 +1,38 @@
+import { allLeagues } from '../leagues';
 import { TeamDatum } from './team-datum';
 import { mlbTeamData } from './mlb-team-data';
 import { nbaTeamData } from './nba-team-data';
 import { nflTeamData } from './nfl-team-data';
+import { IGlobal } from '../i-global';
 
 import * as db from '../../db';
 
-class AllTeams {
-    private mlbTeams: Map<string, db.models.Team> = new Map();
-    private nbaTeams: Map<string, db.models.Team> = new Map();
-    private nflTeams: Map<string, db.models.Team> = new Map();
+class AllTeams implements IGlobal<db.models.Team> {
+    private wrappedActive: Array<db.models.Team>;
 
-    public async init() {    
-        const leagues = await db.models.League.findAll();
+    constructor() {
+        this.wrappedActive = new Array<db.models.Team>;
+    }
+
+    public async init(): Promise<Array<db.models.Team>> {    
+        const leagues = allLeagues.active;
         
         for (const league of leagues) {
-            switch (league.abbreviation) {
-                case 'MLB':
+            switch (league.id) {
+                case allLeagues.mlb.id:
                     await this.initLeagueTeams({
-                        teamsMapReference: this.mlbTeams,
                         teamData: mlbTeamData,
                         league: league,
                     });
                     break;
-                case 'NBA':
+                case allLeagues.nba.id:
                     await this.initLeagueTeams({
-                        teamsMapReference: this.nbaTeams,
                         teamData: nbaTeamData,
                         league: league,
                     });
                     break;
-                case 'NFL':
+                case allLeagues.nfl.id:
                     await this.initLeagueTeams({
-                        teamsMapReference: this.nflTeams,
                         teamData: nflTeamData,
                         league: league,
                     });
@@ -40,46 +41,48 @@ class AllTeams {
                     throw new Error(`Did not find matching league.`);
             }
         }
+
+        return this.wrappedActive;
     }
 
     private async initLeagueTeams({
-        teamsMapReference,
         teamData,
         league,
     }: {
-        teamsMapReference: Map<string, db.models.Team>,
         teamData: Array<TeamDatum>,
         league: db.models.League
     }) {
-        const findOrCreateTeam = async (teamInfo: TeamDatum, league: db.models.League) => {
+        for (const teamDatum of teamData) {
             const [team, created] = await db.models.Team.findOrCreate({
                 where: {
-                    regionFull: teamInfo.regionFull,
-                    nameFull: teamInfo.nameFull,
+                    regionFull: teamDatum.regionFull,
+                    nameFull: teamDatum.nameFull,
                     leagueId: league.id,
                 },
                 defaults: {
-                    regionFull: teamInfo.regionFull,
-                    regionAbbr: teamInfo.regionAbbr,
-                    nameFull: teamInfo.nameFull,
-                    nameAbbr: teamInfo.nameAbbr,
+                    regionFull: teamDatum.regionFull,
+                    regionAbbr: teamDatum.regionAbbr,
+                    nameFull: teamDatum.nameFull,
+                    nameAbbr: teamDatum.nameAbbr,
                     leagueId: league.id,
                 },
             });
-    
+
             if (!created) {
                 await team.update({
-                    regionAbbr: teamInfo.regionAbbr,
-                    nameAbbr: teamInfo.nameAbbr,
+                    regionAbbr: teamDatum.regionAbbr,
+                    nameAbbr: teamDatum.nameAbbr,
                 });
             }
-    
-            teamsMapReference.set(teamInfo.key, team);
-        };
-    
-        const teamPromises = teamData.map((teamInfo) => findOrCreateTeam(teamInfo, league));
-    
-        await Promise.all(teamPromises);
+
+            this.wrappedActive.push(team);
+
+            return team;
+        }
+    }
+
+    get active(): Array<db.models.Team> {
+        return this.wrappedActive;
     }
 }
 

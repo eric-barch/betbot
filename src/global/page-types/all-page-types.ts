@@ -1,18 +1,22 @@
+import { IGlobal } from '../i-global';
+
 import * as db from '../../db';
 
-class AllPageTypes {
+class AllPageTypes implements IGlobal<db.models.PageType> {
     private wrappedGames: db.models.PageType | undefined;
-
     private wrappedActive: Array<db.models.PageType>;
 
     constructor() {
         this.wrappedActive = new Array<db.models.PageType>;
     }
 
-    public async init() {    
+    public async init(): Promise<Array<db.models.PageType>> {    
         this.wrappedGames = await this.initPageType({
             name: 'games',
-        })
+        });
+        this.wrappedActive.push(this.wrappedGames);
+
+        return this.wrappedActive;
     }
     
     private async initPageType({
@@ -28,8 +32,6 @@ class AllPageTypes {
                 name,
             }
         });
-
-        this.wrappedActive.push(pageType);
     
         return pageType;
     }

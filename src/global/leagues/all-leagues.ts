@@ -1,31 +1,37 @@
+import { IGlobal } from '../i-global';
+
 import * as db from '../../db';
 
-class AllLeagues {
+class AllLeagues implements IGlobal<db.models.League> {
     private wrappedMlb: db.models.League | undefined;
     private wrappedNba: db.models.League | undefined;
     private wrappedNfl: db.models.League | undefined;
-
     private wrappedActive: Array<db.models.League>;
 
     constructor() {
         this.wrappedActive = new Array<db.models.League>;
     }
 
-    public async init() {
-        // this.wrappedMlb = await this.initLeague({
-        //     name: 'Major League Baseball',
-        //     abbreviation: 'MLB',
-        // });
+    public async init(): Promise<Array<db.models.League>> {
+        this.wrappedMlb = await this.initLeague({
+            name: 'Major League Baseball',
+            abbreviation: 'MLB',
+        });
+        // this.wrappedActive.push(this.wrappedMlb);
     
         this.wrappedNba = await this.initLeague({
             name: 'National Basketball Association',
             abbreviation: 'NBA',
         });
+        this.wrappedActive.push(this.wrappedNba);
     
-        // this.wrappedNfl = await this.initLeague({
-        //     name: 'National Football League',
-        //     abbreviation: 'NFL',
-        // });
+        this.wrappedNfl = await this.initLeague({
+            name: 'National Football League',
+            abbreviation: 'NFL',
+        });
+        // this.wrappedActive.push(this.wrappedNfl);
+
+        return this.wrappedActive;
     }
 
     private async initLeague({
@@ -50,8 +56,6 @@ class AllLeagues {
                 abbreviation: abbreviation,
             });
         }
-
-        this.wrappedActive.push(league);
     
         return league;
     }
