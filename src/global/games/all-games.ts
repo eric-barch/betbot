@@ -1,3 +1,5 @@
+import { allExchangeLeaguePageTypes } from '../exchange-league-page-types';
+
 import * as db from '../../db';
 import * as parsers from '../../parsers';
 
@@ -11,7 +13,7 @@ class AllGames {
     public async init() {
         console.log();
     
-        const exchangeLeaguePageTypes = await db.models.ExchangeLeaguePageType.findAll();
+        const exchangeLeaguePageTypes = allExchangeLeaguePageTypes.active;
     
         for (const exchangeLeaguePageType of exchangeLeaguePageTypes) {
             const gamesPageParser  = await exchangeLeaguePageType.getParser();

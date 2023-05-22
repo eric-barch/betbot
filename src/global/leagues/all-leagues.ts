@@ -12,20 +12,20 @@ class AllLeagues {
     }
 
     public async init() {
-        this.wrappedMlb = await this.initLeague({
-            name: 'Major League Baseball',
-            abbreviation: 'MLB',
-        });
+        // this.wrappedMlb = await this.initLeague({
+        //     name: 'Major League Baseball',
+        //     abbreviation: 'MLB',
+        // });
     
         this.wrappedNba = await this.initLeague({
             name: 'National Basketball Association',
             abbreviation: 'NBA',
         });
     
-        this.wrappedNfl = await this.initLeague({
-            name: 'National Football League',
-            abbreviation: 'NFL',
-        });
+        // this.wrappedNfl = await this.initLeague({
+        //     name: 'National Football League',
+        //     abbreviation: 'NFL',
+        // });
     }
 
     private async initLeague({
