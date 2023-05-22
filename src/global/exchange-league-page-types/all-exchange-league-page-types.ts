@@ -34,7 +34,7 @@ class AllExchangeLeaguePageTypes {
         const exchangeLeagueId = exchangeLeague.id;
         const pageTypeId = pageType.id;
     
-        const [exchangeLeaguePage, created] = await db.models.ExchangeLeaguePageType.findOrCreate({
+        const [exchangeLeaguePageType, created] = await db.models.ExchangeLeaguePageType.findOrCreate({
             where: {
                 exchangeLeagueId,
                 pageTypeId,
@@ -44,8 +44,10 @@ class AllExchangeLeaguePageTypes {
                 pageTypeId,
             }
         });
+
+        this.active.push(exchangeLeaguePageType);
     
-        return exchangeLeaguePage;
+        return exchangeLeaguePageType;
     }
 
     get active(): Array<db.models.ExchangeLeaguePageType> {
