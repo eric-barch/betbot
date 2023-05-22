@@ -1,17 +1,21 @@
 import * as db from '../../db';
 
-export let gamesPageType: db.models.PageType;
+class AllPageTypes {
+    private wrappedGames: db.models.PageType | undefined;
 
-export class AllPageTypes {
-    public static async init() {
-        console.log();
-    
-        gamesPageType = await this.initPageType({
+    private wrappedActive: Array<db.models.PageType>;
+
+    constructor() {
+        this.wrappedActive = new Array<db.models.PageType>;
+    }
+
+    public async init() {    
+        this.wrappedGames = await this.initPageType({
             name: 'games',
         })
     }
     
-    private static async initPageType({
+    private async initPageType({
         name,
     }: {
         name: string,
@@ -24,9 +28,23 @@ export class AllPageTypes {
                 name,
             }
         });
-    
-        console.log(`'${name}' PageType initialized.`);
+
+        this.wrappedActive.push(pageType);
     
         return pageType;
     }
+
+    get games(): db.models.PageType {
+        if (!this.wrappedGames) {
+            throw new Error(`wrappedGames is undefined.`);
+        }
+
+        return this.wrappedGames;
+    }
+
+    get active(): Array<db.models.PageType> {
+        return this.wrappedActive;
+    }
 }
+
+export const allPageTypes = new AllPageTypes();

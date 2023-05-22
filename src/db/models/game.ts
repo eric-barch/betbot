@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelize-instance';
+import { sequelize } from '../sequelize-instance';
 import { Team } from './team';
 
 export class Game extends s.Model<
@@ -40,16 +40,16 @@ export class Game extends s.Model<
                 [s.Op.and]: [
                     { awayTeamId },
                     { homeTeamId },
-                    sequelizeInstance.where(
-                        sequelizeInstance.fn('YEAR', sequelizeInstance.col('startDate')),
+                    sequelize.where(
+                        sequelize.fn('YEAR', sequelize.col('startDate')),
                         startDate.getUTCFullYear()
                     ),
-                    sequelizeInstance.where(
-                        sequelizeInstance.fn('MONTH', sequelizeInstance.col('startDate')),
+                    sequelize.where(
+                        sequelize.fn('MONTH', sequelize.col('startDate')),
                         startDate.getUTCMonth() + 1,
                     ),
-                    sequelizeInstance.where(
-                        sequelizeInstance.fn('DAY', sequelizeInstance.col('startDate')),
+                    sequelize.where(
+                        sequelize.fn('DAY', sequelize.col('startDate')),
                         startDate.getUTCDate(),
                     ),
                 ],
@@ -75,6 +75,6 @@ Game.init({
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
 }, {
-    sequelize: sequelizeInstance,
+    sequelize: sequelize,
     tableName: 'Games'
 })

@@ -1,14 +1,14 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelize-instance';
+import { sequelize } from '../sequelize-instance';
 import { ExchangeLeague } from './exchange-league';
 import { PageType } from './page-type';
+import { Parser } from '../../parsers/base-models';
+import { ParserFactory } from '../../parsers/base-models/parser-factory';
 
-import * as parsers from '../../parsers';
-
-export class ExchangeLeaguePage extends s.Model<
-    s.InferAttributes<ExchangeLeaguePage, { omit: 'exchangeLeague' | 'pageType' }>,
-    s.InferCreationAttributes<ExchangeLeaguePage, { omit: 'exchangeLeague' | 'pageType' }>
+export class ExchangeLeaguePageType extends s.Model<
+    s.InferAttributes<ExchangeLeaguePageType, { omit: 'exchangeLeague' | 'pageType' }>,
+    s.InferCreationAttributes<ExchangeLeaguePageType, { omit: 'exchangeLeague' | 'pageType' }>
 > {
     declare id: s.CreationOptional<number>;
     declare createdAt: s.CreationOptional<Date>;
@@ -28,24 +28,26 @@ export class ExchangeLeaguePage extends s.Model<
     declare getPageType: s.BelongsToGetAssociationMixin<PageType>;
     declare setPageType: s.BelongsToSetAssociationMixin<PageType, number>;
 
-    public async getParser(): Promise<parsers.Parser> {
+    public async getParser(): Promise<Parser> {
         const exchangeLeague = await this.getExchangeLeague();
 
         const exchangeId = (await exchangeLeague.getExchange()).id;
         const leagueId = (await exchangeLeague.getLeague()).id;
         const pageTypeId = this.pageTypeId;
 
-        const parser = parsers.ParserFactory.getParser({
+        const parser = await ParserFactory.getParser({
             exchangeId,
             leagueId,
             pageTypeId,
         });
 
+        await parser.connect();
+
         return parser;
     }
 }
 
-ExchangeLeaguePage.init({
+ExchangeLeaguePageType.init({
     id: {
         type: s.DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
@@ -56,6 +58,6 @@ ExchangeLeaguePage.init({
     exchangeLeagueId: s.DataTypes.INTEGER.UNSIGNED,
     pageTypeId: s.DataTypes.INTEGER.UNSIGNED,
 }, {
-    sequelize: sequelizeInstance,
-    tableName: 'ExchangeLeaguePages',
+    sequelize: sequelize,
+    tableName: 'ExchangeLeaguePageTypes',
 })

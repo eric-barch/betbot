@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelize-instance';
+import { sequelize } from '../sequelize-instance';
 import { ExchangeLeague } from './exchange-league';
 
 export class PageType extends s.Model<
@@ -35,6 +35,6 @@ PageType.init({
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
 }, {
-    sequelize: sequelizeInstance,
+    sequelize: sequelize,
     tableName: 'PageTypes',
 })

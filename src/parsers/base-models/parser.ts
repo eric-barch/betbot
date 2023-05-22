@@ -5,16 +5,17 @@ import { WebpageConnection } from './webpage-connection';
 export abstract class Parser {
     private wrappedWebpageConnection: WebpageConnection;
 
-    constructor() {
+    constructor({
+        url,
+    }: {
+        url: string,
+    }) {
         this.wrappedWebpageConnection = new WebpageConnection();
+        this.wrappedWebpageConnection.url = url;
     }
 
     public async connect(): Promise<void> {
         await this.wrappedWebpageConnection.connect();
-    }
-
-    set url(url: string) {
-        this.wrappedWebpageConnection.url = url;
     }
 
     get page(): p.Page {

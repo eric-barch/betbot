@@ -1,30 +1,34 @@
 import * as db from '../../db';
 
-export let mlb: db.models.League;
-export let nba: db.models.League;
-export let nfl: db.models.League;
+class AllLeagues {
+    private wrappedMlb: db.models.League | undefined;
+    private wrappedNba: db.models.League | undefined;
+    private wrappedNfl: db.models.League | undefined;
 
-export class AllLeagues {
-    public static async init() {
-        console.log();
+    private wrappedActive: Array<db.models.League>;
+
+    constructor() {
+        this.wrappedActive = new Array<db.models.League>;
+    }
+
+    public async init() {
+        this.wrappedMlb = await this.initLeague({
+            name: 'Major League Baseball',
+            abbreviation: 'MLB',
+        });
     
-        // mlb = await initLeague({
-        //     name: 'Major League Baseball',
-        //     abbreviation: 'MLB',
-        // });
-    
-        nba = await this.initLeague({
+        this.wrappedNba = await this.initLeague({
             name: 'National Basketball Association',
             abbreviation: 'NBA',
         });
     
-        // nfl = await initLeague({
-        //     name: 'National Football League',
-        //     abbreviation: 'NFL',
-        // });
+        this.wrappedNfl = await this.initLeague({
+            name: 'National Football League',
+            abbreviation: 'NFL',
+        });
     }
 
-    private static async initLeague({
+    private async initLeague({
         name,
         abbreviation,
     }: {
@@ -46,9 +50,39 @@ export class AllLeagues {
                 abbreviation: abbreviation,
             });
         }
-    
-        console.log(`${abbreviation} initialized.`);
+
+        this.wrappedActive.push(league);
     
         return league;
     }
+
+    get mlb(): db.models.League {
+        if (!this.wrappedMlb) {
+            throw new Error(`wrappedMlb is undefined.`);
+        }
+
+        return this.wrappedMlb;
+    }
+
+    get nba(): db.models.League {
+        if (!this.wrappedNba) {
+            throw new Error(`wrappedNba is undefined.`);
+        }
+
+        return this.wrappedNba;
+    }
+
+    get nfl(): db.models.League {
+        if (!this.wrappedNfl) {
+            throw new Error(`wrappedNfl is undefined`);
+        }
+
+        return this.wrappedNfl;
+    }
+
+    get active(): Array<db.models.League> {
+        return this.wrappedActive;
+    }
 }
+
+export const allLeagues = new AllLeagues();

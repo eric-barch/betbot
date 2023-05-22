@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelize-instance';
+import { sequelize } from '../sequelize-instance';
 import { Exchange } from './exchange';
 import { Team } from './team';
 
@@ -50,6 +50,6 @@ League.init({
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
 }, {
-    sequelize: sequelizeInstance,
+    sequelize: sequelize,
     tableName: 'Leagues',
 })

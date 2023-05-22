@@ -1,27 +1,31 @@
 import * as db from '../../db';
 
-export let draftKings: db.models.Exchange;
-export let fanDuel: db.models.Exchange;
-export let sugarHouse: db.models.Exchange;
+class AllExchanges {
+    private wrappedDraftKings: db.models.Exchange | undefined;
+    private wrappedFanDuel: db.models.Exchange | undefined;
+    private wrappedSugarHouse: db.models.Exchange | undefined;
 
-export class AllExchanges {
-    public static async init() {
-        console.log();
-    
-        draftKings = await this.initExchange({
+    private wrappedActive: Array<db.models.Exchange>;
+
+    constructor() {
+        this.wrappedActive = new Array<db.models.Exchange>;
+    }
+
+    public async init() {    
+        this.wrappedDraftKings = await this.initExchange({
             name: 'DraftKings',
         });
     
-        fanDuel = await this.initExchange({
+        this.wrappedFanDuel = await this.initExchange({
             name: 'FanDuel',
         });
     
-        sugarHouse = await this.initExchange({
+        this.wrappedSugarHouse = await this.initExchange({
             name: 'SugarHouse',
         })
     }
 
-    private static async initExchange({
+    private async initExchange({
         name,
     }: {
         name: string,
@@ -34,9 +38,39 @@ export class AllExchanges {
                 name,
             }
         });
-    
-        console.log(`${name} initialized.`);
+
+        this.active.push(exchange);
     
         return exchange;
     }
+
+    get draftKings(): db.models.Exchange {
+        if (!this.wrappedDraftKings) {
+            throw new Error(`wrappedDraftKings is undefined.`);
+        }
+
+        return this.wrappedDraftKings;
+    }
+
+    get fanDuel(): db.models.Exchange {
+        if (!this.wrappedFanDuel) {
+            throw new Error( `wrappedFanDuel is undefined.`);
+        }
+
+        return this.wrappedFanDuel;
+    }
+
+    get sugarHouse(): db.models.Exchange {
+        if (!this.wrappedSugarHouse) {
+            throw new Error(`wrappedSugarHouse is undefined.`);
+        }
+
+        return this.wrappedSugarHouse;
+    }
+
+    get active(): Array<db.models.Exchange> {
+        return this.wrappedActive;
+    }
 }
+
+export const allExchanges = new AllExchanges();

@@ -5,35 +5,33 @@ import { nflTeamData } from './nfl-team-data';
 
 import * as db from '../../db';
 
-export let mlbTeams: Map<string, db.models.Team> = new Map();
-export let nbaTeams: Map<string, db.models.Team> = new Map();
-export let nflTeams: Map<string, db.models.Team> = new Map();
+class AllTeams {
+    private mlbTeams: Map<string, db.models.Team> = new Map();
+    private nbaTeams: Map<string, db.models.Team> = new Map();
+    private nflTeams: Map<string, db.models.Team> = new Map();
 
-export class AllTeams {
-    public static async init() {
-        console.log();
-    
+    public async init() {    
         const leagues = await db.models.League.findAll();
         
         for (const league of leagues) {
             switch (league.abbreviation) {
                 case 'MLB':
                     await this.initLeagueTeams({
-                        teamsMapReference: mlbTeams,
+                        teamsMapReference: this.mlbTeams,
                         teamData: mlbTeamData,
                         league: league,
                     });
                     break;
                 case 'NBA':
                     await this.initLeagueTeams({
-                        teamsMapReference: nbaTeams,
+                        teamsMapReference: this.nbaTeams,
                         teamData: nbaTeamData,
                         league: league,
                     });
                     break;
                 case 'NFL':
                     await this.initLeagueTeams({
-                        teamsMapReference: nflTeams,
+                        teamsMapReference: this.nflTeams,
                         teamData: nflTeamData,
                         league: league,
                     });
@@ -44,7 +42,7 @@ export class AllTeams {
         }
     }
 
-    private static async initLeagueTeams({
+    private async initLeagueTeams({
         teamsMapReference,
         teamData,
         league,
@@ -82,7 +80,7 @@ export class AllTeams {
         const teamPromises = teamData.map((teamInfo) => findOrCreateTeam(teamInfo, league));
     
         await Promise.all(teamPromises);
-    
-        console.log(`${league.abbreviation} teams initialized.`);
     }
 }
+
+export const allTeams = new AllTeams();

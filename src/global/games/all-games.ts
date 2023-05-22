@@ -1,14 +1,20 @@
 import * as db from '../../db';
 import * as parsers from '../../parsers';
 
-export class AllGames {
-    public static async init() {
+class AllGames {
+    private active: Array<db.models.Game>;
+
+    constructor() {
+        this.active = new Array<db.models.Game>;
+    }
+
+    public async init() {
         console.log();
     
-        const exchangeLeaguePages = await db.models.ExchangeLeaguePage.findAll();
+        const exchangeLeaguePageTypes = await db.models.ExchangeLeaguePageType.findAll();
     
-        for (const exchangeLeaguePage of exchangeLeaguePages) {
-            const gamesPageParser  = await exchangeLeaguePage.getParser();
+        for (const exchangeLeaguePageType of exchangeLeaguePageTypes) {
+            const gamesPageParser  = await exchangeLeaguePageType.getParser();
             
             if (gamesPageParser instanceof parsers.GamesPageParser) {
                 await gamesPageParser.getGames();
@@ -16,3 +22,5 @@ export class AllGames {
         }
     }
 }
+
+export const allGames = new AllGames();

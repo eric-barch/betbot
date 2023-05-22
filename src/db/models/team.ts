@@ -1,6 +1,6 @@
 import * as s from 'sequelize';
 
-import { sequelizeInstance } from '../sequelize-instance';
+import { sequelize } from '../sequelize-instance';
 import { League } from './league';
 
 export class Team extends s.Model<
@@ -54,6 +54,6 @@ Team.init({
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
 }, {
-    sequelize: sequelizeInstance,
+    sequelize: sequelize,
     tableName: 'Teams',
 });

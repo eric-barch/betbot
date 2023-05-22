@@ -2,17 +2,17 @@ import * as db from './db';
 import * as global from './global';
 
 async function main() {
-    await db.sequelizeInstanceWrapper.init();
+    await db.sequelizeInstance.init();
 
-    await global.AllExchanges.init();
-    await global.AllLeagues.init();
-    await global.AllTeams.init();
-    await global.AllPageTypes.init();
+    await global.allExchanges.init();
+    await global.allLeagues.init();
+    await global.allTeams.init();
+    await global.allPageTypes.init();
 
-    await global.AllExchangeLeagues.init();
-    await global.AllExchangeLeaguePages.init();
+    await global.allExchangeLeagues.init();
+    await global.allExchangeLeaguePageTypes.init();
     
-    await global.AllGames.init();
+    await global.allGames.init();
 }
 
 main();

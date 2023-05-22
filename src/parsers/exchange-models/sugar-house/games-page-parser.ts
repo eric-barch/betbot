@@ -7,8 +7,9 @@ import * as db from '../../../db';
 
 export class SugarHouseNbaGamesPageParser extends baseModels.GamesPageParser {
     constructor() {
-        super();
-        this.url = 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home';
+        super({
+            url: 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home',
+        });
     }
 
     public async getGames(): Promise<Array<db.models.Game>> {
@@ -32,16 +33,16 @@ export class SugarHouseNbaGamesPageParser extends baseModels.GamesPageParser {
                     [s.Op.and]: [
                         { awayTeamId },
                         { homeTeamId },
-                        db.sequelizeInstanceWrapper.instance.where(
-                            db.sequelizeInstanceWrapper.instance.fn('YEAR', db.sequelizeInstanceWrapper.instance.col('startDate')),
+                        db.sequelizeInstance.instance.where(
+                            db.sequelizeInstance.instance.fn('YEAR', db.sequelizeInstance.instance.col('startDate')),
                             startDate.getUTCFullYear()
                         ),
-                        db.sequelizeInstanceWrapper.instance.where(
-                            db.sequelizeInstanceWrapper.instance.fn('MONTH', db.sequelizeInstanceWrapper.instance.col('startDate')),
+                        db.sequelizeInstance.instance.where(
+                            db.sequelizeInstance.instance.fn('MONTH', db.sequelizeInstance.instance.col('startDate')),
                             startDate.getUTCMonth() + 1,
                         ),
-                        db.sequelizeInstanceWrapper.instance.where(
-                            db.sequelizeInstanceWrapper.instance.fn('DAY', db.sequelizeInstanceWrapper.instance.col('startDate')),
+                        db.sequelizeInstance.instance.where(
+                            db.sequelizeInstance.instance.fn('DAY', db.sequelizeInstance.instance.col('startDate')),
                             startDate.getUTCDate(),
                         ),
                     ],

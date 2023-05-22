@@ -11,8 +11,9 @@ interface GameTeams {
 
 export class DraftKingsNbaGamesPageParser extends baseModels.GamesPageParser {
     constructor() {
-        super();
-        this.url = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
+        super({
+            url: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
+        });
     }
 
     public async getGames(): Promise<Array<db.models.Game>> {

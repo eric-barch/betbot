@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-export const sequelizeInstance = new Sequelize(
+export const sequelize = new Sequelize(
     'betbot',
     'root',
     'f9R#@hY82l',

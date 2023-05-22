@@ -1,11 +1,18 @@
+import { allExchanges } from '../exchanges';
+import { allLeagues } from '../leagues';
+
 import * as db from '../../db';
 
-export class AllExchangeLeagues {
-    public static async init() {
-        console.log();
-    
-        const exchanges = await db.models.Exchange.findAll();
-        const leagues = await db.models.League.findAll();
+class AllExchangeLeagues {
+    private wrappedActive: Array<db.models.ExchangeLeague>;
+
+    constructor() {
+        this.wrappedActive = new Array<db.models.ExchangeLeague>;
+    }
+
+    public async init() {    
+        const exchanges = allExchanges.active;
+        const leagues = allLeagues.active;
     
         for (const exchange of exchanges) {
             for (const league of leagues) {
@@ -17,7 +24,7 @@ export class AllExchangeLeagues {
         }
     }
 
-    private static async initExchangeLeague({
+    private async initExchangeLeague({
         exchange,
         league,
     }: {
@@ -37,9 +44,15 @@ export class AllExchangeLeagues {
                 leagueId,
             }
         });
-    
-        console.log(`${exchange.name} ${league.abbreviation} ExchangeLeague initialized.`);
+
+        this.active.push(exchangeLeague);
     
         return exchangeLeague;
     }
+
+    get active(): Array<db.models.ExchangeLeague> {
+        return this.wrappedActive;
+    }
 }
+
+export const allExchangeLeagues = new AllExchangeLeagues();
