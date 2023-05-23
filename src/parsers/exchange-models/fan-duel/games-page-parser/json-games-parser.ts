@@ -19,20 +19,19 @@ export class JsonGamesParser {
     }
 
     private async getJsonGames(): Promise<Array<any>> {
-        const jsonGames = new Array;
+        const jsonGamesElement = await this.gamesPageParser.page.$('script[type="application/ld+json"][data-react-helmet="true"]');
 
-        const gameScriptElements = await this.gamesPageParser.page.$$('script[type="application/ld+json"]');
-
-        for (const gameScriptElement of gameScriptElements) {
-            const textContent = await (await gameScriptElement.getProperty('textContent')).jsonValue();
-
-            if (!textContent) {
-                continue;
-            }
-
-            const gameInJsonFormat = JSON.parse(textContent);
-            jsonGames.push(gameInJsonFormat);
+        if (!jsonGamesElement) {
+            throw new Error(`jsonGamesElement is null.`);
         }
+    
+        const textContent = await (await jsonGamesElement.getProperty('textContent')).jsonValue();
+    
+        if (!textContent) {
+            throw new Error(`textContent is null.`);
+        }
+
+        const jsonGames = JSON.parse(textContent);
 
         return jsonGames;
     }
@@ -54,7 +53,7 @@ export class JsonGamesParser {
                 homeTeam,
                 startDate,
             });
-    
+
             games.push(game);
         }
 
@@ -66,7 +65,7 @@ export class JsonGamesParser {
     }: {
         jsonTeam: any,
     }): Promise<db.models.Team> {
-        const unformattedName = jsonTeam.name;
+        const unformattedName = await jsonTeam.name;
         const team = await db.models.Team.findByUnformattedName({ unformattedName });
         return team;
     }
