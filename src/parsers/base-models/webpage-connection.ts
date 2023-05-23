@@ -54,6 +54,9 @@ export class WebpageConnection {
 
     private async connectToNewPage(): Promise<p.Page> {
         this.wrappedPage = await this.browser.newPage();
+
+        const url = this.url;
+
         await this.page.goto(this.url);
 
         const windowSize = await this.page.evaluate(() => {
@@ -70,6 +73,14 @@ export class WebpageConnection {
 
     public async close(): Promise<void> {
         await this.browser.close();
+    }
+
+    get url(): string {
+        if (!this.wrappedUrl) {
+            throw new Error(`wrappedUrl is undefined.`);
+        }
+
+        return this.wrappedUrl;
     }
 
     set url(url: string) {

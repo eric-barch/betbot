@@ -26,43 +26,42 @@ export class Game extends s.Model<
     declare getHomeTeam: s.BelongsToGetAssociationMixin<Team>;
     declare setHomeTeam: s.BelongsToSetAssociationMixin<Team, number>;
 
-    static async findByAwayTeamIdHomeTeamIdStartDate({
-        awayTeamId,
-        homeTeamId,
+    static async findOrCreateByAwayTeamHomeTeamStartDate({
+        awayTeam,
+        homeTeam,
         startDate,
     }: {
-        awayTeamId: number,
-        homeTeamId: number,
+        awayTeam: Team,
+        homeTeam: Team,
         startDate: Date,
     }): Promise<Game> {
+        const dayInSeconds = 24 * 60 * 60;
+    
         const [game, created] = await this.findOrCreate({
             where: {
                 [s.Op.and]: [
-                    { awayTeamId },
-                    { homeTeamId },
-                    sequelize.where(
-                        sequelize.fn('YEAR', sequelize.col('startDate')),
-                        startDate.getUTCFullYear()
-                    ),
-                    sequelize.where(
-                        sequelize.fn('MONTH', sequelize.col('startDate')),
-                        startDate.getUTCMonth() + 1,
-                    ),
-                    sequelize.where(
-                        sequelize.fn('DAY', sequelize.col('startDate')),
-                        startDate.getUTCDate(),
-                    ),
+                    { awayTeamId: awayTeam.id },
+                    { homeTeamId: homeTeam.id },
+                    {
+                        startDate: {
+                            [s.Op.between]: [
+                                sequelize.fn('DATE_SUB', startDate, sequelize.literal(`INTERVAL ${dayInSeconds} SECOND`)),
+                                sequelize.fn('DATE_ADD', startDate, sequelize.literal(`INTERVAL ${dayInSeconds} SECOND`)),
+                            ],
+                        },
+                    },
                 ],
             },
             defaults: {
-                awayTeamId,
-                homeTeamId,
+                awayTeamId: awayTeam.id,
+                homeTeamId: homeTeam.id,
                 startDate,
             },
         });
-
+    
         return game;
     }
+    
 }
 
 Game.init({

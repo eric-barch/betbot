@@ -11,7 +11,7 @@ async function main() {
 
     await global.allExchangeLeagues.init();
     await global.allExchangeLeaguePageTypes.init();
-    
+
     await global.allGames.init();
 }
 

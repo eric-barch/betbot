@@ -18,7 +18,7 @@ class AllTeams implements IGlobal<db.models.Team> {
         const leagues = allLeagues.active;
         
         for (const league of leagues) {
-            switch (league.id) {
+            switch(league.id) {
                 case allLeagues.mlb.id:
                     await this.initLeagueTeams({
                         teamData: mlbTeamData,
@@ -76,8 +76,6 @@ class AllTeams implements IGlobal<db.models.Team> {
             }
 
             this.wrappedActive.push(team);
-
-            return team;
         }
     }
 

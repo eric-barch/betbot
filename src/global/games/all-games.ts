@@ -3,6 +3,7 @@ import { IGlobal } from '../i-global';
 
 import * as db from '../../db';
 import * as parsers from '../../parsers';
+import { allPageTypes } from '../page-types';
 
 class AllGames implements IGlobal<db.models.Game> {
     private wrappedActive: Array<db.models.Game>;
@@ -11,14 +12,22 @@ class AllGames implements IGlobal<db.models.Game> {
         this.wrappedActive = new Array<db.models.Game>;
     }
 
-    public async init(): Promise<Array<db.models.Game>> {    
-        const exchangeLeaguePageTypes = allExchangeLeaguePageTypes.active;
-    
-        for (const exchangeLeaguePageType of exchangeLeaguePageTypes) {
-            const gamesPageParser  = await exchangeLeaguePageType.getParser();
-            
-            if (gamesPageParser instanceof parsers.GamesPageParser) {
-                await gamesPageParser.getGames();
+    public async init(): Promise<Array<db.models.Game>> {
+        const exchangeLeagueGamePageTypes = allExchangeLeaguePageTypes.active.filter(
+            exchangeLeaguePageType => exchangeLeaguePageType.pageTypeId === allPageTypes.games.id
+        );
+
+        for (const exchangeLeagueGamePageType of exchangeLeagueGamePageTypes) {
+            const gamesPageParser  = await exchangeLeagueGamePageType.getParser();
+
+            if (!(gamesPageParser instanceof parsers.GamesPageParser)) {
+                throw new Error(`gamesPageParser is not a GamesPageParser.`);
+            }
+
+            const exchangeLeagueGames = await gamesPageParser.getGames();
+
+            for (const exchangeLeagueGame of  exchangeLeagueGames) {
+                this.wrappedActive.push(exchangeLeagueGame);
             }
         }
 

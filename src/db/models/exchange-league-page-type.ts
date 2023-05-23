@@ -31,8 +31,8 @@ export class ExchangeLeaguePageType extends s.Model<
     public async getParser(): Promise<Parser> {
         const exchangeLeague = await this.getExchangeLeague();
 
-        const exchangeId = (await exchangeLeague.getExchange()).id;
-        const leagueId = (await exchangeLeague.getLeague()).id;
+        const exchangeId = exchangeLeague.exchangeId;
+        const leagueId = exchangeLeague.leagueId;
         const pageTypeId = this.pageTypeId;
 
         const parser = await ParserFactory.getParser({
