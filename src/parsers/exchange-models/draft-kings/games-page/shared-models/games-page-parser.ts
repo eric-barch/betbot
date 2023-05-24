@@ -1,19 +1,17 @@
 import { JsonGamesParser } from './json-games-parser';
 import { DocumentGamesParser } from './document-games-parser';
 
-import * as baseModels from '../../../base-models';
-import * as db from '../../../../db';
+import * as baseModels from '../../../../shared-models';
+import * as db from '../../../../../db';
 
-export class FanDuelNbaGamesPageParser extends baseModels.GamesPageParser {
+export abstract class DraftKingsGamesPageParser extends baseModels.GamesPageParser {
   private jsonGamesParser: JsonGamesParser;
   private documentGamesParser: DocumentGamesParser;
 
-  constructor() {
-    super({ url: 'https://sportsbook.fanduel.com/navigation/nba' });
+  constructor({ url }: { url: string }) {
+    super({ url });
     this.jsonGamesParser = new JsonGamesParser({ gamesPageParser: this });
-    this.documentGamesParser = new DocumentGamesParser({
-      gamesPageParser: this,
-    });
+    this.documentGamesParser = new DocumentGamesParser({ gamesPageParser: this });
   }
 
   public async getGames(): Promise<Array<db.models.Game>> {

@@ -35,7 +35,7 @@ export class Game extends s.Model<
     homeTeam: Team;
     startDate: Date;
   }): Promise<Game> {
-    const dayInSeconds = 24 * 60 * 60;
+    const sixHoursInSeconds = 6 * 60 * 60;
 
     const [game, created] = await this.findOrCreate({
       where: {
@@ -48,12 +48,12 @@ export class Game extends s.Model<
                 sequelize.fn(
                   'DATE_SUB',
                   startDate,
-                  sequelize.literal(`INTERVAL ${dayInSeconds} SECOND`)
+                  sequelize.literal(`INTERVAL ${sixHoursInSeconds} SECOND`)
                 ),
                 sequelize.fn(
                   'DATE_ADD',
                   startDate,
-                  sequelize.literal(`INTERVAL ${dayInSeconds} SECOND`)
+                  sequelize.literal(`INTERVAL ${sixHoursInSeconds} SECOND`)
                 ),
               ],
             },

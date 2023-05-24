@@ -4,6 +4,8 @@
   "description": "",
   "main": "main.ts",
   "scripts": {
+    "cgo": "tsc && node out/main.js",
+    "go": "node out/main.js",
     "test": "jest"
   },
   "keywords": [],

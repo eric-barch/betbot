@@ -3,8 +3,8 @@ import * as s from 'sequelize';
 import { sequelize } from '../sequelize-instance';
 import { ExchangeLeague } from './exchange-league';
 import { PageType } from './page-type';
-import { Parser } from '../../parsers/base-models';
-import { ParserFactory } from '../../parsers/base-models/parser-factory';
+import { Parser } from '../../parsers/shared-models';
+import { ParserFactory } from '../../parsers/shared-models/parser-factory';
 
 export class ExchangeLeaguePageType extends s.Model<
   s.InferAttributes<ExchangeLeaguePageType, { omit: 'exchangeLeague' | 'pageType' }>,

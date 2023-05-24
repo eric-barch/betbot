@@ -17,7 +17,7 @@ class AllLeagues implements IGlobal<db.models.League> {
       name: 'Major League Baseball',
       abbreviation: 'MLB',
     });
-    // this.wrappedActive.push(this.wrappedMlb);
+    this.wrappedActive.push(this.wrappedMlb);
 
     this.wrappedNba = await this.initLeague({
       name: 'National Basketball Association',

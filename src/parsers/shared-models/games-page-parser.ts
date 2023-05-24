@@ -1,4 +1,4 @@
-import { Parser } from '../base-models';
+import { Parser } from '.';
 
 import * as db from '../../db';
 

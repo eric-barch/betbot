@@ -1,1 +1,1 @@
-export * from './games-page-parser';
+export * from './games-page';

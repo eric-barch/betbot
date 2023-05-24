@@ -1,9 +1,13 @@
 import * as p from 'puppeteer';
 
 export class WebpageConnection {
-  private wrappedUrl: string | undefined;
+  private wrappedUrl: string;
   private wrappedBrowser: p.Browser | undefined;
   private wrappedPage: p.Page | undefined;
+
+  constructor({ url }: { url: string }) {
+    this.wrappedUrl = url;
+  }
 
   public async connect(): Promise<void> {
     await this.connectToBrowser();

@@ -1,8 +1,8 @@
 import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 
-import * as baseModels from '../../../base-models';
-import * as db from '../../../../db';
+import * as baseModels from '../../../../shared-models';
+import * as db from '../../../../../db';
 
 interface MatchupTeams {
   awayTeam: db.models.Team;
@@ -87,20 +87,23 @@ export class DocumentGamesParser {
     const awayTeamNameMatches = matchupString.match(awayTeamNamePattern);
     const homeTeamNameMatches = matchupString.match(homeTeamNamePattern);
 
-    if (!awayTeamNameMatches) {
-      throw new Error(`awayTeamName is null.`);
+    if (!awayTeamNameMatches || (awayTeamNameMatches.length !== 2)) {
+      throw new Error(`awayTeamNameMatches is null or not equal to 2.`);
     }
 
-    if (!homeTeamNameMatches) {
-      throw new Error(`homeTeamName is null.`);
+    if (!homeTeamNameMatches || (homeTeamNameMatches.length !== 2)) {
+      throw new Error(`homeTeamName is null or not equal to 2.`);
     }
+
+    const unformattedAwayName = awayTeamNameMatches[1].replace(/[^a-zA-Z]/g, ' ');
+    const unformattedHomeName = homeTeamNameMatches[1].replace(/[^a-zA-Z]/g, ' ');
 
     const awayTeam = await db.models.Team.findByUnformattedName({
-      unformattedName: awayTeamNameMatches[0],
+      unformattedName: unformattedAwayName,
     });
 
     const homeTeam = await db.models.Team.findByUnformattedName({
-      unformattedName: homeTeamNameMatches[0],
+      unformattedName: unformattedHomeName,
     });
 
     return {

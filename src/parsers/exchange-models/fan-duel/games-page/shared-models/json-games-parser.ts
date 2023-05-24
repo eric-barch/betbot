@@ -1,5 +1,5 @@
-import * as baseModels from '../../../base-models';
-import * as db from '../../../../db';
+import * as baseModels from '../../../../shared-models';
+import * as db from '../../../../../db';
 
 export class JsonGamesParser {
   private gamesPageParser: baseModels.GamesPageParser;

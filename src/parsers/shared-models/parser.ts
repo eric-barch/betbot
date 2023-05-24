@@ -6,8 +6,7 @@ export abstract class Parser {
   private wrappedWebpageConnection: WebpageConnection;
 
   constructor({ url }: { url: string }) {
-    this.wrappedWebpageConnection = new WebpageConnection();
-    this.wrappedWebpageConnection.url = url;
+    this.wrappedWebpageConnection = new WebpageConnection({ url });
   }
 
   public async connect(): Promise<void> {

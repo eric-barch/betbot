@@ -25,6 +25,30 @@ export class ParserFactory {
     if (
       parserKey.matches({
         exchangeId: global.allExchanges.draftKings.id,
+        leagueId: global.allLeagues.mlb.id,
+        pageTypeId: global.allPageTypes.games.id,
+      })
+    ) {
+      parser = new exchangeModels.DraftKingsMlbGamesPageParser();
+    } else if (
+      parserKey.matches({
+        exchangeId: global.allExchanges.fanDuel.id,
+        leagueId: global.allLeagues.mlb.id,
+        pageTypeId: global.allPageTypes.games.id,
+      })
+    ) {
+      parser = new exchangeModels.FanDuelMlbGamesPageParser();
+    } else if (
+      parserKey.matches({
+        exchangeId: global.allExchanges.sugarHouse.id,
+        leagueId: global.allLeagues.mlb.id,
+        pageTypeId: global.allPageTypes.games.id,
+      })
+    ) {
+      parser = new exchangeModels.SugarHouseMlbGamesPageParser();
+    } else if (
+      parserKey.matches({
+        exchangeId: global.allExchanges.draftKings.id,
         leagueId: global.allLeagues.nba.id,
         pageTypeId: global.allPageTypes.games.id,
       })

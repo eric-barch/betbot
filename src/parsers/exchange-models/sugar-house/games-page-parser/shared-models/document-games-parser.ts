@@ -1,8 +1,8 @@
 import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 
-import * as baseModels from '../../../base-models';
-import * as db from '../../../../db';
+import * as baseModels from '../../../../shared-models';
+import * as db from '../../../../../db';
 
 export class DocumentGamesParser {
   private gamesPageParser: baseModels.GamesPageParser;

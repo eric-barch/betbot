@@ -32,7 +32,7 @@ export class Team extends s.Model<
         return team;
       }
     }
-
+    
     throw new Error(`Did not find matching team.`);
   }
 }

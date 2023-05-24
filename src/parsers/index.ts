@@ -1,2 +1,2 @@
-export * from './base-models';
+export * from './shared-models';
 export * from './exchange-models';
