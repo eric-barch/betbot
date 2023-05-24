@@ -3,22 +3,18 @@ import * as p from 'puppeteer';
 import { WebpageConnection } from './webpage-connection';
 
 export abstract class Parser {
-    private wrappedWebpageConnection: WebpageConnection;
+  private wrappedWebpageConnection: WebpageConnection;
 
-    constructor({
-        url,
-    }: {
-        url: string,
-    }) {
-        this.wrappedWebpageConnection = new WebpageConnection();
-        this.wrappedWebpageConnection.url = url;
-    }
+  constructor({ url }: { url: string }) {
+    this.wrappedWebpageConnection = new WebpageConnection();
+    this.wrappedWebpageConnection.url = url;
+  }
 
-    public async connect(): Promise<void> {
-        await this.wrappedWebpageConnection.connect();
-    }
+  public async connect(): Promise<void> {
+    await this.wrappedWebpageConnection.connect();
+  }
 
-    get page(): p.Page {
-        return this.wrappedWebpageConnection.page;
-    }
+  get page(): p.Page {
+    return this.wrappedWebpageConnection.page;
+  }
 }

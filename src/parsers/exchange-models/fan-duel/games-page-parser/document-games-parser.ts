@@ -6,145 +6,137 @@ import * as baseModels from '../../../base-models';
 import * as db from '../../../../db';
 
 export class DocumentGamesParser {
-    private gamesPageParser: baseModels.GamesPageParser;
+  private gamesPageParser: baseModels.GamesPageParser;
 
-    constructor({
-        gamesPageParser,
-    }: {
-        gamesPageParser: baseModels.GamesPageParser,
-    }) {
-        this.gamesPageParser = gamesPageParser;
+  constructor({ gamesPageParser }: { gamesPageParser: baseModels.GamesPageParser }) {
+    this.gamesPageParser = gamesPageParser;
+  }
+
+  public async getGames(): Promise<Array<db.models.Game>> {
+    const games = new Array<db.models.Game>();
+
+    const gameElements = await this.getGameElements();
+
+    for (const gameElement of gameElements) {
+      const matchupTeams = await this.getMatchupTeams({ gameElement });
+
+      const awayTeam = matchupTeams.awayTeam;
+      const homeTeam = matchupTeams.homeTeam;
+      const startDate = await this.getStartDate({ gameElement });
+
+      const game = await db.models.Game.findOrCreateByAwayTeamHomeTeamStartDate({
+        awayTeam,
+        homeTeam,
+        startDate,
+      });
+
+      games.push(game);
     }
 
-    public async getGames(): Promise<Array<db.models.Game>> {
-        const games = new Array<db.models.Game>;
+    return games;
+  }
 
-        const gameElements = await this.getGameElements();
+  private async getGameElements(): Promise<Array<p.ElementHandle>> {
+    const gameElements = new Array<p.ElementHandle>();
 
-        for (const gameElement of gameElements) {
-            const matchupTeams = await this.getMatchupTeams({ gameElement });
+    const gameLinkElements = await this.getGameLinkElements();
 
-            const awayTeam = matchupTeams.awayTeam;
-            const homeTeam = matchupTeams.homeTeam;
-            const startDate = await this.getStartDate({ gameElement });
+    for (const gameLinkElement of gameLinkElements) {
+      const gameElement = await gameLinkElement.$('xpath/../../../..');
 
-            const game = await db.models.Game.findOrCreateByAwayTeamHomeTeamStartDate({
-                awayTeam,
-                homeTeam,
-                startDate,
-            });
+      if (!gameElement) {
+        throw new Error(`gameElement is null.`);
+      }
 
-            games.push(game);
-        }
-
-        return games;
+      gameElements.push(gameElement);
     }
 
-    private async getGameElements(): Promise<Array<p.ElementHandle>> {
-        const gameElements = new Array<p.ElementHandle>;
+    return gameElements;
+  }
 
-        const gameLinkElements = await this.getGameLinkElements();
+  private async getGameLinkElements(): Promise<Array<p.ElementHandle>> {
+    const teams = await db.models.Team.findAll();
+    const teamNames = teams.map((team) => team.nameFull);
+    const teamNamesJoined = teamNames.join(`|`);
+    const regex = new RegExp(`(${teamNamesJoined}).*@.*(${teamNamesJoined})`, `i`);
 
-        for (const gameLinkElement of gameLinkElements) {
-            const gameElement = await gameLinkElement.$('xpath/../../../..');
+    const linkElements = await this.gamesPageParser.page.$$('a');
 
-            if (!gameElement) {
-                throw new Error(`gameElement is null.`);
-            }
+    let firstGameLinkElement;
 
-            gameElements.push(gameElement);
-        }
+    for (const linkElement of linkElements) {
+      const title = await (await linkElement.getProperty('title')).jsonValue();
 
-        return gameElements;
+      if (regex.test(title)) {
+        firstGameLinkElement = linkElement;
+        break;
+      }
     }
 
-    private async getGameLinkElements(): Promise<Array<p.ElementHandle>> {
-        const teams = await db.models.Team.findAll();
-        const teamNames = teams.map(team => team.nameFull);
-        const teamNamesJoined = teamNames.join(`|`);
-        const regex = new RegExp(`(${teamNamesJoined}).*@.*(${teamNamesJoined})`, `i`);
-
-        const linkElements = await this.gamesPageParser.page.$$('a');
-
-        let firstGameLinkElement;
-
-        for (const linkElement of linkElements) {
-            const title = await (await linkElement.getProperty('title')).jsonValue();
-
-            if (regex.test(title)) {
-                firstGameLinkElement = linkElement;
-                break;
-            }
-        }
-
-        if (!firstGameLinkElement) {
-            throw new Error(`Did not find first game link element.`);
-        }
-
-        const gameLinkClassName = await (await firstGameLinkElement.getProperty('className')).jsonValue();
-        const gameLinkElements = await this.gamesPageParser.page.$$(`a[class='${gameLinkClassName}']`);
-
-        return gameLinkElements;
+    if (!firstGameLinkElement) {
+      throw new Error(`Did not find first game link element.`);
     }
 
-    private async getMatchupTeams({
-        gameElement,
-    }: {
-        gameElement: p.ElementHandle,
-    }): Promise<{
-        awayTeam: db.models.Team,
-        homeTeam: db.models.Team,
-    }> {
-        const spansWithAriaLabel = await gameElement.$$('span[aria-label]');
+    const gameLinkClassName = await (
+      await firstGameLinkElement.getProperty('className')
+    ).jsonValue();
+    const gameLinkElements = await this.gamesPageParser.page.$$(`a[class='${gameLinkClassName}']`);
 
-        const matchupTeams = new Array<db.models.Team>;
+    return gameLinkElements;
+  }
 
-        for (const spanWithAriaLabel of spansWithAriaLabel) {
-            const textContent = await (await spanWithAriaLabel.getProperty('textContent')).jsonValue();
+  private async getMatchupTeams({ gameElement }: { gameElement: p.ElementHandle }): Promise<{
+    awayTeam: db.models.Team;
+    homeTeam: db.models.Team;
+  }> {
+    const spansWithAriaLabel = await gameElement.$$('span[aria-label]');
 
-            if (!textContent) {
-                continue;
-            }
+    const matchupTeams = new Array<db.models.Team>();
 
-            try {
-                const team = await db.models.Team.findByUnformattedName({ unformattedName: textContent });
-                matchupTeams.push(team);
-            } catch {
-                continue;
-            }
-        }
+    for (const spanWithAriaLabel of spansWithAriaLabel) {
+      const textContent = await (await spanWithAriaLabel.getProperty('textContent')).jsonValue();
 
-        if (matchupTeams.length !== 2) {
-            throw new Error(`matchupTeams.length is not equal to 2.`);
-        }
+      if (!textContent) {
+        continue;
+      }
 
-        return {
-            awayTeam: matchupTeams[0],
-            homeTeam: matchupTeams[1],
-        }
+      try {
+        const team = await db.models.Team.findByUnformattedName({
+          unformattedName: textContent,
+        });
+        matchupTeams.push(team);
+      } catch {
+        continue;
+      }
     }
 
-    private async getStartDate({
-        gameElement,
-    }: {
-        gameElement: p.ElementHandle,
-    }): Promise<Date> {
-        const startDateElement = await gameElement.$$('time');
-
-        if (startDateElement.length !== 1) {
-            return new Date();
-        }
-
-        const startDateText = await (await startDateElement[0].getProperty('textContent')).jsonValue();
-
-        if (!startDateText) {
-            throw new Error(`timeText is null.`);
-        }
-
-        const startDateTextStripped = startDateText.replace(/(am|pm)(.*)$/i, '$1');
-
-        const startDate = c.parseDate(startDateTextStripped);
-
-        return startDate;
+    if (matchupTeams.length !== 2) {
+      throw new Error(`matchupTeams.length is not equal to 2.`);
     }
+
+    return {
+      awayTeam: matchupTeams[0],
+      homeTeam: matchupTeams[1],
+    };
+  }
+
+  private async getStartDate({ gameElement }: { gameElement: p.ElementHandle }): Promise<Date> {
+    const startDateElement = await gameElement.$$('time');
+
+    if (startDateElement.length !== 1) {
+      return new Date();
+    }
+
+    const startDateText = await (await startDateElement[0].getProperty('textContent')).jsonValue();
+
+    if (!startDateText) {
+      throw new Error(`timeText is null.`);
+    }
+
+    const startDateTextStripped = startDateText.replace(/(am|pm)(.*)$/i, '$1');
+
+    const startDate = c.parseDate(startDateTextStripped);
+
+    return startDate;
+  }
 }
