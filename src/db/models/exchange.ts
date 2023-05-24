@@ -10,9 +10,9 @@ export class Exchange extends s.Model<
 > {
   declare id: s.CreationOptional<number>;
   declare name: string;
+  declare leagues: s.NonAttribute<League[]>;
   declare createdAt: s.CreationOptional<Date>;
   declare updatedAt: s.CreationOptional<Date>;
-  declare leagues: s.NonAttribute<League[]>;
 
   // belongsToMany(League)
   declare getLeagues: s.BelongsToManyGetAssociationsMixin<League>;

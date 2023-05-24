@@ -1,9 +1,9 @@
-import { allExchangeLeaguePageTypes } from '../exchange-league-page-types';
+import { allExchangeLeaguePageTypes } from '../all-pages';
 import { IGlobal } from '../i-global';
 
 import * as db from '../../db';
 import * as parsers from '../../parsers';
-import { allPageTypes } from '../page-types';
+import { allPageTypes } from '../all-page-types';
 
 class AllGames implements IGlobal<db.models.Game> {
   private wrappedActive: Array<db.models.Game>;

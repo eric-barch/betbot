@@ -12,10 +12,10 @@ export class Team extends s.Model<
   declare regionAbbr: string;
   declare nameFull: string;
   declare nameAbbr: string;
+  declare leagueId: s.ForeignKey<League['id']>;
+  declare league: s.NonAttribute<League>;
   declare createdAt: s.CreationOptional<Date>;
   declare updatedAt: s.CreationOptional<Date>;
-  declare leagueId: s.ForeignKey<League['id']>;
-  declare league?: s.NonAttribute<League>;
 
   // belongsTo(League)
   declare createLeague: s.BelongsToCreateAssociationMixin<League>;
@@ -32,7 +32,7 @@ export class Team extends s.Model<
         return team;
       }
     }
-    
+
     throw new Error(`Did not find matching team.`);
   }
 }

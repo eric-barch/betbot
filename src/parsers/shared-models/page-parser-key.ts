@@ -1,4 +1,4 @@
-export class ParserKey {
+export class PageParserKey {
   private wrappedExchangeId: number;
   private wrappedLeagueId: number;
   private wrappedPageTypeId: number;

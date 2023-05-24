@@ -10,12 +10,12 @@ export class ExchangeLeague extends s.Model<
   s.InferCreationAttributes<ExchangeLeague, { omit: 'exchange' | 'league' }>
 > {
   declare id: s.CreationOptional<number>;
-  declare createdAt: s.CreationOptional<Date>;
-  declare updatedAt: s.CreationOptional<Date>;
   declare exchangeId: s.ForeignKey<Exchange['id']>;
   declare leagueId: s.ForeignKey<League['id']>;
   declare exchange: s.NonAttribute<Exchange>;
   declare league: s.NonAttribute<League>;
+  declare createdAt: s.CreationOptional<Date>;
+  declare updatedAt: s.CreationOptional<Date>;
 
   // belongsTo(Exchange)
   declare createExchange: s.BelongsToCreateAssociationMixin<Exchange>;
@@ -51,7 +51,7 @@ ExchangeLeague.init(
     updatedAt: s.DataTypes.DATE,
   },
   {
-    sequelize: sequelize,
+    sequelize,
     tableName: 'ExchangeLeagues',
   }
 );

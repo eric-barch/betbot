@@ -1,17 +1,17 @@
-import { allExchangeLeagues } from '../exchange-leagues';
-import { allPageTypes } from '../page-types';
+import { allExchangeLeagues } from '../all-exchange-leagues';
+import { allPageTypes } from '../all-page-types';
 import { IGlobal } from '../i-global';
 
 import * as db from '../../db';
 
-class AllExchangeLeaguePageTypes implements IGlobal<db.models.ExchangeLeaguePageType> {
-  private wrappedActive: Array<db.models.ExchangeLeaguePageType>;
+class AllExchangeLeaguePageTypes implements IGlobal<db.models.Page> {
+  private wrappedActive: Array<db.models.Page>;
 
   constructor() {
-    this.wrappedActive = new Array<db.models.ExchangeLeaguePageType>();
+    this.wrappedActive = new Array<db.models.Page>();
   }
 
-  public async init(): Promise<Array<db.models.ExchangeLeaguePageType>> {
+  public async init(): Promise<Array<db.models.Page>> {
     const exchangeLeagues = allExchangeLeagues.active;
     const pageTypes = allPageTypes.active;
 
@@ -33,11 +33,11 @@ class AllExchangeLeaguePageTypes implements IGlobal<db.models.ExchangeLeaguePage
   }: {
     exchangeLeague: db.models.ExchangeLeague;
     pageType: db.models.PageType;
-  }): Promise<db.models.ExchangeLeaguePageType> {
+  }): Promise<db.models.Page> {
     const exchangeLeagueId = exchangeLeague.id;
     const pageTypeId = pageType.id;
 
-    const [exchangeLeaguePageType, created] = await db.models.ExchangeLeaguePageType.findOrCreate({
+    const [exchangeLeaguePageType, created] = await db.models.Page.findOrCreate({
       where: {
         exchangeLeagueId,
         pageTypeId,
@@ -53,7 +53,7 @@ class AllExchangeLeaguePageTypes implements IGlobal<db.models.ExchangeLeaguePage
     return exchangeLeaguePageType;
   }
 
-  get active(): Array<db.models.ExchangeLeaguePageType> {
+  get active(): Array<db.models.Page> {
     return this.wrappedActive;
   }
 }

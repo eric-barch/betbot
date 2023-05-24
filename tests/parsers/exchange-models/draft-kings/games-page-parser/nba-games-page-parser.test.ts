@@ -1,13 +1,17 @@
-import { DraftKingsNbaGamesPageParser } from '../../../../../src/parsers/exchange-models/draft-kings/games-page-parser/nba-games-page-parser';
-import { JsonGamesParser } from '../../../../../src/parsers/exchange-models/draft-kings/games-page-parser/json-games-parser';
-import { DocumentGamesParser } from '../../../../../src/parsers/exchange-models/draft-kings/games-page-parser/document-games-parser';
+import { DraftKingsNbaGamesPageParser } from '../../../../../src/parsers/exchange-models/draft-kings/games-page';
+import { JsonGamesParser } from '../../../../../src/parsers/exchange-models/draft-kings/games-page/shared-models/json-games-parser';
+import { DocumentGamesParser } from '../../../../../src/parsers/exchange-models/draft-kings/games-page/shared-models/document-games-parser';
 
-jest.mock('../../../../../src/parsers/exchange-models/draft-kings/games-page-parser/json-games-parser');
-jest.mock('../../../../../src/parsers/exchange-models/draft-kings/games-page-parser/document-games-parser');
+jest.mock(
+  '../../../../../src/parsers/exchange-models/draft-kings/games-page/shared-models/json-games-parser'
+);
+jest.mock(
+  '../../../../../src/parsers/exchange-models/draft-kings/games-page/shared-models/document-games-parser'
+);
 
 describe('DraftKingsNbaGamesPageParser', () => {
   let draftKingsNbaGamesPageParser: DraftKingsNbaGamesPageParser;
-  
+
   const mockJsonGames = [
     {
       id: 1,
@@ -83,9 +87,9 @@ describe('DraftKingsNbaGamesPageParser', () => {
 
     it('should not return games that are returned from jsonGamesParser but not from documentGamesParser', async () => {
       const games = await draftKingsNbaGamesPageParser.getGames();
-      
+
       // The game with id 3 is in jsonGamesParser but not in documentGamesParser
-      const gameNotInDocumentGames = mockJsonGames.find(game => game.id === 3);
+      const gameNotInDocumentGames = mockJsonGames.find((game) => game.id === 3);
       expect(games).not.toContainEqual(gameNotInDocumentGames);
     });
   });

@@ -2,6 +2,7 @@ import * as s from 'sequelize';
 
 import { sequelize } from '../sequelize-instance';
 import { Team } from './team';
+import { Page } from './page';
 
 export class Game extends s.Model<
   s.InferAttributes<Game, { omit: 'awayTeam' | 'homeTeam' }>,
@@ -9,12 +10,12 @@ export class Game extends s.Model<
 > {
   declare id: s.CreationOptional<Date>;
   declare startDate: Date;
-  declare createdAt: s.CreationOptional<Date>;
-  declare updatedAt: s.CreationOptional<Date>;
   declare awayTeamId: s.ForeignKey<Team['id']>;
   declare homeTeamId: s.ForeignKey<Team['id']>;
   declare awayTeam: Team;
   declare homeTeam: Team;
+  declare createdAt: s.CreationOptional<Date>;
+  declare updatedAt: s.CreationOptional<Date>;
 
   // belongsTo(AwayTeam)
   declare createAwayTeam: s.BelongsToCreateAssociationMixin<Team>;
@@ -25,6 +26,18 @@ export class Game extends s.Model<
   declare createHomeTeam: s.BelongsToCreateAssociationMixin<Team>;
   declare getHomeTeam: s.BelongsToGetAssociationMixin<Team>;
   declare setHomeTeam: s.BelongsToSetAssociationMixin<Team, number>;
+
+  // belongsToMany(Page)
+  declare getPages: s.BelongsToManyGetAssociationsMixin<Page>;
+  declare addPage: s.BelongsToManyAddAssociationMixin<Page, number>;
+  declare addPages: s.BelongsToManyAddAssociationsMixin<Page, number>;
+  declare setPages: s.BelongsToManySetAssociationsMixin<Page, number>;
+  declare removePage: s.BelongsToManyRemoveAssociationMixin<Page, number>;
+  declare removePages: s.BelongsToManyRemoveAssociationsMixin<Page, number>;
+  declare hasPage: s.BelongsToManyHasAssociationMixin<Page, number>;
+  declare hasPages: s.BelongsToManyHasAssociationsMixin<Page, number>;
+  declare countPages: s.BelongsToManyCountAssociationsMixin;
+  declare createPage: s.BelongsToManyCreateAssociationMixin<Page>;
 
   static async findOrCreateByAwayTeamHomeTeamStartDate({
     awayTeam,

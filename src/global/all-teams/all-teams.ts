@@ -1,4 +1,4 @@
-import { allLeagues } from '../leagues';
+import { allLeagues } from '../all-leagues';
 import { TeamDatum } from './team-datum';
 import { mlbTeamData } from './mlb-team-data';
 import { nbaTeamData } from './nba-team-data';

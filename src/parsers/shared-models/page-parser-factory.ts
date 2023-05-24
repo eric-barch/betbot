@@ -1,26 +1,29 @@
-import { Parser } from './parser';
-import { ParserKey } from './parser-key';
+import { PageParser } from './page-parser';
+import { PageParserKey } from './page-parser-key';
 
+import * as db from '../../db';
 import * as exchangeModels from '../exchange-models';
 import * as global from '../../global';
 
-export class ParserFactory {
+export class PageParserFactory {
   public static async getParser({
     exchangeId,
     leagueId,
     pageTypeId,
+    sequelizePage,
   }: {
     exchangeId: number;
     leagueId: number;
     pageTypeId: number;
-  }): Promise<Parser> {
-    const parserKey = new ParserKey({
+    sequelizePage: db.models.Page;
+  }): Promise<PageParser> {
+    const parserKey = new PageParserKey({
       exchangeId,
       leagueId,
       pageTypeId,
     });
 
-    let parser: Parser;
+    let parser: PageParser;
 
     if (
       parserKey.matches({
@@ -73,6 +76,8 @@ export class ParserFactory {
     } else {
       throw new Error(`Did not find matching parser.`);
     }
+
+    parser.sequelizePage = sequelizePage;
 
     return parser;
   }

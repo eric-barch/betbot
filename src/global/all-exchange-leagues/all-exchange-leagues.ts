@@ -1,5 +1,5 @@
-import { allExchanges } from '../exchanges';
-import { allLeagues } from '../leagues';
+import { allExchanges } from '../all-exchanges';
+import { allLeagues } from '../all-leagues';
 import { IGlobal } from '../i-global';
 
 import * as db from '../../db';

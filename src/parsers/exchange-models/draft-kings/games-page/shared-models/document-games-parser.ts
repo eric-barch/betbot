@@ -87,11 +87,11 @@ export class DocumentGamesParser {
     const awayTeamNameMatches = matchupString.match(awayTeamNamePattern);
     const homeTeamNameMatches = matchupString.match(homeTeamNamePattern);
 
-    if (!awayTeamNameMatches || (awayTeamNameMatches.length !== 2)) {
+    if (!awayTeamNameMatches || awayTeamNameMatches.length !== 2) {
       throw new Error(`awayTeamNameMatches is null or not equal to 2.`);
     }
 
-    if (!homeTeamNameMatches || (homeTeamNameMatches.length !== 2)) {
+    if (!homeTeamNameMatches || homeTeamNameMatches.length !== 2) {
       throw new Error(`homeTeamName is null or not equal to 2.`);
     }
 

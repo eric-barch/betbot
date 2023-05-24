@@ -40,27 +40,25 @@ class SequelizeInstanceWrapper {
 
     // PageType associations
     models.PageType.belongsToMany(models.ExchangeLeague, {
-      through: models.ExchangeLeaguePageType,
+      through: models.Page,
       foreignKey: 'pageTypeId',
     });
 
     // ExchangeLeague associations
-    models.ExchangeLeague.belongsTo(models.Exchange, {
-      foreignKey: 'exchangeId',
-    });
+    models.ExchangeLeague.belongsTo(models.Exchange, { foreignKey: 'exchangeId' });
     models.ExchangeLeague.belongsTo(models.League, { foreignKey: 'leagueId' });
     models.ExchangeLeague.belongsToMany(models.PageType, {
-      through: models.ExchangeLeaguePageType,
+      through: models.Page,
       foreignKey: 'exchangeLeagueId',
     });
 
-    // ExchangeLeaguePageType associations
-    models.ExchangeLeaguePageType.belongsTo(models.ExchangeLeague, {
-      foreignKey: 'exchangeLeagueId',
-    });
-    models.ExchangeLeaguePageType.belongsTo(models.PageType, {
-      foreignKey: 'pageTypeId',
-    });
+    // Page associations
+    models.Page.belongsTo(models.ExchangeLeague, { foreignKey: 'exchangeLeagueId' });
+    models.Page.belongsTo(models.PageType, { foreignKey: 'pageTypeId' });
+    models.Page.belongsToMany(models.Game, {
+      through: models.PageGame,
+      foreignKey: 'pageId',
+    })
 
     // Game associations
     models.Game.belongsTo(models.Team, {
@@ -71,6 +69,14 @@ class SequelizeInstanceWrapper {
       as: 'homeTeam',
       foreignKey: 'homeTeamId',
     });
+    models.Game.belongsToMany(models.Page, {
+      through: models.PageGame,
+      foreignKey: 'gameId',
+    })
+
+    // PageGame associations
+    models.PageGame.belongsTo(models.Page, { foreignKey: 'pageId' });
+    models.PageGame.belongsTo(models.Game, { foreignKey: 'gameId' });
   }
 
   public async close() {

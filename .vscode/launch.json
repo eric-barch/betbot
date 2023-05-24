@@ -1,14 +1,14 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Debug TypeScript",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/main.ts",
-            "preLaunchTask": "Compile TypeScript",
-            "outFiles": ["${workspaceFolder}/out/**/*.js"],
-            "sourceMaps": true
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug TypeScript",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/main.ts",
+      "preLaunchTask": "Compile TypeScript",
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "sourceMaps": true
+    }
+  ]
 }

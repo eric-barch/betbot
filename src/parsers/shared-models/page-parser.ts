@@ -2,7 +2,10 @@ import * as p from 'puppeteer';
 
 import { WebpageConnection } from './webpage-connection';
 
-export abstract class Parser {
+import * as db from '../../db';
+
+export abstract class PageParser {
+  private wrappedSequelizePage: db.models.Page | undefined;
   private wrappedWebpageConnection: WebpageConnection;
 
   constructor({ url }: { url: string }) {
@@ -15,5 +18,9 @@ export abstract class Parser {
 
   get page(): p.Page {
     return this.wrappedWebpageConnection.page;
+  }
+
+  set sequelizePage(sequelizePage: db.models.Page) {
+    this.wrappedSequelizePage = sequelizePage;
   }
 }
