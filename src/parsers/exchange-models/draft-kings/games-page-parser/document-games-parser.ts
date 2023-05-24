@@ -186,11 +186,11 @@ export class DocumentGamesParser {
         thElement,
     }: {
         thElement: p.ElementHandle,
-    }) {
+    }): Promise<string> {
         const timeStringElement = await thElement.$('.event-cell__start-time');
 
         if (!timeStringElement) {
-            throw new Error(`timeStringElement is null.`);
+            return 'NOW';
         }
 
         const timeString = await (await timeStringElement.getProperty('textContent')).jsonValue();

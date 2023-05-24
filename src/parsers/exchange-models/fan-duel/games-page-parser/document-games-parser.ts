@@ -132,7 +132,7 @@ export class DocumentGamesParser {
         const startDateElement = await gameElement.$$('time');
 
         if (startDateElement.length !== 1) {
-            throw new Error(`startDateElement.length not equal to 1.`);
+            return new Date();
         }
 
         const startDateText = await (await startDateElement[0].getProperty('textContent')).jsonValue();
