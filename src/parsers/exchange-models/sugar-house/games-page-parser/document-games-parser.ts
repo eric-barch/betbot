@@ -52,7 +52,7 @@ export class DocumentGamesParser {
         homeTeam: string,
         startDate: string,
     }> {
-        const gameDetailsElement = await gameElement.$('> * > div');
+        const gameDetailsElement = await gameElement.$('xpath/div/div');
 
         if (!gameDetailsElement) {
             throw new Error(`gameDetailsElement is null.`);
@@ -66,20 +66,21 @@ export class DocumentGamesParser {
 
         const awayTeamNamePattern = new RegExp('^([^@]*)@');
         const homeTeamNamePattern = new RegExp('@([^,]*),');
-        const startDatePattern = new RegExp(' (.*)$');
+        const startDatePattern = new RegExp(',(.*)$');
 
         const awayTeamNameStrings = ariaLabel.match(awayTeamNamePattern);
         const homeTeamNameStrings = ariaLabel.match(homeTeamNamePattern);
         const startDateStrings = ariaLabel.match(startDatePattern);
 
         if ((!awayTeamNameStrings) || (!homeTeamNameStrings) || (!startDateStrings)) {
-            throw new Error(`One or more game detail string is null.`);
+            throw new Error(`One or more detail string is null.`);
         }
 
         return {
-            awayTeam: awayTeamNameStrings[0],
-            homeTeam: homeTeamNameStrings[0],
-            startDate: startDateStrings[0],
+            awayTeam: awayTeamNameStrings[1],
+            homeTeam: homeTeamNameStrings[1],
+            startDate: startDateStrings[1],
         }
+
     }
 }
