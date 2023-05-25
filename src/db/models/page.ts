@@ -41,7 +41,6 @@ export class Page extends s.Model<
   declare countGames: s.BelongsToManyCountAssociationsMixin;
   declare createGame: s.BelongsToManyCreateAssociationMixin<Game>;
 
-
   public async getPageParser(): Promise<PageParser> {
     const exchangeLeague = await this.getExchangeLeague();
 

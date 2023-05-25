@@ -58,7 +58,7 @@ class SequelizeInstanceWrapper {
     models.Page.belongsToMany(models.Game, {
       through: models.PageGame,
       foreignKey: 'pageId',
-    })
+    });
 
     // Game associations
     models.Game.belongsTo(models.Team, {
@@ -72,7 +72,7 @@ class SequelizeInstanceWrapper {
     models.Game.belongsToMany(models.Page, {
       through: models.PageGame,
       foreignKey: 'gameId',
-    })
+    });
 
     // PageGame associations
     models.PageGame.belongsTo(models.Page, { foreignKey: 'pageId' });

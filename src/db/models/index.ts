@@ -5,4 +5,4 @@ export * from './game';
 export * from './league';
 export * from './page-type';
 export * from './team';
-export * from './page-game'
+export * from './page-game';
