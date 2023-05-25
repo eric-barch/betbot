@@ -42,7 +42,7 @@ export class Page extends s.Model<
   declare createGame: s.BelongsToManyCreateAssociationMixin<Game>;
 
 
-  public async getParser(): Promise<PageParser> {
+  public async getPageParser(): Promise<PageParser> {
     const exchangeLeague = await this.getExchangeLeague();
 
     const exchangeId = exchangeLeague.exchangeId;

@@ -34,6 +34,8 @@ PageGame.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    pageId: s.DataTypes.INTEGER.UNSIGNED,
+    gameId: s.DataTypes.INTEGER.UNSIGNED,
     createdAt: s.DataTypes.DATE,
     updatedAt: s.DataTypes.DATE,
   },

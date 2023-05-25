@@ -11,7 +11,7 @@ export abstract class SugarHouseGamesPageParser extends baseModels.GamesPagePars
     this.documentGamesParser = new DocumentGamesParser({ gamesPageParser: this });
   }
 
-  public async getGames(): Promise<Array<db.models.Game>> {
+  protected async scrapeGames(): Promise<Array<db.models.Game>> {
     const games = await this.documentGamesParser.getGames();
     return games;
   }

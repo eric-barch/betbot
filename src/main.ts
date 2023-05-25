@@ -10,7 +10,7 @@ async function main() {
   await global.allPageTypes.init();
 
   await global.allExchangeLeagues.init();
-  await global.allExchangeLeaguePageTypes.init();
+  await global.allPages.init();
 
   await global.allGames.init();
 

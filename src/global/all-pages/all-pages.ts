@@ -4,7 +4,7 @@ import { IGlobal } from '../i-global';
 
 import * as db from '../../db';
 
-class AllExchangeLeaguePageTypes implements IGlobal<db.models.Page> {
+class AllPages implements IGlobal<db.models.Page> {
   private wrappedActive: Array<db.models.Page>;
 
   constructor() {
@@ -58,4 +58,4 @@ class AllExchangeLeaguePageTypes implements IGlobal<db.models.Page> {
   }
 }
 
-export const allExchangeLeaguePageTypes = new AllExchangeLeaguePageTypes();
+export const allPages = new AllPages();

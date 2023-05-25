@@ -14,7 +14,7 @@ export abstract class FanDuelGamesPageParser extends baseModels.GamesPageParser 
     this.documentGamesParser = new DocumentGamesParser({ gamesPageParser: this });
   }
 
-  public async getGames(): Promise<Array<db.models.Game>> {
+  protected async scrapeGames(): Promise<Array<db.models.Game>> {
     await this.jsonGamesParser.getGames();
     const games = await this.documentGamesParser.getGames();
     return games;
