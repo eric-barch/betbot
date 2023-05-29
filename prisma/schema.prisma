@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Exchange {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String   @db.VarChar(255)
+  leagues   League[]
+}
+
+model League {
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  name         String     @db.VarChar(255)
+  abbreviation String     @db.VarChar(255)
+  teams        Team[]
+  games        Game[]
+  exchanges    Exchange[]
+}
+
+model Team {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  regionFull     String   @db.VarChar(255)
+  regionAbbr     String   @db.VarChar(255)
+  identifierFull String   @db.VarChar(255)
+  identifierAbbr String   @db.VarChar(255)
+  league         League   @relation(fields: [leagueId], references: [id])
+  leagueId       Int
+  awayGames      Game[]   @relation("AwayTeamOnGame")
+  homeGames      Game[]   @relation("HomeTeamOnGame")
+}
+
+model Game {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  startDate  DateTime
+  awayTeam   Team     @relation("AwayTeamOnGame", fields: [awayTeamId], references: [id])
+  awayTeamId Int
+  homeTeam   Team     @relation("HomeTeamOnGame", fields: [homeTeamId], references: [id])
+  homeTeamId Int
+  league     League   @relation(fields: [leagueId], references: [id])
+  leagueId   Int
+}
