@@ -1,9 +1,22 @@
+import { config } from './config/config';
+import { PageParserFactory } from './page-parsers/base-models/page-parser/page-parser-factory';
 import * as db from './db';
 
 async function main() {
-  await db.activeExchanges.init();
-  await db.activeLeagues.init();
-  await db.activeTeams.init();
+  for (const exchangeKey in config) {
+    const exchangeObject = config[exchangeKey as keyof typeof config];
+
+    for (const leagueKey in exchangeObject) {
+      const leagueObject = exchangeObject[leagueKey as keyof typeof exchangeObject];
+
+      for (const pageKey in leagueObject) {
+        // Get page parser, which will initiate database objects as part of its own initiation.
+        // Think this is necessary for full extensibility to the general page parser.
+        const url = leagueObject[pageKey as keyof typeof leagueObject];
+        await PageParserFactory.create({ url });
+      }
+    }
+  }
 }
 
 main()
