@@ -5,14 +5,13 @@
       "name": "Debug TypeScript",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "node",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node",
       "runtimeArgs": [
-        "--nolazy",
         "-r",
-        "ts-node/register/transpile-only"
+        "tsconfig-paths/register"
       ],
       "args": [
-        "src/main.ts",
+        "${workspaceRoot}/src/main.ts"
       ],
       "cwd": "${workspaceRoot}",
       "internalConsoleOptions": "openOnSessionStart",

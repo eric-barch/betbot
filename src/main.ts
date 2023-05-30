@@ -1,6 +1,6 @@
-import { config } from './config/config';
-import { PageParserFactory } from './page-parsers/base-models/page-parser/page-parser-factory';
-import * as db from './db';
+import { config } from '@/config';
+import { PageParserFactory } from '@/page-parsers';
+import * as db from '@/db';
 
 async function main() {
   for (const exchangeKey in config) {
