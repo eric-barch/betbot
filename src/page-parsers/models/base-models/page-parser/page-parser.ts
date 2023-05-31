@@ -1,6 +1,8 @@
 import { prisma } from '@/db';
-import { Exchange, League } from '@prisma/client';
-import { ExchangeInitData, LeagueInitData } from '@/init-data';
+import { Exchange, League, Team } from '@prisma/client';
+import {
+  ExchangeInitData, LeagueInitData, TeamInitData, mlbTeams, nbaTeams, nflTeams,
+} from '@/init-data';
 import { WebpageConnector } from './webpage-connector';
 
 export abstract class PageParser {
@@ -29,6 +31,7 @@ export abstract class PageParser {
     await this.connectDbExchangeModel();
     await this.connectDbLeagueModel();
     await this.associateDbExchangeAndLeagueModels();
+    await this.initiateDbTeamModels();
     return this;
   }
 
@@ -110,6 +113,56 @@ export abstract class PageParser {
       exchange: associatedExchange,
       league: associatedLeague,
     }
+  }
+
+  private async initiateDbTeamModels(): Promise<Array<Team>> {
+    const league = this.league;
+
+    let teamsInitData: Array<TeamInitData>;
+
+    switch (league.abbreviation) {
+      case 'MLB':
+        teamsInitData = mlbTeams;
+        break;
+      case 'NBA':
+        teamsInitData = nbaTeams;
+        break;
+      case 'NFL':
+        teamsInitData = nflTeams;
+        break;
+      default:
+        throw new Error(`Did not find matching league abbreviation.`);
+    }
+
+    let teams = new Array<Team>;
+
+    for (const teamInitData of teamsInitData) {
+      let team: Team;
+
+      try {
+        team = await prisma.team.findFirstOrThrow({
+          where: {
+            leagueId: league.id,
+            regionFull: teamInitData.regionFull,
+            identifierFull: teamInitData.identiferFull,
+          }
+        });
+      } catch (e) {
+        team = await prisma.team.create({
+          data: {
+            league: { connect: { id: league.id } },
+            regionFull: teamInitData.regionFull,
+            regionAbbr: teamInitData.regionAbbr,
+            identifierFull: teamInitData.identiferFull,
+            identifierAbbr: teamInitData.idenfierAbbr,
+          }
+        })
+      }
+
+      teams.push(team);
+    }
+
+    return teams;
   }
 
   public get exchange(): Exchange {
