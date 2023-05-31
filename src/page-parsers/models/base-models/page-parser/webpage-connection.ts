@@ -33,7 +33,7 @@ export class WebpageConnection {
 
   private async connectToExistingPage(): Promise<p.Page> {
     const targets = this.browser.targets();
-    const target = targets.find((target) => target.url().includes(this.url));
+    const target = targets.find((target) => target.url().includes(this.wrappedUrl));
 
     if (!target) {
       throw new Error('Expected Target.');
@@ -61,9 +61,7 @@ export class WebpageConnection {
   private async connectToNewPage(): Promise<p.Page> {
     this.wrappedPage = await this.browser.newPage();
 
-    const url = this.url;
-
-    await this.page.goto(this.url);
+    await this.page.goto(this.wrappedUrl);
 
     const windowSize = await this.page.evaluate(() => {
       return {
@@ -81,18 +79,6 @@ export class WebpageConnection {
     await this.browser.close();
   }
 
-  get url(): string {
-    if (!this.wrappedUrl) {
-      throw new Error(`wrappedUrl is undefined.`);
-    }
-
-    return this.wrappedUrl;
-  }
-
-  set url(url: string) {
-    this.wrappedUrl = url;
-  }
-
   private get browser(): p.Browser {
     if (!this.wrappedBrowser) {
       throw new Error(`wrappedBrowser is null.`);
@@ -101,7 +87,7 @@ export class WebpageConnection {
     return this.wrappedBrowser;
   }
 
-  get page(): p.Page {
+  public get page(): p.Page {
     if (!this.wrappedPage) {
       throw new Error(`wrappedPage is null.`);
     }

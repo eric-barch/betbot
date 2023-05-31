@@ -1,34 +1,26 @@
 import { prisma } from '@/db';
 import { PageParser } from './page-parser';
 import { WebpageConnection } from './webpage-connection';
-import { ExchangeInitData, LeagueInitData, TeamsInitDataFactory } from '@/init-data';
+import { PageParserInitData, TeamsInitDataFactory } from '@/init-data';
 import { Exchange, League, Team } from '@prisma/client';
 
 export class PageParserInitializer {
   private pageParser: PageParser;
-  private exchangeInitData: ExchangeInitData;
-  private leagueInitData: LeagueInitData;
-  private url: string;
+  private pageParserInitData: PageParserInitData;
 
   constructor({
     pageParser,
-    url,
-    exchangeInitData,
-    leagueInitData,
+    pageParserInitData,
   }: {
     pageParser: PageParser,
-    exchangeInitData: ExchangeInitData,
-    leagueInitData: LeagueInitData,
-    url: string
+    pageParserInitData: PageParserInitData,
   }) {
     this.pageParser = pageParser;
-    this.url = url;
-    this.exchangeInitData = exchangeInitData;
-    this.leagueInitData = leagueInitData;
+    this.pageParserInitData = pageParserInitData;
   }
 
   public async initWebpageConnection(): Promise<WebpageConnection> {
-    const webpageConnection = new WebpageConnection({ url: this.url });
+    const webpageConnection = new WebpageConnection({ url: this.pageParserInitData.url });
     await webpageConnection.connect();
     return webpageConnection;
   }
@@ -39,13 +31,13 @@ export class PageParserInitializer {
     try {
       exchange = await prisma.exchange.findFirstOrThrow({
         where: {
-          name: this.exchangeInitData.name,
+          name: this.pageParserInitData.exchangeInitData.name,
         }
       });
     } catch (e) {
       exchange = await prisma.exchange.create({
         data: {
-          name: this.exchangeInitData.name,
+          name: this.pageParserInitData.exchangeInitData.name,
         }
       });
     }
@@ -59,14 +51,14 @@ export class PageParserInitializer {
     try {
       league = await prisma.league.findFirstOrThrow({
         where: {
-          name: this.leagueInitData.name,
+          name: this.pageParserInitData.leagueInitData.name,
         }
       });
     } catch (e) {
       league = await prisma.league.create({
         data: {
-          name: this.leagueInitData.name,
-          abbreviation: this.leagueInitData.abbreviation,
+          name: this.pageParserInitData.leagueInitData.name,
+          abbreviation: this.pageParserInitData.leagueInitData.abbreviation,
         },
       });
     }

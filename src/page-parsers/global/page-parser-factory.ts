@@ -1,28 +1,56 @@
 import {
-  PageParser, DraftKingsMlbGamesPageParser, FanDuelMlbGamesPageParser, SugarHouseMlbGamesPageParser, DraftKingsNbaGamesPageParser, FanDuelNbaGamesPageParser, SugarHouseNbaGamesPageParser
+  PageParser, DraftKingsMlbGamesPageParser, FanDuelMlbGamesPageParser,
+  SugarHouseMlbGamesPageParser, DraftKingsNbaGamesPageParser, FanDuelNbaGamesPageParser,
+  SugarHouseNbaGamesPageParser,
 } from '@/page-parsers';
+import {
+  PageParserInitData, draftKings, fanDuel, sugarHouse, mlb, nba, nfl, gamesPageType
+} from '@/init-data';
 
 export class PageParserFactory {
   public static async create({
-    url,
+    pageParserInitData,
   }: {
-    url: string,
+    pageParserInitData: PageParserInitData,
   }): Promise<PageParser> {
-    switch (url) {
-      case 'https://sportsbook.draftkings.com/leagues/baseball/mlb?category=game-lines&subcategory=game':
-        return await DraftKingsMlbGamesPageParser.create();
-      case 'https://sportsbook.draftkings.com/leagues/basketball/nba?category=game-lines&subcategory=game':
-        return await DraftKingsNbaGamesPageParser.create();
-      case 'https://sportsbook.fanduel.com/navigation/mlb':
-        return await FanDuelMlbGamesPageParser.create();
-      case 'https://sportsbook.fanduel.com/navigation/nba':
-        return await FanDuelNbaGamesPageParser.create();
-      case 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093616&type=matches#home':
-        return await SugarHouseMlbGamesPageParser.create();
-      case 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093652&type=matches#home':
-        return await SugarHouseNbaGamesPageParser.create();
-      default:
-        throw new Error(`Did not find matching Page Parser.`);
+    if (pageParserInitData.matches({
+      exchange: draftKings,
+      league: mlb,
+      pageType: gamesPageType,
+    })) {
+      return await DraftKingsMlbGamesPageParser.create({ pageParserInitData });
+    } else if (pageParserInitData.matches({
+      exchange: draftKings,
+      league: nba,
+      pageType: gamesPageType,
+    })) {
+      return await DraftKingsNbaGamesPageParser.create({ pageParserInitData });
+    } else if (pageParserInitData.matches({
+      exchange: fanDuel,
+      league: mlb,
+      pageType: gamesPageType,
+    })) {
+      return await FanDuelMlbGamesPageParser.create({ pageParserInitData });
+    } else if (pageParserInitData.matches({
+      exchange: fanDuel,
+      league: nba,
+      pageType: gamesPageType,
+    })) {
+      return await FanDuelNbaGamesPageParser.create({ pageParserInitData });
+    } else if (pageParserInitData.matches({
+      exchange: sugarHouse,
+      league: mlb,
+      pageType: gamesPageType,
+    })) {
+      return await SugarHouseMlbGamesPageParser.create({ pageParserInitData });
+    } else if (pageParserInitData.matches({
+      exchange: sugarHouse,
+      league: nba,
+      pageType: gamesPageType,
+    })) {
+      return await SugarHouseNbaGamesPageParser.create({ pageParserInitData });
     }
+
+    throw new Error(`Did not find matching Page Parser.`);
   }
 }

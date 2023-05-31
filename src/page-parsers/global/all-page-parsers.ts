@@ -1,5 +1,6 @@
-import { PageParser, PageParserFactory } from '@/page-parsers';
 import { config } from '@/config';
+import { PageParser, PageParserFactory } from '@/page-parsers';
+import { PageParserInitData } from '@/init-data';
 
 class AllPageParsers {
   private wrappedPageParsers: Set<PageParser>;
@@ -15,18 +16,23 @@ class AllPageParsers {
       for (const leagueKey in exchangeObject) {
         const leagueObject = exchangeObject[leagueKey as keyof typeof exchangeObject];
 
-        for (const pageKey in leagueObject) {
-          const url = leagueObject[pageKey as keyof typeof leagueObject];
-          const pageParser = await PageParserFactory.create({ url });
+        for (const pageTypeKey in leagueObject) {
+          const url = leagueObject[pageTypeKey as keyof typeof leagueObject];
+
+          const pageParserInitData = new PageParserInitData({
+            exchangeKey,
+            leagueKey,
+            pageTypeKey,
+            url,
+          });
+
+          const pageParser = await PageParserFactory.create({ pageParserInitData });
+
           this.wrappedPageParsers.add(pageParser);
         }
       }
     }
 
-    return this.wrappedPageParsers;
-  }
-
-  public get pageParsers(): Set<PageParser> {
     return this.wrappedPageParsers;
   }
 }
