@@ -1,6 +1,6 @@
 import * as p from 'puppeteer';
 
-export class WebpageConnector {
+export class WebpageConnection {
   private wrappedUrl: string;
   private wrappedBrowser: p.Browser | undefined;
   private wrappedPage: p.Page | undefined;
