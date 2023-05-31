@@ -1,11 +1,13 @@
-import { prisma, ExchangeWrapper, LeagueWrapper } from '@/db';
+import { prisma } from '@/db';
 import { Exchange, League } from '@prisma/client';
 import { ExchangeInitData, LeagueInitData } from '@/init-data';
 import { WebpageConnector } from './webpage-connector';
 
 export abstract class PageParser {
-  private exchangeWrapper: ExchangeWrapper;
-  private leagueWrapper: LeagueWrapper;
+  private wrappedExchange: Exchange | undefined;
+  private exchangeInitData: ExchangeInitData;
+  private wrappedLeague: League | undefined;
+  private leagueInitData: LeagueInitData;
   private wrappedWebpageConnector: WebpageConnector;
 
   constructor({
@@ -17,15 +19,15 @@ export abstract class PageParser {
     leagueInitData: LeagueInitData,
     url: string
   }) {
-    this.exchangeWrapper = new ExchangeWrapper({ exchangeInitData });
-    this.leagueWrapper = new LeagueWrapper({ leagueInitData });
+    this.exchangeInitData = exchangeInitData;
+    this.leagueInitData = leagueInitData;
     this.wrappedWebpageConnector = new WebpageConnector({ url });
   }
 
   protected async init(): Promise<PageParser> {
     await this.connectWebpage();
-    await this.exchangeWrapper.connectDbModel();
-    await this.leagueWrapper.connectDbModel();
+    await this.connectDbExchangeModel();
+    await this.connectDbLeagueModel();
     await this.associateDbExchangeAndLeagueModels();
     return this;
   }
@@ -34,11 +36,59 @@ export abstract class PageParser {
     await this.wrappedWebpageConnector.connect();
   }
 
-  private async associateDbExchangeAndLeagueModels() {
+  private async connectDbExchangeModel(): Promise<Exchange> {
+    let exchange: Exchange;
+
+    try {
+      exchange = await prisma.exchange.findFirstOrThrow({
+        where: {
+          name: this.exchangeInitData.name,
+        }
+      });
+    } catch (e) {
+      exchange = await prisma.exchange.create({
+        data: {
+          name: this.exchangeInitData.name,
+        }
+      });
+    }
+
+    this.wrappedExchange = exchange;
+
+    return exchange;
+  }
+
+  private async connectDbLeagueModel(): Promise<League> {
+    let league: League;
+
+    try {
+      league = await prisma.league.findFirstOrThrow({
+        where: {
+          name: this.leagueInitData.name,
+        }
+      });
+    } catch (e) {
+      league = await prisma.league.create({
+        data: {
+          name: this.leagueInitData.name,
+          abbreviation: this.leagueInitData.abbreviation,
+        },
+      });
+    }
+
+    this.wrappedLeague = league;
+
+    return league;
+  }
+
+  private async associateDbExchangeAndLeagueModels(): Promise<{
+    exchange: Exchange,
+    league: League,
+  }> {
     const exchange = this.exchange;
     const league = this.league;
 
-    await prisma.exchange.update({
+    const associatedExchange = await prisma.exchange.update({
       where: { id: exchange.id },
       data: {
         leagues: {
@@ -47,21 +97,34 @@ export abstract class PageParser {
       },
     });
 
-    await prisma.league.update({
+    const associatedLeague = await prisma.league.update({
       where: { id: league.id },
       data: {
         exchanges: {
           connect: { id: exchange.id },
-        },
+        }
       },
     });
+
+    return {
+      exchange: associatedExchange,
+      league: associatedLeague,
+    }
   }
 
   public get exchange(): Exchange {
-    return this.exchangeWrapper.exchange;
+    if (!this.wrappedExchange) {
+      throw new Error(`wrappedExchange is undefined.`);
+    }
+
+    return this.wrappedExchange;
   }
 
   public get league(): League {
-    return this.leagueWrapper.league;
+    if (!this.wrappedLeague) {
+      throw new Error(`wrappedLeague is undefined.`);
+    }
+
+    return this.wrappedLeague;
   }
 }

@@ -13,7 +13,3 @@ export class ExchangeInitData {
     return this.wrappedName;
   }
 }
-
-export const draftKings = new ExchangeInitData({ name: 'DraftKings' });
-export const fanDuel = new ExchangeInitData({ name: 'FanDuel' });
-export const sugarHouse = new ExchangeInitData({ name: 'SugarHouse' });
