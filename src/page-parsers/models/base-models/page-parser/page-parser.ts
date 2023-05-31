@@ -1,7 +1,7 @@
 import { prisma } from '@/db';
 import { PageParserInitializer } from './page-parser-initializer';
+import { PageParserInitData } from '@/init-data';
 import { WebpageConnection } from './webpage-connection';
-import { ExchangeInitData, LeagueInitData } from '@/init-data';
 import { Exchange, League } from '@prisma/client';
 
 export abstract class PageParser {
@@ -11,19 +11,13 @@ export abstract class PageParser {
   private wrappedLeague: League | undefined;
 
   constructor({
-    exchangeInitData,
-    leagueInitData,
-    url
+    pageParserInitData,
   }: {
-    exchangeInitData: ExchangeInitData,
-    leagueInitData: LeagueInitData,
-    url: string
+    pageParserInitData: PageParserInitData,
   }) {
     this.initializer = new PageParserInitializer({
       pageParser: this,
-      exchangeInitData,
-      leagueInitData,
-      url,
+      pageParserInitData,
     });
   }
 
