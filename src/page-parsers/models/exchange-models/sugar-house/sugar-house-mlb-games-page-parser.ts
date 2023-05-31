@@ -6,7 +6,7 @@ export class SugarHouseMlbGamesPageParser extends PageParser {
     super({
       exchangeInitData: sugarHouse,
       leagueInitData: mlb,
-      url: 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093616&type=matches#home'
+      url: 'https://ct.playsugarhouse.com/?page=sportsbook&group=1000093616&type=matches#home',
     });
   }
 
