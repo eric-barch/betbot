@@ -35,6 +35,12 @@ class AllPageParsers {
 
     return this.wrappedPageParsers;
   }
+
+  public async update() {
+    for (const pageParser of this.wrappedPageParsers) {
+      await pageParser.update();
+    }
+  }
 }
 
 export const allPageParsers = new AllPageParsers();
