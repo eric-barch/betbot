@@ -64,7 +64,7 @@ export class PageParserInitializer {
     }
 
     await this.associateExchangeAndLeagueModels({ league });
-    await this.initTeamsInDb({ league });
+    await this.ensureTeamsInDb({ league });
 
     return league;
   }
@@ -103,7 +103,7 @@ export class PageParserInitializer {
     }
   }
 
-  private async initTeamsInDb({
+  private async ensureTeamsInDb({
     league,
   }: {
     league: League,
@@ -119,10 +119,20 @@ export class PageParserInitializer {
         team = await prisma.team.findFirstOrThrow({
           where: {
             leagueId: league.id,
-            regionFull: teamInitData.regionFull,
             identifierFull: teamInitData.identiferFull,
           }
         });
+
+        team = await prisma.team.update({
+          where: {
+            id: team.id,
+          },
+          data: {
+            regionFull: teamInitData.regionFull,
+            regionAbbr: teamInitData.regionAbbr,
+            identifierAbbr: teamInitData.idenfierAbbr,
+          }
+        })
       } catch (e) {
         team = await prisma.team.create({
           data: {

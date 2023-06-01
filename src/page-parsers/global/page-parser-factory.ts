@@ -1,11 +1,9 @@
 import {
-  PageParser, DraftKingsMlbGamesPageParser, FanDuelMlbGamesPageParser,
-  SugarHouseMlbGamesPageParser, DraftKingsNbaGamesPageParser, FanDuelNbaGamesPageParser,
-  SugarHouseNbaGamesPageParser,
-} from '@/page-parsers';
-import {
-  PageParserInitData, draftKings, fanDuel, sugarHouse, mlb, nba, nfl, gamesPageType
+  PageParserInitData, draftKings,
+  gamesPageType,
+  mlb, nba
 } from '@/init-data';
+import { DraftKingsGamesPageParser, PageParser } from '@/page-parsers';
 
 export class PageParserFactory {
   public static async create({
@@ -18,37 +16,13 @@ export class PageParserFactory {
       league: mlb,
       pageType: gamesPageType,
     })) {
-      return await DraftKingsMlbGamesPageParser.create({ pageParserInitData });
+      return await DraftKingsGamesPageParser.create({ pageParserInitData });
     } else if (pageParserInitData.matches({
       exchange: draftKings,
       league: nba,
       pageType: gamesPageType,
     })) {
-      return await DraftKingsNbaGamesPageParser.create({ pageParserInitData });
-    } else if (pageParserInitData.matches({
-      exchange: fanDuel,
-      league: mlb,
-      pageType: gamesPageType,
-    })) {
-      return await FanDuelMlbGamesPageParser.create({ pageParserInitData });
-    } else if (pageParserInitData.matches({
-      exchange: fanDuel,
-      league: nba,
-      pageType: gamesPageType,
-    })) {
-      return await FanDuelNbaGamesPageParser.create({ pageParserInitData });
-    } else if (pageParserInitData.matches({
-      exchange: sugarHouse,
-      league: mlb,
-      pageType: gamesPageType,
-    })) {
-      return await SugarHouseMlbGamesPageParser.create({ pageParserInitData });
-    } else if (pageParserInitData.matches({
-      exchange: sugarHouse,
-      league: nba,
-      pageType: gamesPageType,
-    })) {
-      return await SugarHouseNbaGamesPageParser.create({ pageParserInitData });
+      return await DraftKingsGamesPageParser.create({ pageParserInitData });
     }
 
     throw new Error(`Did not find matching Page Parser.`);

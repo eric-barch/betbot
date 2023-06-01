@@ -3,6 +3,7 @@ import { allPageParsers } from '@/page-parsers';
 
 async function main() {
   await allPageParsers.initFromConfig();
+  await allPageParsers.update();
 }
 
 main()

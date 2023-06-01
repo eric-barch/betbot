@@ -74,13 +74,13 @@ export const nbaTeams: Array<TeamInitData> = [
     identifierAbbr: 'Pacers',
   }),
   new TeamInitData({
-    regionFull: 'LA Clippers',
+    regionFull: 'Los Angeles',
     regionAbbr: 'LAC',
     identifierFull: 'Clippers',
     identifierAbbr: 'Clippers',
   }),
   new TeamInitData({
-    regionFull: 'Los Angeles Lakers',
+    regionFull: 'Los Angeles',
     regionAbbr: 'LAL',
     identifierFull: 'Lakers',
     identifierAbbr: 'Lakers',
