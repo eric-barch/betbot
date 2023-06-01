@@ -21,6 +21,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@prisma/client": "^4.14.1"
+    "@prisma/client": "^4.14.1",
+    "chrono-node": "^2.6.3"
   }
 }

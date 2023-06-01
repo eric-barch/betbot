@@ -25,7 +25,6 @@ model League {
   name         String     @db.VarChar(255)
   abbreviation String     @db.VarChar(255)
   teams        Team[]
-  games        Game[]
   exchanges    Exchange[]
 }
 
@@ -44,14 +43,30 @@ model Team {
 }
 
 model Game {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id         Int         @id @default(autoincrement())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   startDate  DateTime
-  awayTeam   Team     @relation("AwayTeamOnGame", fields: [awayTeamId], references: [id])
+  awayTeam   Team        @relation("AwayTeamOnGame", fields: [awayTeamId], references: [id])
   awayTeamId Int
-  homeTeam   Team     @relation("HomeTeamOnGame", fields: [homeTeamId], references: [id])
+  homeTeam   Team        @relation("HomeTeamOnGame", fields: [homeTeamId], references: [id])
   homeTeamId Int
-  league     League   @relation(fields: [leagueId], references: [id])
-  leagueId   Int
+  Statistic  Statistic[]
+}
+
+model Statistic {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String   @db.VarChar(255)
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    Int
+}
+
+model Odd {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  value     Float?
+  price     Int
 }
