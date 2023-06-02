@@ -57,24 +57,44 @@ export class JsonGamesParser {
   }: {
     jsonGame: any,
   }): Promise<Game> {
-    const awayTeam = await DbUtilityFunctions.findDbTeam({
+    const awayTeam = await DbUtilityFunctions.findDbTeamByLeagueAndUnformattedName({
       unformattedName: jsonGame.awayTeam.name,
       league: this.pageParser.league,
     });
 
-    const homeTeam = await DbUtilityFunctions.findDbTeam({
+    const homeTeam = await DbUtilityFunctions.findDbTeamByLeagueAndUnformattedName({
       unformattedName: jsonGame.homeTeam.name,
       league: this.pageParser.league,
     });
 
     const startDate = new Date(jsonGame.startDate);
 
-    const game = await DbUtilityFunctions.findOrCreateDbGame({
+    const game = await DbUtilityFunctions.findOrCreateDbGameByMatchupAndStartDate({
       awayTeam,
       homeTeam,
       startDate,
     });
 
+    const exchange = this.pageParser.exchange;
+    const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
+
+    await DbUtilityFunctions.associateDbExchangeAndDbGameByExchangeAssignedGameId({
+      exchange,
+      game,
+      exchangeAssignedGameId,
+    });
+
     return game;
+  }
+
+  private getExchangeAssignedGameId({
+    jsonGame,
+  }: {
+    jsonGame: any,
+  }): string {
+    const identifier = jsonGame.identifier;
+    const lastHyphenPos: number = identifier.lastIndexOf("-");
+    const exchangeAssignedGameId = identifier.substring(lastHyphenPos + 1);
+    return exchangeAssignedGameId;
   }
 }
