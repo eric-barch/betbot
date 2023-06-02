@@ -11,11 +11,12 @@ generator client {
 }
 
 model Exchange {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String   @db.VarChar(255)
+  id        Int              @id @default(autoincrement())
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  name      String           @db.VarChar(255)
   leagues   League[]
+  games     ExchangeToGame[]
 }
 
 model League {
@@ -43,15 +44,16 @@ model Team {
 }
 
 model Game {
-  id         Int         @id @default(autoincrement())
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id         Int              @id @default(autoincrement())
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
   startDate  DateTime
-  awayTeam   Team        @relation("AwayTeamOnGame", fields: [awayTeamId], references: [id])
+  awayTeam   Team             @relation("AwayTeamOnGame", fields: [awayTeamId], references: [id])
   awayTeamId Int
-  homeTeam   Team        @relation("HomeTeamOnGame", fields: [homeTeamId], references: [id])
+  homeTeam   Team             @relation("HomeTeamOnGame", fields: [homeTeamId], references: [id])
   homeTeamId Int
-  Statistic  Statistic[]
+  exchanges  ExchangeToGame[]
+  statistics Statistic[]
 }
 
 model Statistic {
@@ -69,4 +71,14 @@ model Odd {
   updatedAt DateTime @default(now())
   value     Float?
   price     Int
+}
+
+model ExchangeToGame {
+  exchange               Exchange @relation(fields: [exchangeId], references: [id])
+  exchangeId             Int
+  game                   Game     @relation(fields: [gameId], references: [id])
+  gameId                 Int
+  exchangeAssignedGameId String   @db.VarChar(255)
+
+  @@id([exchangeId, gameId])
 }

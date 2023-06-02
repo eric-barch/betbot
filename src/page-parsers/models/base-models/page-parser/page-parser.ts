@@ -1,20 +1,16 @@
 import * as p from 'puppeteer';
 
-import { prisma } from '@/db';
-import { PageParserInitializer } from './page-parser-initializer';
 import { PageParserInitData } from '@/init-data';
-import { WebpageConnection } from './webpage-connection';
-import { Exchange, League, Game, Statistic, Odd } from '@prisma/client';
+import { Exchange, League } from '@prisma/client';
 import { OddHandle } from './odd-handle';
+import { PageParserInitializer } from './page-parser-initializer';
+import { WebpageConnection } from './webpage-connection';
 
 export abstract class PageParser {
   private initializer: PageParserInitializer;
   private wrappedWebpageConnection: WebpageConnection | undefined;
   private wrappedExchange: Exchange | undefined;
   private wrappedLeague: League | undefined;
-  protected games: Array<Game>;
-  protected statistics: Array<Statistic>;
-  protected odds: Array<Odd>;
   protected oddHandles: Set<OddHandle>;
 
   constructor({
@@ -26,9 +22,6 @@ export abstract class PageParser {
       pageParser: this,
       pageParserInitData,
     });
-    this.games = new Array<Game>;
-    this.statistics = new Array<Statistic>;
-    this.odds = new Array<Odd>;
     this.oddHandles = new Set<OddHandle>;
   }
 
@@ -40,12 +33,10 @@ export abstract class PageParser {
   }
 
   public async update() {
-    await this.updateGames();
+    await this.updateOddHandles();
   }
 
-  protected abstract updateGames(): Promise<Array<Game>>;
-
-  // protected abstract updateStatistics(): Promise<Array<Statistic>>;
+  protected abstract updateOddHandles(): Promise<Array<OddHandle>>;
 
   private get webpageConnection(): WebpageConnection {
     if (!this.wrappedWebpageConnection) {

@@ -3,9 +3,9 @@ export const config = {
     mlb: {
       games: 'https://sportsbook.draftkings.com/leagues/baseball/mlb',
     },
-    nba: {
-      games: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
-    },
+    // nba: {
+    //   games: 'https://sportsbook.draftkings.com/leagues/basketball/nba',
+    // },
     // nfl: {
     //   games: 'https://sportsbook.draftkings.com/leagues/football/nfl',
     // }

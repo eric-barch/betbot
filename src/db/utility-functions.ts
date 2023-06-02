@@ -1,8 +1,8 @@
 import { prisma } from './prisma-client';
-import { Game, League, Team } from '@prisma/client';
+import { Exchange, ExchangeToGame, Game, League, Team } from '@prisma/client';
 
 export class DbUtilityFunctions {
-  public static async findOrCreateDbGame({
+  public static async findOrCreateDbGameByMatchupAndStartDate({
     awayTeam,
     homeTeam,
     startDate,
@@ -43,12 +43,63 @@ export class DbUtilityFunctions {
     return game;
   }
 
-  public static async findDbTeam({
-    unformattedName,
-    league,
+  public static async findDbGameByExchangeAssignedId({
+    exchange,
+    exchangeAssignedGameId,
   }: {
-    unformattedName: string,
+    exchange: Exchange,
+    exchangeAssignedGameId: string,
+  }): Promise<Game> {
+    const exchangeToGame = await prisma.exchangeToGame.findFirst({
+      where: {
+        exchangeId: exchange.id,
+        exchangeAssignedGameId,
+      },
+      include: {
+        game: true,
+      },
+    });
+
+    if (!exchangeToGame || !exchangeToGame.game) {
+      throw new Error(`No Game found for the provided Exchange and exchangeAssignedGameId: ${exchangeAssignedGameId}`);
+    }
+
+    return exchangeToGame.game;
+  }
+
+  public static async associateDbExchangeAndDbGameByExchangeAssignedGameId({
+    exchange,
+    game,
+    exchangeAssignedGameId,
+  }: {
+    exchange: Exchange,
+    game: Game,
+    exchangeAssignedGameId: string,
+  }): Promise<ExchangeToGame> {
+    return await prisma.exchangeToGame.upsert({
+      where: {
+        exchangeId_gameId: {
+          exchangeId: exchange.id,
+          gameId: game.id,
+        }
+      },
+      update: {
+        exchangeAssignedGameId,
+      },
+      create: {
+        exchange: { connect: { id: exchange.id } },
+        game: { connect: { id: game.id } },
+        exchangeAssignedGameId,
+      },
+    });
+  }
+
+  public static async findDbTeamByLeagueAndUnformattedName({
+    league,
+    unformattedName,
+  }: {
     league: League,
+    unformattedName: string,
   }): Promise<Team> {
     //TODO: This is so inefficient.
     const leagueTeams = await prisma.team.findMany({
