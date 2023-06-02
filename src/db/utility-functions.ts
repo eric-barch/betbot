@@ -43,7 +43,7 @@ export class DbUtilityFunctions {
     return game;
   }
 
-  public static async findGameByExchangeAssignedGameId({
+  public static async findGameByExchangeAndExchangeAssignedGameId({
     exchange,
     exchangeAssignedGameId,
   }: {
