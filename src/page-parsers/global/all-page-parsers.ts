@@ -9,7 +9,7 @@ class AllPageParsers {
     this.wrappedPageParsers = new Set<PageParser>;
   }
 
-  public async initFromConfig(): Promise<Set<PageParser>> {
+  public async init(): Promise<Set<PageParser>> {
     for (const exchangeKey in config) {
       const exchangeObject = config[exchangeKey as keyof typeof config];
 
@@ -38,7 +38,7 @@ class AllPageParsers {
 
   public async update() {
     for (const pageParser of this.wrappedPageParsers) {
-      await pageParser.update();
+
     }
   }
 }

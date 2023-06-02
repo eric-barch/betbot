@@ -2,8 +2,7 @@ import { prisma } from '@/db';
 import { allPageParsers } from '@/page-parsers';
 
 async function main() {
-  await allPageParsers.initFromConfig();
-  await allPageParsers.update();
+  await allPageParsers.init();
 }
 
 main()
