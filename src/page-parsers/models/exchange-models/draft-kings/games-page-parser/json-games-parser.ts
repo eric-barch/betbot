@@ -57,19 +57,19 @@ export class JsonGamesParser {
   }: {
     jsonGame: any,
   }): Promise<Game> {
-    const awayTeam = await DbUtilityFunctions.findDbTeamByLeagueAndUnformattedName({
+    const awayTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
       unformattedName: jsonGame.awayTeam.name,
       league: this.pageParser.league,
     });
 
-    const homeTeam = await DbUtilityFunctions.findDbTeamByLeagueAndUnformattedName({
+    const homeTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
       unformattedName: jsonGame.homeTeam.name,
       league: this.pageParser.league,
     });
 
     const startDate = new Date(jsonGame.startDate);
 
-    const game = await DbUtilityFunctions.findOrCreateDbGameByMatchupAndStartDate({
+    const game = await DbUtilityFunctions.findOrCreateGameByMatchupAndStartDate({
       awayTeam,
       homeTeam,
       startDate,
@@ -78,7 +78,7 @@ export class JsonGamesParser {
     const exchange = this.pageParser.exchange;
     const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
 
-    await DbUtilityFunctions.associateDbExchangeAndDbGameByExchangeAssignedGameId({
+    await DbUtilityFunctions.associateExchangeAndGameByExchangeAssignedGameId({
       exchange,
       game,
       exchangeAssignedGameId,

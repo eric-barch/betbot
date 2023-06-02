@@ -1,5 +1,6 @@
 import * as p from 'puppeteer';
 
+import { prisma } from '@/db';
 import { PageParserInitData } from '@/init-data';
 import { PageParser } from '@/page-parsers/models/base-models/page-parser/page-parser';
 import { JsonGamesParser } from './json-games-parser';
@@ -36,7 +37,7 @@ export class DraftKingsGamesPageParser extends PageParser {
 
     for (const buttonElement of buttonElements) {
       const exchange = this.exchange;
-      // const statistic = this.getDbStatistic({ buttonElement });
+      const statistic = await this.getDbStatistic({ buttonElement });
 
       const valueElement = await buttonElement.$('.sportsbook-outcome-cell__label-line-container');
       const priceElement = await buttonElement.$('.sportsbook-outcome-cell__elements');
@@ -57,6 +58,90 @@ export class DraftKingsGamesPageParser extends PageParser {
     return this.oddHandles;
   }
 
+  private async getDbStatistic({
+    buttonElement,
+  }: {
+    buttonElement: p.ElementHandle,
+  }): Promise<Statistic> {
+    const game = await this.getDbGame({
+      buttonElement,
+    });
+
+    const statisticName = await this.getStatisticName({
+      buttonElement,
+      game,
+    });
+
+    const dbStatistic = await DbUtilityFunctions.findOrCreateStatisticByGameAndStatisticName({
+      game,
+      statisticName,
+    });
+
+    return dbStatistic;
+  }
+
+  private async getStatisticName({
+    buttonElement,
+    game,
+  }: {
+    buttonElement: p.ElementHandle,
+    game: Game,
+  }): Promise<string> {
+    const awayTeam = await prisma.team.findFirstOrThrow({
+      where: {
+        id: game.awayTeamId,
+      }
+    });
+
+    const homeTeam = await prisma.team.findFirstOrThrow({
+      where: {
+        id: game.homeTeamId,
+      }
+    });
+
+    const ariaLabel = await (await buttonElement.getProperty('ariaLabel')).jsonValue();
+
+    if (!ariaLabel) {
+      throw new Error(`ariaLabel is null.`);
+    }
+
+    const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b[^\\w\\d]*([+-]?\\d+\\.\\d)+?.*`, "i");
+    const totalPattern = new RegExp("^.*\\b(O|U|Over|Under)\\b[^\\w\\d]*(\\d+(\\.\\d+)?).*$", "i");
+    const winnerPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b[^0-9]*$`, "i");
+
+    const spreadPatternMatches = spreadPattern.exec(ariaLabel);
+    const totalPatternMatches = totalPattern.exec(ariaLabel);
+    const winnerPatternMatches = winnerPattern.exec(ariaLabel);
+
+    if (spreadPatternMatches) {
+      const teamIdentifierFull = spreadPatternMatches[1];
+
+      if (teamIdentifierFull == awayTeam.identifierFull) {
+        return 'spread_away';
+      }
+
+      return 'spread_home';
+    } else if (totalPatternMatches) {
+      const overUnderIdentifier = totalPatternMatches[1];
+
+      if (overUnderIdentifier.toUpperCase().startsWith('O')) {
+        return 'total_over';
+      }
+
+      return 'total_under';
+    } else if (winnerPatternMatches) {
+      const teamIdentifierFull = winnerPatternMatches[1];
+
+      if (teamIdentifierFull == awayTeam.identifierFull) {
+        return 'winner_away';
+      }
+
+      return 'winner_home';
+    }
+
+    throw new Error(`Did not find matching statistic name.`);
+  }
+
   private async getDbGame({
     buttonElement,
   }: {
@@ -65,7 +150,7 @@ export class DraftKingsGamesPageParser extends PageParser {
     const exchange = this.exchange;
     const exchangeAssignedGameId = await this.getExchangeAssignedId({ buttonElement });
 
-    const game = await DbUtilityFunctions.findDbGameByExchangeAssignedId({
+    const game = await DbUtilityFunctions.findGameByExchangeAssignedGameId({
       exchange: exchange,
       exchangeAssignedGameId,
     });

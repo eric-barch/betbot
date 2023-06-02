@@ -1,8 +1,8 @@
 import { prisma } from './prisma-client';
-import { Exchange, ExchangeToGame, Game, League, Team } from '@prisma/client';
+import { Exchange, ExchangeToGame, Game, League, Statistic, Team } from '@prisma/client';
 
 export class DbUtilityFunctions {
-  public static async findOrCreateDbGameByMatchupAndStartDate({
+  public static async findOrCreateGameByMatchupAndStartDate({
     awayTeam,
     homeTeam,
     startDate,
@@ -43,31 +43,30 @@ export class DbUtilityFunctions {
     return game;
   }
 
-  public static async findDbGameByExchangeAssignedId({
+  public static async findGameByExchangeAssignedGameId({
     exchange,
     exchangeAssignedGameId,
   }: {
     exchange: Exchange,
     exchangeAssignedGameId: string,
   }): Promise<Game> {
-    const exchangeToGame = await prisma.exchangeToGame.findFirst({
+    const exchangeToGame = await prisma.exchangeToGame.findFirstOrThrow({
       where: {
         exchangeId: exchange.id,
         exchangeAssignedGameId,
-      },
-      include: {
-        game: true,
-      },
+      }
     });
 
-    if (!exchangeToGame || !exchangeToGame.game) {
-      throw new Error(`No Game found for the provided Exchange and exchangeAssignedGameId: ${exchangeAssignedGameId}`);
-    }
+    const game = await prisma.game.findFirstOrThrow({
+      where: {
+        id: exchangeToGame.gameId,
+      }
+    });
 
-    return exchangeToGame.game;
+    return game;
   }
 
-  public static async associateDbExchangeAndDbGameByExchangeAssignedGameId({
+  public static async associateExchangeAndGameByExchangeAssignedGameId({
     exchange,
     game,
     exchangeAssignedGameId,
@@ -94,7 +93,7 @@ export class DbUtilityFunctions {
     });
   }
 
-  public static async findDbTeamByLeagueAndUnformattedName({
+  public static async findTeamByLeagueAndUnformattedName({
     league,
     unformattedName,
   }: {
@@ -117,5 +116,33 @@ export class DbUtilityFunctions {
     }
 
     throw new Error(`Did not find matching team.`);
+  }
+
+  public static async findOrCreateStatisticByGameAndStatisticName({
+    game,
+    statisticName,
+  }: {
+    game: Game,
+    statisticName: string,
+  }): Promise<Statistic> {
+    let statistic: Statistic;
+
+    try {
+      statistic = await prisma.statistic.findFirstOrThrow({
+        where: {
+          gameId: game.id,
+          name: statisticName,
+        }
+      });
+    } catch (e) {
+      statistic = await prisma.statistic.create({
+        data: {
+          gameId: game.id,
+          name: statisticName,
+        }
+      })
+    }
+
+    return statistic;
   }
 }
