@@ -1,11 +1,6 @@
-import * as p from 'puppeteer';
-
-import { prisma } from '@/db';
 import { PageParserInitData } from '@/init-data';
-import { PageParser } from '@/page-parsers/models/base-models/page-parser/page-parser';
+import { PageParser } from '@/parsers/models/base-models/page-parser/page-parser';
 import { JsonGamesParser } from './json-games-parser';
-import { Game, Statistic } from '@prisma/client';
-import { DbUtilityFunctions } from '@/db';
 import { OddHandleSet } from './odd-handle-set';
 
 export class DraftKingsGamesPageParser extends PageParser {

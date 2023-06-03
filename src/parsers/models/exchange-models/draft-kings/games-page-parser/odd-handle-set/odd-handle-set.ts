@@ -1,5 +1,5 @@
-import { PageParser } from '@/page-parsers';
-import { OddHandle } from './odd-handle';
+import { PageParser } from '@/parsers';
+import { OddHandle } from './odd-handle/odd-handle';
 import { Exchange } from '@prisma/client';
 
 export class OddHandleSet extends Set<OddHandle> {
@@ -19,8 +19,8 @@ export class OddHandleSet extends Set<OddHandle> {
 
     for (const buttonElement of buttonElements) {
       const oddHandle = new OddHandle({
+        parent: this,
         buttonElement,
-        oddHandleSet: this,
       });
 
       await oddHandle.init();

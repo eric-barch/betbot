@@ -1,5 +1,5 @@
 import { config } from '@/config';
-import { PageParser, PageParserFactory } from '@/page-parsers';
+import { PageParser, PageParserFactory } from '@/parsers';
 import { PageParserInitData } from '@/init-data';
 
 class AllPageParsers {
