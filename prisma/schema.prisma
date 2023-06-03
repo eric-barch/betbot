@@ -17,6 +17,7 @@ model Exchange {
   name      String           @db.VarChar(255)
   leagues   League[]
   games     ExchangeToGame[]
+  odds      Odd[]
 }
 
 model League {
@@ -63,14 +64,21 @@ model Statistic {
   name      String   @db.VarChar(255)
   game      Game     @relation(fields: [gameId], references: [id])
   gameId    Int
+  odd       Odd[]
 }
 
 model Odd {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  value     Float?
-  price     Int
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  exchange    Exchange  @relation(fields: [exchangeId], references: [id])
+  exchangeId  Int
+  statistic   Statistic @relation(fields: [statisticId], references: [id])
+  statisticId Int
+  value       Float?
+  price       Int?
+
+  @@unique([exchangeId, statisticId])
 }
 
 model ExchangeToGame {
