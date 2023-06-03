@@ -3,7 +3,7 @@ import {
   gamesPageType,
   mlb, nba
 } from '@/init-data';
-import { DraftKingsGamesPageParser, PageParser } from '@/page-parsers';
+import { DraftKingsGamesPageParser, PageParser } from '@/parsers';
 
 export class PageParserFactory {
   public static async create({

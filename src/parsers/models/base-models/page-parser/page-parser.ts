@@ -2,7 +2,7 @@ import * as p from 'puppeteer';
 
 import { PageParserInitData } from '@/init-data';
 import { Exchange, League } from '@prisma/client';
-import { OddHandle } from '../../exchange-models/draft-kings/games-page-parser/odd-handle';
+import { OddHandle } from '../../exchange-models/draft-kings/games-page-parser/odd-handle-set/odd-handle/odd-handle';
 import { PageParserInitializer } from './page-parser-initializer';
 import { WebpageConnection } from './webpage-connection';
 

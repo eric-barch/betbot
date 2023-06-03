@@ -1,5 +1,5 @@
 import { DbUtilityFunctions } from '@/db';
-import { PageParser } from '@/page-parsers';
+import { PageParser } from '@/parsers';
 import { Game } from '@prisma/client';
 
 export class JsonGamesParser {
