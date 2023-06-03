@@ -1,5 +1,5 @@
 import { prisma } from './prisma-client';
-import { Exchange, ExchangeToGame, Game, League, Statistic, Team } from '@prisma/client';
+import { Exchange, ExchangeToGame, Game, League, Odd, Statistic, Team } from '@prisma/client';
 
 export class DbUtilityFunctions {
   public static async findOrCreateGameByMatchupAndStartDate({
@@ -145,4 +145,38 @@ export class DbUtilityFunctions {
 
     return statistic;
   }
+
+  public static async findOrCreateOddByExchangeAndStatistic({
+    exchange,
+    statistic,
+  }: {
+    exchange: Exchange,
+    statistic: Statistic,
+  }): Promise<Odd> {
+    let odd: Odd;
+
+    const exchangeId = exchange.id;
+    const statisticId = statistic.id;
+
+    try {
+      odd = await prisma.odd.findUniqueOrThrow({
+        where: {
+          exchangeId_statisticId: {
+            exchangeId,
+            statisticId,
+          }
+        }
+      })
+    } catch (e) {
+      odd = await prisma.odd.create({
+        data: {
+          exchangeId,
+          statisticId,
+        }
+      })
+    }
+
+    return odd;
+  }
+
 }

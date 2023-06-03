@@ -1,3 +1,4 @@
+import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 
 import { prisma, DbUtilityFunctions } from '@/db';
@@ -10,8 +11,8 @@ export class OddHandle {
   private exchange: Exchange;
   private wrappedGame: Game | undefined;
   private wrappedStatistic: Statistic | undefined;
-  private odd: Odd | undefined;
-  private valueElement: p.ElementHandle | null | undefined;
+  private wrappedOdd: Odd | undefined;
+  private wrappedValueElement: p.ElementHandle | null | undefined;
   private wrappedPriceElement: p.ElementHandle | undefined;
 
   constructor({
@@ -32,6 +33,7 @@ export class OddHandle {
 
     await this.parseGame();
     await this.parseStatistic();
+    await this.parseOdd();
 
     return this;
   }
@@ -40,10 +42,27 @@ export class OddHandle {
     const exchange = this.exchange;
     const exchangeAssignedGameId = await this.parseExchangeAssignedGameId();
 
-    this.game = await DbUtilityFunctions.findGameByExchangeAndExchangeAssignedGameId({
-      exchange,
-      exchangeAssignedGameId,
-    });
+    try {
+      this.game = await DbUtilityFunctions.findGameByExchangeAndExchangeAssignedGameId({
+        exchange,
+        exchangeAssignedGameId,
+      });
+    } catch (e) {
+      const startDate = await this.parseStartDate();
+      // const matchup = await this.parseMatchup();
+
+      // this.game = await DbUtilityFunctions.findOrCreateGameByMatchupAndStartDate({
+      //   awayTeam: matchup.awayTeam,
+      //   homeTeam: matchup.homeTeam,
+      //   startDate,
+      // });
+
+      // await DbUtilityFunctions.associateExchangeAndGameByExchangeAssignedGameId({
+      //   exchange,
+      //   game: this.game,
+      //   exchangeAssignedGameId,
+      // });
+    }
 
     return this.game;
   }
@@ -54,6 +73,103 @@ export class OddHandle {
     const eventId = parsedDataTracking.eventId;
     return eventId;
   }
+
+  private async parseStartDate(): Promise<Date> {
+    const dateString = await this.parseDateString();
+    const timeString = await this.parseTimeString();
+    const startDateString = `${dateString} ${timeString}`;
+    const startDate = c.parseDate(startDateString);
+    return startDate;
+  }
+
+  private async parseDateString(): Promise<string> {
+    const dateTableElement = await this.getDateTableElement();
+    const dateTableHeaderElement = await dateTableElement.$('.always-left.column-header');
+
+    if (!dateTableHeaderElement) {
+      throw new Error(`dateTableHeaderElement is null.`);
+    }
+
+    const dateString = await (await dateTableHeaderElement.getProperty('textContent')).jsonValue();
+
+    if (!dateString) {
+      throw new Error(`dateString is null.`);
+    }
+
+    return dateString;
+  }
+
+  private async getDateTableElement(): Promise<p.ElementHandle> {
+    let ancestor = this.buttonElement;
+
+    const classNameToFind = 'parlay-card-10-a';
+
+    while (ancestor) {
+      const className = await (await ancestor.getProperty('className')).jsonValue();
+
+      if (className === classNameToFind) {
+        return ancestor;
+      }
+
+      const parentElement = await ancestor.$('xpath/..');
+
+      if (!parentElement) {
+        throw new Error(`parentElement is null.`);
+      }
+
+      ancestor = parentElement;
+    }
+
+    throw new Error(`Did not find dateTableElement.`);
+  }
+
+  private async parseTimeString(): Promise<string> {
+    const teamRowElement = await this.getTeamRowElement();
+    const timeElement = await teamRowElement.$('.event-cell__start-time');
+
+    if (!timeElement) {
+      throw new Error(`timeElement is null.`);
+    }
+
+    const timeString = await (await timeElement.getProperty('textContent')).jsonValue();
+
+    if (!timeString) {
+      throw new Error(`timeString is null.`);
+    }
+
+    return timeString;
+  }
+
+  private async getTeamRowElement(): Promise<p.ElementHandle> {
+    let ancestor = this.buttonElement;
+
+    const nodeNameToFind = 'tr';
+
+    while (ancestor) {
+      const nodeName = await (await ancestor.getProperty('nodeName')).jsonValue();
+
+      if (nodeName.toLowerCase() === nodeNameToFind) {
+        return ancestor;
+      }
+
+      const parentElement = await ancestor.$('xpath/..');
+
+      if (!parentElement) {
+        throw new Error(`parentElement is null.`);
+      }
+
+      ancestor = parentElement;
+    }
+
+    throw new Error(`Did not find teamRowElement.`);
+  }
+
+  // private async parseMatchup(): Promise<{
+  //   awayTeam: Team,
+  //   homeTeam: Team,
+  // }> {
+
+  // }
 
   private async parseStatistic(): Promise<Statistic> {
     const game = this.game;
@@ -92,6 +208,18 @@ export class OddHandle {
     throw new Error(`Did not find matching statistic name.`);
   }
 
+  private async parseOdd(): Promise<Odd> {
+    const exchange = this.exchange;
+    const statistic = this.statistic;
+
+    this.odd = await DbUtilityFunctions.findOrCreateOddByExchangeAndStatistic({
+      exchange,
+      statistic,
+    });
+
+    return this.odd;
+  }
+
   private async getAriaLabel(): Promise<string> {
     const ariaLabel = await (await this.buttonElement.getProperty('ariaLabel')).jsonValue();
 
@@ -124,6 +252,30 @@ export class OddHandle {
 
   private set statistic(statistic: Statistic) {
     this.wrappedStatistic = statistic;
+  }
+
+  private get odd(): Odd {
+    if (!this.wrappedOdd) {
+      throw new Error(`wrappedOdd is undefined.`);
+    }
+
+    return this.wrappedOdd;
+  }
+
+  private set odd(odd: Odd) {
+    this.wrappedOdd = odd;
+  }
+
+  private get valueElement(): p.ElementHandle | null {
+    if (this.wrappedValueElement === undefined) {
+      throw new Error(`wrappedValueElement is undefined.`);
+    }
+
+    return this.wrappedValueElement;
+  }
+
+  private set valueElement(valueElement: p.ElementHandle | null) {
+    this.wrappedValueElement = valueElement;
   }
 
   private get priceElement(): p.ElementHandle {
