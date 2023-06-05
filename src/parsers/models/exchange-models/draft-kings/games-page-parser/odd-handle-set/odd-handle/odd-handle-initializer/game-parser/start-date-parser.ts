@@ -2,19 +2,20 @@ import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 
 import { GameWithoutExchangeAssignedIdParser } from './game-without-exchange-assigned-id-parser';
+import { OddHandle } from '../../odd-handle';
 
 export class StartDateParser {
-  private parent: GameWithoutExchangeAssignedIdParser;
+  private parentOddHandle: OddHandle;
   private wrappedDateString: string | undefined;
   private wrappedTimeString: string | undefined;
   private wrappedStartDate: Date | undefined;
 
   constructor({
-    parent,
+    parentOddHandle,
   }: {
-    parent: GameWithoutExchangeAssignedIdParser,
+    parentOddHandle: OddHandle,
   }) {
-    this.parent = parent;
+    this.parentOddHandle = parentOddHandle;
   }
 
   public async parse(): Promise<Date> {
@@ -117,7 +118,11 @@ export class StartDateParser {
   }
 
   private get buttonElement(): p.ElementHandle {
-    return this.parent.buttonElement;
+    return this.parentOddHandle.buttonElement;
+  }
+
+  private set dateString(dateString: string) {
+    this.wrappedDateString = dateString;
   }
 
   private get dateString(): string {
@@ -128,8 +133,8 @@ export class StartDateParser {
     return this.wrappedDateString;
   }
 
-  private set dateString(dateString: string) {
-    this.wrappedDateString = dateString;
+  private set timeString(timeString: string) {
+    this.wrappedTimeString = timeString;
   }
 
   private get timeString(): string {
@@ -140,8 +145,8 @@ export class StartDateParser {
     return this.wrappedTimeString;
   }
 
-  private set timeString(timeString: string) {
-    this.wrappedTimeString = timeString;
+  private set startDate(startDate: Date) {
+    this.wrappedStartDate = startDate;
   }
 
   public get startDate(): Date {
@@ -150,9 +155,5 @@ export class StartDateParser {
     }
 
     return this.wrappedStartDate;
-  }
-
-  private set startDate(startDate: Date) {
-    this.wrappedStartDate = startDate;
   }
 }

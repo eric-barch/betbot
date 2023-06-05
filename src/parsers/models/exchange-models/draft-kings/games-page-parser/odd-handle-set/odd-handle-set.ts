@@ -1,37 +1,45 @@
 import { PageParser } from '@/parsers';
 import { OddHandle } from './odd-handle/odd-handle';
-import { Exchange } from '@prisma/client';
 
-export class OddHandleSet extends Set<OddHandle> {
-  private pageParser: PageParser;
+export class OddHandleSet {
+  private parentPageParser: PageParser;
+  private wrappedOddHandles: Set<OddHandle>;
 
   constructor({
     pageParser,
   }: {
     pageParser: PageParser,
   }) {
-    super();
-    this.pageParser = pageParser;
+    this.parentPageParser = pageParser;
+    this.wrappedOddHandles = new Set<OddHandle>;
   }
 
   public async init(): Promise<OddHandleSet> {
-    const buttonElements = await this.pageParser.page.$$('div[role="button"].sportsbook-outcome-cell__body');
+    const buttonElements = await this.parentPageParser.page.$$('div[role="button"].sportsbook-outcome-cell__body');
 
     for (const buttonElement of buttonElements) {
       const oddHandle = new OddHandle({
-        parent: this,
+        parentPageParser: this.parentPageParser,
         buttonElement,
       });
 
       await oddHandle.init();
 
-      this.add(oddHandle);
+      this.add({ oddHandle });
     }
 
     return this;
   }
 
-  get exchange(): Exchange {
-    return this.pageParser.exchange;
+  public add({
+    oddHandle,
+  }: {
+    oddHandle: OddHandle,
+  }) {
+    this.wrappedOddHandles.add(oddHandle);
+  }
+
+  public get pageParser(): PageParser {
+    return this.pageParser;
   }
 }

@@ -1,17 +1,18 @@
 import { Exchange, Odd, Statistic } from '@prisma/client';
 import { DbUtilityFunctions } from '@/db';
-import { OddHandleInitializer } from './odd-handle-initializer';
+import { OddHandleParser } from './odd-handle-parser';
+import { OddHandle } from '../odd-handle';
 
 export class OddParser {
-  private parent: OddHandleInitializer;
+  private parentOddHandle: OddHandle;
   private wrappedOdd: Odd | undefined;
 
   constructor({
-    parent,
+    parentOddHandle,
   }: {
-    parent: OddHandleInitializer,
+    parentOddHandle: OddHandle,
   }) {
-    this.parent = parent;
+    this.parentOddHandle = parentOddHandle;
   }
 
   public async parse(): Promise<Odd> {
@@ -27,11 +28,15 @@ export class OddParser {
   }
 
   private get exchange(): Exchange {
-    return this.parent.exchange;
+    return this.parentOddHandle.exchange;
   }
 
   private get statistic(): Statistic {
-    return this.parent.statistic;
+    return this.parentOddHandle.statistic;
+  }
+
+  private set odd(odd: Odd) {
+    this.wrappedOdd = odd;
   }
 
   public get odd(): Odd {
@@ -40,9 +45,5 @@ export class OddParser {
     }
 
     return this.wrappedOdd;
-  }
-
-  private set odd(odd: Odd) {
-    this.wrappedOdd = odd;
   }
 }

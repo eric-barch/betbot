@@ -1,4 +1,4 @@
-import { TeamInitData } from '../teams';
+import { TeamInitData } from '.';
 
 export const nflTeams = [
   new TeamInitData({
