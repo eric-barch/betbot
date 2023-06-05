@@ -1,7 +1,7 @@
 import { Exchange, Odd, Statistic } from '@prisma/client';
 import { DbUtilityFunctions } from '@/db';
-import { OddHandleParser } from './odd-handle-parser';
-import { OddHandle } from '../odd-handle';
+import { OddHandleParser } from '../odd-handle-parser';
+import { OddHandle } from '../../odd-handle';
 
 export class OddParser {
   private parentOddHandle: OddHandle;

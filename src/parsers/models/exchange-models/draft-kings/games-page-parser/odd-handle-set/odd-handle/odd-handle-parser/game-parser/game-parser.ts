@@ -1,11 +1,9 @@
 import * as p from 'puppeteer';
 
-import { Exchange, Game } from '@prisma/client';
 import { DbUtilityFunctions } from '@/db';
-import { OddHandleParser } from '../odd-handle-parser';
-import { GameWithoutExchangeAssignedIdParser } from './game-without-exchange-assigned-id-parser';
-import { PageParser } from '@/parsers/models/base-models';
+import { Exchange, Game } from '@prisma/client';
 import { OddHandle } from '../../odd-handle';
+import { GameWithoutExchangeAssignedIdParser } from './game-without-exchange-assigned-id-parser';
 
 export class GameParser {
   private parentOddHandle: OddHandle;
@@ -54,8 +52,7 @@ export class GameParser {
 
   private async findOrCreateGameWithoutExchangeAssignedId(): Promise<Game> {
     this.gameWithoutExchangeAssignedIdParser = new GameWithoutExchangeAssignedIdParser({ parentOddHandle: this.parentOddHandle });
-    await this.gameWithoutExchangeAssignedIdParser.parse();
-    this.game = this.gameWithoutExchangeAssignedIdParser.game;
+    this.game = await this.gameWithoutExchangeAssignedIdParser.parse();
     return this.game;
   }
 

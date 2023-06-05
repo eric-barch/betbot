@@ -2,8 +2,8 @@ import * as p from 'puppeteer';
 
 import { Game, Statistic } from '@prisma/client';
 import { prisma, DbUtilityFunctions } from '@/db';
-import { OddHandleParser } from './odd-handle-parser';
-import { OddHandle } from '../odd-handle';
+import { OddHandleParser } from '../odd-handle-parser';
+import { OddHandle } from '../../odd-handle';
 
 export class StatisticParser {
   private parentOddHandle: OddHandle;
