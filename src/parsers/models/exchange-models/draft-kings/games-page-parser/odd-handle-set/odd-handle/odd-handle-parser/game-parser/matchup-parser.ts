@@ -1,8 +1,7 @@
 import * as p from 'puppeteer';
 
-import { Odd, Team } from '@prisma/client';
-import { GameWithoutExchangeAssignedIdParser } from './game-without-exchange-assigned-id-parser';
 import { DbUtilityFunctions } from '@/db';
+import { Team } from '@prisma/client';
 import { OddHandle } from '../../odd-handle';
 
 export class MatchupParser {

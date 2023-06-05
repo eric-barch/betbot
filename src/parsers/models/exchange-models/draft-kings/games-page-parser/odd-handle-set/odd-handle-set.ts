@@ -3,7 +3,7 @@ import { OddHandle } from './odd-handle/odd-handle';
 
 export class OddHandleSet {
   private parentPageParser: PageParser;
-  private wrappedOddHandles: Set<OddHandle>;
+  private oddHandles: Set<OddHandle>;
 
   constructor({
     pageParser,
@@ -11,7 +11,7 @@ export class OddHandleSet {
     pageParser: PageParser,
   }) {
     this.parentPageParser = pageParser;
-    this.wrappedOddHandles = new Set<OddHandle>;
+    this.oddHandles = new Set<OddHandle>;
   }
 
   public async init(): Promise<OddHandleSet> {
@@ -25,18 +25,10 @@ export class OddHandleSet {
 
       await oddHandle.init();
 
-      this.add({ oddHandle });
+      this.oddHandles.add(oddHandle);
     }
 
     return this;
-  }
-
-  public add({
-    oddHandle,
-  }: {
-    oddHandle: OddHandle,
-  }) {
-    this.wrappedOddHandles.add(oddHandle);
   }
 
   public get pageParser(): PageParser {
