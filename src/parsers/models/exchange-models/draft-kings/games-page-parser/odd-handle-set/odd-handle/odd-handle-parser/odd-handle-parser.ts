@@ -1,11 +1,8 @@
 import * as p from 'puppeteer';
 
 import { Exchange, Game, Odd, Statistic } from '@prisma/client';
-import { OddHandle } from '../odd-handle';
-import { GameParser } from './game-parser';
-import { StatisticParser } from './statistic-parser';
-import { OddParser } from './odd-parser';
-import { PageParser } from '@/parsers/models/base-models';
+import { OddHandle } from '../';
+import { GameParser, OddParser, StatisticParser } from './';
 
 export class OddHandleParser {
   private parentOddHandle: OddHandle;

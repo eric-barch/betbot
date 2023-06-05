@@ -104,7 +104,7 @@ export class MatchupParser {
       unformattedName: teamNameMatches[1],
     });
 
-    this.awayTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
+    this.homeTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
       league,
       unformattedName: teamNameMatches[2],
     })

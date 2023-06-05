@@ -1,7 +1,7 @@
 import * as p from 'puppeteer';
 
 import { PageParser } from '@/parsers/models/base-models';
-import { OddHandleParser } from './odd-handle-initializer';
+import { OddHandleParser } from './odd-handle-parser';
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
 
 
