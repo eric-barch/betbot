@@ -5,47 +5,48 @@ import { OddHandle } from '../odd-handle';
 import { GameParser } from './game-parser';
 import { StatisticParser } from './statistic-parser';
 import { OddParser } from './odd-parser';
+import { PageParser } from '@/parsers/models/base-models';
 
-export class OddHandleInitializer {
-  private parent: OddHandle
+export class OddHandleParser {
+  private parentOddHandle: OddHandle;
   private gameParser: GameParser;
   private statisticParser: StatisticParser;
   private oddParser: OddParser;
 
   constructor({
-    parent,
+    parentOddHandle,
   }: {
-    parent: OddHandle,
+    parentOddHandle: OddHandle,
   }) {
-    this.parent = parent;
-    this.gameParser = new GameParser({ parent: this });
-    this.statisticParser = new StatisticParser({ parent: this });
-    this.oddParser = new OddParser({ parent: this });
+    this.parentOddHandle = parentOddHandle;
+    this.gameParser = new GameParser({ parentOddHandle: this.parentOddHandle });
+    this.statisticParser = new StatisticParser({ parentOddHandle: this.parentOddHandle });
+    this.oddParser = new OddParser({ parentOddHandle: this.parentOddHandle });
   }
 
-  public async initValueElement(): Promise<p.ElementHandle | null> {
+  public async parseValueElement(): Promise<p.ElementHandle | null> {
     const valueElement = await this.buttonElement.$('.sportsbook-outcome-cell__label-line-container');
     return valueElement;
   }
 
-  public async initPriceElement(): Promise<p.ElementHandle | null> {
+  public async parsePriceElement(): Promise<p.ElementHandle | null> {
     const priceElement = await this.buttonElement.$('.sportsbook-outcome-cell__elements');
     return priceElement;
   }
 
-  public async initOdd(): Promise<Odd> {
+  public async parseOdd(): Promise<Odd> {
     await this.gameParser.parse();
     await this.statisticParser.parse();
     await this.oddParser.parse();
     return this.odd;
   }
 
-  public get exchange(): Exchange {
-    return this.parent.exchange;
+  private get buttonElement(): p.ElementHandle {
+    return this.parentOddHandle.buttonElement;
   }
 
-  public get buttonElement(): p.ElementHandle {
-    return this.parent.buttonElement;
+  public get exchangeAssignedGameId(): string {
+    return this.gameParser.exchangeAssignedGameId;
   }
 
   public get game(): Game {

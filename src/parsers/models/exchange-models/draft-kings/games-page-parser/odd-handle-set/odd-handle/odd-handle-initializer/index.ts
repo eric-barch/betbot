@@ -1,1 +1,1 @@
-export * from './odd-handle-initializer';
+export * from './odd-handle-parser';

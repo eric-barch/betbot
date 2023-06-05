@@ -2,18 +2,19 @@ import * as p from 'puppeteer';
 
 import { Game, Statistic } from '@prisma/client';
 import { prisma, DbUtilityFunctions } from '@/db';
-import { OddHandleInitializer } from './odd-handle-initializer';
+import { OddHandleParser } from './odd-handle-parser';
+import { OddHandle } from '../odd-handle';
 
 export class StatisticParser {
-  private parent: OddHandleInitializer;
+  private parentOddHandle: OddHandle;
   private wrappedStatistic: Statistic | undefined;
 
   constructor({
-    parent,
+    parentOddHandle,
   }: {
-    parent: OddHandleInitializer,
+    parentOddHandle: OddHandle,
   }) {
-    this.parent = parent;
+    this.parentOddHandle = parentOddHandle;
   }
 
   public async parse(): Promise<Statistic> {
@@ -64,11 +65,15 @@ export class StatisticParser {
   }
 
   private get buttonElement(): p.ElementHandle {
-    return this.parent.buttonElement;
+    return this.parentOddHandle.buttonElement;
   }
 
   private get game(): Game {
-    return this.parent.game;
+    return this.parentOddHandle.game;
+  }
+
+  private set statistic(statistic: Statistic) {
+    this.wrappedStatistic = statistic;
   }
 
   public get statistic(): Statistic {
@@ -77,9 +82,5 @@ export class StatisticParser {
     }
 
     return this.wrappedStatistic;
-  }
-
-  public set statistic(statistic: Statistic) {
-    this.wrappedStatistic = statistic;
   }
 }

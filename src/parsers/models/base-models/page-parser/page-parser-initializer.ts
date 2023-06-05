@@ -1,7 +1,7 @@
 import { prisma } from '@/db';
 import { PageParser } from './page-parser';
 import { WebpageConnection } from './webpage-connection';
-import { PageParserInitData, TeamsInitDataFactory } from '@/init-data';
+import { PageParserInitData, TeamsInitDataFactory } from '@/config/init-data';
 import { Exchange, League, Team } from '@prisma/client';
 
 export class PageParserInitializer {

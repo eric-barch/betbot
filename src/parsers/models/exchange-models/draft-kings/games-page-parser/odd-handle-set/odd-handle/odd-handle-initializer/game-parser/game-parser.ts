@@ -2,21 +2,23 @@ import * as p from 'puppeteer';
 
 import { Exchange, Game } from '@prisma/client';
 import { DbUtilityFunctions } from '@/db';
-import { OddHandleInitializer } from '../odd-handle-initializer';
+import { OddHandleParser } from '../odd-handle-parser';
 import { GameWithoutExchangeAssignedIdParser } from './game-without-exchange-assigned-id-parser';
+import { PageParser } from '@/parsers/models/base-models';
+import { OddHandle } from '../../odd-handle';
 
 export class GameParser {
-  private parent: OddHandleInitializer;
+  private parentOddHandle: OddHandle;
   private wrappedExchangeAssignedGameId: string | undefined;
-  private newGameParser: GameWithoutExchangeAssignedIdParser | undefined;
+  private gameWithoutExchangeAssignedIdParser: GameWithoutExchangeAssignedIdParser | undefined;
   private wrappedGame: Game | undefined;
 
   constructor({
-    parent,
+    parentOddHandle,
   }: {
-    parent: OddHandleInitializer,
+    parentOddHandle: OddHandle,
   }) {
-    this.parent = parent;
+    this.parentOddHandle = parentOddHandle;
   }
 
   public async parse(): Promise<Game> {
@@ -51,18 +53,22 @@ export class GameParser {
   }
 
   private async findOrCreateGameWithoutExchangeAssignedId(): Promise<Game> {
-    this.newGameParser = new GameWithoutExchangeAssignedIdParser({ parent: this });
-    await this.newGameParser.parse();
-    this.game = this.newGameParser.game;
+    this.gameWithoutExchangeAssignedIdParser = new GameWithoutExchangeAssignedIdParser({ parentOddHandle: this.parentOddHandle });
+    await this.gameWithoutExchangeAssignedIdParser.parse();
+    this.game = this.gameWithoutExchangeAssignedIdParser.game;
     return this.game;
   }
 
-  public get buttonElement(): p.ElementHandle {
-    return this.parent.buttonElement;
+  private get buttonElement(): p.ElementHandle {
+    return this.parentOddHandle.buttonElement;
   }
 
-  public get exchange(): Exchange {
-    return this.parent.exchange;
+  private get exchange(): Exchange {
+    return this.parentOddHandle.exchange;
+  }
+
+  private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
+    this.wrappedExchangeAssignedGameId = exchangeAssignedGameId;
   }
 
   public get exchangeAssignedGameId(): string {
@@ -73,8 +79,8 @@ export class GameParser {
     return this.wrappedExchangeAssignedGameId;
   }
 
-  private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
-    this.wrappedExchangeAssignedGameId = exchangeAssignedGameId;
+  private set game(game: Game) {
+    this.wrappedGame = game;
   }
 
   public get game(): Game {
@@ -83,9 +89,5 @@ export class GameParser {
     }
 
     return this.wrappedGame;
-  }
-
-  private set game(game: Game) {
-    this.wrappedGame = game;
   }
 }

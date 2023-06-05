@@ -1,26 +1,26 @@
 import * as p from 'puppeteer';
 
 import { Exchange, Game } from '@prisma/client';
-import { GameParser } from './game-parser';
 import { StartDateParser } from './start-date-parser';
 import { MatchupParser } from './matchup-parser';
 import { DbUtilityFunctions } from '@/db';
+import { OddHandle } from '../../odd-handle';
 
 // TODO: This is not a good name.
 export class GameWithoutExchangeAssignedIdParser {
-  private parent: GameParser;
+  private parentOddHandle: OddHandle;
   private startDateParser: StartDateParser;
   private matchupParser: MatchupParser;
   private wrappedGame: Game | undefined;
 
   constructor({
-    parent,
+    parentOddHandle,
   }: {
-    parent: GameParser,
+    parentOddHandle: OddHandle,
   }) {
-    this.parent = parent;
-    this.startDateParser = new StartDateParser({ parent: this });
-    this.matchupParser = new MatchupParser({ parent: this });
+    this.parentOddHandle = parentOddHandle;
+    this.startDateParser = new StartDateParser({ parentOddHandle: this.parentOddHandle });
+    this.matchupParser = new MatchupParser({ parentOddHandle: this.parentOddHandle });
   }
 
   public async parse(): Promise<Game> {
@@ -42,16 +42,12 @@ export class GameWithoutExchangeAssignedIdParser {
     return this.game;
   }
 
-  public get buttonElement(): p.ElementHandle {
-    return this.parent.buttonElement;
+  private get exchange(): Exchange {
+    return this.parentOddHandle.exchange;
   }
 
-  public get exchange(): Exchange {
-    return this.parent.exchange;
-  }
-
-  public get exchangeAssignedGameId(): string {
-    return this.parent.exchangeAssignedGameId;
+  private get exchangeAssignedGameId(): string {
+    return this.parentOddHandle.exchangeAssignedGameId;
   }
 
   public get game(): Game {

@@ -2,7 +2,7 @@ import {
   PageParserInitData, draftKings,
   gamesPageType,
   mlb, nba
-} from '@/init-data';
+} from '@/config/init-data';
 import { DraftKingsGamesPageParser, PageParser } from '@/parsers';
 
 export class PageParserFactory {
@@ -12,17 +12,17 @@ export class PageParserFactory {
     pageParserInitData: PageParserInitData,
   }): Promise<PageParser> {
     if (pageParserInitData.matches({
-      exchange: draftKings,
-      league: mlb,
-      pageType: gamesPageType,
+      exchangeInitData: draftKings,
+      leagueInitData: mlb,
+      pageTypeInitData: gamesPageType,
     })) {
-      return await DraftKingsGamesPageParser.create({ pageParserInitData });
+      return await DraftKingsGamesPageParser.create();
     } else if (pageParserInitData.matches({
-      exchange: draftKings,
-      league: nba,
-      pageType: gamesPageType,
+      exchangeInitData: draftKings,
+      leagueInitData: nba,
+      pageTypeInitData: gamesPageType,
     })) {
-      return await DraftKingsGamesPageParser.create({ pageParserInitData });
+      return await DraftKingsGamesPageParser.create();
     }
 
     throw new Error(`Did not find matching Page Parser.`);
