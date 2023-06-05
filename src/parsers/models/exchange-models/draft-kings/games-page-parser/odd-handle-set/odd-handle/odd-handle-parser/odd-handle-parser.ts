@@ -41,8 +41,12 @@ export class OddHandleParser {
     return this.odd;
   }
 
-  private get buttonElement(): p.ElementHandle {
+  public get buttonElement(): p.ElementHandle {
     return this.parentOddHandle.buttonElement;
+  }
+
+  public get exchange(): Exchange {
+    return this.parentOddHandle.exchange;
   }
 
   public get exchangeAssignedGameId(): string {

@@ -1,5 +1,6 @@
-import { ExchangeInitData, LeagueInitData, PageTypeInitData } from './init-data';
-import { PageParserInitData } from './init-data/page-parser-init-data';
+import {
+  ExchangeInitData, LeagueInitData, PageParserInitData, PageTypeInitData
+} from './init-data';
 
 class Config {
   private pageUrls: Array<string>;
@@ -11,7 +12,8 @@ class Config {
     pageUrls: Array<string>,
   }) {
     this.pageUrls = pageUrls;
-    this.wrappedPageParsersInitData = this.updatePageParsersInitData();
+    this.wrappedPageParsersInitData = new Set<PageParserInitData>;
+    this.updatePageParsersInitData();
   }
 
   private updatePageParsersInitData(): Set<PageParserInitData> {
