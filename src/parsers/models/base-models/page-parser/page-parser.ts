@@ -2,7 +2,6 @@ import * as p from 'puppeteer';
 
 import { PageParserInitData } from '@/config/init-data';
 import { Exchange, League } from '@prisma/client';
-import { OddHandle } from '../../exchange-models/draft-kings/games-page-parser/draft-kings-games-page-parser/odd-handle-set';
 import { PageParserInitializer } from './page-parser-initializer';
 import { WebpageConnection } from './webpage-connection';
 
@@ -11,7 +10,6 @@ export abstract class PageParser {
   private wrappedWebpageConnection: WebpageConnection | undefined;
   private wrappedExchange: Exchange | undefined;
   private wrappedLeague: League | undefined;
-  protected oddHandles: Set<OddHandle>;
 
   constructor({
     pageParserInitData,
@@ -22,7 +20,6 @@ export abstract class PageParser {
       pageParser: this,
       pageParserInitData,
     });
-    this.oddHandles = new Set<OddHandle>;
   }
 
   protected async init(): Promise<PageParser> {
@@ -31,6 +28,8 @@ export abstract class PageParser {
     this.wrappedLeague = await this.initializer.initLeague();
     return this;
   }
+
+  public abstract update(): Promise<PageParser>;
 
   public async disconnect(): Promise<void> {
     await this.webpageConnection.disconnect();

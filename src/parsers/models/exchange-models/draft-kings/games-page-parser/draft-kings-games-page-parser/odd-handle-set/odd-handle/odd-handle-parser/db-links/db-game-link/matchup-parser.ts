@@ -2,7 +2,7 @@ import * as p from 'puppeteer';
 
 import { DbUtilityFunctions } from '@/db';
 import { Team } from '@prisma/client';
-import { OddHandleParser } from '../odd-handle-parser';
+import { OddHandleParser } from '../../odd-handle-parser';
 
 export class MatchupParser {
   private parentOddHandleParser: OddHandleParser;

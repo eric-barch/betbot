@@ -1,12 +1,12 @@
 
 import { DbUtilityFunctions } from '@/db';
 import { Game } from '@prisma/client';
-import { OddHandleParser } from '../odd-handle-parser';
+import { OddHandleParser } from '../../odd-handle-parser';
 import { MatchupParser } from './matchup-parser';
 import { StartDateParser } from './start-date-parser';
 
 // TODO: This is not a good name.
-export class GameDetailsParser {
+export class GameParser {
   private parentOddHandleParser: OddHandleParser;
   private exchangeAssignedGameId: string;
   private startDateParser: StartDateParser;
@@ -32,8 +32,8 @@ export class GameDetailsParser {
   }: {
     parentOddHandleParser: OddHandleParser,
     exchangeAssignedGameId: string,
-  }): Promise<GameDetailsParser> {
-    const gameDetailsParser = new GameDetailsParser({
+  }): Promise<GameParser> {
+    const gameDetailsParser = new GameParser({
       parentOddHandleParser,
       exchangeAssignedGameId,
     });

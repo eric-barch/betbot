@@ -27,6 +27,11 @@ export class JsonGamesParser {
     return jsonGamesParser;
   }
 
+  public async update(): Promise<JsonGamesParser> {
+    await this.ensureGamesInDb();
+    return this;
+  }
+
   public async ensureGamesInDb(): Promise<Array<Game>> {
     await this.scrapeJsonGames();
     await this.parseDbGames();

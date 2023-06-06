@@ -53,6 +53,7 @@ model Game {
   awayTeamId Int
   homeTeam   Team             @relation("HomeTeamOnGame", fields: [homeTeamId], references: [id])
   homeTeamId Int
+  active     Boolean
   exchanges  ExchangeToGame[]
   statistics Statistic[]
 }
@@ -64,6 +65,7 @@ model Statistic {
   name      String   @db.VarChar(255)
   game      Game     @relation(fields: [gameId], references: [id])
   gameId    Int
+  active    Boolean
   odd       Odd[]
 }
 
