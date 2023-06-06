@@ -2,10 +2,10 @@ import * as p from 'puppeteer';
 
 import { DbUtilityFunctions } from '@/db';
 import { Team } from '@prisma/client';
-import { OddHandle } from '../../odd-handle';
+import { OddHandleParser } from '../odd-handle-parser';
 
 export class MatchupParser {
-  private parentOddHandle: OddHandle;
+  private parentOddHandleParser: OddHandleParser;
   private wrappedTeamRowElement: p.ElementHandle | undefined;
   private wrappedGameLinkElement: p.ElementHandle | undefined;
   private wrappedGameLinkString: string | undefined;
@@ -13,11 +13,11 @@ export class MatchupParser {
   private wrappedHomeTeam: Team | undefined;
 
   constructor({
-    parentOddHandle,
+    parentOddHandleParser,
   }: {
-    parentOddHandle: OddHandle,
+    parentOddHandleParser: OddHandleParser,
   }) {
-    this.parentOddHandle = parentOddHandle;
+    this.parentOddHandleParser = parentOddHandleParser;
   }
 
   public async parse(): Promise<{
@@ -62,7 +62,7 @@ export class MatchupParser {
   }
 
   private async updateTeamRowElement(): Promise<p.ElementHandle> {
-    let ancestor = this.buttonElement;
+    let ancestor = this.parentOddHandleParser.buttonElement;
 
     const nodeNameToFind = 'tr';
 
@@ -97,7 +97,7 @@ export class MatchupParser {
       throw new Error(`teamNameMatches is null.`);
     }
 
-    const league = this.parentOddHandle.league;
+    const league = this.parentOddHandleParser.league;
 
     this.awayTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
       league,
@@ -113,10 +113,6 @@ export class MatchupParser {
       awayTeam: this.awayTeam,
       homeTeam: this.homeTeam,
     };
-  }
-
-  public get buttonElement(): p.ElementHandle {
-    return this.parentOddHandle.buttonElement;
   }
 
   private get teamRowElement(): p.ElementHandle {

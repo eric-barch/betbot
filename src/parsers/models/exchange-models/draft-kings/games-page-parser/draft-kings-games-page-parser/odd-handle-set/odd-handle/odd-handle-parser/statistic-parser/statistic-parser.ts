@@ -1,24 +1,32 @@
-import * as p from 'puppeteer';
 
-import { Game, Statistic } from '@prisma/client';
-import { prisma, DbUtilityFunctions } from '@/db';
+import { DbUtilityFunctions, prisma } from '@/db';
+import { Statistic } from '@prisma/client';
 import { OddHandleParser } from '../odd-handle-parser';
-import { OddHandle } from '../../odd-handle';
 
-export class StatisticParser {
-  private parentOddHandle: OddHandle;
+export class StatisticLinker {
+  private parentOddHandleParser: OddHandleParser;
   private wrappedStatistic: Statistic | undefined;
 
-  constructor({
-    parentOddHandle,
+  private constructor({
+    parentOddHandleParser,
   }: {
-    parentOddHandle: OddHandle,
+    parentOddHandleParser: OddHandleParser,
   }) {
-    this.parentOddHandle = parentOddHandle;
+    this.parentOddHandleParser = parentOddHandleParser;
   }
 
-  public async parse(): Promise<Statistic> {
-    const game = this.game;
+  public static async create({
+    parentOddHandleParser,
+  }: {
+    parentOddHandleParser: OddHandleParser,
+  }): Promise<StatisticLinker> {
+    const statisticLinker = new StatisticLinker({ parentOddHandleParser });
+    await statisticLinker.link();
+    return statisticLinker;
+  }
+
+  private async link(): Promise<Statistic> {
+    const game = this.parentOddHandleParser.game;
     const statisticName = await this.parseStatisticName();
 
     this.statistic = await DbUtilityFunctions.findOrCreateStatisticByGameAndStatisticName({
@@ -31,9 +39,10 @@ export class StatisticParser {
 
   private async parseStatisticName(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
+    const game = this.parentOddHandleParser.game;
 
-    const awayTeam = await prisma.team.findFirstOrThrow({ where: { id: this.game.awayTeamId } });
-    const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: this.game.homeTeamId } });
+    const awayTeam = await prisma.team.findFirstOrThrow({ where: { id: game.awayTeamId } });
+    const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: game.homeTeamId } });
 
     const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b[^\\w\\d]*([+-]?\\d+\\.\\d)+?.*`, "i");
     const totalPattern = new RegExp("^.*\\b(O|U|Over|Under)\\b[^\\w\\d]*(\\d+(\\.\\d+)?).*$", "i");
@@ -55,21 +64,14 @@ export class StatisticParser {
   }
 
   private async getAriaLabel(): Promise<string> {
-    const ariaLabel = await (await this.buttonElement.getProperty('ariaLabel')).jsonValue();
+    const buttonElement = this.parentOddHandleParser.buttonElement;
+    const ariaLabel = await (await buttonElement.getProperty('ariaLabel')).jsonValue();
 
     if (!ariaLabel) {
       throw new Error(`ariaLabel is null.`)
     }
 
     return ariaLabel;
-  }
-
-  private get buttonElement(): p.ElementHandle {
-    return this.parentOddHandle.buttonElement;
-  }
-
-  private get game(): Game {
-    return this.parentOddHandle.game;
   }
 
   private set statistic(statistic: Statistic) {

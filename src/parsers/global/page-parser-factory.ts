@@ -3,7 +3,7 @@ import {
   gamesPageType,
   mlb, nba
 } from '@/config/init-data';
-import { DraftKingsGamesPageParser, PageParser } from '@/parsers';
+import { DraftKingsMlbGamesPageParser, DraftKingsNbaGamesPageParser, PageParser } from '@/parsers';
 
 export class PageParserFactory {
   public static async create({
@@ -16,13 +16,13 @@ export class PageParserFactory {
       leagueInitData: mlb,
       pageTypeInitData: gamesPageType,
     })) {
-      return await DraftKingsGamesPageParser.create();
+      return await DraftKingsMlbGamesPageParser.create();
     } else if (pageParserInitData.matches({
       exchangeInitData: draftKings,
       leagueInitData: nba,
       pageTypeInitData: gamesPageType,
     })) {
-      return await DraftKingsGamesPageParser.create();
+      return await DraftKingsNbaGamesPageParser.create();
     }
 
     throw new Error(`Did not find matching Page Parser.`);

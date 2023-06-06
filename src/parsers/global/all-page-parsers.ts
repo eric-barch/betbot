@@ -8,18 +8,19 @@ class AllPageParsers {
     this.pageParsers = new Set<PageParser>;
   }
 
-  public async init(): Promise<Set<PageParser>> {
-    await this.initPageParsers();
-    return this.pageParsers;
-  }
-
-  private async initPageParsers(): Promise<Set<PageParser>> {
+  public async init(): Promise<AllPageParsers> {
     for (const pageParserInitData of config.pageParsersInitData) {
       const pageParser = await PageParserFactory.create({ pageParserInitData });
       this.pageParsers.add(pageParser);
     }
 
-    return this.pageParsers;
+    return this;
+  }
+
+  public async disconnect(): Promise<void> {
+    for (const pageParser of this.pageParsers) {
+      await pageParser.disconnect();
+    }
   }
 }
 

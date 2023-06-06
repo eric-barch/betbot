@@ -3,18 +3,28 @@ import { PageParser } from '@/parsers';
 import { Game } from '@prisma/client';
 
 export class JsonGamesParser {
-  private pageParser: PageParser;
+  private parentPageParser: PageParser;
   private jsonGames: Array<any>;
   private dbGames: Array<Game>;
 
-  constructor({
-    pageParser,
+  private constructor({
+    parentPageParser,
   }: {
-    pageParser: PageParser,
+    parentPageParser: PageParser,
   }) {
-    this.pageParser = pageParser;
+    this.parentPageParser = parentPageParser;
     this.jsonGames = new Array<any>;
     this.dbGames = new Array<Game>;
+  }
+
+  public static async create({
+    parentPageParser,
+  }: {
+    parentPageParser: PageParser,
+  }): Promise<JsonGamesParser> {
+    const jsonGamesParser = new JsonGamesParser({ parentPageParser });
+    await jsonGamesParser.ensureGamesInDb();
+    return jsonGamesParser;
   }
 
   public async ensureGamesInDb(): Promise<Array<Game>> {
@@ -24,7 +34,7 @@ export class JsonGamesParser {
   }
 
   private async scrapeJsonGames(): Promise<Array<any>> {
-    const gameScriptElements = await this.pageParser.page.$$(
+    const gameScriptElements = await this.parentPageParser.page.$$(
       'script[type="application/ld+json"]'
     );
 
@@ -59,12 +69,12 @@ export class JsonGamesParser {
   }): Promise<Game> {
     const awayTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
       unformattedName: jsonGame.awayTeam.name,
-      league: this.pageParser.league,
+      league: this.parentPageParser.league,
     });
 
     const homeTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
       unformattedName: jsonGame.homeTeam.name,
-      league: this.pageParser.league,
+      league: this.parentPageParser.league,
     });
 
     const startDate = new Date(jsonGame.startDate);
@@ -75,7 +85,7 @@ export class JsonGamesParser {
       startDate,
     });
 
-    const exchange = this.pageParser.exchange;
+    const exchange = this.parentPageParser.exchange;
     const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
 
     await DbUtilityFunctions.associateExchangeAndGameByExchangeAssignedGameId({
