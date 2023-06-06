@@ -1,21 +1,20 @@
 import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 
-import { GameWithoutExchangeAssignedIdParser } from './game-without-exchange-assigned-id-parser';
-import { OddHandle } from '../../odd-handle';
+import { OddHandleParser } from '../odd-handle-parser';
 
 export class StartDateParser {
-  private parentOddHandle: OddHandle;
+  private parentOddHandleParser: OddHandleParser;
   private wrappedDateString: string | undefined;
   private wrappedTimeString: string | undefined;
   private wrappedStartDate: Date | undefined;
 
   constructor({
-    parentOddHandle,
+    parentOddHandleParser,
   }: {
-    parentOddHandle: OddHandle,
+    parentOddHandleParser: OddHandleParser,
   }) {
-    this.parentOddHandle = parentOddHandle;
+    this.parentOddHandleParser = parentOddHandleParser;
   }
 
   public async parse(): Promise<Date> {
@@ -45,7 +44,7 @@ export class StartDateParser {
   }
 
   private async getDateTableElement(): Promise<p.ElementHandle> {
-    let ancestor = this.buttonElement;
+    let ancestor = this.parentOddHandleParser.buttonElement;
 
     const classNameToFind = 'parlay-card-10-a';
 
@@ -88,7 +87,7 @@ export class StartDateParser {
   }
 
   private async getTeamRowElement(): Promise<p.ElementHandle> {
-    let ancestor = this.buttonElement;
+    let ancestor = this.parentOddHandleParser.buttonElement;
 
     const nodeNameToFind = 'tr';
 
@@ -115,10 +114,6 @@ export class StartDateParser {
     const startDateString = `${this.dateString} ${this.timeString}`;
     this.startDate = c.parseDate(startDateString);
     return this.startDate;
-  }
-
-  private get buttonElement(): p.ElementHandle {
-    return this.parentOddHandle.buttonElement;
   }
 
   private set dateString(dateString: string) {

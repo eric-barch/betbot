@@ -14,6 +14,10 @@ export class WebpageConnection {
     await this.connectToPage();
   }
 
+  public async disconnect(): Promise<void> {
+    this.browser.disconnect();
+  }
+
   private async connectToBrowser(): Promise<p.Browser> {
     this.wrappedBrowser = await p.connect({
       browserURL: 'http://127.0.0.1:9222',
@@ -53,7 +57,7 @@ export class WebpageConnection {
     });
 
     this.wrappedPage = targetPage;
-    this.page.setViewport(windowSize);
+    await this.page.setViewport(windowSize);
 
     return this.page;
   }
@@ -70,7 +74,7 @@ export class WebpageConnection {
       };
     });
 
-    this.page.setViewport(windowSize);
+    await this.page.setViewport(windowSize);
 
     return this.page;
   }

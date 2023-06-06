@@ -1,25 +1,34 @@
-import * as p from 'puppeteer';
 
 import { DbUtilityFunctions } from '@/db';
-import { Exchange, Game } from '@prisma/client';
-import { OddHandle } from '../../odd-handle';
-import { GameWithoutExchangeAssignedIdParser } from './game-without-exchange-assigned-id-parser';
+import { Game } from '@prisma/client';
+import { OddHandleParser } from '../odd-handle-parser';
+import { GameDetailsParser } from './game-without-exchange-assigned-id-parser';
 
-export class GameParser {
-  private parentOddHandle: OddHandle;
+export class GameLinker {
+  private parentOddHandleParser: OddHandleParser;
   private wrappedExchangeAssignedGameId: string | undefined;
-  private gameWithoutExchangeAssignedIdParser: GameWithoutExchangeAssignedIdParser | undefined;
+  private wrappedGameDetailsParser: GameDetailsParser | undefined;
   private wrappedGame: Game | undefined;
 
-  constructor({
-    parentOddHandle,
+  private constructor({
+    parentOddHandleParser,
   }: {
-    parentOddHandle: OddHandle,
+    parentOddHandleParser: OddHandleParser,
   }) {
-    this.parentOddHandle = parentOddHandle;
+    this.parentOddHandleParser = parentOddHandleParser;
   }
 
-  public async parse(): Promise<Game> {
+  public static async create({
+    parentOddHandleParser,
+  }: {
+    parentOddHandleParser: OddHandleParser,
+  }): Promise<GameLinker> {
+    const gameLinker = new GameLinker({ parentOddHandleParser });
+    await gameLinker.link();
+    return gameLinker;
+  }
+
+  private async link(): Promise<Game> {
     await this.parseExchangeAssignedGameId();
 
     try {
@@ -32,14 +41,15 @@ export class GameParser {
   }
 
   private async parseExchangeAssignedGameId(): Promise<string> {
-    const dataTracking = await this.buttonElement.evaluate(el => el.getAttribute('data-tracking') || '');
+    const buttonElement = this.parentOddHandleParser.buttonElement;
+    const dataTracking = await buttonElement.evaluate(el => el.getAttribute('data-tracking') || '');
     const parsedDataTracking = JSON.parse(dataTracking);
     this.exchangeAssignedGameId = parsedDataTracking.eventId;
     return this.exchangeAssignedGameId;
   }
 
   private async findGameWithExchangeAssignedId(): Promise<Game> {
-    const exchange = this.exchange;
+    const exchange = this.parentOddHandleParser.exchange;
     const exchangeAssignedGameId = this.exchangeAssignedGameId;
 
     this.game = await DbUtilityFunctions.findGameByExchangeAndExchangeAssignedGameId({
@@ -51,17 +61,12 @@ export class GameParser {
   }
 
   private async findOrCreateGameWithoutExchangeAssignedId(): Promise<Game> {
-    this.gameWithoutExchangeAssignedIdParser = new GameWithoutExchangeAssignedIdParser({ parentOddHandle: this.parentOddHandle });
-    this.game = await this.gameWithoutExchangeAssignedIdParser.parse();
+    this.gameDetailsParser = await GameDetailsParser.create({
+      parentOddHandleParser: this.parentOddHandleParser,
+      exchangeAssignedGameId: this.exchangeAssignedGameId,
+    });
+    this.game = this.gameDetailsParser.game;
     return this.game;
-  }
-
-  private get buttonElement(): p.ElementHandle {
-    return this.parentOddHandle.buttonElement;
-  }
-
-  private get exchange(): Exchange {
-    return this.parentOddHandle.exchange;
   }
 
   private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
@@ -86,5 +91,17 @@ export class GameParser {
     }
 
     return this.wrappedGame;
+  }
+
+  private set gameDetailsParser(gameDetailsParser: GameDetailsParser) {
+    this.wrappedGameDetailsParser = gameDetailsParser;
+  }
+
+  private get gameDetailsParser(): GameDetailsParser {
+    if (!this.wrappedGameDetailsParser) {
+      throw new Error(`wrappedGameDetails is undefined.`);
+    }
+
+    return this.wrappedGameDetailsParser;
   }
 }
