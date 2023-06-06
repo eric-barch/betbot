@@ -2,57 +2,89 @@ import * as p from 'puppeteer';
 
 import { PageParser } from '@/parsers';
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
-import { OddDataElementParser } from './element-parser';
-import { GameLinker } from './game-parser';
-import { OddLinker } from './odd-parser';
-import { StatisticLinker } from './statistic-parser';
+import { PriceParser, ValueParser } from './data-parsers';
+import { DbGameLink, DbOddLink, DbStatisticLink } from './db-links';
+import { OddHandleSet } from '../../odd-handle-set';
 
 export class OddHandleParser {
   private parentPageParser: PageParser;
-  private wrappedButtonElement: p.ElementHandle;
-  private gameLinker: GameLinker | undefined;
-  private statisticLinker: StatisticLinker | undefined;
-  private wrappedOddLinker: OddLinker | undefined;
-  private priceParser: OddDataElementParser | undefined;
-  private valueParser: OddDataElementParser | undefined;
+  private parentOddHandleSet: OddHandleSet;
+  private wrappedButtonElement: p.ElementHandle | null;
+  private dbGameLink: DbGameLink | undefined;
+  private dbStatisticLink: DbStatisticLink | undefined;
+  private wrappedDbOddLink: DbOddLink | undefined;
+  private wrappedPriceParser: PriceParser | undefined;
+  private wrappedValueParser: ValueParser | undefined;
 
-  constructor({
+  public constructor({
     parentPageParser,
+    parentOddHandleSet,
     buttonElement,
   }: {
     parentPageParser: PageParser,
+    parentOddHandleSet: OddHandleSet,
     buttonElement: p.ElementHandle,
   }) {
     this.parentPageParser = parentPageParser;
+    this.parentOddHandleSet = parentOddHandleSet;
     this.wrappedButtonElement = buttonElement;
   }
 
-  public async init(): Promise<Odd> {
-    await this.initLinkers();
-    await this.initElementParsers();
+  public async init(): Promise<OddHandleParser> {
+    await this.initDbLinks();
+    await this.initDataParsers();
     await this.oddLinker.updateData();
-    return this.odd;
+    return this;
   }
 
-  private async initLinkers(): Promise<void> {
-    this.gameLinker = await GameLinker.create({ parentOddHandleParser: this });
-    this.statisticLinker = await StatisticLinker.create({ parentOddHandleParser: this });
-    this.oddLinker = await OddLinker.create({ parentOddHandleParser: this });
+  private async initDbLinks(): Promise<void> {
+    this.dbGameLink = await DbGameLink.create({ parentOddHandleParser: this });
+    this.dbStatisticLink = await DbStatisticLink.create({ parentOddHandleParser: this });
+    this.oddLinker = await DbOddLink.create({ parentOddHandleParser: this });
   }
 
-  private async initElementParsers(): Promise<void> {
-    const priceElement = await this.buttonElement.$('.sportsbook-outcome-cell__elements');
-    this.priceParser = await OddDataElementParser.create({ element: priceElement });
+  private async initDataParsers(): Promise<void> {
+    const foo = await PriceParser.create({ parentOddHandleParser: this });
+    this.priceParser = foo;
 
-    const valueElement = await this.buttonElement.$('.sportsbook-outcome-cell__label-line-container');
-    this.valueParser = await OddDataElementParser.create({ element: valueElement });
+    const bar = await ValueParser.create({ parentOddHandleParser: this });
+    this.valueParser = bar;
   }
 
-  public get buttonElement(): p.ElementHandle {
-    if (!this.wrappedButtonElement) {
-      throw new Error(`wrappedButtonElement is undefined.`);
+  public async update(): Promise<OddHandleParser> {
+    await this.updateButtonElement();
+    await this.updateDataParsers();
+    await this.oddLinker.updateData();
+    return this;
+  }
+
+  private async updateButtonElement(): Promise<p.ElementHandle | null> {
+    const buttonElements = this.parentOddHandleSet.buttonElements;
+
+    const ariaLabelRegExp = new RegExp('foo');
+    const exchangeAssignedGameId = this.exchangeAssignedGameId;
+
+    for (const buttonElement of buttonElements) {
+      const ariaLabel = await buttonElement.evaluate(el => el.getAttribute('aria-label') || '');
+      const dataTracking = await buttonElement.evaluate(el => JSON.parse(el.getAttribute('data-tracking') || ''));
+
+      const ariaLabelMatches = (ariaLabelRegExp.test(ariaLabel));
+      const idMatches = (dataTracking && dataTracking.eventId === exchangeAssignedGameId);
+
+      if (ariaLabelMatches && idMatches) {
+        return buttonElement;
+      }
     }
 
+    return null;
+  }
+
+  private async updateDataParsers(): Promise<void> {
+    await this.priceParser.update();
+    await this.valueParser.update();
+  }
+
+  public get buttonElement(): p.ElementHandle | null {
     return this.wrappedButtonElement;
   }
 
@@ -61,51 +93,23 @@ export class OddHandleParser {
   }
 
   public get exchangeAssignedGameId(): string {
-    if (!this.gameLinker) {
+    if (!this.dbGameLink) {
       throw new Error(`gameLinker is undefined.`);
     }
 
-    return this.gameLinker.exchangeAssignedGameId;
+    return this.dbGameLink.exchangeAssignedGameId;
   }
 
   public get game(): Game {
-    if (!this.gameLinker) {
+    if (!this.dbGameLink) {
       throw new Error(`gameLinker is undefined.`);
     }
 
-    return this.gameLinker.game;
+    return this.dbGameLink.game;
   }
 
   public get league(): League {
     return this.parentPageParser.league;
-  }
-
-  public get statistic(): Statistic {
-    if (!this.statisticLinker) {
-      throw new Error(`statisticLinker is undefined.`);
-    }
-
-    return this.statisticLinker.statistic;
-  }
-
-  public get odd(): Odd {
-    if (!this.oddLinker) {
-      throw new Error(`oddLinker is undefined.`);
-    }
-
-    return this.oddLinker.odd;
-  }
-
-  private set oddLinker(oddLinker: OddLinker) {
-    this.wrappedOddLinker = oddLinker;
-  }
-
-  private get oddLinker(): OddLinker {
-    if (!this.wrappedOddLinker) {
-      throw new Error(`wrappedOddLinker is undefined.`);
-    }
-
-    return this.wrappedOddLinker;
   }
 
   public get price(): number | null {
@@ -116,11 +120,63 @@ export class OddHandleParser {
     return this.priceParser.value
   }
 
+  private set priceParser(priceParser: PriceParser) {
+    this.wrappedPriceParser = priceParser;
+  }
+
+  private get priceParser(): PriceParser {
+    if (!this.wrappedPriceParser) {
+      throw new Error(`wrappedPriceParser is undefined.`);
+    }
+
+    return this.wrappedPriceParser;
+  }
+
+  public get statistic(): Statistic {
+    if (!this.dbStatisticLink) {
+      throw new Error(`statisticLinker is undefined.`);
+    }
+
+    return this.dbStatisticLink.statistic;
+  }
+
+  public get odd(): Odd {
+    if (!this.oddLinker) {
+      throw new Error(`oddLinker is undefined.`);
+    }
+
+    return this.oddLinker.odd;
+  }
+
+  private set oddLinker(oddLinker: DbOddLink) {
+    this.wrappedDbOddLink = oddLinker;
+  }
+
+  private get oddLinker(): DbOddLink {
+    if (!this.wrappedDbOddLink) {
+      throw new Error(`wrappedOddLinker is undefined.`);
+    }
+
+    return this.wrappedDbOddLink;
+  }
+
   public get value(): number | null {
     if (!this.valueParser) {
       throw new Error(`valueParser is undefined.`);
     }
 
     return this.valueParser.value;
+  }
+
+  private set valueParser(valueParser: ValueParser) {
+    this.wrappedValueParser = valueParser;
+  }
+
+  private get valueParser(): ValueParser {
+    if (!this.wrappedValueParser) {
+      throw new Error(`wrappedValueParser is undefined.`);
+    }
+
+    return this.wrappedValueParser;
   }
 }

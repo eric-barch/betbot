@@ -36,6 +36,7 @@ export class DbUtilityFunctions {
           awayTeam: { connect: { id: awayTeam.id } },
           homeTeam: { connect: { id: homeTeam.id } },
           startDate,
+          active: true,
         }
       })
     }
@@ -141,6 +142,7 @@ export class DbUtilityFunctions {
         data: {
           gameId: game.id,
           name: statisticName,
+          active: true,
         }
       })
     }

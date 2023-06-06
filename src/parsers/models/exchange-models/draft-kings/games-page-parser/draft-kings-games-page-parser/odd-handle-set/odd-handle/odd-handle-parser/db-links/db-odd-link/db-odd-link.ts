@@ -1,8 +1,8 @@
 import { DbUtilityFunctions, prisma } from '@/db';
 import { Odd } from '@prisma/client';
-import { OddHandleParser } from '../odd-handle-parser';
+import { OddHandleParser } from '../../odd-handle-parser';
 
-export class OddLinker {
+export class DbOddLink {
   private parentOddHandleParser: OddHandleParser;
   private wrappedOdd: Odd | undefined;
 
@@ -18,10 +18,10 @@ export class OddLinker {
     parentOddHandleParser,
   }: {
     parentOddHandleParser: OddHandleParser,
-  }): Promise<OddLinker> {
-    const oddLinker = new OddLinker({ parentOddHandleParser });
-    await oddLinker.link();
-    return oddLinker;
+  }): Promise<DbOddLink> {
+    const dbOddLink = new DbOddLink({ parentOddHandleParser });
+    await dbOddLink.link();
+    return dbOddLink;
   }
 
   private async link(): Promise<Odd> {
@@ -37,8 +37,8 @@ export class OddLinker {
   }
 
   public async updateData(): Promise<Odd> {
-    const price = this.parentOddHandleParser.price;
     const value = this.parentOddHandleParser.value;
+    const price = this.parentOddHandleParser.price;
 
     this.odd = await prisma.odd.update({
       where: {

@@ -1,13 +1,13 @@
 
 import { DbUtilityFunctions } from '@/db';
 import { Game } from '@prisma/client';
-import { OddHandleParser } from '../odd-handle-parser';
-import { GameDetailsParser } from './game-without-exchange-assigned-id-parser';
+import { OddHandleParser } from '../../odd-handle-parser';
+import { GameParser } from './game-parser';
 
-export class GameLinker {
+export class DbGameLink {
   private parentOddHandleParser: OddHandleParser;
   private wrappedExchangeAssignedGameId: string | undefined;
-  private wrappedGameDetailsParser: GameDetailsParser | undefined;
+  private wrappedGameParser: GameParser | undefined;
   private wrappedGame: Game | undefined;
 
   private constructor({
@@ -22,10 +22,10 @@ export class GameLinker {
     parentOddHandleParser,
   }: {
     parentOddHandleParser: OddHandleParser,
-  }): Promise<GameLinker> {
-    const gameLinker = new GameLinker({ parentOddHandleParser });
-    await gameLinker.link();
-    return gameLinker;
+  }): Promise<DbGameLink> {
+    const dbGameLink = new DbGameLink({ parentOddHandleParser });
+    await dbGameLink.link();
+    return dbGameLink;
   }
 
   private async link(): Promise<Game> {
@@ -42,9 +42,13 @@ export class GameLinker {
 
   private async parseExchangeAssignedGameId(): Promise<string> {
     const buttonElement = this.parentOddHandleParser.buttonElement;
-    const dataTracking = await buttonElement.evaluate(el => el.getAttribute('data-tracking') || '');
-    const parsedDataTracking = JSON.parse(dataTracking);
-    this.exchangeAssignedGameId = parsedDataTracking.eventId;
+
+    if (!buttonElement) {
+      throw new Error(`buttonElement is null.`);
+    }
+
+    const dataTracking = await buttonElement.evaluate(el => JSON.parse(el.getAttribute('data-tracking') || ''));
+    this.exchangeAssignedGameId = dataTracking.eventId;
     return this.exchangeAssignedGameId;
   }
 
@@ -61,11 +65,11 @@ export class GameLinker {
   }
 
   private async findOrCreateGameWithoutExchangeAssignedId(): Promise<Game> {
-    this.gameDetailsParser = await GameDetailsParser.create({
+    this.gameParser = await GameParser.create({
       parentOddHandleParser: this.parentOddHandleParser,
       exchangeAssignedGameId: this.exchangeAssignedGameId,
     });
-    this.game = this.gameDetailsParser.game;
+    this.game = this.gameParser.game;
     return this.game;
   }
 
@@ -93,15 +97,15 @@ export class GameLinker {
     return this.wrappedGame;
   }
 
-  private set gameDetailsParser(gameDetailsParser: GameDetailsParser) {
-    this.wrappedGameDetailsParser = gameDetailsParser;
+  private set gameParser(gameDetailsParser: GameParser) {
+    this.wrappedGameParser = gameDetailsParser;
   }
 
-  private get gameDetailsParser(): GameDetailsParser {
-    if (!this.wrappedGameDetailsParser) {
+  private get gameParser(): GameParser {
+    if (!this.wrappedGameParser) {
       throw new Error(`wrappedGameDetails is undefined.`);
     }
 
-    return this.wrappedGameDetailsParser;
+    return this.wrappedGameParser;
   }
 }

@@ -17,10 +17,20 @@ class AllPageParsers {
     return this;
   }
 
-  public async disconnect(): Promise<void> {
+  public async update(): Promise<AllPageParsers> {
+    for (const pageParser of this.pageParsers) {
+      await pageParser.update();
+    }
+
+    return this;
+  }
+
+  public async disconnect(): Promise<AllPageParsers> {
     for (const pageParser of this.pageParsers) {
       await pageParser.disconnect();
     }
+
+    return this;
   }
 }
 

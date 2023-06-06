@@ -1,31 +1,40 @@
 import * as p from 'puppeteer';
-
 import { OddHandleParser } from '../odd-handle-parser';
-import { Odd } from '@prisma/client';
 
-export class OddDataElementParser {
-  private element: p.ElementHandle | null;
+export abstract class DataParser {
+  private parentOddHandleParser: OddHandleParser;
+  protected abstract selector: string;
+  private element: p.ElementHandle | null | undefined;
   private wrappedValue: number | null | undefined;
 
-  private constructor({
-    element,
+  protected constructor({
+    parentOddHandleParser,
   }: {
-    element: p.ElementHandle | null,
+    parentOddHandleParser: OddHandleParser,
   }) {
-    this.element = element;
+    this.parentOddHandleParser = parentOddHandleParser;
   }
 
-  public static async create({
-    element,
-  }: {
-    element: p.ElementHandle | null,
-  }): Promise<OddDataElementParser> {
-    const elementParser = new OddDataElementParser({ element });
-    await elementParser.parse();
-    return elementParser;
+
+  public async update(): Promise<DataParser> {
+    await this.updateElement();
+    await this.updateValue();
+    return this;
   }
 
-  public async parse(): Promise<number | null> {
+  private async updateElement(): Promise<p.ElementHandle | null> {
+    const buttonElement = this.parentOddHandleParser.buttonElement;
+
+    if (!buttonElement) {
+      this.element = null;
+      return this.element;
+    }
+
+    this.element = await buttonElement.$(`${this.selector}`);
+    return this.element;
+  }
+
+  public async updateValue(): Promise<number | null> {
     if (!this.element) {
       this.value = null;
       return this.value;

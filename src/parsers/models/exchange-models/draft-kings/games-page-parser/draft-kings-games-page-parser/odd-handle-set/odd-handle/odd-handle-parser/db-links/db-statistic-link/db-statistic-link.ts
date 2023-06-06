@@ -1,9 +1,9 @@
 
 import { DbUtilityFunctions, prisma } from '@/db';
 import { Statistic } from '@prisma/client';
-import { OddHandleParser } from '../odd-handle-parser';
+import { OddHandleParser } from '../../odd-handle-parser';
 
-export class StatisticLinker {
+export class DbStatisticLink {
   private parentOddHandleParser: OddHandleParser;
   private wrappedStatistic: Statistic | undefined;
 
@@ -19,10 +19,10 @@ export class StatisticLinker {
     parentOddHandleParser,
   }: {
     parentOddHandleParser: OddHandleParser,
-  }): Promise<StatisticLinker> {
-    const statisticLinker = new StatisticLinker({ parentOddHandleParser });
-    await statisticLinker.link();
-    return statisticLinker;
+  }): Promise<DbStatisticLink> {
+    const dbStatisticLink = new DbStatisticLink({ parentOddHandleParser });
+    await dbStatisticLink.link();
+    return dbStatisticLink;
   }
 
   private async link(): Promise<Statistic> {
@@ -65,6 +65,11 @@ export class StatisticLinker {
 
   private async getAriaLabel(): Promise<string> {
     const buttonElement = this.parentOddHandleParser.buttonElement;
+
+    if (!buttonElement) {
+      throw new Error(`buttonElement is null.`);
+    }
+
     const ariaLabel = await (await buttonElement.getProperty('ariaLabel')).jsonValue();
 
     if (!ariaLabel) {

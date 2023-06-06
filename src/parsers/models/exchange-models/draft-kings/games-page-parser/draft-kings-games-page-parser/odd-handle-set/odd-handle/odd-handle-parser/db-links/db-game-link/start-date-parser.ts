@@ -1,7 +1,7 @@
 import * as c from 'chrono-node';
 import * as p from 'puppeteer';
 
-import { OddHandleParser } from '../odd-handle-parser';
+import { OddHandleParser } from '../../odd-handle-parser';
 
 export class StartDateParser {
   private parentOddHandleParser: OddHandleParser;
