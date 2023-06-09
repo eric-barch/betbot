@@ -1,6 +1,6 @@
 import { TeamInitData } from '.';
 
-export const nbaTeams: Array<TeamInitData> = [
+export const nbaTeamsInitData: Array<TeamInitData> = [
   new TeamInitData({
     regionFull: 'Atlanta',
     regionAbbr: 'ATL',

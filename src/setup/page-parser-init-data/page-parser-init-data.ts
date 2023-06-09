@@ -1,7 +1,11 @@
 
+import { prisma } from '@/db';
 import { Exchange, League, Team } from '@prisma/client';
-import { DbUtilityFunctions, prisma } from '@/db';
-import { ExchangeInitData, LeagueInitData, PageTypeInitData, draftKings, fanDuel, sugarHouse, mlb, nba, nfl, gamesPageType, TeamsInitDataFactory } from '.';
+import {
+  ExchangeInitData, LeagueInitData, PageTypeInitData, TeamsInitDataFactory, draftKingsInitData,
+  fanDuelInitData, gamesPageTypeInitData, mlbInitData, nbaInitData, nflInitData, sugarHouseInitData,
+} from './init-data';
+
 
 export class PageParserInitData {
   private wrappedUrl: string;
@@ -10,103 +14,109 @@ export class PageParserInitData {
   private wrappedPageTypeInitData: PageTypeInitData;
   private wrappedExchange: Exchange | undefined;
   private wrappedLeague: League | undefined;
-  private teams: Array<Team>;
 
-  constructor({
+  private constructor({
     pageUrl,
   }: {
     pageUrl: string,
   }) {
     this.wrappedUrl = pageUrl;
-    this.wrappedExchangeInitData = this.updateExchangeInitData();
-    this.wrappedLeagueInitData = this.updateLeagueInitData();
-    this.wrappedPageTypeInitData = this.updatePageTypeInitData();
-    this.teams = new Array<Team>();
+    this.wrappedExchangeInitData = this.parseExchangeInitData();
+    this.wrappedLeagueInitData = this.parseLeagueInitData();
+    this.wrappedPageTypeInitData = this.parsePageTypeInitData();
   }
 
-  private updateExchangeInitData(): ExchangeInitData {
-    if (this.wrappedUrl.includes('draftkings.com')) {
-      this.wrappedExchangeInitData = draftKings;
-    } else if (this.wrappedUrl.includes('fanduel.com')) {
-      this.wrappedExchangeInitData = fanDuel;
-    } else if (this.wrappedUrl.includes('playsugarhouse.com')) {
-      this.wrappedExchangeInitData = sugarHouse;
-    }
-
-    if (!this.wrappedExchangeInitData) {
-      throw new Error(`Did not find matching exchange init data.`);
-    }
-
-    return this.wrappedExchangeInitData;
+  public static async create({
+    pageUrl,
+  }: {
+    pageUrl: string,
+  }) {
+    const pageParserInitData = new PageParserInitData({ pageUrl });
+    await pageParserInitData.ensureObjectsInDb();
+    return pageParserInitData;
   }
 
-  private updateLeagueInitData(): LeagueInitData {
-    switch (this.wrappedExchangeInitData) {
-      case draftKings:
-        if (this.wrappedUrl.includes('mlb')) {
-          this.wrappedLeagueInitData = mlb;
-        } else if (this.wrappedUrl.includes('nba')) {
-          this.wrappedLeagueInitData = nba;
-        } else if (this.wrappedUrl.includes('nfl')) {
-          this.wrappedLeagueInitData = nfl;
-        }
-        break;
-      case fanDuel:
-        if (this.wrappedUrl.includes('mlb')) {
-          this.wrappedLeagueInitData = mlb;
-        } else if (this.wrappedUrl.includes('nba')) {
-          this.wrappedLeagueInitData = nba;
-        } else if (this.wrappedUrl.includes('nfl')) {
-          this.wrappedLeagueInitData = nfl;
-        }
-        break;
-      case sugarHouse:
-        if (this.wrappedUrl.includes('1000093616')) {
-          this.wrappedLeagueInitData = mlb;
-        } else if (this.wrappedUrl.includes('1000093652')) {
-          this.wrappedLeagueInitData = nba;
-        } else if (this.wrappedUrl.includes('1000093656')) {
-          this.wrappedLeagueInitData = nfl;
-        }
-        break;
+  private parseExchangeInitData(): ExchangeInitData {
+    if (this.url.includes('draftkings.com')) {
+      this.exchangeInitData = draftKingsInitData;
+    } else if (this.url.includes('fanduel.com')) {
+      this.exchangeInitData = fanDuelInitData;
+    } else if (this.url.includes('playsugarhouse.com')) {
+      this.exchangeInitData = sugarHouseInitData;
+    } else {
+      throw new Error(`Did not find matching exchangeInitData.`);
     }
 
-    if (!this.wrappedLeagueInitData) {
-      throw new Error(`Did not find matching league init data.`);
-    }
-
-    return this.wrappedLeagueInitData;
+    return this.exchangeInitData;
   }
 
-  private updatePageTypeInitData(): PageTypeInitData {
-    switch (this.wrappedExchangeInitData) {
-      case draftKings:
-        this.wrappedPageTypeInitData = gamesPageType;
+  private parseLeagueInitData(): LeagueInitData {
+    switch (this.exchangeInitData) {
+      case draftKingsInitData:
+        if (this.url.includes('mlb')) {
+          this.leagueInitData = mlbInitData;
+        } else if (this.url.includes('nba')) {
+          this.leagueInitData = nbaInitData;
+        } else if (this.url.includes('nfl')) {
+          this.leagueInitData = nflInitData;
+        }
         break;
-      case fanDuel:
-        this.wrappedPageTypeInitData = gamesPageType;
+      case fanDuelInitData:
+        if (this.url.includes('mlb')) {
+          this.leagueInitData = mlbInitData;
+        } else if (this.url.includes('nba')) {
+          this.leagueInitData = nbaInitData;
+        } else if (this.url.includes('nfl')) {
+          this.leagueInitData = nflInitData;
+        }
         break;
-        break;
-      case sugarHouse:
-        this.wrappedPageTypeInitData = gamesPageType;
+      case sugarHouseInitData:
+        if (this.url.includes('1000093616')) {
+          this.leagueInitData = mlbInitData;
+        } else if (this.url.includes('1000093652')) {
+          this.leagueInitData = nbaInitData;
+        } else if (this.url.includes('1000093656')) {
+          this.leagueInitData = nflInitData;
+        }
         break;
     }
 
-    if (!this.wrappedPageTypeInitData) {
-      throw new Error(`Did not find matching page type init data.`);
+    if (!this.leagueInitData) {
+      throw new Error(`Did not find matching leagueInitData.`);
+    }
+
+    return this.leagueInitData;
+  }
+
+  private parsePageTypeInitData(): PageTypeInitData {
+    switch (this.exchangeInitData) {
+      case draftKingsInitData:
+        this.pageTypeInitData = gamesPageTypeInitData;
+        break;
+      case fanDuelInitData:
+        this.pageTypeInitData = gamesPageTypeInitData;
+        break;
+        break;
+      case sugarHouseInitData:
+        this.pageTypeInitData = gamesPageTypeInitData;
+        break;
+    }
+
+    if (!this.pageTypeInitData) {
+      throw new Error(`Did not find matching pageTypeInitData.`);
     }
 
     return this.wrappedPageTypeInitData;
   }
 
-  public async init(): Promise<PageParserInitData> {
-    await this.initExchange();
-    await this.initLeague();
-    await this.initTeams();
+  private async ensureObjectsInDb(): Promise<PageParserInitData> {
+    await this.ensureExchangeInDb();
+    await this.ensureLeagueInDb();
+    await this.ensureTeamsInDb();
     return this;
   }
 
-  private async initExchange(): Promise<Exchange> {
+  private async ensureExchangeInDb(): Promise<Exchange> {
     this.exchange = await prisma.exchange.upsert({
       where: {
         name: this.wrappedExchangeInitData.name,
@@ -120,7 +130,7 @@ export class PageParserInitData {
     return this.exchange;
   }
 
-  private async initLeague(): Promise<League> {
+  private async ensureLeagueInDb(): Promise<League> {
     this.league = await prisma.league.upsert({
       where: {
         name: this.wrappedLeagueInitData.name,
@@ -137,8 +147,10 @@ export class PageParserInitData {
     return this.league;
   }
 
-  private async initTeams(): Promise<Array<Team>> {
+  private async ensureTeamsInDb(): Promise<Array<Team>> {
     const teamsInitData = TeamsInitDataFactory.getLeagueTeams({ league: this.league });
+
+    const teams = new Array<Team>();
 
     for (const teamInitData of teamsInitData) {
       const team = await prisma.team.upsert({
@@ -161,11 +173,9 @@ export class PageParserInitData {
           identifierFull: teamInitData.identifierFull,
         },
       });
-
-      this.teams.push(team);
     }
 
-    return this.teams;
+    return teams;
   }
 
   public matches({
@@ -192,12 +202,24 @@ export class PageParserInitData {
     return this.wrappedUrl;
   }
 
+  private set exchangeInitData(exchangeInitData: ExchangeInitData) {
+    this.wrappedExchangeInitData = exchangeInitData;
+  }
+
   public get exchangeInitData(): ExchangeInitData {
     return this.wrappedExchangeInitData;
   }
 
+  private set leagueInitData(leagueInitData: LeagueInitData) {
+    this.wrappedLeagueInitData = leagueInitData;
+  }
+
   public get leagueInitData(): LeagueInitData {
     return this.wrappedLeagueInitData;
+  }
+
+  private set pageTypeInitData(pageTypeInitData: PageTypeInitData) {
+    this.wrappedPageTypeInitData = pageTypeInitData;
   }
 
   public get pageTypeInitData(): PageTypeInitData {
