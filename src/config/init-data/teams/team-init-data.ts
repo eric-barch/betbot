@@ -29,11 +29,11 @@ export class TeamInitData {
     return this.wrappedRegionAbbr;
   }
 
-  public get identiferFull(): string {
+  public get identifierFull(): string {
     return this.wrappedIdentifierFull;
   }
 
-  public get idenfierAbbr(): string {
+  public get identifierAbbr(): string {
     return this.wrappedIdentifierAbbr;
   }
 }

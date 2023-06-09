@@ -14,7 +14,7 @@ model Exchange {
   id        Int              @id @default(autoincrement())
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
-  name      String           @db.VarChar(255)
+  name      String           @unique @db.VarChar(255)
   leagues   League[]
   games     ExchangeToGame[]
   odds      Odd[]
@@ -24,7 +24,7 @@ model League {
   id           Int        @id @default(autoincrement())
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  name         String     @db.VarChar(255)
+  name         String     @unique @db.VarChar(255)
   abbreviation String     @db.VarChar(255)
   teams        Team[]
   exchanges    Exchange[]
@@ -42,6 +42,8 @@ model Team {
   leagueId       Int
   awayGames      Game[]   @relation("AwayTeamOnGame")
   homeGames      Game[]   @relation("HomeTeamOnGame")
+
+  @@unique([leagueId, identifierFull])
 }
 
 model Game {
@@ -67,6 +69,8 @@ model Statistic {
   gameId    Int
   active    Boolean
   odd       Odd[]
+
+  @@unique([name, gameId])
 }
 
 model Odd {
@@ -91,4 +95,5 @@ model ExchangeToGame {
   exchangeAssignedGameId String   @db.VarChar(255)
 
   @@id([exchangeId, gameId])
+  @@unique([exchangeId, exchangeAssignedGameId])
 }

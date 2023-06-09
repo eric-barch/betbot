@@ -1,2 +1,2 @@
 export * from './prisma-client';
-export * from './utility-functions'
+export * from './db-utility-functions'

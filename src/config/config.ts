@@ -1,3 +1,4 @@
+import { Page } from 'puppeteer';
 import {
   ExchangeInitData, LeagueInitData, PageParserInitData, PageTypeInitData
 } from './init-data';
@@ -19,7 +20,15 @@ class Config {
   private updatePageParsersInitData(): Set<PageParserInitData> {
     for (const pageUrl of this.pageUrls) {
       const pageParserInitData = new PageParserInitData({ pageUrl });
-      this.wrappedPageParsersInitData.add(pageParserInitData);
+      this.pageParsersInitData.add(pageParserInitData);
+    }
+
+    return this.wrappedPageParsersInitData;
+  }
+
+  public async init(): Promise<Set<PageParserInitData>> {
+    for (const pageParserInitData of this.pageParsersInitData) {
+      await pageParserInitData.init();
     }
 
     return this.wrappedPageParsersInitData;
@@ -45,6 +54,10 @@ class Config {
     }
 
     throw new Error(`Did not find matching PageParserInitData.`);
+  }
+
+  private set pageParsersInitData(pageParsersInitData: Set<PageParserInitData>) {
+    this.wrappedPageParsersInitData = pageParsersInitData;
   }
 
   public get pageParsersInitData(): Set<PageParserInitData> {

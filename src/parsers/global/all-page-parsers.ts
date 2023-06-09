@@ -19,7 +19,7 @@ class AllPageParsers {
 
   public async update(): Promise<AllPageParsers> {
     for (const pageParser of this.pageParsers) {
-      await pageParser.update();
+      console.log('Implement AllPageParsers.update()');
     }
 
     return this;
