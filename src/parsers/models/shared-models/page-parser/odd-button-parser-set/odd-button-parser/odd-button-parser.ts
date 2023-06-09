@@ -31,6 +31,7 @@ export abstract class OddButtonParser {
     this.dbOddConnection = await this.initDbOddConnection();
     this.priceParser = await this.initPriceParser();
     this.valueParser = await this.initValueParser();
+    await this.dbOddConnection.updateData();
     return this;
   }
 

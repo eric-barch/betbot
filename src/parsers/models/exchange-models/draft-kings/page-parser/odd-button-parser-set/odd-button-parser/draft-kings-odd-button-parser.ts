@@ -42,16 +42,18 @@ export class DraftKingsOddButtonParser extends OddButtonParser {
   protected async initPriceParser(): Promise<DataParser> {
     this.priceParser = await DataParser.create({
       parentOddButtonParser: this,
-      selector: '.sportsbook-outcome-cell__label-line-container',
+      selector: '.sportsbook-outcome-cell__elements',
     });
+
     return this.priceParser;
   }
 
   protected async initValueParser(): Promise<DataParser> {
     this.valueParser = await DataParser.create({
       parentOddButtonParser: this,
-      selector: '.sportsbook-outcome-cell__elements',
+      selector: '.sportsbook-outcome-cell__label-line-container',
     });
+
     return this.valueParser;
   }
 }

@@ -1,6 +1,6 @@
 import * as p from 'puppeteer';
 
-import { PageParserInitData } from '@/config';
+import { PageParserInitData } from '@/setup';
 import { Exchange, League } from '@prisma/client';
 import { DbExchangeConnection, DbLeagueConnection } from './db-connections';
 import { OddButtonParserSet } from './odd-button-parser-set';

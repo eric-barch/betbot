@@ -1,5 +1,5 @@
 import { League } from '@prisma/client';
-import { TeamInitData, mlbTeams, nbaTeams, nflTeams } from '@/config/init-data';
+import { TeamInitData, mlbTeamsInitData, nbaTeamsInitData, nflTeamsInitData } from '@/setup/page-parser-init-data';
 
 export class TeamsInitDataFactory {
   public static getLeagueTeams({
@@ -9,11 +9,11 @@ export class TeamsInitDataFactory {
   }): Array<TeamInitData> {
     switch (league.name) {
       case 'Major League Baseball':
-        return mlbTeams;
+        return mlbTeamsInitData;
       case 'National Basketball Association':
-        return nbaTeams;
+        return nbaTeamsInitData;
       case 'National Football League':
-        return nflTeams;
+        return nflTeamsInitData;
       default:
         throw new Error(`Did not find matching league teams.`);
     }
