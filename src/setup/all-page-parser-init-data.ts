@@ -1,40 +1,29 @@
-import { Page } from 'puppeteer';
 import {
   ExchangeInitData, LeagueInitData, PageParserInitData, PageTypeInitData
-} from './init-data';
+} from './page-parser-init-data';
 
-class Config {
+class AllPageParserInitData extends Set<PageParserInitData> {
   private pageUrls: Array<string>;
-  private wrappedPageParsersInitData: Set<PageParserInitData>;
 
   constructor({
     pageUrls,
   }: {
     pageUrls: Array<string>,
   }) {
+    super();
     this.pageUrls = pageUrls;
-    this.wrappedPageParsersInitData = new Set<PageParserInitData>;
-    this.updatePageParsersInitData();
-  }
-
-  private updatePageParsersInitData(): Set<PageParserInitData> {
-    for (const pageUrl of this.pageUrls) {
-      const pageParserInitData = new PageParserInitData({ pageUrl });
-      this.pageParsersInitData.add(pageParserInitData);
-    }
-
-    return this.wrappedPageParsersInitData;
   }
 
   public async init(): Promise<Set<PageParserInitData>> {
-    for (const pageParserInitData of this.pageParsersInitData) {
-      await pageParserInitData.init();
+    for (const pageUrl of this.pageUrls) {
+      const pageParserInitData = await PageParserInitData.create({ pageUrl });
+      this.add(pageParserInitData);
     }
 
-    return this.wrappedPageParsersInitData;
+    return this;
   }
 
-  public findPageParserInitData({
+  public find({
     exchangeInitData,
     leagueInitData,
     pageTypeInitData,
@@ -43,7 +32,7 @@ class Config {
     leagueInitData: LeagueInitData,
     pageTypeInitData: PageTypeInitData,
   }): PageParserInitData {
-    for (const pageParserInitData of this.wrappedPageParsersInitData) {
+    for (const pageParserInitData of this) {
       if (pageParserInitData.matches({
         exchangeInitData,
         leagueInitData,
@@ -55,17 +44,9 @@ class Config {
 
     throw new Error(`Did not find matching PageParserInitData.`);
   }
-
-  private set pageParsersInitData(pageParsersInitData: Set<PageParserInitData>) {
-    this.wrappedPageParsersInitData = pageParsersInitData;
-  }
-
-  public get pageParsersInitData(): Set<PageParserInitData> {
-    return this.wrappedPageParsersInitData;
-  }
 }
 
-export const config = new Config({
+export const allPageParserInitData = new AllPageParserInitData({
   pageUrls: [
     'https://sportsbook.draftkings.com/leagues/baseball/mlb',
     'https://sportsbook.draftkings.com/leagues/basketball/nba',

@@ -1,4 +1,4 @@
-import { PageParserInitData } from '@/config';
+import { PageParserInitData } from '@/setup';
 import { PageParser, DraftKingsPageParser } from '@/parsers';
 
 export class PageParserFactory {

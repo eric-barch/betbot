@@ -1,6 +1,6 @@
 import { TeamInitData } from '.';
 
-export const nflTeams = [
+export const nflTeamsInitData = [
   new TeamInitData({
     regionFull: 'Arizona',
     regionAbbr: 'ARI',
