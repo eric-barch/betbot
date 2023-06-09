@@ -31,7 +31,7 @@ export class DraftKingsDbGameConnection extends DbGameConnection {
   }
 
   private async parseExchangeAssignedGameId(): Promise<string> {
-    const buttonElement = this.parentOddButtonParser.buttonElement;
+    const buttonElement = this.parentOddButtonParser.button;
 
     if (!buttonElement) {
       throw new Error(`buttonElement is null.`);

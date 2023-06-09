@@ -21,10 +21,13 @@ export abstract class DbOddConnection {
 
   protected abstract updateDbOdd(): Promise<Odd>;
 
-  public async updateData(): Promise<Odd> {
-    const price = this.parentOddButtonParser.price;
-    const value = this.parentOddButtonParser.value;
-
+  public async updateData({
+    price,
+    value,
+  }: {
+    price: number | null,
+    value: number | null,
+  }): Promise<Odd> {
     this.odd = await prisma.odd.update({
       where: {
         id: this.odd.id,

@@ -25,21 +25,4 @@ export class DraftKingsDbOddConnection extends DbOddConnection {
 
     return this.odd;
   }
-
-  public async updateData(): Promise<Odd> {
-    const value = this.parentOddButtonParser.value;
-    const price = this.parentOddButtonParser.price;
-
-    this.odd = await prisma.odd.update({
-      where: {
-        id: this.odd.id,
-      },
-      data: {
-        price,
-        value,
-      }
-    });
-
-    return this.odd;
-  }
 }

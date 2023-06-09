@@ -62,7 +62,7 @@ export class DraftKingsMatchupParser {
   }
 
   private async updateTeamRowElement(): Promise<p.ElementHandle> {
-    let ancestor = this.parentOddButtonParser.buttonElement;
+    let ancestor = this.parentOddButtonParser.button;
 
     const nodeNameToFind = 'tr';
 

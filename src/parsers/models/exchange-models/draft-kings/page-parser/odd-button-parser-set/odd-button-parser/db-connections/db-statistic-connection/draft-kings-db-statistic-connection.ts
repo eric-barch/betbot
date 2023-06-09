@@ -54,7 +54,7 @@ export class DraftKingsDbStatisticConnection extends DbStatisticConnection {
   }
 
   private async getAriaLabel(): Promise<string> {
-    const buttonElement = this.parentOddButtonParser.buttonElement;
+    const buttonElement = this.parentOddButtonParser.button;
 
     if (!buttonElement) {
       throw new Error(`buttonElement is null.`);
