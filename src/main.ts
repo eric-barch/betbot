@@ -5,12 +5,8 @@ async function main() {
   await allPageParsers.init();
 
   while (true) {
-    const start = Date.now();
     await allPageParsers.updateOddData();
-    const end = Date.now();
-
-    console.log(`Updated in ${end - start}ms`);
-    await delay(500);
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 }
 
@@ -25,7 +21,3 @@ main()
     await allPageParsers.disconnect();
     process.exit(1);
   });
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

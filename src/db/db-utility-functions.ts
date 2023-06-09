@@ -85,12 +85,10 @@ export class DbUtilityFunctions {
           gameId: game.id,
         }
       },
-      update: {
-        exchangeAssignedGameId,
-      },
+      update: {},
       create: {
-        exchange: { connect: { id: exchange.id } },
-        game: { connect: { id: game.id } },
+        exchangeId: exchange.id,
+        gameId: game.id,
         exchangeAssignedGameId,
       },
     });
@@ -141,7 +139,6 @@ export class DbUtilityFunctions {
       create: {
         name: statisticName,
         gameId: game.id,
-        active: true,
       },
     });
 

@@ -67,7 +67,6 @@ model Statistic {
   name      String   @db.VarChar(255)
   game      Game     @relation(fields: [gameId], references: [id])
   gameId    Int
-  active    Boolean
   odd       Odd[]
 
   @@unique([name, gameId])

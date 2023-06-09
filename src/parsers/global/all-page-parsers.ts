@@ -14,10 +14,13 @@ class AllPageParsers extends Set<PageParser> {
   }
 
   public async updateOddData(): Promise<AllPageParsers> {
+    const start = Date.now();
     for (const pageParser of this) {
       await pageParser.updateOddData();
     }
+    const end = Date.now();
 
+    console.log(`Updated in ${end - start}ms`);
     return this;
   }
 
