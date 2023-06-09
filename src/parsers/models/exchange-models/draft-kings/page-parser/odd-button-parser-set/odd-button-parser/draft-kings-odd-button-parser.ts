@@ -12,7 +12,7 @@ import {
   OddButtonParser,
 } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
 import {
-  DraftKingsDbGameConnection,
+  DraftKingsDbGame,
   DraftKingsDbOddConnection,
   DraftKingsDbStatisticConnection,
 } from './db-connections';
@@ -40,7 +40,7 @@ export class DraftKingsOddButtonParser extends OddButtonParser {
   }
 
   protected async initDbGame(): Promise<DbGameConnection> {
-    this.dbGame = await DraftKingsDbGameConnection.create({ parentOddButtonParser: this });
+    this.dbGame = await DraftKingsDbGame.create({ parentOddButtonParser: this });
     return this.dbGame;
   }
 

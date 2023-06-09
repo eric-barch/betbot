@@ -99,12 +99,12 @@ export class DraftKingsMatchupParser {
 
     const league = this.parentOddButtonParser.league;
 
-    this.awayTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
+    this.awayTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
       league,
       unformattedName: teamNameMatches[1],
     });
 
-    this.homeTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
+    this.homeTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
       league,
       unformattedName: teamNameMatches[2],
     })

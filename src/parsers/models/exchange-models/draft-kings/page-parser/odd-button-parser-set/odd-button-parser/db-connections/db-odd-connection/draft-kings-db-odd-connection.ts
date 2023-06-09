@@ -15,12 +15,21 @@ export class DraftKingsDbOddConnection extends DbOddConnection {
   }
 
   protected async updateDbOdd(): Promise<Odd> {
-    const exchange = this.parentOddButtonParser.exchange;
-    const statistic = this.parentOddButtonParser.statistic;
+    const exchangeId = this.parentOddButtonParser.exchange.id;
+    const statisticId = this.parentOddButtonParser.statistic.id;
 
-    this.odd = await DbUtilityFunctions.findOrCreateOddByExchangeAndStatistic({
-      exchange,
-      statistic,
+    this.odd = await prisma.odd.upsert({
+      where: {
+        exchangeId_statisticId: {
+          exchangeId,
+          statisticId,
+        },
+      },
+      update: {},
+      create: {
+        exchangeId,
+        statisticId,
+      },
     });
 
     return this.odd;

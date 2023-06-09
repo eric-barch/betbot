@@ -1,4 +1,4 @@
-import { DbUtilityFunctions } from '@/db';
+import { prisma } from '@/db';
 import { ExchangeInitData } from '@/setup';
 import { Exchange } from '@prisma/client';
 
@@ -25,7 +25,12 @@ export class DbExchange {
   }
 
   private async connect(): Promise<DbExchange> {
-    this.exchange = await DbUtilityFunctions.findExchangeByName({ name: this.initData.name });
+    this.exchange = await prisma.exchange.findUniqueOrThrow({
+      where: {
+        name: this.initData.name,
+      },
+    });
+
     return this;
   }
 

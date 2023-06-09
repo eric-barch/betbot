@@ -16,12 +16,21 @@ export class DraftKingsDbStatisticConnection extends DbStatisticConnection {
   }
 
   protected async updateDbStatistic(): Promise<Statistic> {
-    const game = this.parentOddButtonParser.game;
-    const statisticName = await this.parseStatisticName();
+    const name = await this.parseStatisticName();
+    const gameId = this.parentOddButtonParser.game.id;
 
-    this.statistic = await DbUtilityFunctions.findOrCreateStatisticByGameAndStatisticName({
-      game,
-      statisticName,
+    this.statistic = await prisma.statistic.upsert({
+      where: {
+        name_gameId: {
+          name,
+          gameId,
+        },
+      },
+      update: {},
+      create: {
+        name,
+        gameId,
+      },
     });
 
     return this.statistic;

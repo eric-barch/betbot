@@ -1,4 +1,4 @@
-import { DbUtilityFunctions } from '@/db';
+import { DbUtilityFunctions, prisma } from '@/db';
 import { LeagueInitData } from '@/setup';
 import { League } from '@prisma/client';
 
@@ -25,7 +25,12 @@ export class DbLeague {
   }
 
   private async connect(): Promise<DbLeague> {
-    this.league = await DbUtilityFunctions.findLeagueByName({ name: this.initData.name });
+    this.league = await prisma.league.findUniqueOrThrow({
+      where: {
+        name: this.initData.name,
+      },
+    });
+
     return this;
   }
 
