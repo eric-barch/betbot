@@ -26,6 +26,7 @@ export class OddButton {
   }): Promise<OddButton> {
     this.referenceSelector = referenceSelector;
     await this.initReference();
+    console.log('Reference initialized.');
     return this;
   }
 

@@ -4,7 +4,7 @@ import { PageParser } from '@/parsers';
 import { DbGameConnection as DbGame, DbStatisticConnection as DbStatistic, DbOddConnection as DbOdd } from './db-connections';
 import { DataParser } from './data-parser';
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
-import { OddButton as OddButton } from './button-reference';
+import { OddButton as OddButton } from './odd-button';
 
 export abstract class OddButtonParser {
   private parentPageParser: PageParser;
