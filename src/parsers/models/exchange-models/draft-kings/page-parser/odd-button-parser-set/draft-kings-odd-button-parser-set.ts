@@ -1,9 +1,9 @@
 import * as p from 'puppeteer';
 
 import { DraftKingsOddButtonParser, DraftKingsPageParser, OddButtonParser } from '@/parsers';
-import { OddButtonParserSet } from '@/parsers/models/shared-models/page-parser/odd-button-parser-set/odd-button-parser-set';
+import { OddButtonParsers } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parsers';
 
-export class DraftKingsOddButtonParserSet extends OddButtonParserSet {
+export class DraftKingsOddButtonParserSet extends OddButtonParsers {
   public static async create({
     parentPageParser,
   }: {

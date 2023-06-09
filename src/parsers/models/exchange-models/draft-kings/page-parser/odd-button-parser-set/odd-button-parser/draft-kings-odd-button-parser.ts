@@ -10,7 +10,7 @@ import {
 } from '@/parsers';
 import {
   OddButtonParser,
-} from '@/parsers/models/shared-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
+} from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
 import {
   DraftKingsDbGameConnection,
   DraftKingsDbOddConnection,

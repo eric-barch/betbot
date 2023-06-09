@@ -2,7 +2,7 @@
 import { DbUtilityFunctions, prisma } from '@/db';
 import { Statistic } from '@prisma/client';
 import { OddButtonParser } from '@/parsers';
-import { DbStatisticConnection } from '@/parsers/models/shared-models/page-parser/odd-button-parser-set/odd-button-parser/db-connections/db-statistic-connection';
+import { DbStatisticConnection } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-statistic-connection';
 
 export class DraftKingsDbStatisticConnection extends DbStatisticConnection {
   public static async create({
@@ -34,7 +34,7 @@ export class DraftKingsDbStatisticConnection extends DbStatisticConnection {
     const awayTeam = await prisma.team.findFirstOrThrow({ where: { id: game.awayTeamId } });
     const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: game.homeTeamId } });
 
-    const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b[^\\w\\d]*([+-]?\\d+\\.\\d)+?.*`, "i");
+    const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b[^\\w\\d]*([+-]?\\d+(\\.\\d+)?).*`, "i");
     const totalPattern = new RegExp("^.*\\b(O|U|Over|Under)\\b[^\\w\\d]*(\\d+(\\.\\d+)?).*$", "i");
     const winnerPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b[^0-9]*$`, "i");
 

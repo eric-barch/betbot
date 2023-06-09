@@ -1,6 +1,6 @@
 import { DbUtilityFunctions } from '@/db';
 import { OddButtonParser } from '@/parsers';
-import { DbGameConnection } from '@/parsers/models/shared-models/page-parser/odd-button-parser-set/odd-button-parser/db-connections/db-game-connection';
+import { DbGameConnection } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-game-connection';
 import { Game } from '@prisma/client';
 import { DraftKingsGameParser } from './draft-kings-game-parser';
 

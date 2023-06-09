@@ -3,7 +3,7 @@ import * as p from 'puppeteer';
 import { PageParserInitData } from '@/setup';
 import { Exchange, League } from '@prisma/client';
 import { DbExchange, DbLeague } from './db-connections';
-import { OddButtonParserSet } from './odd-button-parser-set';
+import { OddButtonParsers } from './odd-button-parsers';
 import { Webpage } from './webpage';
 
 export abstract class PageParser {
@@ -11,7 +11,7 @@ export abstract class PageParser {
   private wrappedWebpage: Webpage | undefined;
   private wrappedDbExchange: DbExchange | undefined;
   private wrappedDbLeague: DbLeague | undefined;
-  private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
+  private wrappedOddButtonParsers: OddButtonParsers | undefined;
 
   protected constructor({
     initData,
@@ -25,14 +25,14 @@ export abstract class PageParser {
     this.webpage = await Webpage.create({ url: this.initData.url });
     this.dbExchange = await DbExchange.create({ initData: this.initData.exchangeInitData });
     this.dbLeague = await DbLeague.create({ initData: this.initData.leagueInitData });
-    this.oddButtonParserSet = await this.initOddButtonParserSet();
+    this.oddButtonParsers = await this.initOddButtonParsers();
     return this;
   }
 
-  protected abstract initOddButtonParserSet(): Promise<OddButtonParserSet>;
+  protected abstract initOddButtonParsers(): Promise<OddButtonParsers>;
 
   public async updateOddData(): Promise<PageParser> {
-    await this.oddButtonParserSet.updateOddData();
+    await this.oddButtonParsers.updateOddData();
     return this;
   };
 
@@ -76,16 +76,16 @@ export abstract class PageParser {
     return this.wrappedDbLeague;
   }
 
-  protected set oddButtonParserSet(oddButtonParserSet: OddButtonParserSet) {
-    this.wrappedOddButtonParserSet = oddButtonParserSet;
+  protected set oddButtonParsers(oddButtonParsers: OddButtonParsers) {
+    this.wrappedOddButtonParsers = oddButtonParsers;
   }
 
-  protected get oddButtonParserSet(): OddButtonParserSet {
-    if (!this.wrappedOddButtonParserSet) {
-      throw new Error(`wrappedOddButtonParserSet is undefined.`);
+  protected get oddButtonParsers(): OddButtonParsers {
+    if (!this.wrappedOddButtonParsers) {
+      throw new Error(`wrappedOddButtonParsers is undefined.`);
     }
 
-    return this.wrappedOddButtonParserSet;
+    return this.wrappedOddButtonParsers;
   }
 
   public get page(): p.Page {
