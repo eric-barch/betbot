@@ -1,31 +1,29 @@
 import * as p from 'puppeteer';
 
-import { PageParser } from '../page-parser';
-
-export class WebpageConnection {
-  private url: string;
+export class Webpage {
+  private wrappedUrl: string;
   private wrappedBrowser: p.Browser | undefined;
   private wrappedPage: p.Page | undefined;
 
   constructor({
-    parentPageParser
+    url,
   }: {
-    parentPageParser: PageParser
+    url: string,
   }) {
-    this.url = parentPageParser.url;
+    this.wrappedUrl = url;
   }
 
   public static async create({
-    parentPageParser,
+    url,
   }: {
-    parentPageParser: PageParser,
-  }): Promise<WebpageConnection> {
-    const webpageConnection = new WebpageConnection({ parentPageParser });
+    url: string,
+  }): Promise<Webpage> {
+    const webpageConnection = new Webpage({ url });
     await webpageConnection.connect();
     return webpageConnection;
   }
 
-  private async connect(): Promise<WebpageConnection> {
+  private async connect(): Promise<Webpage> {
     await this.connectToBrowser();
     await this.connectToPage();
     return this;
@@ -51,7 +49,7 @@ export class WebpageConnection {
 
   private async connectToExistingPage(): Promise<p.Page> {
     const targets = this.browser.targets();
-    const target = targets.find((target) => target.url().includes(this.url));
+    const target = targets.find((target) => target.url().includes(this.wrappedUrl));
 
     if (!target) {
       throw new Error('Expected Target.');
@@ -79,7 +77,7 @@ export class WebpageConnection {
   private async connectToNewPage(): Promise<p.Page> {
     this.page = await this.browser.newPage();
 
-    await this.page.goto(this.url);
+    await this.page.goto(this.wrappedUrl);
 
     const windowSize = await this.page.evaluate(() => {
       return {

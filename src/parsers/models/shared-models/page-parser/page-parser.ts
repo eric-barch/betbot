@@ -2,29 +2,29 @@ import * as p from 'puppeteer';
 
 import { PageParserInitData } from '@/setup';
 import { Exchange, League } from '@prisma/client';
-import { DbExchangeConnection, DbLeagueConnection } from './db-connections';
+import { DbExchange, DbLeague } from './db-connections';
 import { OddButtonParserSet } from './odd-button-parser-set';
-import { WebpageConnection } from './webpage-connection';
+import { Webpage } from './webpage';
 
 export abstract class PageParser {
-  private pageParserInitData: PageParserInitData;
-  private wrappedWebpageConnection: WebpageConnection | undefined;
-  private wrappedDbExchangeConnection: DbExchangeConnection | undefined;
-  private wrappedDbLeagueConnection: DbLeagueConnection | undefined;
+  private initData: PageParserInitData;
+  private wrappedWebpage: Webpage | undefined;
+  private wrappedDbExchange: DbExchange | undefined;
+  private wrappedDbLeague: DbLeague | undefined;
   private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
 
   protected constructor({
-    pageParserInitData,
+    initData,
   }: {
-    pageParserInitData: PageParserInitData,
+    initData: PageParserInitData,
   }) {
-    this.pageParserInitData = pageParserInitData;
+    this.initData = initData;
   }
 
   protected async init(): Promise<PageParser> {
-    this.webpageConnection = await WebpageConnection.create({ parentPageParser: this });
-    this.dbExchangeConnection = await DbExchangeConnection.create({ parentPageParser: this });
-    this.dbLeagueConnection = await DbLeagueConnection.create({ parentPageParser: this });
+    this.webpage = await Webpage.create({ url: this.initData.url });
+    this.dbExchange = await DbExchange.create({ initData: this.initData.exchangeInitData });
+    this.dbLeague = await DbLeague.create({ initData: this.initData.leagueInitData });
     this.oddButtonParserSet = await this.initOddButtonParserSet();
     return this;
   }
@@ -37,59 +37,43 @@ export abstract class PageParser {
   };
 
   public async disconnect(): Promise<void> {
-    await this.webpageConnection.disconnect();
+    await this.webpage.disconnect();
   }
 
-  public get exchangeName(): string {
-    return this.pageParserInitData.exchangeInitData.name;
+  private set webpage(webpage: Webpage) {
+    this.wrappedWebpage = webpage;
   }
 
-  public get leagueName(): string {
-    return this.pageParserInitData.leagueInitData.name;
-  }
-
-  public get url(): string {
-    return this.pageParserInitData.url;
-  }
-
-  public get page(): p.Page {
-    return this.webpageConnection.page;
-  }
-
-  private get webpageConnection(): WebpageConnection {
-    if (!this.wrappedWebpageConnection) {
-      throw new Error(`wrappedWebpageConnection is undefined.`);
+  private get webpage(): Webpage {
+    if (!this.wrappedWebpage) {
+      throw new Error(`wrappedWebpage is undefined.`);
     }
 
-    return this.wrappedWebpageConnection;
+    return this.wrappedWebpage;
   }
 
-  private set webpageConnection(webpageConnection: WebpageConnection) {
-    this.wrappedWebpageConnection = webpageConnection;
+  private set dbExchange(dbExchange: DbExchange) {
+    this.wrappedDbExchange = dbExchange;
   }
 
-  private set dbExchangeConnection(dbExchangeConnection: DbExchangeConnection) {
-    this.wrappedDbExchangeConnection = dbExchangeConnection;
-  }
-
-  public get exchange(): Exchange {
-    if (!this.wrappedDbExchangeConnection) {
-      throw new Error(`wrappedDbExchangeConnection is undefined.`);
+  private get dbExchange(): DbExchange {
+    if (!this.wrappedDbExchange) {
+      throw new Error(`wrappedDbExchange is undefined.`);
     }
 
-    return this.wrappedDbExchangeConnection.exchange;
+    return this.wrappedDbExchange;
   }
 
-  private set dbLeagueConnection(dbLeagueConnection: DbLeagueConnection) {
-    this.wrappedDbLeagueConnection = dbLeagueConnection;
+  private set dbLeague(dbLeague: DbLeague) {
+    this.wrappedDbLeague = dbLeague;
   }
 
-  public get league(): League {
-    if (!this.wrappedDbLeagueConnection) {
-      throw new Error(`wrappedDbLeagueConnection is undefined.`);
+  private get dbLeague(): DbLeague {
+    if (!this.wrappedDbLeague) {
+      throw new Error(`wrappedDbLeague is undefined.`);
     }
 
-    return this.wrappedDbLeagueConnection.league;
+    return this.wrappedDbLeague;
   }
 
   protected set oddButtonParserSet(oddButtonParserSet: OddButtonParserSet) {
@@ -102,5 +86,17 @@ export abstract class PageParser {
     }
 
     return this.wrappedOddButtonParserSet;
+  }
+
+  public get page(): p.Page {
+    return this.webpage.page;
+  }
+
+  public get exchange(): Exchange {
+    return this.dbExchange.exchange;
+  }
+
+  public get league(): League {
+    return this.dbLeague.league
   }
 }

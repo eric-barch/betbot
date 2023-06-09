@@ -11,7 +11,7 @@ export class DraftKingsPageParser extends PageParser {
   }: {
     pageParserInitData: PageParserInitData,
   }): Promise<DraftKingsPageParser> {
-    const draftKingsPageParser = new DraftKingsPageParser({ pageParserInitData });
+    const draftKingsPageParser = new DraftKingsPageParser({ initData: pageParserInitData });
     await draftKingsPageParser.init();
     return draftKingsPageParser;
   }
