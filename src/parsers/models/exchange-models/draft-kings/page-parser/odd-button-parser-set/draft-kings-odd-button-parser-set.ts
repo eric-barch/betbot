@@ -1,35 +1,35 @@
 import * as p from 'puppeteer';
 
-import { DraftKingsOddButtonParser, OddButtonParser, PageParser } from '@/parsers';
+import { DraftKingsOddButtonParser, DraftKingsPageParser, OddButtonParser } from '@/parsers';
 import { OddButtonParserSet } from '@/parsers/models/shared-models/page-parser/odd-button-parser-set/odd-button-parser-set';
 
 export class DraftKingsOddButtonParserSet extends OddButtonParserSet {
   public static async create({
     parentPageParser,
   }: {
-    parentPageParser: PageParser;
+    parentPageParser: DraftKingsPageParser;
   }): Promise<DraftKingsOddButtonParserSet> {
     const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet({ parentPageParser });
     await draftKingsOddButtonParserSet.init();
     return draftKingsOddButtonParserSet;
   }
 
-  protected async updateButtonElements(): Promise<Array<p.ElementHandle>> {
+  protected async scrapePageForButtons(): Promise<Array<p.ElementHandle>> {
     const page = this.parentPageParser.page;
-    this.buttonElements = await page.$$('div[role="button"].sportsbook-outcome-cell__body');
-    return this.buttonElements;
+    this.buttons = await page.$$('div[role="button"].sportsbook-outcome-cell__body');
+    return this.buttons;
   }
 
   protected async initOddButtonParsers(): Promise<Set<OddButtonParser>> {
-    for (const buttonElement of this.buttonElements) {
+    for (const buttonElement of this.buttons) {
       const draftKingsOddButtonParser = await DraftKingsOddButtonParser.create({
         parentPageParser: this.parentPageParser,
-        buttonElement,
+        button: buttonElement,
       });
 
-      this.oddButtonParsers.add(draftKingsOddButtonParser);
+      this.add(draftKingsOddButtonParser);
     }
 
-    return this.oddButtonParsers;
+    return this;
   }
 }

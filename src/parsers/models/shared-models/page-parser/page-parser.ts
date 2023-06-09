@@ -31,6 +31,11 @@ export abstract class PageParser {
 
   protected abstract initOddButtonParserSet(): Promise<OddButtonParserSet>;
 
+  public async updateOddData(): Promise<PageParser> {
+    await this.oddButtonParserSet.updateOddData();
+    return this;
+  };
+
   public async disconnect(): Promise<void> {
     await this.webpageConnection.disconnect();
   }

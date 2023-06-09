@@ -13,9 +13,9 @@ class AllPageParsers extends Set<PageParser> {
     return this;
   }
 
-  public async update(): Promise<AllPageParsers> {
+  public async updateOddData(): Promise<AllPageParsers> {
     for (const pageParser of this) {
-      console.log('Implement AllPageParsers.update()');
+      await pageParser.updateOddData();
     }
 
     return this;

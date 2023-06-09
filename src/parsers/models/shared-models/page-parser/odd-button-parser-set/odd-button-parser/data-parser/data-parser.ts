@@ -31,17 +31,17 @@ export class DataParser {
       selector,
     });
     await dataParser.updateElement();
-    await dataParser.updateValue();
+    await dataParser.getValue();
     return dataParser;
   }
 
   private async updateElement(): Promise<p.ElementHandle | null> {
-    const buttonElement = this.parentOddButtonParser.buttonElement;
+    const buttonElement = this.parentOddButtonParser.button;
     this.element = await buttonElement.$(`${this.selector}`);
     return this.element;
   }
 
-  private async updateValue(): Promise<number | null> {
+  public async getValue(): Promise<number | null> {
     if (!this.element) {
       this.value = null;
       return this.value;
@@ -66,7 +66,7 @@ export class DataParser {
     this.wrappedElement = element;
   }
 
-  public get element(): p.ElementHandle | null {
+  private get element(): p.ElementHandle | null {
     if (this.wrappedElement === undefined) {
       throw new Error(`wrappedElementHandle is undefined.`);
     }
@@ -78,7 +78,7 @@ export class DataParser {
     this.wrappedValue = value;
   }
 
-  public get value(): number | null {
+  private get value(): number | null {
     if (this.wrappedValue === undefined) {
       throw new Error(`wrappedValue is undefined.`);
     }

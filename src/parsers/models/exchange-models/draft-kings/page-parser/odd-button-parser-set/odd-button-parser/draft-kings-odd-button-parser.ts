@@ -1,42 +1,56 @@
 import * as p from 'puppeteer';
 
-import { OddButtonParser } from '@/parsers/models/shared-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
 import {
-  PageParser, DbGameConnection, DbStatisticConnection, DbOddConnection, DataParser,
+  OddButton,
+  DataParser,
+  DbGameConnection,
+  DbOddConnection,
+  DbStatisticConnection,
+  PageParser,
 } from '@/parsers';
 import {
-  DraftKingsDbGameConnection, DraftKingsDbStatisticConnection, DraftKingsDbOddConnection,
+  OddButtonParser,
+} from '@/parsers/models/shared-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
+import {
+  DraftKingsDbGameConnection,
+  DraftKingsDbOddConnection,
+  DraftKingsDbStatisticConnection,
 } from './db-connections';
 
 export class DraftKingsOddButtonParser extends OddButtonParser {
   public static async create({
     parentPageParser,
-    buttonElement,
+    button,
   }: {
     parentPageParser: PageParser,
-    buttonElement: p.ElementHandle,
+    button: p.ElementHandle,
   }): Promise<DraftKingsOddButtonParser> {
     const draftKingsOddButtonParser = new DraftKingsOddButtonParser({
       parentPageParser,
-      buttonElement,
+      button,
     });
     await draftKingsOddButtonParser.init();
     return draftKingsOddButtonParser;
   }
 
-  protected async initDbGameConnection(): Promise<DbGameConnection> {
-    this.dbGameConnection = await DraftKingsDbGameConnection.create({ parentOddButtonParser: this });
-    return this.dbGameConnection;
+  protected async initOddButton(): Promise<OddButton> {
+    await this.oddButton.init({ referenceSelector: 'tr' });
+    return this.oddButton;
   }
 
-  protected async initDbStatisticConnection(): Promise<DbStatisticConnection> {
-    this.dbStatisticConnection = await DraftKingsDbStatisticConnection.create({ parentOddButtonParser: this });
-    return this.dbStatisticConnection;
+  protected async initDbGame(): Promise<DbGameConnection> {
+    this.dbGame = await DraftKingsDbGameConnection.create({ parentOddButtonParser: this });
+    return this.dbGame;
   }
 
-  protected async initDbOddConnection(): Promise<DbOddConnection> {
-    this.dbOddConnection = await DraftKingsDbOddConnection.create({ parentOddButtonParser: this });
-    return this.dbOddConnection;
+  protected async initDbStatistic(): Promise<DbStatisticConnection> {
+    this.dbStatistic = await DraftKingsDbStatisticConnection.create({ parentOddButtonParser: this });
+    return this.dbStatistic;
+  }
+
+  protected async initDbOdd(): Promise<DbOddConnection> {
+    this.dbOdd = await DraftKingsDbOddConnection.create({ parentOddButtonParser: this });
+    return this.dbOdd;
   }
 
   protected async initPriceParser(): Promise<DataParser> {
@@ -55,5 +69,13 @@ export class DraftKingsOddButtonParser extends OddButtonParser {
     });
 
     return this.valueParser;
+  }
+
+  public async updateOddData(): Promise<DraftKingsOddButtonParser> {
+    await this.oddButton.updateOddButton();
+    await this.initPriceParser();
+    await this.initValueParser();
+    await this.updateDbOddFromDataParsers();
+    return this;
   }
 }
