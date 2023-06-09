@@ -24,7 +24,7 @@ export class OddButton {
   }: {
     referenceSelector: string,
   }): Promise<OddButton> {
-    this.wrappedReferenceSelector = referenceSelector;
+    this.referenceSelector = referenceSelector;
     await this.initReference();
     return this;
   }
@@ -82,7 +82,9 @@ export class OddButton {
   }
 
   public async updateOddButton(): Promise<p.ElementHandle> {
-    const button = await this.reference.$(`xpath/${this.referenceToButtonXPath}`);
+    const button = await this.reference.$(`xpath${this.referenceToButtonXPath}`);
+
+    const className = await (await button?.getProperty('className'))?.jsonValue();
 
     if (!button) {
       throw new Error(`button is null.`);
