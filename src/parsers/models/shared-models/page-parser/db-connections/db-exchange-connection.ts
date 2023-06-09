@@ -1,31 +1,31 @@
 import { DbUtilityFunctions } from '@/db';
+import { ExchangeInitData } from '@/setup';
 import { Exchange } from '@prisma/client';
-import { PageParser } from '../page-parser';
 
-export class DbExchangeConnection {
-  private parentPageParser: PageParser;
+export class DbExchange {
+  private initData: ExchangeInitData;
   private wrappedExchange: Exchange | undefined;
 
   private constructor({
-    parentPageParser,
+    initData,
   }: {
-    parentPageParser: PageParser,
+    initData: ExchangeInitData,
   }) {
-    this.parentPageParser = parentPageParser;
+    this.initData = initData;
   }
 
   public static async create({
-    parentPageParser,
+    initData,
   }: {
-    parentPageParser: PageParser,
-  }): Promise<DbExchangeConnection> {
-    const dbExchangeConnection = new DbExchangeConnection({ parentPageParser });
+    initData: ExchangeInitData,
+  }): Promise<DbExchange> {
+    const dbExchangeConnection = new DbExchange({ initData });
     await dbExchangeConnection.connect();
     return dbExchangeConnection;
   }
 
-  private async connect(): Promise<DbExchangeConnection> {
-    this.exchange = await DbUtilityFunctions.findExchangeByName({ name: this.parentPageParser.exchangeName });
+  private async connect(): Promise<DbExchange> {
+    this.exchange = await DbUtilityFunctions.findExchangeByName({ name: this.initData.name });
     return this;
   }
 

@@ -1,33 +1,31 @@
-import { League } from '@prisma/client';
-import { PageParser } from '../page-parser';
 import { DbUtilityFunctions } from '@/db';
+import { LeagueInitData } from '@/setup';
+import { League } from '@prisma/client';
 
-export class DbLeagueConnection {
-  private parentPageParser: PageParser;
-  private leagueName: string;
+export class DbLeague {
+  private initData: LeagueInitData;
   private wrappedLeague: League | undefined;
 
   private constructor({
-    parentPageParser,
+    initData,
   }: {
-    parentPageParser: PageParser,
+    initData: LeagueInitData,
   }) {
-    this.parentPageParser = parentPageParser;
-    this.leagueName = parentPageParser.leagueName;
+    this.initData = initData;
   }
 
   public static async create({
-    parentPageParser,
+    initData,
   }: {
-    parentPageParser: PageParser,
-  }): Promise<DbLeagueConnection> {
-    const dbLeagueConnection = new DbLeagueConnection({ parentPageParser });
+    initData: LeagueInitData,
+  }): Promise<DbLeague> {
+    const dbLeagueConnection = new DbLeague({ initData });
     await dbLeagueConnection.connect();
     return dbLeagueConnection;
   }
 
-  private async connect(): Promise<DbLeagueConnection> {
-    this.league = await DbUtilityFunctions.findLeagueByName({ name: this.leagueName });
+  private async connect(): Promise<DbLeague> {
+    this.league = await DbUtilityFunctions.findLeagueByName({ name: this.initData.name });
     return this;
   }
 
