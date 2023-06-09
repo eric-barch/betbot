@@ -1,49 +1,70 @@
 import * as p from 'puppeteer';
 
 import { PageParser } from '@/parsers';
-import { DbGameConnection, DbStatisticConnection, DbOddConnection } from './db-connections';
+import { DbGameConnection as DbGame, DbStatisticConnection as DbStatistic, DbOddConnection as DbOdd } from './db-connections';
 import { DataParser } from './data-parser';
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
+import { OddButton as OddButton } from './button-reference';
 
 export abstract class OddButtonParser {
   private parentPageParser: PageParser;
-  private wrappedButtonElement: p.ElementHandle;
-  private wrappedDbGameConnection: DbGameConnection | undefined;
-  private wrappedDbStatisticConnection: DbStatisticConnection | undefined;
-  private wrappedDbOddConnection: DbOddConnection | undefined;
+  private wrappedOddButton: OddButton;
+  private wrappedDbGame: DbGame | undefined;
+  private wrappedDbStatistic: DbStatistic | undefined;
+  private wrappedDbOdd: DbOdd | undefined;
   private wrappedPriceParser: DataParser | undefined;
   private wrappedValueParser: DataParser | undefined;
 
   protected constructor({
     parentPageParser,
-    buttonElement,
+    button,
   }: {
     parentPageParser: PageParser,
-    buttonElement: p.ElementHandle,
+    button: p.ElementHandle,
   }) {
     this.parentPageParser = parentPageParser;
-    this.wrappedButtonElement = buttonElement;
+    this.wrappedOddButton = new OddButton({
+      parentOddButtonParser: this,
+      button,
+    });
   }
 
   protected async init(): Promise<OddButtonParser> {
-    this.dbGameConnection = await this.initDbGameConnection();
-    this.dbStatisticConnection = await this.initDbStatisticConnection();
-    this.dbOddConnection = await this.initDbOddConnection();
+    this.oddButton = await this.initOddButton();
+    this.dbGame = await this.initDbGame();
+    this.dbStatistic = await this.initDbStatistic();
+    this.dbOdd = await this.initDbOdd();
     this.priceParser = await this.initPriceParser();
     this.valueParser = await this.initValueParser();
-    await this.dbOddConnection.updateData();
+
+    await this.updateOddData();
+
     return this;
   }
 
-  protected abstract initDbGameConnection(): Promise<DbGameConnection>;
+  protected abstract initOddButton(): Promise<OddButton>;
 
-  protected abstract initDbStatisticConnection(): Promise<DbStatisticConnection>;
+  protected abstract initDbGame(): Promise<DbGame>;
 
-  protected abstract initDbOddConnection(): Promise<DbOddConnection>;
+  protected abstract initDbStatistic(): Promise<DbStatistic>;
+
+  protected abstract initDbOdd(): Promise<DbOdd>;
 
   protected abstract initPriceParser(): Promise<DataParser>;
 
   protected abstract initValueParser(): Promise<DataParser>;
+
+  public abstract updateOddData(): Promise<OddButtonParser>;
+
+  protected async updateDbOddFromDataParsers(): Promise<void> {
+    const price = await this.priceParser.getValue();
+    const value = await this.valueParser.getValue();
+
+    await this.dbOdd.updateData({
+      price,
+      value,
+    });
+  }
 
   public get exchange(): Exchange {
     return this.parentPageParser.exchange;
@@ -53,56 +74,68 @@ export abstract class OddButtonParser {
     return this.parentPageParser.league;
   }
 
-  public get buttonElement(): p.ElementHandle {
-    return this.wrappedButtonElement;
+  protected set oddButton(oddButton: OddButton) {
+    this.wrappedOddButton = oddButton;
   }
 
-  protected set dbGameConnection(dbGameConnection: DbGameConnection) {
-    this.wrappedDbGameConnection = dbGameConnection;
+  protected get oddButton(): OddButton {
+    if (!this.wrappedOddButton) {
+      throw new Error(`wrappedOddButton is undefined.`);
+    }
+
+    return this.wrappedOddButton;
   }
 
-  protected get dbGameConnection(): DbGameConnection {
-    if (!this.wrappedDbGameConnection) {
+  public get button(): p.ElementHandle {
+    return this.oddButton.button;
+  }
+
+  protected set dbGame(dbGameConnection: DbGame) {
+    this.wrappedDbGame = dbGameConnection;
+  }
+
+  protected get dbGame(): DbGame {
+    if (!this.wrappedDbGame) {
       throw new Error(`wrappedDbGameConnection is undefined.`);
     }
 
-    return this.wrappedDbGameConnection;
+    return this.wrappedDbGame;
   }
 
   public get game(): Game {
-    return this.dbGameConnection.game;
+    return this.dbGame.game;
   }
 
-  protected set dbStatisticConnection(dbStatisticConnection: DbStatisticConnection) {
-    this.wrappedDbStatisticConnection = dbStatisticConnection;
+  protected set dbStatistic(dbStatisticConnection: DbStatistic) {
+    this.wrappedDbStatistic = dbStatisticConnection;
   }
 
-  protected get dbStatisticConnection(): DbStatisticConnection {
-    if (!this.wrappedDbStatisticConnection) {
+  protected get dbStatistic(): DbStatistic {
+    if (!this.wrappedDbStatistic) {
       throw new Error(`wrappedDbStatisticConnection is undefined.`);
     }
 
-    return this.wrappedDbStatisticConnection;
+    return this.wrappedDbStatistic;
   }
 
   public get statistic(): Statistic {
-    return this.dbStatisticConnection.statistic;
+    return this.dbStatistic.statistic;
   }
 
-  protected set dbOddConnection(dbOddConnection: DbOddConnection) {
-    this.wrappedDbOddConnection = dbOddConnection;
+  protected set dbOdd(dbOddConnection: DbOdd) {
+    this.wrappedDbOdd = dbOddConnection;
   }
 
-  protected get dbOddConnection(): DbOddConnection {
-    if (!this.wrappedDbOddConnection) {
+  protected get dbOdd(): DbOdd {
+    if (!this.wrappedDbOdd) {
       throw new Error(`wrappedDbOddConnection is undefined.`);
     }
 
-    return this.wrappedDbOddConnection;
+    return this.wrappedDbOdd;
   }
 
   public get odd(): Odd {
-    return this.dbOddConnection.odd;
+    return this.dbOdd.odd;
   }
 
   protected set priceParser(priceParser: DataParser) {
@@ -117,10 +150,6 @@ export abstract class OddButtonParser {
     return this.wrappedPriceParser;
   }
 
-  public get price(): number | null {
-    return this.priceParser.value;
-  }
-
   protected set valueParser(valueParser: DataParser) {
     this.wrappedValueParser = valueParser;
   }
@@ -131,9 +160,5 @@ export abstract class OddButtonParser {
     }
 
     return this.wrappedValueParser;
-  }
-
-  public get value(): number | null {
-    return this.valueParser.value;
   }
 }

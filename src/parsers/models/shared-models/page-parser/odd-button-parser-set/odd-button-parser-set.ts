@@ -3,51 +3,46 @@ import * as p from 'puppeteer';
 import { PageParser } from '@/parsers';
 import { OddButtonParser } from './odd-button-parser';
 
-export abstract class OddButtonParserSet {
+export abstract class OddButtonParserSet extends Set<OddButtonParser> {
   protected parentPageParser: PageParser;
-  private wrappedButtonElements: Array<p.ElementHandle> | undefined;
-  private wrappedOddButtonParsers: Set<OddButtonParser>;
+  private wrappedButtons: Array<p.ElementHandle> | undefined;
 
   protected constructor({
     parentPageParser,
   }: {
     parentPageParser: PageParser,
   }) {
+    super();
     this.parentPageParser = parentPageParser;
-    this.wrappedOddButtonParsers = new Set<OddButtonParser>;
   }
 
   protected async init(): Promise<OddButtonParserSet> {
-    this.buttonElements = await this.updateButtonElements();
-    this.oddButtonParsers = await this.initOddButtonParsers();
+    this.buttons = await this.scrapePageForButtons();
+    await this.initOddButtonParsers();
     return this;
   }
 
-  protected abstract updateButtonElements(): Promise<Array<p.ElementHandle>>;
+  protected abstract scrapePageForButtons(): Promise<Array<p.ElementHandle>>;
 
   protected abstract initOddButtonParsers(): Promise<Set<OddButtonParser>>;
 
-  protected set buttonElements(buttonElements: Array<p.ElementHandle>) {
-    this.wrappedButtonElements = buttonElements;
-  }
-
-  protected get buttonElements(): Array<p.ElementHandle> {
-    if (!this.wrappedButtonElements) {
-      throw new Error(`wrappedButtonElements is undefined.`);
+  public async updateOddData(): Promise<OddButtonParserSet> {
+    for (const oddButtonParser of this) {
+      await oddButtonParser.updateOddData();
     }
 
-    return this.wrappedButtonElements;
+    return this;
+  };
+
+  protected set buttons(buttonElements: Array<p.ElementHandle>) {
+    this.wrappedButtons = buttonElements;
   }
 
-  protected set oddButtonParsers(oddButtonParsers: Set<OddButtonParser>) {
-    this.wrappedOddButtonParsers = oddButtonParsers;
-  }
-
-  public get oddButtonParsers(): Set<OddButtonParser> {
-    if (!this.wrappedOddButtonParsers) {
-      throw new Error(`wrappedOddButtonParsers is undefined.`);
+  protected get buttons(): Array<p.ElementHandle> {
+    if (!this.wrappedButtons) {
+      throw new Error(`wrappedButtons is undefined.`);
     }
 
-    return this.wrappedOddButtonParsers;
+    return this.wrappedButtons;
   }
 }

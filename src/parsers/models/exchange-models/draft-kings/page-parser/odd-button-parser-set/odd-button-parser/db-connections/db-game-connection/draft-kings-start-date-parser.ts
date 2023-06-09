@@ -44,7 +44,7 @@ export class DraftKingsStartDateParser {
   }
 
   private async getDateTableElement(): Promise<p.ElementHandle> {
-    let ancestor = this.parentOddButtonParser.buttonElement;
+    let ancestor = this.parentOddButtonParser.button;
 
     const classNameToFind = 'parlay-card-10-a';
 
@@ -87,7 +87,7 @@ export class DraftKingsStartDateParser {
   }
 
   private async getTeamRowElement(): Promise<p.ElementHandle> {
-    let ancestor = this.parentOddButtonParser.buttonElement;
+    let ancestor = this.parentOddButtonParser.button;
 
     const nodeNameToFind = 'tr';
 
