@@ -44,62 +44,12 @@ export class DbUtilityFunctions {
     return game;
   }
 
-  public static async findGameByExchangeAndExchangeAssignedGameId({
-    exchange,
-    exchangeAssignedGameId,
-  }: {
-    exchange: Exchange,
-    exchangeAssignedGameId: string,
-  }): Promise<Game> {
-    const exchangeToGame = await prisma.exchangeToGame.findUniqueOrThrow({
-      where: {
-        exchangeId_exchangeAssignedGameId: {
-          exchangeId: exchange.id,
-          exchangeAssignedGameId,
-        }
-      }
-    });
-
-    const game = await prisma.game.findUniqueOrThrow({
-      where: {
-        id: exchangeToGame.gameId,
-      }
-    });
-
-    return game;
-  }
-
-  public static async associateExchangeAndGameByExchangeAssignedGameId({
-    exchange,
-    game,
-    exchangeAssignedGameId,
-  }: {
-    exchange: Exchange,
-    game: Game,
-    exchangeAssignedGameId: string,
-  }): Promise<ExchangeToGame> {
-    return await prisma.exchangeToGame.upsert({
-      where: {
-        exchangeId_gameId: {
-          exchangeId: exchange.id,
-          gameId: game.id,
-        }
-      },
-      update: {},
-      create: {
-        exchangeId: exchange.id,
-        gameId: game.id,
-        exchangeAssignedGameId,
-      },
-    });
-  }
-
-  public static async findTeamByLeagueAndUnformattedName({
-    league,
+  public static async findTeamByUnformattedNameAndLeague({
     unformattedName,
+    league,
   }: {
-    league: League,
     unformattedName: string,
+    league: League,
   }): Promise<Team> {
     unformattedName = unformattedName.replace(/[^a-zA-Z]/g, ' ');
 
@@ -119,84 +69,5 @@ export class DbUtilityFunctions {
     }
 
     throw new Error(`Did not find matching team.`);
-  }
-
-  public static async findOrCreateStatisticByGameAndStatisticName({
-    game,
-    statisticName,
-  }: {
-    game: Game,
-    statisticName: string,
-  }): Promise<Statistic> {
-    const statistic = await prisma.statistic.upsert({
-      where: {
-        name_gameId: {
-          name: statisticName,
-          gameId: game.id,
-        }
-      },
-      update: {},
-      create: {
-        name: statisticName,
-        gameId: game.id,
-      },
-    });
-
-    return statistic;
-  }
-
-  public static async findOrCreateOddByExchangeAndStatistic({
-    exchange,
-    statistic,
-  }: {
-    exchange: Exchange,
-    statistic: Statistic,
-  }): Promise<Odd> {
-    const exchangeId = exchange.id;
-    const statisticId = statistic.id;
-
-    const odd = await prisma.odd.upsert({
-      where: {
-        exchangeId_statisticId: {
-          exchangeId,
-          statisticId,
-        }
-      },
-      update: {},
-      create: {
-        exchangeId,
-        statisticId,
-      }
-    });
-
-    return odd;
-  }
-
-  public static async findExchangeByName({
-    name,
-  }: {
-    name: string,
-  }): Promise<Exchange> {
-    const exchange = await prisma.exchange.findUniqueOrThrow({
-      where: {
-        name,
-      }
-    });
-
-    return exchange;
-  }
-
-  public static async findLeagueByName({
-    name,
-  }: {
-    name: string,
-  }): Promise<League> {
-    const league = await prisma.league.findUniqueOrThrow({
-      where: {
-        name,
-      }
-    });
-
-    return league;
   }
 }

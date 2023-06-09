@@ -18,13 +18,13 @@ export abstract class OddButtonParsers extends Set<OddButtonParser> {
 
   protected async init(): Promise<OddButtonParsers> {
     this.buttons = await this.scrapePageForButtons();
-    await this.initOddButtonParsers();
+    await this.createOddButtonParsers();
     return this;
   }
 
   protected abstract scrapePageForButtons(): Promise<Array<p.ElementHandle>>;
 
-  protected abstract initOddButtonParsers(): Promise<Set<OddButtonParser>>;
+  protected abstract createOddButtonParsers(): Promise<Set<OddButtonParser>>;
 
   public async updateOddData(): Promise<OddButtonParsers> {
     for (const oddButtonParser of this) {

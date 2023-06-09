@@ -1,5 +1,5 @@
 
-import { DbUtilityFunctions } from '@/db';
+import { DbUtilityFunctions, prisma } from '@/db';
 import { OddButtonParser } from '@/parsers';
 import { Game } from '@prisma/client';
 import { DraftKingsMatchupParser } from './draft-kings-matchup-parser';
@@ -50,10 +50,25 @@ export class DraftKingsGameParser {
       startDate: this.startDateParser.startDate,
     });
 
-    await DbUtilityFunctions.associateExchangeAndGameByExchangeAssignedGameId({
-      exchange: this.parentOddButtonParser.exchange,
-      game: this.game,
-      exchangeAssignedGameId: this.exchangeAssignedGameId,
+    const exchangeId = this.parentOddButtonParser.exchange.id;
+    const gameId = this.game.id;
+    const exchangeAssignedGameId = this.exchangeAssignedGameId;
+
+    await prisma.exchangeToGame.upsert({
+      where: {
+        exchangeId_gameId: {
+          exchangeId,
+          gameId,
+        },
+      },
+      update: {
+        exchangeAssignedGameId,
+      },
+      create: {
+        exchangeId,
+        gameId,
+        exchangeAssignedGameId,
+      },
     });
 
     return this.game;

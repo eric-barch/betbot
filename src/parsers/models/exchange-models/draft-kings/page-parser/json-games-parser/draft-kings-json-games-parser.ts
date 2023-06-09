@@ -1,4 +1,4 @@
-import { DbUtilityFunctions } from '@/db';
+import { DbUtilityFunctions, prisma } from '@/db';
 import { PageParser } from '@/parsers';
 import { Game } from '@prisma/client';
 
@@ -67,12 +67,12 @@ export class DraftKingsJsonGamesParser {
   }: {
     jsonGame: any,
   }): Promise<Game> {
-    const awayTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
+    const awayTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
       unformattedName: jsonGame.awayTeam.name,
       league: this.parentPageParser.league,
     });
 
-    const homeTeam = await DbUtilityFunctions.findTeamByLeagueAndUnformattedName({
+    const homeTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
       unformattedName: jsonGame.homeTeam.name,
       league: this.parentPageParser.league,
     });
@@ -84,14 +84,26 @@ export class DraftKingsJsonGamesParser {
       homeTeam,
       startDate,
     });
+    const gameId = game.id;
 
-    const exchange = this.parentPageParser.exchange;
+    const exchangeId = this.parentPageParser.exchange.id;
     const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
 
-    await DbUtilityFunctions.associateExchangeAndGameByExchangeAssignedGameId({
-      exchange,
-      game,
-      exchangeAssignedGameId,
+    await prisma.exchangeToGame.upsert({
+      where: {
+        exchangeId_gameId: {
+          exchangeId,
+          gameId,
+        },
+      },
+      update: {
+        exchangeAssignedGameId,
+      },
+      create: {
+        exchangeId,
+        gameId,
+        exchangeAssignedGameId,
+      },
     });
 
     return game;

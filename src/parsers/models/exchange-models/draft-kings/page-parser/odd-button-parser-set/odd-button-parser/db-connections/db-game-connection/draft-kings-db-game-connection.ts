@@ -1,10 +1,10 @@
-import { DbUtilityFunctions } from '@/db';
+import { DbUtilityFunctions, prisma } from '@/db';
 import { OddButtonParser } from '@/parsers';
-import { DbGameConnection } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-game-connection';
+import { DbGameConnection as DbGame } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-game-connection';
 import { Game } from '@prisma/client';
 import { DraftKingsGameParser } from './draft-kings-game-parser';
 
-export class DraftKingsDbGameConnection extends DbGameConnection {
+export class DraftKingsDbGame extends DbGame {
   private wrappedExchangeAssignedGameId: string | undefined;
   private wrappedGameParser: DraftKingsGameParser | undefined;
 
@@ -12,8 +12,8 @@ export class DraftKingsDbGameConnection extends DbGameConnection {
     parentOddButtonParser,
   }: {
     parentOddButtonParser: OddButtonParser,
-  }): Promise<DraftKingsDbGameConnection> {
-    const draftKingsDbGameConnection = new DraftKingsDbGameConnection({ parentOddButtonParser });
+  }): Promise<DraftKingsDbGame> {
+    const draftKingsDbGameConnection = new DraftKingsDbGame({ parentOddButtonParser });
     await draftKingsDbGameConnection.init();
     return draftKingsDbGameConnection;
   }
@@ -43,11 +43,19 @@ export class DraftKingsDbGameConnection extends DbGameConnection {
   }
 
   private async findGameWithExchangeAssignedId(): Promise<Game> {
-    this.game = await DbUtilityFunctions.findGameByExchangeAndExchangeAssignedGameId({
-      exchange: this.parentOddButtonParser.exchange,
-      exchangeAssignedGameId: this.exchangeAssignedGameId,
+    const exchangeToGame = await prisma.exchangeToGame.findUniqueOrThrow({
+      where: {
+        exchangeId_exchangeAssignedGameId: {
+          exchangeId: this.parentOddButtonParser.exchange.id,
+          exchangeAssignedGameId: this.exchangeAssignedGameId,
+        },
+      },
+      include: {
+        game: true,
+      },
     });
 
+    this.game = exchangeToGame.game;
     return this.game;
   }
 
