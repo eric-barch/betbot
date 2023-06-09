@@ -1,6 +1,6 @@
 import { PageParserInitData } from '@/setup';
 import { PageParser } from '@/parsers/models/shared-models/page-parser/page-parser';
-import { DraftKingsOddButtonParserSet, OddButtonParserSet } from '@/parsers';
+import { DraftKingsOddButtonParserSet, OddButtonParsers } from '@/parsers';
 import { DraftKingsJsonGamesParser } from './json-games-parser';
 
 export class DraftKingsPageParser extends PageParser {
@@ -16,10 +16,10 @@ export class DraftKingsPageParser extends PageParser {
     return draftKingsPageParser;
   }
 
-  protected async initOddButtonParserSet(): Promise<OddButtonParserSet> {
+  protected async initOddButtonParsers(): Promise<OddButtonParsers> {
     this.jsonGamesParser = await DraftKingsJsonGamesParser.create({ parentPageParser: this });
-    this.oddButtonParserSet = await DraftKingsOddButtonParserSet.create({ parentPageParser: this });
-    return this.oddButtonParserSet
+    this.oddButtonParsers = await DraftKingsOddButtonParserSet.create({ parentPageParser: this });
+    return this.oddButtonParsers;
   }
 
   private set jsonGamesParser(jsonGamesParser: DraftKingsJsonGamesParser) {

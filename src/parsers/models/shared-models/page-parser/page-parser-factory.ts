@@ -1,6 +1,7 @@
 import { PageParserInitData } from '@/setup';
 import { PageParser, DraftKingsPageParser } from '@/parsers';
 
+//TODO: I feel like this doesn't make sense to have?
 export class PageParserFactory {
   public static async create({
     pageParserInitData,
