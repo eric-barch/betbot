@@ -1,9 +1,9 @@
-import * as p from 'puppeteer';
+import { Browser, connect, Page } from 'puppeteer';
 
 export class Webpage {
   private wrappedUrl: string;
-  private wrappedBrowser: p.Browser | undefined;
-  private wrappedPage: p.Page | undefined;
+  private wrappedBrowser: Browser | undefined;
+  private wrappedPage: Page | undefined;
 
   constructor({
     url,
@@ -29,15 +29,15 @@ export class Webpage {
     return this;
   }
 
-  private async connectToBrowser(): Promise<p.Browser> {
-    this.browser = await p.connect({
+  private async connectToBrowser(): Promise<Browser> {
+    this.browser = await connect({
       browserURL: 'http://127.0.0.1:9222',
     });
 
     return this.browser;
   }
 
-  private async connectToPage(): Promise<p.Page> {
+  private async connectToPage(): Promise<Page> {
     try {
       this.page = await this.connectToExistingPage();
     } catch {
@@ -49,7 +49,7 @@ export class Webpage {
     return this.page;
   }
 
-  private async connectToExistingPage(): Promise<p.Page> {
+  private async connectToExistingPage(): Promise<Page> {
     const targets = this.browser.targets();
     const target = targets.find((target) => target.url().includes(this.wrappedUrl));
 
@@ -76,7 +76,7 @@ export class Webpage {
     return this.page;
   }
 
-  private async connectToNewPage(): Promise<p.Page> {
+  private async connectToNewPage(): Promise<Page> {
     this.page = await this.browser.newPage();
 
     await this.page.goto(this.wrappedUrl);
@@ -97,11 +97,11 @@ export class Webpage {
     this.browser.disconnect();
   }
 
-  private set browser(browser: p.Browser) {
+  private set browser(browser: Browser) {
     this.wrappedBrowser = browser;
   }
 
-  private get browser(): p.Browser {
+  private get browser(): Browser {
     if (!this.wrappedBrowser) {
       throw new Error(`wrappedBrowser is null.`);
     }
@@ -109,11 +109,11 @@ export class Webpage {
     return this.wrappedBrowser;
   }
 
-  private set page(page: p.Page) {
+  private set page(page: Page) {
     this.wrappedPage = page;
   }
 
-  public get page(): p.Page {
+  public get page(): Page {
     if (!this.wrappedPage) {
       throw new Error(`wrappedPage is null.`);
     }

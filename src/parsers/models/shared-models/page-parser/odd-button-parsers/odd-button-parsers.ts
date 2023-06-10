@@ -1,11 +1,11 @@
-import * as p from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
 
 import { PageParser } from '@/parsers';
 import { OddButtonParser } from './odd-button-parser';
 
 export abstract class OddButtonParsers extends Set<OddButtonParser> {
   protected parentPageParser: PageParser;
-  private wrappedButtons: Array<p.ElementHandle> | undefined;
+  private wrappedButtons: Array<ElementHandle> | undefined;
 
   protected constructor({
     parentPageParser,
@@ -22,7 +22,7 @@ export abstract class OddButtonParsers extends Set<OddButtonParser> {
     return this;
   }
 
-  protected abstract scrapePageForButtons(): Promise<Array<p.ElementHandle>>;
+  protected abstract scrapePageForButtons(): Promise<Array<ElementHandle>>;
 
   protected abstract createOddButtonParsers(): Promise<Set<OddButtonParser>>;
 
@@ -34,11 +34,11 @@ export abstract class OddButtonParsers extends Set<OddButtonParser> {
     return this;
   };
 
-  protected set buttons(buttons: Array<p.ElementHandle>) {
+  protected set buttons(buttons: Array<ElementHandle>) {
     this.wrappedButtons = buttons;
   }
 
-  protected get buttons(): Array<p.ElementHandle> {
+  protected get buttons(): Array<ElementHandle> {
     if (!this.wrappedButtons) {
       throw new Error(`wrappedButtons is undefined.`);
     }

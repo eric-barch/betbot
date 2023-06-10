@@ -1,4 +1,4 @@
-import * as p from 'puppeteer';
+import { Page } from 'puppeteer';
 
 import { PageParserInitData } from '@/setup';
 import { Exchange, League } from '@prisma/client';
@@ -88,7 +88,7 @@ export abstract class PageParser {
     return this.wrappedOddButtonParsers;
   }
 
-  public get page(): p.Page {
+  public get page(): Page {
     return this.webpage.page;
   }
 
