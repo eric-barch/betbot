@@ -44,6 +44,8 @@ export class Webpage {
       this.page = await this.connectToNewPage();
     }
 
+    await this.page.reload();
+
     return this.page;
   }
 

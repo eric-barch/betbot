@@ -2,9 +2,9 @@
 import { DbUtilityFunctions, prisma } from '@/db';
 import { Statistic } from '@prisma/client';
 import { OddButtonParser } from '@/parsers';
-import { DbStatisticConnection } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-statistic-connection';
+import { DbStatistic } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-statistic-connection';
 
-export class DraftKingsDbStatisticConnection extends DbStatisticConnection {
+export class DraftKingsDbStatisticConnection extends DbStatistic {
   public static async create({
     parentOddButtonParser,
   }: {
@@ -63,13 +63,13 @@ export class DraftKingsDbStatisticConnection extends DbStatisticConnection {
   }
 
   private async getAriaLabel(): Promise<string> {
-    const buttonElement = this.parentOddButtonParser.button;
+    const button = this.parentOddButtonParser.button;
 
-    if (!buttonElement) {
-      throw new Error(`buttonElement is null.`);
+    if (!button) {
+      throw new Error(`button is null.`);
     }
 
-    const ariaLabel = await (await buttonElement.getProperty('ariaLabel')).jsonValue();
+    const ariaLabel = await (await button.getProperty('ariaLabel')).jsonValue();
 
     if (!ariaLabel) {
       throw new Error(`ariaLabel is null.`)

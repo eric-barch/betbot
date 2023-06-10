@@ -21,10 +21,10 @@ export class DraftKingsOddButtonParserSet extends OddButtonParsers {
   }
 
   protected async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
-    for (const buttonElement of this.buttons) {
+    for (const button of this.buttons) {
       const draftKingsOddButtonParser = await DraftKingsOddButtonParser.create({
         parentPageParser: this.parentPageParser,
-        button: buttonElement,
+        button: button,
       });
 
       this.add(draftKingsOddButtonParser);
