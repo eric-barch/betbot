@@ -2,7 +2,7 @@ import { prisma } from '@/db';
 import { Odd } from '@prisma/client';
 import { OddButtonParser } from '../odd-button-parser';
 
-export abstract class DbOddConnection {
+export abstract class DbOdd {
   private wrappedParentOddButtonParser: OddButtonParser;
   private wrappedOdd: Odd | undefined;
 
@@ -14,7 +14,7 @@ export abstract class DbOddConnection {
     this.wrappedParentOddButtonParser = parentOddButtonParser;
   }
 
-  protected async init(): Promise<DbOddConnection> {
+  protected async init(): Promise<DbOdd> {
     this.odd = await this.updateDbOdd();
     return this;
   }

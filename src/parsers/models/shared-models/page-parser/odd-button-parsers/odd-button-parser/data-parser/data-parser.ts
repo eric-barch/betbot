@@ -3,7 +3,7 @@ import * as p from 'puppeteer';
 import { OddButtonParser } from '../odd-button-parser';
 
 export class DataParser {
-  private parentOddButtonParser: OddButtonParser;
+  private readonly parentOddButtonParser: OddButtonParser;
   private selector: string;
   private wrappedElement: p.ElementHandle | null | undefined;
   private wrappedValue: number | null | undefined;
@@ -36,8 +36,8 @@ export class DataParser {
   }
 
   private async updateElement(): Promise<p.ElementHandle | null> {
-    const buttonElement = this.parentOddButtonParser.button;
-    this.element = await buttonElement.$(`${this.selector}`);
+    const button = this.parentOddButtonParser.button;
+    this.element = await button.$(`${this.selector}`);
     return this.element;
   }
 

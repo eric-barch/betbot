@@ -2,20 +2,16 @@ import * as p from 'puppeteer';
 import { OddButtonParser } from '../odd-button-parser';
 
 export class OddButton {
-  private parentOddButtonParser: OddButtonParser;
   private wrappedButton: p.ElementHandle;
   private wrappedReferenceSelector: string | undefined;
   private wrappedReference: p.ElementHandle | undefined;
   private wrappedReferenceToButtonXPath: string | undefined;
 
   public constructor({
-    parentOddButtonParser,
     button,
   }: {
-    parentOddButtonParser: OddButtonParser,
     button: p.ElementHandle,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
     this.wrappedButton = button;
   }
 
@@ -26,12 +22,11 @@ export class OddButton {
   }): Promise<OddButton> {
     this.referenceSelector = referenceSelector;
     await this.initReference();
-    console.log('Reference initialized.');
     return this;
   }
 
   private async initReference(): Promise<p.ElementHandle> {
-    let element = this.parentOddButtonParser.button;
+    let element = this.button;
     this.referenceToButtonXPath = '';
 
     while (element) {
@@ -84,8 +79,6 @@ export class OddButton {
 
   public async updateOddButton(): Promise<p.ElementHandle> {
     const button = await this.reference.$(`xpath${this.referenceToButtonXPath}`);
-
-    const className = await (await button?.getProperty('className'))?.jsonValue();
 
     if (!button) {
       throw new Error(`button is null.`);

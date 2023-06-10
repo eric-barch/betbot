@@ -1,10 +1,10 @@
 import * as p from 'puppeteer';
 
 import { PageParser } from '@/parsers';
-import { DbGameConnection as DbGame, DbStatisticConnection as DbStatistic, DbOddConnection as DbOdd } from './db-connections';
-import { DataParser } from './data-parser';
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
-import { OddButton as OddButton } from './odd-button';
+import { DataParser } from './data-parser';
+import { DbGame, DbOdd, DbStatistic } from './db-connections';
+import { OddButton } from './odd-button';
 
 export abstract class OddButtonParser {
   private parentPageParser: PageParser;
@@ -23,10 +23,7 @@ export abstract class OddButtonParser {
     button: p.ElementHandle,
   }) {
     this.parentPageParser = parentPageParser;
-    this.wrappedOddButton = new OddButton({
-      parentOddButtonParser: this,
-      button,
-    });
+    this.wrappedOddButton = new OddButton({ button });
   }
 
   protected async init(): Promise<OddButtonParser> {

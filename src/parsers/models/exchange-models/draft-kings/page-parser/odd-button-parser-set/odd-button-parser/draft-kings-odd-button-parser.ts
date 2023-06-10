@@ -3,9 +3,9 @@ import * as p from 'puppeteer';
 import {
   OddButton,
   DataParser,
-  DbGameConnection,
-  DbOddConnection,
-  DbStatisticConnection,
+  DbGame,
+  DbOdd,
+  DbStatistic,
   PageParser,
 } from '@/parsers';
 import {
@@ -39,17 +39,17 @@ export class DraftKingsOddButtonParser extends OddButtonParser {
     return this.oddButton;
   }
 
-  protected async initDbGame(): Promise<DbGameConnection> {
+  protected async initDbGame(): Promise<DbGame> {
     this.dbGame = await DraftKingsDbGame.create({ parentOddButtonParser: this });
     return this.dbGame;
   }
 
-  protected async initDbStatistic(): Promise<DbStatisticConnection> {
+  protected async initDbStatistic(): Promise<DbStatistic> {
     this.dbStatistic = await DraftKingsDbStatisticConnection.create({ parentOddButtonParser: this });
     return this.dbStatistic;
   }
 
-  protected async initDbOdd(): Promise<DbOddConnection> {
+  protected async initDbOdd(): Promise<DbOdd> {
     this.dbOdd = await DraftKingsDbOddConnection.create({ parentOddButtonParser: this });
     return this.dbOdd;
   }

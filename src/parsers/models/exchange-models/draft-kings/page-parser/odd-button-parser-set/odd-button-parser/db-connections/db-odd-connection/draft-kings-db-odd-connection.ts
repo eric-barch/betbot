@@ -1,9 +1,9 @@
-import { DbOddConnection } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-odd-connection';
+import { DbOdd } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-odd-connection';
 import { DbUtilityFunctions, prisma } from '@/db';
 import { OddButtonParser } from '@/parsers';
 import { Odd } from '@prisma/client';
 
-export class DraftKingsDbOddConnection extends DbOddConnection {
+export class DraftKingsDbOddConnection extends DbOdd {
   public static async create({
     parentOddButtonParser,
   }: {
