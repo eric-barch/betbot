@@ -1,11 +1,11 @@
-import * as p from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
 
 import { OddButtonParser } from '../odd-button-parser';
 
 export class DataParser {
   private readonly parentOddButtonParser: OddButtonParser;
   private selector: string;
-  private wrappedElement: p.ElementHandle | null | undefined;
+  private wrappedElement: ElementHandle | null | undefined;
   private wrappedValue: number | null | undefined;
 
   protected constructor({
@@ -35,7 +35,7 @@ export class DataParser {
     return dataParser;
   }
 
-  private async updateElement(): Promise<p.ElementHandle | null> {
+  private async updateElement(): Promise<ElementHandle | null> {
     const button = this.parentOddButtonParser.button;
     this.element = await button.$(`${this.selector}`);
     return this.element;
@@ -62,11 +62,11 @@ export class DataParser {
     return this.value;
   }
 
-  private set element(element: p.ElementHandle | null) {
+  private set element(element: ElementHandle | null) {
     this.wrappedElement = element;
   }
 
-  private get element(): p.ElementHandle | null {
+  private get element(): ElementHandle | null {
     if (this.wrappedElement === undefined) {
       throw new Error(`wrappedElementHandle is undefined.`);
     }

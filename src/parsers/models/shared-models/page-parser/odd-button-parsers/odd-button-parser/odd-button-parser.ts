@@ -1,4 +1,4 @@
-import * as p from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
 
 import { PageParser } from '@/parsers';
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
@@ -20,7 +20,7 @@ export abstract class OddButtonParser {
     button,
   }: {
     parentPageParser: PageParser,
-    button: p.ElementHandle,
+    button: ElementHandle,
   }) {
     this.parentPageParser = parentPageParser;
     this.wrappedOddButton = new OddButton({ button });
@@ -83,7 +83,7 @@ export abstract class OddButtonParser {
     return this.wrappedOddButton;
   }
 
-  public get button(): p.ElementHandle {
+  public get button(): ElementHandle {
     return this.oddButton.button;
   }
 

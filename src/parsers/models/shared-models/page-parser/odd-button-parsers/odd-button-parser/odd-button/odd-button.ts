@@ -1,16 +1,15 @@
-import * as p from 'puppeteer';
-import { OddButtonParser } from '../odd-button-parser';
+import { ElementHandle } from 'puppeteer';
 
 export class OddButton {
-  private wrappedButton: p.ElementHandle;
+  private wrappedButton: ElementHandle;
   private wrappedReferenceSelector: string | undefined;
-  private wrappedReference: p.ElementHandle | undefined;
+  private wrappedReference: ElementHandle | undefined;
   private wrappedReferenceToButtonXPath: string | undefined;
 
   public constructor({
     button,
   }: {
-    button: p.ElementHandle,
+    button: ElementHandle,
   }) {
     this.wrappedButton = button;
   }
@@ -25,7 +24,7 @@ export class OddButton {
     return this;
   }
 
-  private async initReference(): Promise<p.ElementHandle> {
+  private async initReference(): Promise<ElementHandle> {
     let element = this.button;
     this.referenceToButtonXPath = '';
 
@@ -45,7 +44,7 @@ export class OddButton {
 
       const elementProperty = await element.getProperty('parentElement');
 
-      if (!(elementProperty instanceof p.ElementHandle)) {
+      if (!(elementProperty instanceof ElementHandle)) {
         throw new Error(`elementProperty is not ElementHandle.`);
       }
 
@@ -58,7 +57,7 @@ export class OddButton {
   private async getElementTagWithIndex({
     element,
   }: {
-    element: p.ElementHandle,
+    element: ElementHandle,
   }): Promise<string> {
     const { tag, index } = await element.evaluate(el => {
       const tag = el.tagName.toLowerCase();
@@ -77,7 +76,7 @@ export class OddButton {
     return `/${tag}[${index}]`;
   }
 
-  public async updateOddButton(): Promise<p.ElementHandle> {
+  public async updateOddButton(): Promise<ElementHandle> {
     const button = await this.reference.$(`xpath${this.referenceToButtonXPath}`);
 
     if (!button) {
@@ -88,11 +87,11 @@ export class OddButton {
     return this.button
   }
 
-  private set button(button: p.ElementHandle) {
+  private set button(button: ElementHandle) {
     this.wrappedButton = button;
   }
 
-  public get button(): p.ElementHandle {
+  public get button(): ElementHandle {
     if (!this.wrappedButton) {
       throw new Error(`wrappedButton is undefined.`);
     }
@@ -112,11 +111,11 @@ export class OddButton {
     return this.wrappedReferenceSelector;
   }
 
-  private set reference(reference: p.ElementHandle) {
+  private set reference(reference: ElementHandle) {
     this.wrappedReference = reference;
   }
 
-  private get reference(): p.ElementHandle {
+  private get reference(): ElementHandle {
     if (!this.wrappedReference) {
       throw new Error(`wrappedReference is undefined.`);
     }
