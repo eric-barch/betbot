@@ -1,7 +1,6 @@
 import { PageParserInitData } from '@/setup';
 import { PageParser, DraftKingsPageParser } from '@/parsers';
 
-//TODO: I feel like this doesn't make sense to have?
 export class PageParserFactory {
   public static async create({
     pageParserInitData,
@@ -14,11 +13,9 @@ export class PageParserFactory {
       case 'DraftKings':
         return await DraftKingsPageParser.create({ pageParserInitData });
       case 'FanDuel':
-
-        break;
+        throw new Error(`FanDuelPageParser not implemented.`);
       case 'SugarHouse':
-
-        break;
+        throw new Error(`SugarHousePageParser not implemented.`);
     }
 
     throw new Error(`Did not find matching exchangeName.`);

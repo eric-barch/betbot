@@ -14,7 +14,7 @@ export class DraftKingsOddButtonParserSet extends OddButtonParsers {
     return draftKingsOddButtonParserSet;
   }
 
-  protected async scrapePageForButtons(): Promise<Array<p.ElementHandle>> {
+  protected async scrapeButtons(): Promise<Array<p.ElementHandle>> {
     const page = this.parentPageParser.page;
     this.buttons = await page.$$('div[role="button"].sportsbook-outcome-cell__body');
     return this.buttons;

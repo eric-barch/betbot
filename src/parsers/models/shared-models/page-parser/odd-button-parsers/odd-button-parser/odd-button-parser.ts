@@ -1,13 +1,13 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser } from '@/parsers';
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
 import { DataParser } from './data-parser';
 import { DbGame, DbOdd, DbStatistic } from './db-connections';
 import { OddButton } from './odd-button';
 
 export abstract class OddButtonParser {
-  private parentPageParser: PageParser;
+  protected readonly exchange: Exchange;
+  protected readonly league: League;
   private wrappedOddButton: OddButton;
   private wrappedDbGame: DbGame | undefined;
   private wrappedDbStatistic: DbStatistic | undefined;
@@ -16,13 +16,16 @@ export abstract class OddButtonParser {
   private wrappedValueParser: DataParser | undefined;
 
   protected constructor({
-    parentPageParser,
+    exchange,
+    league,
     button,
   }: {
-    parentPageParser: PageParser,
+    exchange: Exchange,
+    league: League,
     button: ElementHandle,
   }) {
-    this.parentPageParser = parentPageParser;
+    this.exchange = exchange;
+    this.league = league;
     this.wrappedOddButton = new OddButton({ button });
   }
 
@@ -61,14 +64,6 @@ export abstract class OddButtonParser {
       price,
       value,
     });
-  }
-
-  public get exchange(): Exchange {
-    return this.parentPageParser.exchange;
-  }
-
-  public get league(): League {
-    return this.parentPageParser.league;
   }
 
   protected set oddButton(oddButton: OddButton) {

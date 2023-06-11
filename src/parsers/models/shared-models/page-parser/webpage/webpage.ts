@@ -1,7 +1,7 @@
 import { Browser, connect, Page } from 'puppeteer';
 
 export class Webpage {
-  private wrappedUrl: string;
+  private readonly url: string;
   private wrappedBrowser: Browser | undefined;
   private wrappedPage: Page | undefined;
 
@@ -10,7 +10,7 @@ export class Webpage {
   }: {
     url: string,
   }) {
-    this.wrappedUrl = url;
+    this.url = url;
   }
 
   public static async create({
@@ -51,7 +51,7 @@ export class Webpage {
 
   private async connectToExistingPage(): Promise<Page> {
     const targets = this.browser.targets();
-    const target = targets.find((target) => target.url().includes(this.wrappedUrl));
+    const target = targets.find((target) => target.url().includes(this.url));
 
     if (!target) {
       throw new Error('Expected Target.');
@@ -79,7 +79,7 @@ export class Webpage {
   private async connectToNewPage(): Promise<Page> {
     this.page = await this.browser.newPage();
 
-    await this.page.goto(this.wrappedUrl);
+    await this.page.goto(this.url);
 
     const windowSize = await this.page.evaluate(() => {
       return {
@@ -103,7 +103,7 @@ export class Webpage {
 
   private get browser(): Browser {
     if (!this.wrappedBrowser) {
-      throw new Error(`wrappedBrowser is null.`);
+      throw new Error(`wrappedBrowser is undefined.`);
     }
 
     return this.wrappedBrowser;
@@ -115,7 +115,7 @@ export class Webpage {
 
   public get page(): Page {
     if (!this.wrappedPage) {
-      throw new Error(`wrappedPage is null.`);
+      throw new Error(`wrappedPage is undefined.`);
     }
 
     return this.wrappedPage;
