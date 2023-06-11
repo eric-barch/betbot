@@ -1,7 +1,9 @@
 
+import { Game } from '@prisma/client';
+
 import { DbUtilityFunctions, prisma } from '@/db';
 import { OddButtonParser } from '@/parsers';
-import { Game } from '@prisma/client';
+
 import { DraftKingsMatchupParser } from './draft-kings-matchup-parser';
 import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
 

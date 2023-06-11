@@ -1,4 +1,5 @@
 import { Game } from '@prisma/client';
+
 import { OddButtonParser } from '../odd-button-parser';
 
 export abstract class DbGameInitializer {

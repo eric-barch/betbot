@@ -1,13 +1,13 @@
 import { ElementHandle } from 'puppeteer';
 
-import { Exchange, League } from '@prisma/client';
-import { OddButtonParser } from './odd-button-parser';
 import { PageParser } from '../page-parser';
+
+import { OddButtonParser } from './odd-button-parser';
 
 export abstract class OddButtonParsers {
   protected readonly parentPageParser: PageParser;
   private wrappedButtons: Array<ElementHandle> | undefined;
-  private wrappedOddButtonParsers: Set<OddButtonParser> | undefined;
+  private wrappedOddButtonParsers: Set<OddButtonParser>;
 
   protected constructor({
     parentPageParser,
@@ -15,6 +15,7 @@ export abstract class OddButtonParsers {
     parentPageParser: PageParser,
   }) {
     this.parentPageParser = parentPageParser;
+    this.wrappedOddButtonParsers = new Set<OddButtonParser>();
   }
 
   protected async init(): Promise<OddButtonParsers> {

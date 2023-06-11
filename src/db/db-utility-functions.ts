@@ -1,5 +1,6 @@
-import { prisma } from './prisma-client';
 import { Exchange, ExchangeToGame, Game, League, Odd, Statistic, Team } from '@prisma/client';
+
+import { prisma } from './prisma-client';
 
 export class DbUtilityFunctions {
   public static async findOrCreateGameByMatchupAndStartDate({
