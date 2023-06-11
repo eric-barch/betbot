@@ -1,18 +1,18 @@
 
-import { DbUtilityFunctions, prisma } from '@/db';
-import { Statistic } from '@prisma/client';
+import { prisma } from '@/db';
 import { OddButtonParser } from '@/parsers';
-import { DbStatistic } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-statistic-connection';
+import { DbStatisticInitializer } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-initializers/db-statistic-initializer';
+import { Statistic } from '@prisma/client';
 
-export class DraftKingsDbStatisticConnection extends DbStatistic {
+export class DraftKingsDbStatisticInitializer extends DbStatisticInitializer {
   public static async create({
     parentOddButtonParser,
   }: {
     parentOddButtonParser: OddButtonParser,
-  }): Promise<DraftKingsDbStatisticConnection> {
-    const draftKingsDbStatisticConnection = new DraftKingsDbStatisticConnection({ parentOddButtonParser });
-    await draftKingsDbStatisticConnection.init();
-    return draftKingsDbStatisticConnection;
+  }): Promise<DraftKingsDbStatisticInitializer> {
+    const draftKingsDbStatisticInitializer = new DraftKingsDbStatisticInitializer({ parentOddButtonParser });
+    await draftKingsDbStatisticInitializer.init();
+    return draftKingsDbStatisticInitializer;
   }
 
   protected async updateDbStatistic(): Promise<Statistic> {

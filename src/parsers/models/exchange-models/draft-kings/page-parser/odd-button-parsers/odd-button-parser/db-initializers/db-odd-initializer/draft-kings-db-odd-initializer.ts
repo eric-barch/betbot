@@ -1,17 +1,17 @@
-import { DbOdd } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-odd-connection';
-import { DbUtilityFunctions, prisma } from '@/db';
+import { prisma } from '@/db';
 import { OddButtonParser } from '@/parsers';
+import { DbOddInitializer } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-initializers/db-odd-initializer';
 import { Odd } from '@prisma/client';
 
-export class DraftKingsDbOddConnection extends DbOdd {
+export class DraftKingsDbOddInitializer extends DbOddInitializer {
   public static async create({
     parentOddButtonParser,
   }: {
     parentOddButtonParser: OddButtonParser,
-  }): Promise<DraftKingsDbOddConnection> {
-    const dbOddConnection = new DraftKingsDbOddConnection({ parentOddButtonParser });
-    await dbOddConnection.init();
-    return dbOddConnection;
+  }): Promise<DraftKingsDbOddInitializer> {
+    const draftKingsdbOddInitializer = new DraftKingsDbOddInitializer({ parentOddButtonParser });
+    await draftKingsdbOddInitializer.init();
+    return draftKingsdbOddInitializer;
   }
 
   protected async updateDbOdd(): Promise<Odd> {

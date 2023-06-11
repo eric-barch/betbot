@@ -3,13 +3,13 @@ import * as p from 'puppeteer';
 import { DraftKingsOddButtonParser, DraftKingsPageParser, OddButtonParser } from '@/parsers';
 import { OddButtonParsers } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parsers';
 
-export class DraftKingsOddButtonParserSet extends OddButtonParsers {
+export class DraftKingsOddButtonParsers extends OddButtonParsers {
   public static async create({
     parentPageParser,
   }: {
     parentPageParser: DraftKingsPageParser;
-  }): Promise<DraftKingsOddButtonParserSet> {
-    const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet({ parentPageParser });
+  }): Promise<DraftKingsOddButtonParsers> {
+    const draftKingsOddButtonParserSet = new DraftKingsOddButtonParsers({ parentPageParser });
     await draftKingsOddButtonParserSet.init();
     return draftKingsOddButtonParserSet;
   }
@@ -23,13 +23,14 @@ export class DraftKingsOddButtonParserSet extends OddButtonParsers {
   protected async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
     for (const button of this.buttons) {
       const draftKingsOddButtonParser = await DraftKingsOddButtonParser.create({
-        parentPageParser: this.parentPageParser,
+        exchange: this.parentPageParser.exchange,
+        league: this.parentPageParser.league,
         button: button,
       });
 
-      this.add(draftKingsOddButtonParser);
+      this.oddButtonParsers.add(draftKingsOddButtonParser);
     }
 
-    return this;
+    return this.oddButtonParsers;
   }
 }

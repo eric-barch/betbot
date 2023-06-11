@@ -1,9 +1,19 @@
 import { Game } from '@prisma/client';
+import { OddButtonParser } from '../odd-button-parser';
 
-export abstract class DbGame {
+export abstract class DbGameInitializer {
+  protected readonly parentOddButtonParser: OddButtonParser;
   private wrappedGame: Game | undefined;
 
-  protected async init(): Promise<DbGame> {
+  protected constructor({
+    parentOddButtonParser,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+  }) {
+    this.parentOddButtonParser = parentOddButtonParser;
+  }
+
+  protected async init(): Promise<DbGameInitializer> {
     this.game = await this.updateDbGame();
     return this;
   }
