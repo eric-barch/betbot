@@ -11,7 +11,7 @@ import {
 
 import {
   DraftKingsDbGameInitializer, DraftKingsDbOddInitializer, DraftKingsDbStatisticInitializer,
-} from './db-initializers';
+} from './draft-kings-db-initializers';
 
 export class DraftKingsOddButtonParser extends OddButtonParser {
   public static async create({
