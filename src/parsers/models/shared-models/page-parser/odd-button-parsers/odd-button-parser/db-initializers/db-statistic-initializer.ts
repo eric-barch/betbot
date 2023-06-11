@@ -1,4 +1,5 @@
 import { Statistic } from '@prisma/client';
+
 import { OddButtonParser } from '../odd-button-parser';
 
 export abstract class DbStatisticInitializer {

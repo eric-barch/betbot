@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
-
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
+
 import { DataParser } from './data-parser';
 import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './db-initializers';
 import { OddButton } from './odd-button';

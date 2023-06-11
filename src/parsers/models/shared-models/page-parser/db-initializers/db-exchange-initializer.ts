@@ -1,6 +1,7 @@
+import { Exchange } from '@prisma/client';
+
 import { prisma } from '@/db';
 import { ExchangeInitData } from '@/setup';
-import { Exchange } from '@prisma/client';
 
 export class DbExchangeInitializer {
   private initData: ExchangeInitData;

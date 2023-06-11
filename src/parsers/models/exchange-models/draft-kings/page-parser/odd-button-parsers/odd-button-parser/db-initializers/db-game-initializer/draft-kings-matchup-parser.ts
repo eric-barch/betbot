@@ -1,7 +1,7 @@
 import { ElementHandle } from 'puppeteer';
+import { Team } from '@prisma/client';
 
 import { DbUtilityFunctions } from '@/db';
-import { Team } from '@prisma/client';
 import { OddButtonParser } from '@/parsers/models/shared-models';
 
 export class DraftKingsMatchupParser {

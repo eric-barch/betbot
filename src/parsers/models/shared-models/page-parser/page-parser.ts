@@ -1,7 +1,8 @@
 import { Page } from 'puppeteer';
+import { Exchange, League } from '@prisma/client';
 
 import { PageParserInitData } from '@/setup';
-import { Exchange, League } from '@prisma/client';
+
 import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
 import { OddButtonParsers } from './odd-button-parsers';
 import { Webpage } from './webpage';

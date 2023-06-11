@@ -1,5 +1,7 @@
-import { prisma } from '@/db';
 import { Odd } from '@prisma/client';
+
+import { prisma } from '@/db';
+
 import { OddButtonParser } from '../odd-button-parser';
 
 export abstract class DbOddInitializer {

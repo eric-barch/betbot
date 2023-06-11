@@ -1,4 +1,5 @@
 import { ElementHandle } from 'puppeteer';
+import { Exchange, League } from '@prisma/client';
 
 import {
   DataParser, DbGameInitializer, DbOddInitializer, DbStatisticInitializer,
@@ -7,7 +8,7 @@ import {
 import {
   OddButtonParser,
 } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
-import { Exchange, League } from '@prisma/client';
+
 import {
   DraftKingsDbGameInitializer, DraftKingsDbOddInitializer, DraftKingsDbStatisticInitializer,
 } from './db-initializers';

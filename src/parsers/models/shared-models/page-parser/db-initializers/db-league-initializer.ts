@@ -1,6 +1,7 @@
+import { League } from '@prisma/client';
+
 import { DbUtilityFunctions, prisma } from '@/db';
 import { LeagueInitData } from '@/setup';
-import { League } from '@prisma/client';
 
 export class DbLeagueInitializer {
   private initData: LeagueInitData;
