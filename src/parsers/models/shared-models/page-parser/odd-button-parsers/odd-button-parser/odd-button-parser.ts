@@ -2,16 +2,16 @@ import { ElementHandle } from 'puppeteer';
 
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
 import { DataParser } from './data-parser';
-import { DbGame, DbOdd, DbStatistic } from './db-connections';
+import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './db-initializers';
 import { OddButton } from './odd-button';
 
 export abstract class OddButtonParser {
-  protected readonly exchange: Exchange;
-  protected readonly league: League;
+  public readonly exchange: Exchange;
+  public readonly league: League;
   private wrappedOddButton: OddButton;
-  private wrappedDbGame: DbGame | undefined;
-  private wrappedDbStatistic: DbStatistic | undefined;
-  private wrappedDbOdd: DbOdd | undefined;
+  private wrappedDbGameInitializer: DbGameInitializer | undefined;
+  private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
+  private wrappedDbOddInitializer: DbOddInitializer | undefined;
   private wrappedPriceParser: DataParser | undefined;
   private wrappedValueParser: DataParser | undefined;
 
@@ -31,11 +31,11 @@ export abstract class OddButtonParser {
 
   protected async init(): Promise<OddButtonParser> {
     this.oddButton = await this.initOddButton();
-    this.dbGame = await this.initDbGame();
-    this.dbStatistic = await this.initDbStatistic();
-    this.dbOdd = await this.initDbOdd();
-    this.priceParser = await this.initPriceParser();
-    this.valueParser = await this.initValueParser();
+    this.dbGameInitializer = await this.createConcreteDbGameInitializer();
+    this.dbStatisticInitializer = await this.createConcreteDbStatisticInitializer();
+    this.dbOddInitializer = await this.createConcreteDbOddInitializer();
+    this.priceParser = await this.createConcretePriceParser();
+    this.valueParser = await this.createConcreteValueParser();
 
     await this.updateOddData();
 
@@ -44,15 +44,15 @@ export abstract class OddButtonParser {
 
   protected abstract initOddButton(): Promise<OddButton>;
 
-  protected abstract initDbGame(): Promise<DbGame>;
+  protected abstract createConcreteDbGameInitializer(): Promise<DbGameInitializer>;
 
-  protected abstract initDbStatistic(): Promise<DbStatistic>;
+  protected abstract createConcreteDbStatisticInitializer(): Promise<DbStatisticInitializer>;
 
-  protected abstract initDbOdd(): Promise<DbOdd>;
+  protected abstract createConcreteDbOddInitializer(): Promise<DbOddInitializer>;
 
-  protected abstract initPriceParser(): Promise<DataParser>;
+  protected abstract createConcretePriceParser(): Promise<DataParser>;
 
-  protected abstract initValueParser(): Promise<DataParser>;
+  protected abstract createConcreteValueParser(): Promise<DataParser>;
 
   public abstract updateOddData(): Promise<OddButtonParser>;
 
@@ -60,7 +60,7 @@ export abstract class OddButtonParser {
     const price = await this.priceParser.getValue();
     const value = await this.valueParser.getValue();
 
-    await this.dbOdd.updateData({
+    await this.dbOddInitializer.updateData({
       price,
       value,
     });
@@ -82,52 +82,52 @@ export abstract class OddButtonParser {
     return this.oddButton.button;
   }
 
-  protected set dbGame(dbGameConnection: DbGame) {
-    this.wrappedDbGame = dbGameConnection;
+  protected set dbGameInitializer(dbGameInitializer: DbGameInitializer) {
+    this.wrappedDbGameInitializer = dbGameInitializer;
   }
 
-  protected get dbGame(): DbGame {
-    if (!this.wrappedDbGame) {
-      throw new Error(`wrappedDbGameConnection is undefined.`);
+  protected get dbGameInitializer(): DbGameInitializer {
+    if (!this.wrappedDbGameInitializer) {
+      throw new Error(`wrappedDbGameInitializer is undefined.`);
     }
 
-    return this.wrappedDbGame;
+    return this.wrappedDbGameInitializer;
   }
 
   public get game(): Game {
-    return this.dbGame.game;
+    return this.dbGameInitializer.game;
   }
 
-  protected set dbStatistic(dbStatisticConnection: DbStatistic) {
-    this.wrappedDbStatistic = dbStatisticConnection;
+  protected set dbStatisticInitializer(dbStatisticInitializer: DbStatisticInitializer) {
+    this.wrappedDbStatisticInitializer = dbStatisticInitializer;
   }
 
-  protected get dbStatistic(): DbStatistic {
-    if (!this.wrappedDbStatistic) {
-      throw new Error(`wrappedDbStatisticConnection is undefined.`);
+  protected get dbStatisticInitializer(): DbStatisticInitializer {
+    if (!this.wrappedDbStatisticInitializer) {
+      throw new Error(`wrappedDbStatisticInitializer is undefined.`);
     }
 
-    return this.wrappedDbStatistic;
+    return this.wrappedDbStatisticInitializer;
   }
 
   public get statistic(): Statistic {
-    return this.dbStatistic.statistic;
+    return this.dbStatisticInitializer.statistic;
   }
 
-  protected set dbOdd(dbOddConnection: DbOdd) {
-    this.wrappedDbOdd = dbOddConnection;
+  protected set dbOddInitializer(dbOddInitializer: DbOddInitializer) {
+    this.wrappedDbOddInitializer = dbOddInitializer;
   }
 
-  protected get dbOdd(): DbOdd {
-    if (!this.wrappedDbOdd) {
-      throw new Error(`wrappedDbOddConnection is undefined.`);
+  protected get dbOddInitializer(): DbOddInitializer {
+    if (!this.wrappedDbOddInitializer) {
+      throw new Error(`wrappedDbOddInitializer is undefined.`);
     }
 
-    return this.wrappedDbOdd;
+    return this.wrappedDbOddInitializer;
   }
 
   public get odd(): Odd {
-    return this.dbOdd.odd;
+    return this.dbOddInitializer.odd;
   }
 
   protected set priceParser(priceParser: DataParser) {

@@ -1,10 +1,20 @@
 import { prisma } from '@/db';
 import { Odd } from '@prisma/client';
+import { OddButtonParser } from '../odd-button-parser';
 
-export abstract class DbOdd {
+export abstract class DbOddInitializer {
+  protected readonly parentOddButtonParser: OddButtonParser;
   private wrappedOdd: Odd | undefined;
 
-  protected async init(): Promise<DbOdd> {
+  protected constructor({
+    parentOddButtonParser,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+  }) {
+    this.parentOddButtonParser = parentOddButtonParser;
+  }
+
+  protected async init(): Promise<DbOddInitializer> {
     this.odd = await this.updateDbOdd();
     return this;
   }

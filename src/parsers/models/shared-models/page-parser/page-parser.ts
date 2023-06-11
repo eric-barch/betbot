@@ -2,15 +2,15 @@ import { Page } from 'puppeteer';
 
 import { PageParserInitData } from '@/setup';
 import { Exchange, League } from '@prisma/client';
-import { DbExchange as ExchangeInitializer, DbLeague as LeagueInitializer } from './db-connections';
+import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
 import { OddButtonParsers } from './odd-button-parsers';
 import { Webpage } from './webpage';
 
 export abstract class PageParser {
   private readonly initData: PageParserInitData;
   private wrappedWebpage: Webpage | undefined;
-  private wrappedExchangeInitializer: ExchangeInitializer | undefined;
-  private wrappedLeagueInitializer: LeagueInitializer | undefined;
+  private wrappedDbExchangeInitializer: DbExchangeInitializer | undefined;
+  private wrappedDbLeagueInitializer: DbLeagueInitializer | undefined;
   private wrappedOddButtonParsers: OddButtonParsers | undefined;
 
   protected constructor({
@@ -23,8 +23,8 @@ export abstract class PageParser {
 
   protected async init(): Promise<PageParser> {
     this.webpage = await Webpage.create({ url: this.initData.url });
-    this.exchangeInitializer = await ExchangeInitializer.create({ initData: this.initData.exchangeInitData });
-    this.leagueInitializer = await LeagueInitializer.create({ initData: this.initData.leagueInitData });
+    this.dbExchangeInitializer = await DbExchangeInitializer.create({ initData: this.initData.exchangeInitData });
+    this.dbLeagueInitializer = await DbLeagueInitializer.create({ initData: this.initData.leagueInitData });
     this.oddButtonParsers = await this.createOddButtonParsers();
     return this;
   }
@@ -52,12 +52,28 @@ export abstract class PageParser {
     return this.wrappedWebpage;
   }
 
-  private set exchangeInitializer(exchangeInitializer: ExchangeInitializer) {
-    this.wrappedExchangeInitializer = exchangeInitializer;
+  private set dbExchangeInitializer(dbExchangeInitializer: DbExchangeInitializer) {
+    this.wrappedDbExchangeInitializer = dbExchangeInitializer;
   }
 
-  private set leagueInitializer(leagueInitializer: LeagueInitializer) {
-    this.wrappedLeagueInitializer = leagueInitializer;
+  private get dbExchangeInitializer(): DbExchangeInitializer {
+    if (!this.wrappedDbExchangeInitializer) {
+      throw new Error(`wrappedDbExchangeInitializer is undefined.`);
+    }
+
+    return this.wrappedDbExchangeInitializer;
+  }
+
+  private set dbLeagueInitializer(dbLeagueInitializer: DbLeagueInitializer) {
+    this.wrappedDbLeagueInitializer = dbLeagueInitializer;
+  }
+
+  private get dbLeagueInitializer(): DbLeagueInitializer {
+    if (!this.wrappedDbLeagueInitializer) {
+      throw new Error(`wrappedDbLeagueInitializer is undefined.`);
+    }
+
+    return this.wrappedDbLeagueInitializer;
   }
 
   protected set oddButtonParsers(oddButtonParsers: OddButtonParsers) {
@@ -77,10 +93,10 @@ export abstract class PageParser {
   }
 
   public get exchange(): Exchange {
-    return this.exchangeInitializer.exchange;
+    return this.dbExchangeInitializer.exchange;
   }
 
   public get league(): League {
-    return this.leagueInitializer.league
+    return this.dbLeagueInitializer.league
   }
 }

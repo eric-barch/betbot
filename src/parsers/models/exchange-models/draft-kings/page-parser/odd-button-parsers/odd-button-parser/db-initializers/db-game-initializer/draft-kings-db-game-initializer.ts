@@ -1,21 +1,21 @@
-import { DbUtilityFunctions, prisma } from '@/db';
+import { prisma } from '@/db';
 import { OddButtonParser } from '@/parsers';
-import { DbGame as DbGame } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-connections/db-game-connection';
+import { DbGameInitializer } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-initializers/db-game-initializer';
 import { Game } from '@prisma/client';
 import { DraftKingsGameParser } from './draft-kings-game-parser';
 
-export class DraftKingsDbGame extends DbGame {
+export class DraftKingsDbGameInitializer extends DbGameInitializer {
   private wrappedExchangeAssignedGameId: string | undefined;
   private wrappedGameParser: DraftKingsGameParser | undefined;
 
   public static async create({
     parentOddButtonParser,
   }: {
-    parentOddButtonParser: OddButtonParser,
-  }): Promise<DraftKingsDbGame> {
-    const draftKingsDbGameConnection = new DraftKingsDbGame({ parentOddButtonParser });
-    await draftKingsDbGameConnection.init();
-    return draftKingsDbGameConnection;
+    parentOddButtonParser: OddButtonParser;
+  }): Promise<DraftKingsDbGameInitializer> {
+    const draftKingsDbGameInitializer = new DraftKingsDbGameInitializer({ parentOddButtonParser });
+    await draftKingsDbGameInitializer.init();
+    return draftKingsDbGameInitializer;
   }
 
   protected async updateDbGame(): Promise<Game> {
@@ -37,7 +37,10 @@ export class DraftKingsDbGame extends DbGame {
       throw new Error(`button is null.`);
     }
 
-    const dataTracking = await button.evaluate(el => JSON.parse(el.getAttribute('data-tracking') || ''));
+    const dataTracking = await this.parentOddButtonParser.button.evaluate(
+      el => JSON.parse(el.getAttribute('data-tracking') || '')
+    );
+
     this.exchangeAssignedGameId = dataTracking.eventId;
     return this.exchangeAssignedGameId;
   }
