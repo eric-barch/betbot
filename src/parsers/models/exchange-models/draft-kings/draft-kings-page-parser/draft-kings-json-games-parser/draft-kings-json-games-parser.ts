@@ -1,7 +1,7 @@
 import { Game } from '@prisma/client';
 
 import { DbUtilityFunctions, prisma } from '@/db';
-import { PageParser } from '@/parsers';
+import { PageParser } from '@/parsers/models/shared-models';
 
 export class DraftKingsJsonGamesParser {
   private parentPageParser: PageParser;
