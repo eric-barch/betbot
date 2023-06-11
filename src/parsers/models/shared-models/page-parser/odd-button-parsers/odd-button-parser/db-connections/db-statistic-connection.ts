@@ -1,17 +1,7 @@
 import { Statistic } from '@prisma/client';
-import { OddButtonParser } from '../odd-button-parser';
 
 export abstract class DbStatistic {
-  protected readonly parentOddButtonParser: OddButtonParser;
   private wrappedStatistic: Statistic | undefined;
-
-  protected constructor({
-    parentOddButtonParser,
-  }: {
-    parentOddButtonParser: OddButtonParser,
-  }) {
-    this.parentOddButtonParser = parentOddButtonParser;
-  }
 
   protected async init(): Promise<DbStatistic> {
     this.statistic = await this.updateDbStatistic();

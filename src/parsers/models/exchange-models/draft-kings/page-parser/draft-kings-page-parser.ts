@@ -16,7 +16,7 @@ export class DraftKingsPageParser extends PageParser {
     return draftKingsPageParser;
   }
 
-  protected async initOddButtonParsers(): Promise<OddButtonParsers> {
+  protected async createOddButtonParsers(): Promise<OddButtonParsers> {
     this.jsonGamesParser = await DraftKingsJsonGamesParser.create({ parentPageParser: this });
     this.oddButtonParsers = await DraftKingsOddButtonParserSet.create({ parentPageParser: this });
     return this.oddButtonParsers;
