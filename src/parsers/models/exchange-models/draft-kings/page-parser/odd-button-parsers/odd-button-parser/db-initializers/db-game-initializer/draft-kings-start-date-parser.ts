@@ -1,5 +1,5 @@
-import * as c from 'chrono-node';
-import * as p from 'puppeteer';
+import { parseDate } from 'chrono-node';
+import { ElementHandle } from 'puppeteer';
 
 import { OddButtonParser } from '@/parsers/models/shared-models';
 
@@ -43,7 +43,7 @@ export class DraftKingsStartDateParser {
     return this.dateString;
   }
 
-  private async getDateTableElement(): Promise<p.ElementHandle> {
+  private async getDateTableElement(): Promise<ElementHandle> {
     let ancestor = this.parentOddButtonParser.button;
 
     const classNameToFind = 'parlay-card-10-a';
@@ -86,7 +86,7 @@ export class DraftKingsStartDateParser {
     return this.timeString;
   }
 
-  private async getTeamRowElement(): Promise<p.ElementHandle> {
+  private async getTeamRowElement(): Promise<ElementHandle> {
     let ancestor = this.parentOddButtonParser.button;
 
     const nodeNameToFind = 'tr';
@@ -112,7 +112,7 @@ export class DraftKingsStartDateParser {
 
   private parseStartDate(): Date {
     const startDateString = `${this.dateString} ${this.timeString}`;
-    this.startDate = c.parseDate(startDateString);
+    this.startDate = parseDate(startDateString);
     return this.startDate;
   }
 

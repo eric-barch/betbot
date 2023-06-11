@@ -1,4 +1,4 @@
-import * as p from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
 
 import { DbUtilityFunctions } from '@/db';
 import { Team } from '@prisma/client';
@@ -6,8 +6,8 @@ import { OddButtonParser } from '@/parsers/models/shared-models';
 
 export class DraftKingsMatchupParser {
   private parentOddButtonParser: OddButtonParser;
-  private wrappedTeamRowElement: p.ElementHandle | undefined;
-  private wrappedGameLinkElement: p.ElementHandle | undefined;
+  private wrappedTeamRowElement: ElementHandle | undefined;
+  private wrappedGameLinkElement: ElementHandle | undefined;
   private wrappedGameLinkString: string | undefined;
   private wrappedAwayTeam: Team | undefined;
   private wrappedHomeTeam: Team | undefined;
@@ -47,7 +47,7 @@ export class DraftKingsMatchupParser {
     return this.gameLinkString;
   }
 
-  private async updateGameLinkElement(): Promise<p.ElementHandle> {
+  private async updateGameLinkElement(): Promise<ElementHandle> {
     await this.updateTeamRowElement();
 
     const gameLinkElement = await this.teamRowElement.$('.event-cell-link');
@@ -61,7 +61,7 @@ export class DraftKingsMatchupParser {
     return this.gameLinkElement;
   }
 
-  private async updateTeamRowElement(): Promise<p.ElementHandle> {
+  private async updateTeamRowElement(): Promise<ElementHandle> {
     let ancestor = this.parentOddButtonParser.button;
 
     const nodeNameToFind = 'tr';
@@ -115,7 +115,7 @@ export class DraftKingsMatchupParser {
     };
   }
 
-  private get teamRowElement(): p.ElementHandle {
+  private get teamRowElement(): ElementHandle {
     if (!this.wrappedTeamRowElement) {
       throw new Error(`wrappedTeamRowElement is undefined.`);
     }
@@ -123,11 +123,11 @@ export class DraftKingsMatchupParser {
     return this.wrappedTeamRowElement;
   }
 
-  private set teamRowElement(teamRowElement: p.ElementHandle) {
+  private set teamRowElement(teamRowElement: ElementHandle) {
     this.wrappedTeamRowElement = teamRowElement;
   }
 
-  private get gameLinkElement(): p.ElementHandle {
+  private get gameLinkElement(): ElementHandle {
     if (!this.wrappedGameLinkElement) {
       throw new Error(`wrappedGameLinkElement is undefined.`);
     }
@@ -135,7 +135,7 @@ export class DraftKingsMatchupParser {
     return this.wrappedGameLinkElement;
   }
 
-  private set gameLinkElement(gameLinkElement: p.ElementHandle) {
+  private set gameLinkElement(gameLinkElement: ElementHandle) {
     this.wrappedGameLinkElement = gameLinkElement;
   }
 
