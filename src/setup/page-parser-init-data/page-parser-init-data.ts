@@ -1,6 +1,8 @@
 
-import { prisma } from '@/db';
 import { Exchange, League, Team } from '@prisma/client';
+
+import { prisma } from '@/db';
+
 import {
   ExchangeInitData, LeagueInitData, PageTypeInitData, TeamsInitDataFactory, draftKingsInitData,
   fanDuelInitData, gamesPageTypeInitData, mlbInitData, nbaInitData, nflInitData, sugarHouseInitData,

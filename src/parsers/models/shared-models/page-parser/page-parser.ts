@@ -1,106 +1,103 @@
-import * as p from 'puppeteer';
+import { Page } from 'puppeteer';
+import { Exchange, League } from '@prisma/client';
 
 import { PageParserInitData } from '@/setup';
-import { Exchange, League } from '@prisma/client';
-import { DbExchangeConnection, DbLeagueConnection } from './db-connections';
-import { OddButtonParserSet } from './odd-button-parser-set';
-import { WebpageConnection } from './webpage-connection';
+
+import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
+import { OddButtonParsers } from './odd-button-parsers';
+import { Webpage } from './webpage';
 
 export abstract class PageParser {
-  private pageParserInitData: PageParserInitData;
-  private wrappedWebpageConnection: WebpageConnection | undefined;
-  private wrappedDbExchangeConnection: DbExchangeConnection | undefined;
-  private wrappedDbLeagueConnection: DbLeagueConnection | undefined;
-  private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
+  private readonly initData: PageParserInitData;
+  private wrappedWebpage: Webpage | undefined;
+  private wrappedDbExchangeInitializer: DbExchangeInitializer | undefined;
+  private wrappedDbLeagueInitializer: DbLeagueInitializer | undefined;
+  private wrappedOddButtonParsers: OddButtonParsers | undefined;
 
   protected constructor({
-    pageParserInitData,
+    initData,
   }: {
-    pageParserInitData: PageParserInitData,
+    initData: PageParserInitData,
   }) {
-    this.pageParserInitData = pageParserInitData;
+    this.initData = initData;
   }
 
   protected async init(): Promise<PageParser> {
-    this.webpageConnection = await WebpageConnection.create({ parentPageParser: this });
-    this.dbExchangeConnection = await DbExchangeConnection.create({ parentPageParser: this });
-    this.dbLeagueConnection = await DbLeagueConnection.create({ parentPageParser: this });
-    this.oddButtonParserSet = await this.initOddButtonParserSet();
+    this.webpage = await Webpage.create({ url: this.initData.url });
+    this.dbExchangeInitializer = await DbExchangeInitializer.create({ initData: this.initData.exchangeInitData });
+    this.dbLeagueInitializer = await DbLeagueInitializer.create({ initData: this.initData.leagueInitData });
+    this.oddButtonParsers = await this.createOddButtonParsers();
     return this;
   }
 
-  protected abstract initOddButtonParserSet(): Promise<OddButtonParserSet>;
+  protected abstract createOddButtonParsers(): Promise<OddButtonParsers>;
 
   public async updateOddData(): Promise<PageParser> {
-    await this.oddButtonParserSet.updateOddData();
+    await this.oddButtonParsers.updateOddData();
     return this;
   };
 
   public async disconnect(): Promise<void> {
-    await this.webpageConnection.disconnect();
+    await this.webpage.disconnect();
   }
 
-  public get exchangeName(): string {
-    return this.pageParserInitData.exchangeInitData.name;
+  private set webpage(webpage: Webpage) {
+    this.wrappedWebpage = webpage;
   }
 
-  public get leagueName(): string {
-    return this.pageParserInitData.leagueInitData.name;
-  }
-
-  public get url(): string {
-    return this.pageParserInitData.url;
-  }
-
-  public get page(): p.Page {
-    return this.webpageConnection.page;
-  }
-
-  private get webpageConnection(): WebpageConnection {
-    if (!this.wrappedWebpageConnection) {
-      throw new Error(`wrappedWebpageConnection is undefined.`);
+  private get webpage(): Webpage {
+    if (!this.wrappedWebpage) {
+      throw new Error(`wrappedWebpage is undefined.`);
     }
 
-    return this.wrappedWebpageConnection;
+    return this.wrappedWebpage;
   }
 
-  private set webpageConnection(webpageConnection: WebpageConnection) {
-    this.wrappedWebpageConnection = webpageConnection;
+  private set dbExchangeInitializer(dbExchangeInitializer: DbExchangeInitializer) {
+    this.wrappedDbExchangeInitializer = dbExchangeInitializer;
   }
 
-  private set dbExchangeConnection(dbExchangeConnection: DbExchangeConnection) {
-    this.wrappedDbExchangeConnection = dbExchangeConnection;
+  private get dbExchangeInitializer(): DbExchangeInitializer {
+    if (!this.wrappedDbExchangeInitializer) {
+      throw new Error(`wrappedDbExchangeInitializer is undefined.`);
+    }
+
+    return this.wrappedDbExchangeInitializer;
+  }
+
+  private set dbLeagueInitializer(dbLeagueInitializer: DbLeagueInitializer) {
+    this.wrappedDbLeagueInitializer = dbLeagueInitializer;
+  }
+
+  private get dbLeagueInitializer(): DbLeagueInitializer {
+    if (!this.wrappedDbLeagueInitializer) {
+      throw new Error(`wrappedDbLeagueInitializer is undefined.`);
+    }
+
+    return this.wrappedDbLeagueInitializer;
+  }
+
+  protected set oddButtonParsers(oddButtonParsers: OddButtonParsers) {
+    this.wrappedOddButtonParsers = oddButtonParsers;
+  }
+
+  protected get oddButtonParsers(): OddButtonParsers {
+    if (!this.wrappedOddButtonParsers) {
+      throw new Error(`wrappedOddButtonParsers is undefined.`);
+    }
+
+    return this.wrappedOddButtonParsers;
+  }
+
+  public get page(): Page {
+    return this.webpage.page;
   }
 
   public get exchange(): Exchange {
-    if (!this.wrappedDbExchangeConnection) {
-      throw new Error(`wrappedDbExchangeConnection is undefined.`);
-    }
-
-    return this.wrappedDbExchangeConnection.exchange;
-  }
-
-  private set dbLeagueConnection(dbLeagueConnection: DbLeagueConnection) {
-    this.wrappedDbLeagueConnection = dbLeagueConnection;
+    return this.dbExchangeInitializer.exchange;
   }
 
   public get league(): League {
-    if (!this.wrappedDbLeagueConnection) {
-      throw new Error(`wrappedDbLeagueConnection is undefined.`);
-    }
-
-    return this.wrappedDbLeagueConnection.league;
-  }
-
-  protected set oddButtonParserSet(oddButtonParserSet: OddButtonParserSet) {
-    this.wrappedOddButtonParserSet = oddButtonParserSet;
-  }
-
-  protected get oddButtonParserSet(): OddButtonParserSet {
-    if (!this.wrappedOddButtonParserSet) {
-      throw new Error(`wrappedOddButtonParserSet is undefined.`);
-    }
-
-    return this.wrappedOddButtonParserSet;
+    return this.dbLeagueInitializer.league
   }
 }

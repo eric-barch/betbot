@@ -1,4 +1,5 @@
 import { League } from '@prisma/client';
+
 import { TeamInitData, mlbTeamsInitData, nbaTeamsInitData, nflTeamsInitData } from '@/setup/page-parser-init-data';
 
 export class TeamsInitDataFactory {
