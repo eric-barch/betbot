@@ -1,10 +1,8 @@
 import { Game } from '@prisma/client';
 
 import { prisma } from '@/db';
-import { OddButtonParser } from '@/parsers';
-import { DbGameInitializer } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-initializers/db-game-initializer';
-
-import { DraftKingsGameParser } from './draft-kings-game-parser';
+import { DraftKingsGameParser } from '@/parsers/models/exchange-models/draft-kings';
+import { DbGameInitializer, OddButtonParser } from '@/parsers/models/shared-models';
 
 export class DraftKingsDbGameInitializer extends DbGameInitializer {
   private wrappedExchangeAssignedGameId: string | undefined;

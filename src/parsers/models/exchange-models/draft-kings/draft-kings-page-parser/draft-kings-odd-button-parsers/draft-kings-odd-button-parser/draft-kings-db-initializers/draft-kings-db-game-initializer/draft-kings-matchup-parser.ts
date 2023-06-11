@@ -1,5 +1,5 @@
-import { ElementHandle } from 'puppeteer';
 import { Team } from '@prisma/client';
+import { ElementHandle } from 'puppeteer';
 
 import { DbUtilityFunctions } from '@/db';
 import { OddButtonParser } from '@/parsers/models/shared-models';

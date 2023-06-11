@@ -1,8 +1,6 @@
+import { DraftKingsJsonGamesParser, DraftKingsOddButtonParsers } from '@/parsers/models/exchange-models/draft-kings';
+import { OddButtonParsers, PageParser } from '@/parsers/models/shared-models';
 import { PageParserInitData } from '@/setup';
-import { PageParser } from '@/parsers/models/shared-models/page-parser/page-parser';
-import { DraftKingsOddButtonParsers, OddButtonParsers } from '@/parsers';
-
-import { DraftKingsJsonGamesParser } from './draft-kings-json-games-parser';
 
 export class DraftKingsPageParser extends PageParser {
   private wrappedJsonGamesParser: DraftKingsJsonGamesParser | undefined;

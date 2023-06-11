@@ -1,17 +1,13 @@
-import { ElementHandle } from 'puppeteer';
 import { Exchange, League } from '@prisma/client';
-
-import {
-  DataParser, DbGameInitializer, DbOddInitializer, DbStatisticInitializer,
-  OddButton
-} from '@/parsers';
-import {
-  OddButtonParser,
-} from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
+import { ElementHandle } from 'puppeteer';
 
 import {
   DraftKingsDbGameInitializer, DraftKingsDbOddInitializer, DraftKingsDbStatisticInitializer,
-} from './draft-kings-db-initializers';
+} from '@/parsers/models/exchange-models/draft-kings';
+import {
+  DataParser, DbGameInitializer, DbOddInitializer, DbStatisticInitializer,
+  OddButton, OddButtonParser,
+} from '@/parsers/models/shared-models';
 
 export class DraftKingsOddButtonParser extends OddButtonParser {
   public static async create({
