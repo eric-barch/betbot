@@ -16,28 +16,7 @@ export class DraftKingsDbStatisticInitializer extends DbStatisticInitializer {
     return draftKingsDbStatisticInitializer;
   }
 
-  protected async updateDbStatistic(): Promise<Statistic> {
-    const name = await this.parseStatisticName();
-    const gameId = this.parentOddButtonParser.game.id;
-
-    this.statistic = await prisma.statistic.upsert({
-      where: {
-        name_gameId: {
-          name,
-          gameId,
-        },
-      },
-      update: {},
-      create: {
-        name,
-        gameId,
-      },
-    });
-
-    return this.statistic;
-  }
-
-  private async parseStatisticName(): Promise<string> {
+  protected async parseStatisticName(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
     const game = this.parentOddButtonParser.game;
 

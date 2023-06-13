@@ -1,6 +1,7 @@
 import { Statistic } from '@prisma/client';
 
 import { OddButtonParser } from '@/parsers/models/shared-models';
+import { prisma } from '@/db';
 
 export abstract class DbStatisticInitializer {
   protected readonly parentOddButtonParser: OddButtonParser;
@@ -19,7 +20,28 @@ export abstract class DbStatisticInitializer {
     return this;
   }
 
-  protected abstract updateDbStatistic(): Promise<Statistic>;
+  protected async updateDbStatistic(): Promise<Statistic> {
+    const name = await this.parseStatisticName();
+    const gameId = this.parentOddButtonParser.game.id;
+
+    this.statistic = await prisma.statistic.upsert({
+      where: {
+        name_gameId: {
+          name,
+          gameId,
+        },
+      },
+      update: {},
+      create: {
+        name,
+        gameId,
+      },
+    });
+
+    return this.statistic;
+  }
+
+  protected abstract parseStatisticName(): Promise<string>;
 
   protected set statistic(statistic: Statistic) {
     this.wrappedStatistic = statistic;

@@ -3,11 +3,11 @@ import { Odd } from '@prisma/client';
 import { prisma } from '@/db';
 import { OddButtonParser } from '@/parsers/models/shared-models';
 
-export abstract class DbOddInitializer {
-  protected readonly parentOddButtonParser: OddButtonParser;
+export class DbOddInitializer {
+  private readonly parentOddButtonParser: OddButtonParser;
   private wrappedOdd: Odd | undefined;
 
-  protected constructor({
+  private constructor({
     parentOddButtonParser,
   }: {
     parentOddButtonParser: OddButtonParser,
@@ -15,12 +15,43 @@ export abstract class DbOddInitializer {
     this.parentOddButtonParser = parentOddButtonParser;
   }
 
-  protected async init(): Promise<DbOddInitializer> {
+  public static async create({
+    parentOddButtonParser,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+  }): Promise<DbOddInitializer> {
+    const dbOddInitializer = new DbOddInitializer({
+      parentOddButtonParser,
+    });
+    await dbOddInitializer.init();
+    return dbOddInitializer;
+  }
+
+  private async init(): Promise<DbOddInitializer> {
     this.odd = await this.updateDbOdd();
     return this;
   }
 
-  protected abstract updateDbOdd(): Promise<Odd>;
+  private async updateDbOdd(): Promise<Odd> {
+    const exchangeId = this.parentOddButtonParser.exchange.id;
+    const statisticId = this.parentOddButtonParser.statistic.id;
+
+    this.odd = await prisma.odd.upsert({
+      where: {
+        exchangeId_statisticId: {
+          exchangeId,
+          statisticId,
+        },
+      },
+      update: {},
+      create: {
+        exchangeId,
+        statisticId,
+      },
+    });
+
+    return this.odd;
+  }
 
   public async updateData({
     price,
@@ -42,7 +73,7 @@ export abstract class DbOddInitializer {
     return this.odd;
   }
 
-  protected set odd(odd: Odd) {
+  private set odd(odd: Odd) {
     this.wrappedOdd = odd;
   }
 
