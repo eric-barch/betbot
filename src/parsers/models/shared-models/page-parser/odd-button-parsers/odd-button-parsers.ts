@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser } from '../page-parser';
+import { PageParser } from '@/parsers/models/shared-models';
 
 import { OddButtonParser } from './odd-button-parser';
 

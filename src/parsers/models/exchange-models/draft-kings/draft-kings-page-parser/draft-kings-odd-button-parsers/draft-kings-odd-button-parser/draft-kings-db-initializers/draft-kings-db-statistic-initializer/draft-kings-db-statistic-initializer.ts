@@ -2,7 +2,8 @@
 import { Statistic } from '@prisma/client';
 
 import { prisma } from '@/db';
-import { DbStatisticInitializer, OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/shared-models';
+import { DbStatisticInitializer } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-initializers/db-statistic-initializer';
 
 export class DraftKingsDbStatisticInitializer extends DbStatisticInitializer {
   public static async create({
