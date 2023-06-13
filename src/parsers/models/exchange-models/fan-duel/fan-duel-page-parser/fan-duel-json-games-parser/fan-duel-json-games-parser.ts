@@ -116,7 +116,7 @@ export class FanDuelJsonGamesParser {
     jsonGame: any,
   }): string {
     const url = jsonGame.url;
-    const lastHyphenPos: number = url.lastIndexOf("-");
+    const lastHyphenPos = url.lastIndexOf("-");
     const exchangeAssignedGameId = url.substring(lastHyphenPos + 1);
     return exchangeAssignedGameId;
   }

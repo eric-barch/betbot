@@ -48,9 +48,9 @@ class AllPageParserInitData extends Set<PageParserInitData> {
 
 export const allPageParserInitData = new AllPageParserInitData({
   pageUrls: [
-    'https://sportsbook.draftkings.com/leagues/baseball/mlb',
+    // 'https://sportsbook.draftkings.com/leagues/baseball/mlb',
     // 'https://sportsbook.draftkings.com/leagues/basketball/nba',
-    'https://sportsbook.draftkings.com/leagues/football/nfl',
+    // 'https://sportsbook.draftkings.com/leagues/football/nfl',
     'https://sportsbook.fanduel.com/navigation/mlb',
     // 'https://sportsbook.fanduel.com/navigation/nba',
     // 'https://sportsbook.fanduel.com/navigation/nfl',
