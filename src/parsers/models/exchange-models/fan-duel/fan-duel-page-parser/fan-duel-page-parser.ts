@@ -1,4 +1,4 @@
-import { FanDuelJsonGamesParser } from '@/parsers/models/exchange-models/fan-duel';
+import { FanDuelJsonGamesParser, FanDuelOddButtonParsers } from '@/parsers/models/exchange-models/fan-duel';
 import { OddButtonParsers, PageParser } from '@/parsers/models/shared-models';
 import { PageParserInitData } from '@/setup';
 
@@ -17,7 +17,7 @@ export class FanDuelPageParser extends PageParser {
 
   protected async createOddButtonParsers(): Promise<OddButtonParsers> {
     this.jsonGamesParser = await FanDuelJsonGamesParser.create({ parentPageParser: this });
-    // this.oddButtonParsers = await FanDuelOddButtonParsers.create({ parentPageParser: this });
+    this.oddButtonParsers = await FanDuelOddButtonParsers.create({ parentPageParser: this });
     return this.oddButtonParsers;
   }
 
