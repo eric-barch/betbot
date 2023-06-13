@@ -112,7 +112,18 @@ export class DraftKingsStartDateParser {
 
   private parseStartDate(): Date {
     const startDateString = `${this.dateString} ${this.timeString}`;
-    this.startDate = parseDate(startDateString);
+    const startDate = parseDate(startDateString);
+
+    /**Check if startDate is more than a week in the past. If it is, chrono-node likely parsed it
+     * incorrectly. Add a year to the start date to fix. */
+    const currentDate = new Date();
+    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000; // 7 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
+
+    if (startDate.getTime() < currentDate.getTime() - oneWeekInMilliseconds) {
+      startDate.setFullYear(startDate.getFullYear() + 1); // Add a year to the start date
+    }
+
+    this.startDate = startDate;
     return this.startDate;
   }
 

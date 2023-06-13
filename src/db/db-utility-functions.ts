@@ -52,7 +52,7 @@ export class DbUtilityFunctions {
     unformattedName: string,
     league: League,
   }): Promise<Team> {
-    unformattedName = unformattedName.replace(/[^a-zA-Z]/g, ' ');
+    unformattedName = unformattedName.replace(/[^a-zA-Z0-9]/g, ' ');
 
     //TODO: This is so inefficient.
     const leagueTeams = await prisma.team.findMany({
