@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { FanDuelPageParser } from '@/parsers/models/exchange-models/fan-duel';
+import { FanDuelPageParser, FanDuelOddButtonParser } from '@/parsers/models/exchange-models/fan-duel';
 import { OddButtonParser, OddButtonParsers } from '@/parsers/models/shared-models';
 
 export class FanDuelOddButtonParsers extends OddButtonParsers {
@@ -71,6 +71,16 @@ export class FanDuelOddButtonParsers extends OddButtonParsers {
   }
 
   protected async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
+    for (const button of this.buttons) {
+      const fanDuelOddButtonParser = await FanDuelOddButtonParser.create({
+        exchange: this.parentPageParser.exchange,
+        league: this.parentPageParser.league,
+        button: button,
+      });
+
+      this.oddButtonParsers.add(fanDuelOddButtonParser);
+    }
+
     return this.oddButtonParsers;
   }
 }
