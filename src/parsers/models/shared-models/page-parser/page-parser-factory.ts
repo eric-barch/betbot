@@ -1,19 +1,19 @@
 import { PageParserInitData } from '@/setup';
-import { PageParser, DraftKingsPageParser } from '@/parsers';
+import { PageParser, DraftKingsPageParser, FanDuelPageParser } from '@/parsers';
 
 export class PageParserFactory {
   public static async create({
-    pageParserInitData,
+    initData,
   }: {
-    pageParserInitData: PageParserInitData,
+    initData: PageParserInitData,
   }): Promise<PageParser> {
-    const exchangeName = pageParserInitData.exchangeInitData.name;
+    const exchangeName = initData.exchangeInitData.name;
 
     switch (exchangeName) {
       case 'DraftKings':
-        return await DraftKingsPageParser.create({ pageParserInitData });
+        return await DraftKingsPageParser.create({ initData });
       case 'FanDuel':
-        throw new Error(`FanDuelPageParser not implemented.`);
+        return await FanDuelPageParser.create({ initData });
       case 'SugarHouse':
         throw new Error(`SugarHousePageParser not implemented.`);
     }

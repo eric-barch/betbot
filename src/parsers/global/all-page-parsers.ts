@@ -6,7 +6,7 @@ class AllPageParsers extends Set<PageParser> {
     await allPageParserInitData.init();
 
     for (const pageParserInitData of allPageParserInitData) {
-      const pageParser = await PageParserFactory.create({ pageParserInitData });
+      const pageParser = await PageParserFactory.create({ initData: pageParserInitData });
       this.add(pageParser);
     }
 
