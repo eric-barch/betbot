@@ -30,7 +30,6 @@ export class DraftKingsOddButtonParser extends OddButtonParser {
 
   protected async initOddButton(): Promise<OddButton> {
     await this.oddButton.init({ referenceSelector: 'tr' });
-    const foo = this.oddButton;
     return this.oddButton;
   }
 
