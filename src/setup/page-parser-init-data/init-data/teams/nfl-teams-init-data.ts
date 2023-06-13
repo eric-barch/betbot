@@ -190,7 +190,7 @@ export const nflTeamsInitData = [
   new TeamInitData({
     regionFull: 'Washington',
     regionAbbr: 'WAS',
-    identifierFull: 'Football Team',
-    identifierAbbr: 'WFT',
+    identifierFull: 'Commanders',
+    identifierAbbr: 'Commanders',
   }),
 ];
