@@ -2,40 +2,30 @@ import { ElementHandle } from 'puppeteer';
 
 import { OddButtonParser } from '@/parsers/models/shared-models';
 
-export class DataParser {
-  private readonly parentOddButtonParser: OddButtonParser;
-  private selector: string;
+export abstract class DataParser {
+  protected readonly parentOddButtonParser: OddButtonParser;
+  private wrappedSelector: string | undefined;
   private wrappedElement: ElementHandle | null | undefined;
   private wrappedValue: number | null | undefined;
 
   protected constructor({
     parentOddButtonParser,
-    selector,
   }: {
     parentOddButtonParser: OddButtonParser,
-    selector: string,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.selector = selector;
   }
 
-  public static async create({
-    parentOddButtonParser,
-    selector,
-  }: {
-    parentOddButtonParser: OddButtonParser,
-    selector: string,
-  }): Promise<DataParser> {
-    const dataParser = new DataParser({
-      parentOddButtonParser,
-      selector,
-    });
-    await dataParser.updateElement();
-    await dataParser.getValue();
-    return dataParser;
+  protected async init(): Promise<DataParser> {
+    this.selector = await this.initSelector();
+    this.element = await this.getElement();
+    this.value = await this.getValue();
+    return this;
   }
 
-  private async updateElement(): Promise<ElementHandle | null> {
+  protected abstract initSelector(): Promise<string>;
+
+  private async getElement(): Promise<ElementHandle | null> {
     const button = this.parentOddButtonParser.button;
     this.element = await button.$(`${this.selector}`);
     return this.element;
@@ -62,6 +52,18 @@ export class DataParser {
     return this.value;
   }
 
+  protected set selector(selector: string) {
+    this.wrappedSelector = selector;
+  }
+
+  protected get selector(): string {
+    if (!this.wrappedSelector) {
+      throw new Error(`wrappedSelector is undefined.`);
+    }
+
+    return this.wrappedSelector;
+  }
+
   private set element(element: ElementHandle | null) {
     this.wrappedElement = element;
   }
@@ -85,5 +87,4 @@ export class DataParser {
 
     return this.wrappedValue;
   }
-
 }
