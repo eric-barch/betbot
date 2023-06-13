@@ -1,5 +1,8 @@
+import { DraftKingsPageParser, FanDuelPageParser } from '@/parsers/models/exchange-models';
 import { PageParserInitData } from '@/setup';
-import { PageParser, DraftKingsPageParser, FanDuelPageParser } from '@/parsers';
+
+import { PageParser } from './page-parser';
+
 
 export class PageParserFactory {
   public static async create({

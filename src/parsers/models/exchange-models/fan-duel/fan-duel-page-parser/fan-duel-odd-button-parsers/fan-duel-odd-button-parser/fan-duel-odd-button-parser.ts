@@ -1,10 +1,8 @@
 import { Exchange, League } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
-import { FanDuelDbGameInitializer } from '@/parsers/models/exchange-models/fan-duel';
-import {
-  DataParser, DbGameInitializer, DbOddInitializer, DbStatisticInitializer, OddButton, OddButtonParser
-} from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
+import { FanDuelOddButton, FanDuelDbGameInitializer } from '@/parsers/models/exchange-models/fan-duel';
 
 export class FanDuelOddButtonParser extends OddButtonParser {
   public static async create({
@@ -25,34 +23,17 @@ export class FanDuelOddButtonParser extends OddButtonParser {
     return fanDuelOddButtonParser;
   }
 
-  protected async initOddButton(): Promise<OddButton> {
-    await this.oddButton.init({ referenceSelector: 'li' });
-    return this.oddButton;
-  }
-
-  protected async createConcreteDbGameInitializer(): Promise<DbGameInitializer> {
+  protected async init(): Promise<FanDuelOddButtonParser> {
+    this.oddButton = await FanDuelOddButton.create({ parentOddButtonParser: this });
     this.dbGameInitializer = await FanDuelDbGameInitializer.create({ parentOddButtonParser: this });
-    return this.dbGameInitializer;
-  }
-
-  protected async createConcreteDbStatisticInitializer(): Promise<DbStatisticInitializer> {
-    throw new Error(`createConcreteDbStatisticInitializer not implemented.`);
-  }
-
-  protected async createConcreteDbOddInitializer(): Promise<DbOddInitializer> {
-    throw new Error(`createConcreteDbOddInitializer not implemented.`);
-  }
-
-  protected async createConcretePriceParser(): Promise<DataParser> {
-    throw new Error(`createConcretePriceParser not implemented.`);
-  }
-
-  protected async createConcreteValueParser(): Promise<DataParser> {
-    throw new Error(`createConcreteValueParser not implemented.`);
+    this.dbStatisticInitializer = await FanDuelDbStatisticInitializer.create({ parentOddButtonParser: this });
+    // this.dbOddInitializer = await FanDuelDbOddInitializer.create({ parentOddButtonParser: this });
+    // this.priceParser = await FanDuelPriceParser.create({ parentOddButtonParser: this });
+    // this.valueParser = await FanDuelValueParser.create({ parentOddButtonParser: this });
+    return this;
   }
 
   public async updateOddData(): Promise<FanDuelOddButtonParser> {
-    await this.updateDbOddFromDataParsers();
-    return this;
+    throw new Error(`updateOddData not implemented.`);
   }
 }

@@ -1,5 +1,6 @@
 import { DraftKingsJsonGamesParser, DraftKingsOddButtonParsers } from '@/parsers/models/exchange-models/draft-kings';
-import { OddButtonParsers, PageParser } from '@/parsers/models/shared-models';
+import { OddButtonParsers } from '@/parsers/models/shared-models';
+import { PageParser } from '@/parsers/models/shared-models/page-parser/page-parser';
 import { PageParserInitData } from '@/setup';
 
 export class DraftKingsPageParser extends PageParser {

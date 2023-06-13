@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParser } from '../odd-button-parser';
+import { OddButtonParser } from '@/parsers/models/shared-models';
 
 export class DataParser {
   private readonly parentOddButtonParser: OddButtonParser;

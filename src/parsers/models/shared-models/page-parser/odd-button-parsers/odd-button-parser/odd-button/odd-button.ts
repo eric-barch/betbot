@@ -1,12 +1,12 @@
 import { ElementHandle } from 'puppeteer';
 
-export class OddButton {
+export abstract class OddButton {
   private wrappedButton: ElementHandle;
   private wrappedReferenceSelector: string | undefined;
   private wrappedReference: ElementHandle | undefined;
   private wrappedReferenceToButtonXPath: string | undefined;
 
-  public constructor({
+  protected constructor({
     button,
   }: {
     button: ElementHandle,
@@ -14,15 +14,13 @@ export class OddButton {
     this.wrappedButton = button;
   }
 
-  public async init({
-    referenceSelector,
-  }: {
-    referenceSelector: string,
-  }): Promise<OddButton> {
-    this.referenceSelector = referenceSelector;
-    await this.initReference();
+  protected async init(): Promise<OddButton> {
+    this.referenceSelector = await this.initReferenceSelector();
+    this.reference = await this.initReference();
     return this;
   }
+
+  protected abstract initReferenceSelector(): Promise<string>;
 
   private async initReference(): Promise<ElementHandle> {
     let element = this.button;
@@ -99,11 +97,11 @@ export class OddButton {
     return this.wrappedButton;
   }
 
-  private set referenceSelector(referenceSelector: string) {
+  protected set referenceSelector(referenceSelector: string) {
     this.wrappedReferenceSelector = referenceSelector;
   }
 
-  private get referenceSelector(): string {
+  protected get referenceSelector(): string {
     if (!this.wrappedReferenceSelector) {
       throw new Error(`wrappedReferenceSelector is undefined.`);
     }

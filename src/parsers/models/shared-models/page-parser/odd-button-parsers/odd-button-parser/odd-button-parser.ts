@@ -8,7 +8,9 @@ import { OddButton } from './odd-button';
 export abstract class OddButtonParser {
   public readonly exchange: Exchange;
   public readonly league: League;
-  private wrappedOddButton: OddButton;
+  // TODO: This is hacky.
+  public readonly seedButton: ElementHandle;
+  private wrappedOddButton: OddButton | undefined;
   private wrappedDbGameInitializer: DbGameInitializer | undefined;
   private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
   private wrappedDbOddInitializer: DbOddInitializer | undefined;
@@ -26,33 +28,10 @@ export abstract class OddButtonParser {
   }) {
     this.exchange = exchange;
     this.league = league;
-    this.wrappedOddButton = new OddButton({ button });
+    this.seedButton = button;
   }
 
-  protected async init(): Promise<OddButtonParser> {
-    this.oddButton = await this.initOddButton();
-    this.dbGameInitializer = await this.createConcreteDbGameInitializer();
-    this.dbStatisticInitializer = await this.createConcreteDbStatisticInitializer();
-    this.dbOddInitializer = await this.createConcreteDbOddInitializer();
-    this.priceParser = await this.createConcretePriceParser();
-    this.valueParser = await this.createConcreteValueParser();
-
-    await this.updateOddData();
-
-    return this;
-  }
-
-  protected abstract initOddButton(): Promise<OddButton>;
-
-  protected abstract createConcreteDbGameInitializer(): Promise<DbGameInitializer>;
-
-  protected abstract createConcreteDbStatisticInitializer(): Promise<DbStatisticInitializer>;
-
-  protected abstract createConcreteDbOddInitializer(): Promise<DbOddInitializer>;
-
-  protected abstract createConcretePriceParser(): Promise<DataParser>;
-
-  protected abstract createConcreteValueParser(): Promise<DataParser>;
+  protected abstract init(): Promise<OddButtonParser>;
 
   public abstract updateOddData(): Promise<OddButtonParser>;
 

@@ -1,7 +1,6 @@
-import { ElementHandle } from 'puppeteer';
-
 import { DraftKingsOddButtonParser, DraftKingsPageParser } from '@/parsers/models/exchange-models/draft-kings';
-import { OddButtonParser, OddButtonParsers } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParsers } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parsers';
 
 export class DraftKingsOddButtonParsers extends OddButtonParsers {
   protected wrappedOddButtonSelector: string = 'div[role="button"].sportsbook-outcome-cell__body';

@@ -1,7 +1,8 @@
 import { Odd } from '@prisma/client';
 
 import { prisma } from '@/db';
-import { DbOddInitializer, OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/shared-models';
+import { DbOddInitializer } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/db-initializers/db-odd-initializer';
 
 export class DraftKingsDbOddInitializer extends DbOddInitializer {
   public static async create({

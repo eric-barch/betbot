@@ -1,7 +1,8 @@
 import { ElementHandle } from 'puppeteer';
 
 import { FanDuelPageParser, FanDuelOddButtonParser } from '@/parsers/models/exchange-models/fan-duel';
-import { OddButtonParser, OddButtonParsers } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParsers } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parsers';
 
 export class FanDuelOddButtonParsers extends OddButtonParsers {
   protected wrappedOddButtonSelector: string | undefined;
