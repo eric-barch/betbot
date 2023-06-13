@@ -3,7 +3,7 @@ import { Game } from '@prisma/client';
 import { DbUtilityFunctions, prisma } from '@/db';
 import { PageParser } from '@/parsers/models/shared-models';
 
-export class DraftKingsJsonGamesParser {
+export class FanDuelJsonGamesParser {
   private parentPageParser: PageParser;
   private jsonGames: Array<any>;
   private dbGames: Array<Game>;
@@ -22,8 +22,8 @@ export class DraftKingsJsonGamesParser {
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<DraftKingsJsonGamesParser> {
-    const jsonGamesParser = new DraftKingsJsonGamesParser({ parentPageParser });
+  }): Promise<FanDuelJsonGamesParser> {
+    const jsonGamesParser = new FanDuelJsonGamesParser({ parentPageParser });
     await jsonGamesParser.ensureGamesInDb();
     return jsonGamesParser;
   }
@@ -35,21 +35,21 @@ export class DraftKingsJsonGamesParser {
   }
 
   private async scrapeJsonGames(): Promise<Array<any>> {
-    const gameScriptElements = await this.parentPageParser.page.$$(
-      'script[type="application/ld+json"]'
+    const jsonGamesElement = await this.parentPageParser.page.$(
+      'script[type="application/ld+json"][data-react-helmet="true"]'
     );
 
-    for (const gameScriptElement of gameScriptElements) {
-      const textContent = await (await gameScriptElement.getProperty('textContent')).jsonValue();
-
-      if (!textContent) {
-        continue;
-      }
-
-      const gameInJsonFormat = JSON.parse(textContent);
-
-      this.jsonGames.push(gameInJsonFormat);
+    if (!jsonGamesElement) {
+      throw new Error(`jsonGamesElement is null.`);
     }
+
+    const textContent = await (await jsonGamesElement.getProperty('textContent')).jsonValue();
+
+    if (!textContent) {
+      throw new Error(`textContent is null.`);
+    }
+
+    this.jsonGames = JSON.parse(textContent);
 
     return this.jsonGames;
   }
@@ -115,9 +115,9 @@ export class DraftKingsJsonGamesParser {
   }: {
     jsonGame: any,
   }): string {
-    const identifier = jsonGame.identifier;
-    const lastHyphenPos: number = identifier.lastIndexOf("-");
-    const exchangeAssignedGameId = identifier.substring(lastHyphenPos + 1);
+    const url = jsonGame.url;
+    const lastHyphenPos: number = url.lastIndexOf("-");
+    const exchangeAssignedGameId = url.substring(lastHyphenPos + 1);
     return exchangeAssignedGameId;
   }
 }
