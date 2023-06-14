@@ -20,20 +20,48 @@ export class FanDuelDbStatisticInitializer extends DbStatisticInitializer {
     const awayTeam = await prisma.team.findFirstOrThrow({ where: { id: game.awayTeamId } });
     const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: game.homeTeamId } });
 
-    const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*run line.*`, "i");
-    const winnerPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*moneyline.*`, "i")
-    const totalPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*total runs.*`, "i");
+    const spreadPattern = new RegExp(`\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*\\b(run line|spread)\\b`, "i");
+    const winnerPattern = new RegExp(`\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*\\bmoneyline\\b`, "i");
+    const totalPattern = new RegExp(`\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*\\btotal\\b`, "i");
 
     const spreadPatternMatches = spreadPattern.exec(ariaLabel);
     const winnerPatternMatches = winnerPattern.exec(ariaLabel);
     const totalPatternMatches = totalPattern.exec(ariaLabel);
 
     if (spreadPatternMatches) {
-      return (spreadPatternMatches[1] === awayTeam.identifierFull) ? 'spread_away' : 'spread_home';
-    } else if (winnerPatternMatches) {
-      return (winnerPatternMatches[1] === awayTeam.identifierFull) ? 'winner_away' : 'winner_home';
-    } else if (totalPatternMatches) {
-      return (totalPatternMatches[1].toUpperCase().startsWith('O')) ? 'total_over' : 'total_under';
+      if (spreadPatternMatches[1] === awayTeam.identifierFull) {
+        return 'spread_away';
+      }
+
+      if (spreadPatternMatches[1] === homeTeam.identifierFull) {
+        return 'spread_home';
+      }
+
+      throw new Error(`Did not find matching spread statistic name.`);
+    }
+
+    if (winnerPatternMatches) {
+      if (winnerPatternMatches[1] === awayTeam.identifierFull) {
+        return 'winner_away';
+      }
+
+      if (winnerPatternMatches[1] === homeTeam.identifierFull) {
+        return 'winner_home';
+      }
+
+      throw new Error(`Did not find matching winner statistic name.`);
+    }
+
+    if (totalPatternMatches) {
+      if (totalPatternMatches[1] === awayTeam.identifierFull) {
+        return 'total_over';
+      }
+
+      if (totalPatternMatches[1] === homeTeam.identifierFull) {
+        return 'total_under';
+      }
+
+      throw new Error(`Did not find matching total statistic name.`);
     }
 
     throw new Error(`Did not find matching statistic name.`);

@@ -152,33 +152,34 @@ export class PageParserInitData {
   private async ensureTeamsInDb(): Promise<Array<Team>> {
     const teamsInitData = TeamsInitDataFactory.getLeagueTeams({ league: this.league });
 
-    const teams = new Array<Team>();
-
-    for (const teamInitData of teamsInitData) {
-      const team = await prisma.team.upsert({
-        where: {
-          leagueId_identifierFull: {
+    const teams = await Promise.all(
+      teamsInitData.map((teamInitData) =>
+        prisma.team.upsert({
+          where: {
+            leagueId_identifierFull: {
+              leagueId: this.league.id,
+              identifierFull: teamInitData.identifierFull,
+            },
+          },
+          update: {
+            regionAbbr: teamInitData.regionAbbr,
+            regionFull: teamInitData.regionFull,
+            identifierAbbr: teamInitData.identifierAbbr,
+          },
+          create: {
             leagueId: this.league.id,
+            regionAbbr: teamInitData.regionAbbr,
+            regionFull: teamInitData.regionFull,
+            identifierAbbr: teamInitData.identifierAbbr,
             identifierFull: teamInitData.identifierFull,
-          }
-        },
-        update: {
-          regionAbbr: teamInitData.regionAbbr,
-          regionFull: teamInitData.regionFull,
-          identifierAbbr: teamInitData.identifierAbbr,
-        },
-        create: {
-          leagueId: this.league.id,
-          regionAbbr: teamInitData.regionAbbr,
-          regionFull: teamInitData.regionFull,
-          identifierAbbr: teamInitData.identifierAbbr,
-          identifierFull: teamInitData.identifierFull,
-        },
-      });
-    }
+          },
+        })
+      )
+    );
 
     return teams;
   }
+
 
   public matches({
     exchangeInitData,

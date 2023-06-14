@@ -14,7 +14,7 @@ export abstract class OddButtonParser {
   private wrappedDbGameInitializer: DbGameInitializer | undefined;
   private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
   private wrappedDbOddInitializer: DbOddInitializer | undefined;
-  private wrappedTextContent: string | undefined;
+  private wrappedTextContent: string | null | undefined;
   private wrappedPrice: number | null | undefined;
   private wrappedValue: number | null | undefined;
 
@@ -45,12 +45,8 @@ export abstract class OddButtonParser {
     });
   }
 
-  private async getTextContent(): Promise<string> {
+  private async getTextContent(): Promise<string | null> {
     const textContent = await (await this.button.getProperty('textContent')).jsonValue();
-
-    if (!textContent) {
-      throw new Error(`textContent is null.`);
-    }
 
     this.textContent = textContent;
     return this.textContent;
@@ -58,6 +54,12 @@ export abstract class OddButtonParser {
 
   private async parseTextContent(): Promise<void> {
     this.textContent = await this.getTextContent();
+
+    if (!this.textContent) {
+      this.value = null;
+      this.price = null;
+      return;
+    }
 
     // Normalize minus signs
     const allHyphens = '−-−‐‑‒–—―';
@@ -68,15 +70,22 @@ export abstract class OddButtonParser {
     if (!numbers) {
       this.value = null;
       this.price = null;
-    } else if (numbers.length === 1) {
+      return;
+    }
+
+    if (numbers.length === 1) {
       this.value = null;
       this.price = parseInt(numbers[0]);
-    } else if (numbers.length === 2) {
+      return;
+    }
+
+    if (numbers.length === 2) {
       this.value = parseFloat(numbers[0]);
       this.price = parseInt(numbers[1]);
-    } else {
-      throw new Error(`More than two numbers found in textContent.`);
+      return;
     }
+
+    throw new Error(`More than two numbers found in textContent.`);
   }
 
   protected set oddButton(oddButton: OddButton) {
@@ -143,12 +152,12 @@ export abstract class OddButtonParser {
     return this.dbOddInitializer.odd;
   }
 
-  protected set textContent(textContent: string) {
+  protected set textContent(textContent: string | null) {
     this.wrappedTextContent = textContent;
   }
 
-  protected get textContent(): string {
-    if (!this.wrappedTextContent) {
+  protected get textContent(): string | null {
+    if (this.wrappedTextContent === undefined) {
       throw new Error(`wrappedTextContent is undefined.`);
     }
 

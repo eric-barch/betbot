@@ -32,11 +32,39 @@ export class DraftKingsDbStatisticInitializer extends DbStatisticInitializer {
     const winnerPatternMatches = winnerPattern.exec(ariaLabel);
 
     if (spreadPatternMatches) {
-      return (spreadPatternMatches[1] === awayTeam.identifierFull) ? 'spread_away' : 'spread_home';
-    } else if (totalPatternMatches) {
-      return (totalPatternMatches[1].toUpperCase().startsWith('O')) ? 'total_over' : 'total_under';
-    } else if (winnerPatternMatches) {
-      return (winnerPatternMatches[1] === awayTeam.identifierFull) ? 'winner_away' : 'winner_home';
+      if (spreadPatternMatches[1] === awayTeam.identifierFull) {
+        return 'spread_away';
+      }
+
+      if (spreadPatternMatches[1] === homeTeam.identifierFull) {
+        return 'spread_home';
+      }
+
+      throw new Error(`Did not find matching spread statistic name.`);
+    }
+
+    if (totalPatternMatches) {
+      if (totalPatternMatches[1].toUpperCase().startsWith('O')) {
+        return 'total_over';
+      }
+
+      if (totalPatternMatches[1].toUpperCase().startsWith('U')) {
+        return 'total_under';
+      }
+
+      throw new Error(`Did not find matching total statistic name.`);
+    }
+
+    if (winnerPatternMatches) {
+      if (winnerPatternMatches[1] === awayTeam.identifierFull) {
+        return 'winner_away';
+      }
+
+      if (winnerPatternMatches[1] === homeTeam.identifierFull) {
+        return 'winner_home';
+      }
+
+      throw new Error(`Did not find matching winner statistic name.`);
     }
 
     throw new Error(`Did not find matching statistic name.`);
