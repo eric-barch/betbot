@@ -5,19 +5,27 @@ class AllPageParsers extends Set<PageParser> {
   public async init(): Promise<AllPageParsers> {
     await allPageParserInitData.init();
 
-    for (const pageParserInitData of allPageParserInitData) {
-      const pageParser = await PageParserFactory.create({ initData: pageParserInitData });
-      this.add(pageParser);
-    }
+    await Promise.all(
+      Array.from(allPageParserInitData).map(async (pageParserInitData) => {
+        const pageParser = await PageParserFactory.create({ initData: pageParserInitData });
+        this.add(pageParser);
+      })
+    );
 
     return this;
   }
 
+
   public async updateOddData(): Promise<AllPageParsers> {
     const start = Date.now();
-    for (const pageParser of this) {
-      await pageParser.updateOddData();
-    }
+
+    await Promise.all(
+      Array.from(this).map(async (pageParser) => {
+        await pageParser.updateOddData();
+      })
+    );
+
+
     const end = Date.now();
 
     console.log(`Updated in ${end - start}ms`);
@@ -25,9 +33,11 @@ class AllPageParsers extends Set<PageParser> {
   }
 
   public async disconnect(): Promise<AllPageParsers> {
-    for (const pageParser of this) {
-      await pageParser.disconnect();
-    }
+    await Promise.all(
+      Array.from(this).map(async (pageParser) => {
+        await pageParser.disconnect();
+      })
+    );
 
     return this;
   }
