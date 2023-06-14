@@ -39,26 +39,29 @@ export class DraftKingsJsonGamesParser {
       'script[type="application/ld+json"]'
     );
 
-    for (const gameScriptElement of gameScriptElements) {
-      const textContent = await (await gameScriptElement.getProperty('textContent')).jsonValue();
+    const jsonGames = await Promise.all(
+      gameScriptElements.map(async (gameScriptElement) => {
+        const textContent = await (await gameScriptElement.getProperty('textContent')).jsonValue();
 
-      if (!textContent) {
-        continue;
-      }
+        if (!textContent) {
+          return;
+        }
 
-      const gameInJsonFormat = JSON.parse(textContent);
+        const jsonGame = JSON.parse(textContent);
+        return jsonGame;
+      })
+    );
 
-      this.jsonGames.push(gameInJsonFormat);
-    }
-
+    this.jsonGames = jsonGames.filter(Boolean);
     return this.jsonGames;
   }
 
   private async parseDbGames(): Promise<Array<Game>> {
-    for (const jsonGame of this.jsonGames) {
-      const game = await this.parseDbGame({ jsonGame });
-      this.dbGames.push(game);
-    }
+    this.dbGames = await Promise.all(
+      this.jsonGames.map(async (jsonGame) => {
+        return await this.parseDbGame({ jsonGame });
+      })
+    );
 
     return this.dbGames;
   }
