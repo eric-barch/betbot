@@ -12,11 +12,11 @@ export class FanDuelPriceParser extends DataParser {
     return fanDuelPriceParser;
   }
 
-  protected async initSelector(): Promise<string> {
+  protected async initSelector(): Promise<string | null> {
     const spans = await this.parentOddButtonParser.button.$$('span');
 
     if (spans.length !== 2) {
-      this.selector = '';
+      this.selector = null;
       return this.selector;
     }
 

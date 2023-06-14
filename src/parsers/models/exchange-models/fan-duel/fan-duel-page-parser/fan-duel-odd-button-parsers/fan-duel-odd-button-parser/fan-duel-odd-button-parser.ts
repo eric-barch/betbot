@@ -33,12 +33,12 @@ export class FanDuelOddButtonParser extends OddButtonParser {
     this.dbGameInitializer = await FanDuelDbGameInitializer.create({ parentOddButtonParser: this });
     this.dbStatisticInitializer = await FanDuelDbStatisticInitializer.create({ parentOddButtonParser: this });
     this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
-    this.priceParser = await FanDuelPriceParser.create({ parentOddButtonParser: this });
-    this.valueParser = await FanDuelValueParser.create({ parentOddButtonParser: this });
+    await this.parseTextContent();
     return this;
   }
 
   public async updateOddData(): Promise<FanDuelOddButtonParser> {
-    throw new Error(`updateOddData not implemented.`);
+    await this.updateDbOddFromTextContent();
+    return this;
   }
 }

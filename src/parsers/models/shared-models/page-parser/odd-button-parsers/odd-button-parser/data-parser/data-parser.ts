@@ -4,7 +4,7 @@ import { OddButtonParser } from '@/parsers/models/shared-models';
 
 export abstract class DataParser {
   protected readonly parentOddButtonParser: OddButtonParser;
-  private wrappedSelector: string | undefined;
+  private wrappedSelector: string | null | undefined;
   private wrappedElement: ElementHandle | null | undefined;
   private wrappedValue: number | null | undefined;
 
@@ -23,9 +23,14 @@ export abstract class DataParser {
     return this;
   }
 
-  protected abstract initSelector(): Promise<string>;
+  protected abstract initSelector(): Promise<string | null>;
 
   private async getElement(): Promise<ElementHandle | null> {
+    if (!this.selector) {
+      this.element = null;
+      return this.element;
+    }
+
     const button = this.parentOddButtonParser.button;
     this.element = await button.$(`${this.selector}`);
     return this.element;
@@ -52,12 +57,12 @@ export abstract class DataParser {
     return this.value;
   }
 
-  protected set selector(selector: string) {
+  protected set selector(selector: string | null) {
     this.wrappedSelector = selector;
   }
 
-  protected get selector(): string {
-    if (!this.wrappedSelector) {
+  protected get selector(): string | null {
+    if (this.wrappedSelector === undefined) {
       throw new Error(`wrappedSelector is undefined.`);
     }
 
