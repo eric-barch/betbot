@@ -29,12 +29,13 @@ export class DraftKingsOddButtonParser extends OddButtonParser {
     this.dbGameInitializer = await DraftKingsDbGameInitializer.create({ parentOddButtonParser: this });
     this.dbStatisticInitializer = await DraftKingsDbStatisticInitializer.create({ parentOddButtonParser: this });
     this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
-    // this.priceParser = await DraftKingsPriceParser.create({ parentOddButtonParser: this });
-    // this.valueParser = await DraftKingsValueParser.create({ parentOddButtonParser: this });
+    await this.updateDbOddFromTextContent();
     return this;
   }
 
   public async updateOddData(): Promise<DraftKingsOddButtonParser> {
-    throw new Error(`updateOddData() not implemented.`);
+    await this.oddButton.updateOddButton();
+    await this.updateDbOddFromTextContent();
+    return this;
   }
 }

@@ -1,4 +1,4 @@
-import { Exchange, ExchangeToGame, Game, League, Odd, Statistic, Team } from '@prisma/client';
+import { Game, League, Team } from '@prisma/client';
 
 import { prisma } from './prisma-client';
 
@@ -12,7 +12,7 @@ export class DbUtilityFunctions {
     homeTeam: Team,
     startDate: Date,
   }): Promise<Game> {
-    const startDateToleranceInHours = 3;
+    const startDateToleranceInHours = 2;
     const startDateToleranceInMilliseconds = startDateToleranceInHours * 60 * 60 * 1000;
 
     const toleranceBeforeStartDate = new Date(startDate.getTime() - startDateToleranceInMilliseconds);

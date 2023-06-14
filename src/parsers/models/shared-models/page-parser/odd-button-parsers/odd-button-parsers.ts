@@ -6,7 +6,7 @@ import { OddButtonParser } from './odd-button-parser';
 
 export abstract class OddButtonParsers {
   protected readonly parentPageParser: PageParser;
-  protected abstract wrappedOddButtonSelector: string | undefined;
+  private wrappedOddButtonSelector: string | undefined;
   private wrappedButtons: Array<ElementHandle> | undefined;
   private wrappedOddButtonParsers: Set<OddButtonParser>;
 
@@ -20,6 +20,7 @@ export abstract class OddButtonParsers {
   }
 
   protected async init(): Promise<OddButtonParsers> {
+    this.oddButtonSelector = await this.setOddButtonSelector();
     this.buttons = await this.scrapeButtons();
     this.oddButtonParsers = await this.createOddButtonParsers();
     return this;
@@ -30,6 +31,8 @@ export abstract class OddButtonParsers {
     this.buttons = await page.$$(this.oddButtonSelector);
     return this.buttons;
   }
+
+  protected abstract setOddButtonSelector(): Promise<string>;
 
   protected abstract createOddButtonParsers(): Promise<Set<OddButtonParser>>;
 

@@ -5,15 +5,12 @@ import { OddButtonParser } from '@/parsers/models/shared-models';
 import { OddButtonParsers } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parsers';
 
 export class FanDuelOddButtonParsers extends OddButtonParsers {
-  protected wrappedOddButtonSelector: string | undefined;
-
   public static async create({
     parentPageParser,
   }: {
     parentPageParser: FanDuelPageParser;
   }): Promise<FanDuelOddButtonParsers> {
     const fanDuelOddButtonParserSet = new FanDuelOddButtonParsers({ parentPageParser });
-    await fanDuelOddButtonParserSet.setOddButtonSelector();
     await fanDuelOddButtonParserSet.init();
     return fanDuelOddButtonParserSet;
   }

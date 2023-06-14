@@ -3,8 +3,6 @@ import { OddButtonParser } from '@/parsers/models/shared-models';
 import { OddButtonParsers } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parsers';
 
 export class DraftKingsOddButtonParsers extends OddButtonParsers {
-  protected wrappedOddButtonSelector: string = 'div[role="button"].sportsbook-outcome-cell__body';
-
   public static async create({
     parentPageParser,
   }: {
@@ -13,6 +11,11 @@ export class DraftKingsOddButtonParsers extends OddButtonParsers {
     const draftKingsOddButtonParserSet = new DraftKingsOddButtonParsers({ parentPageParser });
     await draftKingsOddButtonParserSet.init();
     return draftKingsOddButtonParserSet;
+  }
+
+  protected async setOddButtonSelector(): Promise<string> {
+    this.oddButtonSelector = 'div[role="button"].sportsbook-outcome-cell__body';
+    return this.oddButtonSelector;
   }
 
   protected async createOddButtonParsers(): Promise<Set<OddButtonParser>> {

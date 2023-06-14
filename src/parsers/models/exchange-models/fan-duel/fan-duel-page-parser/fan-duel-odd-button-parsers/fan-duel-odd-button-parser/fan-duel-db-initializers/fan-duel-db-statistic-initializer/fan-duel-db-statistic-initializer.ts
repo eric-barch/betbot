@@ -21,19 +21,19 @@ export class FanDuelDbStatisticInitializer extends DbStatisticInitializer {
     const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: game.homeTeamId } });
 
     const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*run line.*`, "i");
-    const totalPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*moneyline.*`, "i");
-    const winnerPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*total runs.*`, "i")
+    const winnerPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*moneyline.*`, "i")
+    const totalPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*total runs.*`, "i");
 
     const spreadPatternMatches = spreadPattern.exec(ariaLabel);
-    const totalPatternMatches = totalPattern.exec(ariaLabel);
     const winnerPatternMatches = winnerPattern.exec(ariaLabel);
+    const totalPatternMatches = totalPattern.exec(ariaLabel);
 
     if (spreadPatternMatches) {
       return (spreadPatternMatches[1] === awayTeam.identifierFull) ? 'spread_away' : 'spread_home';
-    } else if (totalPatternMatches) {
-      return (totalPatternMatches[1].toUpperCase().startsWith('O')) ? 'total_over' : 'total_under';
     } else if (winnerPatternMatches) {
       return (winnerPatternMatches[1] === awayTeam.identifierFull) ? 'winner_away' : 'winner_home';
+    } else if (totalPatternMatches) {
+      return (totalPatternMatches[1].toUpperCase().startsWith('O')) ? 'total_over' : 'total_under';
     }
 
     throw new Error(`Did not find matching statistic name.`);

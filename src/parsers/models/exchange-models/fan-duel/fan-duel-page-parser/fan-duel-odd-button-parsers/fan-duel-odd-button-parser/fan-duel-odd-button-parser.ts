@@ -2,7 +2,7 @@ import { Exchange, League } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
 import {
-  FanDuelDbGameInitializer, FanDuelDbStatisticInitializer, FanDuelOddButton, FanDuelPriceParser, FanDuelValueParser
+  FanDuelDbGameInitializer, FanDuelDbStatisticInitializer, FanDuelOddButton
 } from '@/parsers/models/exchange-models/fan-duel';
 import { DbOddInitializer } from '@/parsers/models/shared-models';
 import {
@@ -33,7 +33,7 @@ export class FanDuelOddButtonParser extends OddButtonParser {
     this.dbGameInitializer = await FanDuelDbGameInitializer.create({ parentOddButtonParser: this });
     this.dbStatisticInitializer = await FanDuelDbStatisticInitializer.create({ parentOddButtonParser: this });
     this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
-    await this.parseTextContent();
+    await this.updateDbOddFromTextContent();
     return this;
   }
 
