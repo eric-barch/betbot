@@ -1,16 +1,17 @@
 import { DraftKingsJsonGamesParser, DraftKingsOddButtonParsers } from '@/parsers/models/exchange-models/draft-kings';
-import { OddButtonParsers, PageParser } from '@/parsers/models/shared-models';
+import { OddButtonParsers } from '@/parsers/models/shared-models';
+import { PageParser } from '@/parsers/models/shared-models/page-parser/page-parser';
 import { PageParserInitData } from '@/setup';
 
 export class DraftKingsPageParser extends PageParser {
   private wrappedJsonGamesParser: DraftKingsJsonGamesParser | undefined;
 
   public static async create({
-    pageParserInitData,
+    initData,
   }: {
-    pageParserInitData: PageParserInitData,
+    initData: PageParserInitData,
   }): Promise<DraftKingsPageParser> {
-    const draftKingsPageParser = new DraftKingsPageParser({ initData: pageParserInitData });
+    const draftKingsPageParser = new DraftKingsPageParser({ initData });
     await draftKingsPageParser.init();
     return draftKingsPageParser;
   }

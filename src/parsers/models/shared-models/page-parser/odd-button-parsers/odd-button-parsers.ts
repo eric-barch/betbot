@@ -1,11 +1,12 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser } from '../page-parser';
+import { PageParser } from '@/parsers/models/shared-models';
 
 import { OddButtonParser } from './odd-button-parser';
 
 export abstract class OddButtonParsers {
   protected readonly parentPageParser: PageParser;
+  private wrappedOddButtonSelector: string | undefined;
   private wrappedButtons: Array<ElementHandle> | undefined;
   private wrappedOddButtonParsers: Set<OddButtonParser>;
 
@@ -19,22 +20,39 @@ export abstract class OddButtonParsers {
   }
 
   protected async init(): Promise<OddButtonParsers> {
+    this.oddButtonSelector = await this.setOddButtonSelector();
     this.buttons = await this.scrapeButtons();
     this.oddButtonParsers = await this.createOddButtonParsers();
     return this;
   }
 
-  protected abstract scrapeButtons(): Promise<Array<ElementHandle>>;
+  protected async scrapeButtons(): Promise<Array<ElementHandle>> {
+    const page = this.parentPageParser.page;
+    this.buttons = await page.$$(this.oddButtonSelector);
+    return this.buttons;
+  }
+
+  protected abstract setOddButtonSelector(): Promise<string>;
 
   protected abstract createOddButtonParsers(): Promise<Set<OddButtonParser>>;
 
   public async updateOddData(): Promise<OddButtonParsers> {
-    for (const oddButtonParser of this.oddButtonParsers) {
-      await oddButtonParser.updateOddData();
-    }
+    await Promise.all(Array.from(this.oddButtonParsers).map(oddButtonParser => oddButtonParser.updateOddData()));
 
     return this;
   };
+
+  protected set oddButtonSelector(oddButtonSelector: string) {
+    this.wrappedOddButtonSelector = oddButtonSelector;
+  }
+
+  protected get oddButtonSelector(): string {
+    if (!this.wrappedOddButtonSelector) {
+      throw new Error(`wrappedOddButtonSelector is undefined.`);
+    }
+
+    return this.wrappedOddButtonSelector;
+  }
 
   protected set oddButtonParsers(oddButtonParsers: Set<OddButtonParser>) {
     this.wrappedOddButtonParsers = oddButtonParsers;

@@ -8,12 +8,15 @@ import { OddButton } from './odd-button';
 export abstract class OddButtonParser {
   public readonly exchange: Exchange;
   public readonly league: League;
-  private wrappedOddButton: OddButton;
+  // TODO: Hacky.
+  public readonly seedButton: ElementHandle;
+  private wrappedOddButton: OddButton | undefined;
   private wrappedDbGameInitializer: DbGameInitializer | undefined;
   private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
   private wrappedDbOddInitializer: DbOddInitializer | undefined;
-  private wrappedPriceParser: DataParser | undefined;
-  private wrappedValueParser: DataParser | undefined;
+  private wrappedTextContent: string | undefined;
+  private wrappedPrice: number | null | undefined;
+  private wrappedValue: number | null | undefined;
 
   protected constructor({
     exchange,
@@ -26,44 +29,54 @@ export abstract class OddButtonParser {
   }) {
     this.exchange = exchange;
     this.league = league;
-    this.wrappedOddButton = new OddButton({ button });
+    this.seedButton = button;
   }
 
-  protected async init(): Promise<OddButtonParser> {
-    this.oddButton = await this.initOddButton();
-    this.dbGameInitializer = await this.createConcreteDbGameInitializer();
-    this.dbStatisticInitializer = await this.createConcreteDbStatisticInitializer();
-    this.dbOddInitializer = await this.createConcreteDbOddInitializer();
-    this.priceParser = await this.createConcretePriceParser();
-    this.valueParser = await this.createConcreteValueParser();
-
-    await this.updateOddData();
-
-    return this;
-  }
-
-  protected abstract initOddButton(): Promise<OddButton>;
-
-  protected abstract createConcreteDbGameInitializer(): Promise<DbGameInitializer>;
-
-  protected abstract createConcreteDbStatisticInitializer(): Promise<DbStatisticInitializer>;
-
-  protected abstract createConcreteDbOddInitializer(): Promise<DbOddInitializer>;
-
-  protected abstract createConcretePriceParser(): Promise<DataParser>;
-
-  protected abstract createConcreteValueParser(): Promise<DataParser>;
+  protected abstract init(): Promise<OddButtonParser>;
 
   public abstract updateOddData(): Promise<OddButtonParser>;
 
-  protected async updateDbOddFromDataParsers(): Promise<void> {
-    const price = await this.priceParser.getValue();
-    const value = await this.valueParser.getValue();
+  protected async updateDbOddFromTextContent(): Promise<void> {
+    await this.parseTextContent();
 
     await this.dbOddInitializer.updateData({
-      price,
-      value,
+      price: this.price,
+      value: this.value,
     });
+  }
+
+  private async getTextContent(): Promise<string> {
+    const textContent = await (await this.button.getProperty('textContent')).jsonValue();
+
+    if (!textContent) {
+      throw new Error(`textContent is null.`);
+    }
+
+    this.textContent = textContent;
+    return this.textContent;
+  }
+
+  private async parseTextContent(): Promise<void> {
+    this.textContent = await this.getTextContent();
+
+    // Normalize minus signs
+    const allHyphens = '−-−‐‑‒–—―';
+    const normalizedMinusSign = this.textContent.replace(new RegExp(`[${allHyphens}]`, 'g'), '-');
+
+    const numbers = normalizedMinusSign.match(/-?\d+(\.\d+)?/g);
+
+    if (!numbers) {
+      this.value = null;
+      this.price = null;
+    } else if (numbers.length === 1) {
+      this.value = null;
+      this.price = parseInt(numbers[0]);
+    } else if (numbers.length === 2) {
+      this.value = parseFloat(numbers[0]);
+      this.price = parseInt(numbers[1]);
+    } else {
+      throw new Error(`More than two numbers found in textContent.`);
+    }
   }
 
   protected set oddButton(oddButton: OddButton) {
@@ -130,27 +143,39 @@ export abstract class OddButtonParser {
     return this.dbOddInitializer.odd;
   }
 
-  protected set priceParser(priceParser: DataParser) {
-    this.wrappedPriceParser = priceParser;
+  protected set textContent(textContent: string) {
+    this.wrappedTextContent = textContent;
   }
 
-  protected get priceParser(): DataParser {
-    if (!this.wrappedPriceParser) {
-      throw new Error(`wrappedPriceParser is undefined.`);
+  protected get textContent(): string {
+    if (!this.wrappedTextContent) {
+      throw new Error(`wrappedTextContent is undefined.`);
     }
 
-    return this.wrappedPriceParser;
+    return this.wrappedTextContent;
   }
 
-  protected set valueParser(valueParser: DataParser) {
-    this.wrappedValueParser = valueParser;
+  protected set price(price: number | null) {
+    this.wrappedPrice = price;
   }
 
-  protected get valueParser(): DataParser {
-    if (!this.wrappedValueParser) {
-      throw new Error(`wrappedValueParser is undefined.`);
+  protected get price(): number | null {
+    if (this.wrappedPrice === undefined) {
+      throw new Error(`wrappedPrice is undefined.`);
     }
 
-    return this.wrappedValueParser;
+    return this.wrappedPrice;
+  }
+
+  protected set value(value: number | null) {
+    this.wrappedValue = value;
+  }
+
+  protected get value(): number | null {
+    if (this.wrappedValue === undefined) {
+      throw new Error(`wrappedValue is undefined.`);
+    }
+
+    return this.wrappedValue;
   }
 }

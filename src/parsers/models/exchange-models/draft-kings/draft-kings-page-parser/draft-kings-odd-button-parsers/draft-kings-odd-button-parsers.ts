@@ -1,7 +1,6 @@
-import { ElementHandle } from 'puppeteer';
-
 import { DraftKingsOddButtonParser, DraftKingsPageParser } from '@/parsers/models/exchange-models/draft-kings';
-import { OddButtonParser, OddButtonParsers } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParsers } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parsers';
 
 export class DraftKingsOddButtonParsers extends OddButtonParsers {
   public static async create({
@@ -14,10 +13,9 @@ export class DraftKingsOddButtonParsers extends OddButtonParsers {
     return draftKingsOddButtonParserSet;
   }
 
-  protected async scrapeButtons(): Promise<Array<ElementHandle>> {
-    const page = this.parentPageParser.page;
-    this.buttons = await page.$$('div[role="button"].sportsbook-outcome-cell__body');
-    return this.buttons;
+  protected async setOddButtonSelector(): Promise<string> {
+    this.oddButtonSelector = 'div[role="button"].sportsbook-outcome-cell__body';
+    return this.oddButtonSelector;
   }
 
   protected async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
