@@ -69,15 +69,16 @@ export class FanDuelOddButtonParsers extends OddButtonParsers {
   }
 
   protected async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
-    this.oddButtonParsers = new Set(await Promise.all(
+    await Promise.all(
       this.buttons.map(async (button) => {
-        return await FanDuelOddButtonParser.create({
+        const fanDuelOddButtonParser = await FanDuelOddButtonParser.create({
           exchange: this.parentPageParser.exchange,
           league: this.parentPageParser.league,
           button,
         });
+        this.oddButtonParsers.add(fanDuelOddButtonParser);
       })
-    ));
+    );
 
     return this.oddButtonParsers;
   }

@@ -15,15 +15,18 @@ class AllPageParserInitData extends Set<PageParserInitData> {
   }
 
   public async init(): Promise<Set<PageParserInitData>> {
-    for (const pageUrl of this.pageUrls) {
-      const pageParserInitData = await PageParserInitData.create({ pageUrl });
-      this.add(pageParserInitData);
-    }
+    await Promise.all(
+      Array.from(this.pageUrls).map(async (pageUrl) => {
+        const pageParserInitData = await PageParserInitData.create({ pageUrl });
+        this.add(pageParserInitData);
+      })
+    );
 
     return this;
   }
 
-  public find({
+
+  public async find({
     exchangeInitData,
     leagueInitData,
     pageTypeInitData,
@@ -31,19 +34,27 @@ class AllPageParserInitData extends Set<PageParserInitData> {
     exchangeInitData: ExchangeInitData,
     leagueInitData: LeagueInitData,
     pageTypeInitData: PageTypeInitData,
-  }): PageParserInitData {
-    for (const pageParserInitData of this) {
-      if (pageParserInitData.matches({
-        exchangeInitData,
-        leagueInitData,
-        pageTypeInitData,
-      })) {
-        return pageParserInitData;
-      }
-    }
+  }): Promise<PageParserInitData> {
+    const pageParserInitData = await Promise.any(
+      Array.from(this).map((pageParserInitData) =>
+        new Promise<PageParserInitData>((resolve, reject) => {
+          if (pageParserInitData.matches({
+            exchangeInitData,
+            leagueInitData,
+            pageTypeInitData,
+          })) {
+            resolve(pageParserInitData);
+          } else {
+            reject(new Error('Does not match'));
+          }
+        })
+      )
+    );
 
-    throw new Error(`Did not find matching PageParserInitData.`);
+    return pageParserInitData;
   }
+
+
 }
 
 export const allPageParserInitData = new AllPageParserInitData({
