@@ -20,9 +20,11 @@ export class FanDuelDbStatisticInitializer extends DbStatisticInitializer {
     const awayTeam = await prisma.team.findFirstOrThrow({ where: { id: game.awayTeamId } });
     const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: game.homeTeamId } });
 
-    const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*run line.*`, "i");
+    const spreadTerms = `run line|spread`;
+
+    const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*${spreadTerms}.*`, "i");
     const winnerPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*moneyline.*`, "i")
-    const totalPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*total runs.*`, "i");
+    const totalPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b.*total.*`, "i");
 
     const spreadPatternMatches = spreadPattern.exec(ariaLabel);
     const winnerPatternMatches = winnerPattern.exec(ariaLabel);
