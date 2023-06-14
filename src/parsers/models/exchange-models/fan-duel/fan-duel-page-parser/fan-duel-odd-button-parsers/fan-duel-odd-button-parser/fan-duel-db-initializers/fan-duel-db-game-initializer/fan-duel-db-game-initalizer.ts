@@ -36,6 +36,9 @@ export class FanDuelDbGameInitializer extends DbGameInitializer {
       throw new Error(`button is null.`);
     }
 
+    const className = await (await button.getProperty('className')).jsonValue();
+    const textContent = await (await button.getProperty('textContent')).jsonValue();
+
     const linkElement = await button.$('xpath/../../../a');
 
     if (!linkElement) {
