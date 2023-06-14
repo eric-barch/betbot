@@ -54,21 +54,24 @@ export class DbUtilityFunctions {
   }): Promise<Team> {
     unformattedName = unformattedName.replace(/[^a-zA-Z0-9]/g, ' ');
 
-    //TODO: This is so inefficient.
     const leagueTeams = await prisma.team.findMany({
       where: {
         leagueId: league.id,
       }
     });
 
-    for (const team of leagueTeams) {
-      const regex = new RegExp(`\\b${team.identifierFull}\\b`, 'i');
+    const foundTeam = await Promise.any(leagueTeams.map((team) => {
+      return new Promise<Team>((resolve, reject) => {
+        const regex = new RegExp(`\\b${team.identifierFull}\\b`, 'i');
 
-      if (regex.test(unformattedName)) {
-        return team;
-      }
-    }
+        if (regex.test(unformattedName)) {
+          resolve(team);
+        } else {
+          reject();
+        }
+      });
+    }));
 
-    throw new Error(`Did not find matching team.`);
+    return foundTeam;
   }
 }
