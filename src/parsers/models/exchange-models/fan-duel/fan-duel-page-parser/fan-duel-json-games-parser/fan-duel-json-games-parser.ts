@@ -55,10 +55,11 @@ export class FanDuelJsonGamesParser {
   }
 
   private async parseDbGames(): Promise<Array<Game>> {
-    for (const jsonGame of this.jsonGames) {
-      const game = await this.parseDbGame({ jsonGame });
-      this.dbGames.push(game);
-    }
+    this.dbGames = await Promise.all(
+      this.jsonGames.map(async (jsonGame) => {
+        return await this.parseDbGame({ jsonGame });
+      })
+    );
 
     return this.dbGames;
   }
