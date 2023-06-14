@@ -14,8 +14,9 @@ export abstract class OddButtonParser {
   private wrappedDbGameInitializer: DbGameInitializer | undefined;
   private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
   private wrappedDbOddInitializer: DbOddInitializer | undefined;
-  private wrappedPriceParser: DataParser | undefined;
-  private wrappedValueParser: DataParser | undefined;
+  private wrappedTextContent: string | undefined;
+  private wrappedPrice: number | null | undefined;
+  private wrappedValue: number | null | undefined;
 
   protected constructor({
     exchange,
@@ -35,14 +36,47 @@ export abstract class OddButtonParser {
 
   public abstract updateOddData(): Promise<OddButtonParser>;
 
-  protected async updateDbOddFromDataParsers(): Promise<void> {
-    const price = await this.priceParser.getValue();
-    const value = await this.valueParser.getValue();
+  protected async updateDbOddFromTextContent(): Promise<void> {
+    await this.parseTextContent();
 
     await this.dbOddInitializer.updateData({
-      price,
-      value,
+      price: this.price,
+      value: this.value,
     });
+  }
+
+  private async getTextContent(): Promise<string> {
+    const textContent = await (await this.button.getProperty('textContent')).jsonValue();
+
+    if (!textContent) {
+      throw new Error(`textContent is null.`);
+    }
+
+    this.textContent = textContent;
+    return this.textContent;
+  }
+
+  public async parseTextContent(): Promise<void> {
+    this.textContent = await this.getTextContent();
+
+    // Normalize minus signs
+    const allHyphens = '−-−‐‑‒–—―';
+    const normalizedPolarity = this.textContent.replace(new RegExp(`[${allHyphens}]`, 'g'), '-');
+
+    const numbers = normalizedPolarity.match(/-?\d+(\.\d+)?/g);
+
+    if (!numbers) {
+      this.value = null;
+      this.price = null;
+    } else if (numbers.length === 1) {
+      this.value = null;
+      this.price = parseInt(numbers[0]);
+    } else if (numbers.length === 2) {
+      this.value = parseFloat(numbers[0]);
+      this.price = parseInt(numbers[1]);
+    } else {
+      throw new Error(`More than two numbers found in textContent.`);
+    }
   }
 
   protected set oddButton(oddButton: OddButton) {
@@ -109,27 +143,39 @@ export abstract class OddButtonParser {
     return this.dbOddInitializer.odd;
   }
 
-  protected set priceParser(priceParser: DataParser) {
-    this.wrappedPriceParser = priceParser;
+  protected set textContent(textContent: string) {
+    this.wrappedTextContent = textContent;
   }
 
-  protected get priceParser(): DataParser {
-    if (!this.wrappedPriceParser) {
-      throw new Error(`wrappedPriceParser is undefined.`);
+  protected get textContent(): string {
+    if (!this.wrappedTextContent) {
+      throw new Error(`wrappedTextContent is undefined.`);
     }
 
-    return this.wrappedPriceParser;
+    return this.wrappedTextContent;
   }
 
-  protected set valueParser(valueParser: DataParser) {
-    this.wrappedValueParser = valueParser;
+  protected set price(price: number | null) {
+    this.wrappedPrice = price;
   }
 
-  protected get valueParser(): DataParser {
-    if (!this.wrappedValueParser) {
-      throw new Error(`wrappedValueParser is undefined.`);
+  protected get price(): number | null {
+    if (this.wrappedPrice === undefined) {
+      throw new Error(`wrappedPrice is undefined.`);
     }
 
-    return this.wrappedValueParser;
+    return this.wrappedPrice;
+  }
+
+  protected set value(value: number | null) {
+    this.wrappedValue = value;
+  }
+
+  protected get value(): number | null {
+    if (this.wrappedValue === undefined) {
+      throw new Error(`wrappedValue is undefined.`);
+    }
+
+    return this.wrappedValue;
   }
 }
