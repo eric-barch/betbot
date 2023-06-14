@@ -8,7 +8,7 @@ import { OddButton } from './odd-button';
 export abstract class OddButtonParser {
   public readonly exchange: Exchange;
   public readonly league: League;
-  // TODO: This is hacky.
+  // TODO: Hacky.
   public readonly seedButton: ElementHandle;
   private wrappedOddButton: OddButton | undefined;
   private wrappedDbGameInitializer: DbGameInitializer | undefined;
@@ -56,14 +56,14 @@ export abstract class OddButtonParser {
     return this.textContent;
   }
 
-  public async parseTextContent(): Promise<void> {
+  private async parseTextContent(): Promise<void> {
     this.textContent = await this.getTextContent();
 
     // Normalize minus signs
     const allHyphens = '−-−‐‑‒–—―';
-    const normalizedPolarity = this.textContent.replace(new RegExp(`[${allHyphens}]`, 'g'), '-');
+    const normalizedMinusSign = this.textContent.replace(new RegExp(`[${allHyphens}]`, 'g'), '-');
 
-    const numbers = normalizedPolarity.match(/-?\d+(\.\d+)?/g);
+    const numbers = normalizedMinusSign.match(/-?\d+(\.\d+)?/g);
 
     if (!numbers) {
       this.value = null;
