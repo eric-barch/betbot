@@ -33,8 +33,8 @@ export class DraftKingsOddButtonParser extends OddButtonParser {
     return this;
   }
 
-  public async updateOddData(): Promise<DraftKingsOddButtonParser> {
-    await this.oddButton.updateOddButton();
+  public async updateOdd(): Promise<DraftKingsOddButtonParser> {
+    await this.oddButton.resetFromReference();
     await this.updateDbOddFromTextContent();
     return this;
   }

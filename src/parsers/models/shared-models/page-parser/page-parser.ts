@@ -32,8 +32,8 @@ export abstract class PageParser {
 
   protected abstract createOddButtonParsers(): Promise<OddButtonParsers>;
 
-  public async updateOddData(): Promise<PageParser> {
-    await this.oddButtonParsers.updateOddData();
+  public async updateOdds(): Promise<PageParser> {
+    await this.oddButtonParsers.updateOdds();
     return this;
   };
 

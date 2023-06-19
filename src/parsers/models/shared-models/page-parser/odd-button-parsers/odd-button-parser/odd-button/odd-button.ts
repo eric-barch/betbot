@@ -74,12 +74,15 @@ export abstract class OddButton {
     return `/${tag}[${index}]`;
   }
 
-  public async updateOddButton(): Promise<ElementHandle> {
+  public async resetFromReference(): Promise<ElementHandle> {
     const button = await this.reference.$(`xpath${this.referenceToButtonXPath}`);
 
     if (!button) {
       throw new Error(`button is null.`);
     }
+
+    // Something verifying that the new button is in the right place. Might have to make this an
+    // abstract method and implement it in the child classes.
 
     this.button = button;
     return this.button

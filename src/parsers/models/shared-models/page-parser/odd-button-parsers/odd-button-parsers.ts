@@ -36,9 +36,9 @@ export abstract class OddButtonParsers {
 
   protected abstract createOddButtonParsers(): Promise<Set<OddButtonParser>>;
 
-  public async updateOddData(): Promise<OddButtonParsers> {
+  public async updateOdds(): Promise<OddButtonParsers> {
     await Promise.all(
-      Array.from(this.oddButtonParsers).map(oddButtonParser => oddButtonParser.updateOddData())
+      Array.from(this.oddButtonParsers).map(oddButtonParser => oddButtonParser.updateOdd())
     );
 
     return this;
