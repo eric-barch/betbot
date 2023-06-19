@@ -45,13 +45,6 @@ export abstract class OddButtonParser {
     });
   }
 
-  private async getTextContent(): Promise<string | null> {
-    const textContent = await (await this.button.getProperty('textContent')).jsonValue();
-
-    this.textContent = textContent;
-    return this.textContent;
-  }
-
   private async parseTextContent(): Promise<void> {
     this.textContent = await this.getTextContent();
 
@@ -86,6 +79,11 @@ export abstract class OddButtonParser {
     }
 
     throw new Error(`More than two numbers found in textContent.`);
+  }
+
+  private async getTextContent(): Promise<string | null> {
+    this.textContent = await (await this.button.getProperty('textContent')).jsonValue();
+    return this.textContent;
   }
 
   protected set oddButton(oddButton: OddButton) {
