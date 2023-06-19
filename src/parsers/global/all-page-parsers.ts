@@ -16,12 +16,12 @@ class AllPageParsers extends Set<PageParser> {
   }
 
 
-  public async updateOddData(): Promise<AllPageParsers> {
+  public async updateOdds(): Promise<AllPageParsers> {
     const start = Date.now();
 
     await Promise.all(
       Array.from(this).map(async (pageParser) => {
-        await pageParser.updateOddData();
+        await pageParser.updateOdds();
       })
     );
 

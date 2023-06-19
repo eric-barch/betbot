@@ -5,7 +5,7 @@ async function main() {
   await allPageParsers.init();
 
   while (true) {
-    await allPageParsers.updateOddData();
+    await allPageParsers.updateOdds();
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 }
