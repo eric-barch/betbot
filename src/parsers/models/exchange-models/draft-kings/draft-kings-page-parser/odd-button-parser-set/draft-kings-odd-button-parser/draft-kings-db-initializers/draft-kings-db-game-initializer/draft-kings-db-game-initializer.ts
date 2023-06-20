@@ -3,7 +3,7 @@ import { Game } from '@prisma/client';
 import { prisma } from '@/db';
 import { DraftKingsGameParser } from '@/parsers/models/exchange-models/draft-kings';
 import { OddButtonParser } from '@/parsers/models/common-models';
-import { DbGameInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parsers/odd-button-parser/db-initializers/db-game-initializer';
+import { DbGameInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-game-initializer';
 
 export class DraftKingsDbGameInitializer extends DbGameInitializer {
   private wrappedExchangeAssignedGameId: string | undefined;
