@@ -1,6 +1,6 @@
 import { prisma } from '@/db';
 import { OddButtonParser } from '@/parsers/models/common-models';
-import { DbStatisticInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parsers/odd-button-parser/db-initializers/db-statistic-initializer';
+import { DbStatisticInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-statistic-initializer';
 
 export class FanDuelDbStatisticInitializer extends DbStatisticInitializer {
   public static async create({

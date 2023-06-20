@@ -1,7 +1,7 @@
 import { ElementHandle } from 'puppeteer';
 
 import { IPageParser, OddButtonParser } from '@/parsers/models/common-models';
-import { CommonOddButtonParserSet, IOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parsers/odd-button-parsers';
+import { CommonOddButtonParserSet, IOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
 import { FanDuelOddButtonParser } from '@/parsers/models/exchange-models/fan-duel';
 
 export class FanDuelOddButtonParserSet implements IOddButtonParserSet {

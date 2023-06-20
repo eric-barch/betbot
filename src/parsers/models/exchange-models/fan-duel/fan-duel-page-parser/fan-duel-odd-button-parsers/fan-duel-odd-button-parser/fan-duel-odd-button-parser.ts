@@ -7,7 +7,7 @@ import {
 import { DbOddInitializer } from '@/parsers/models/common-models';
 import {
   OddButtonParser,
-} from '@/parsers/models/common-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
+} from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
 
 export class FanDuelOddButtonParser extends OddButtonParser {
   public static async create({

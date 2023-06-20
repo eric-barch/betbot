@@ -4,7 +4,7 @@ import { Page } from 'puppeteer';
 import { PageParserInitData } from '@/setup';
 
 import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
-import { IOddButtonParserSet } from './odd-button-parsers';
+import { IOddButtonParserSet } from './odd-button-parser-set';
 import { Webpage } from './webpage';
 
 export interface IPageParser {

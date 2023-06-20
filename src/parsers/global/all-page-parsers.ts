@@ -1,5 +1,9 @@
+import { PageParserFactory as ExchangePageParserFactory, IPageParser } from '@/parsers';
 import { allPageParserInitData } from '@/setup';
-import { IPageParser, PageParser, PageParserFactory as ExchangePageParserFactory } from '@/parsers';
+
+import { DraftKingsParserFactory } from '../models/exchange-models/draft-kings/draft-kings-parser-factory';
+import { FanDuelParserFactory } from '../models/exchange-models/fan-duel/fan-duel-parser-factory';
+import { IParserFactory } from '../models/exchange-models/i-parser-factory';
 
 class AllPageParsers {
   private set: Set<IPageParser> = new Set<IPageParser>();
@@ -8,9 +12,24 @@ class AllPageParsers {
     await allPageParserInitData.init();
 
     await Promise.all(
-      Array.from(allPageParserInitData).map(async (pageParserInitData) => {
-        const exchangePageParser = await ExchangePageParserFactory.create({ initData: pageParserInitData });
-        this.set.add(exchangePageParser);
+      Array.from(allPageParserInitData).map(async (initData) => {
+        const exchangeName = initData.exchangeInitData.name;
+
+        let parserFactory: IParserFactory;
+
+        switch (exchangeName) {
+          case 'DraftKings':
+            parserFactory = new DraftKingsParserFactory();
+            break;
+          case 'FanDuel':
+            parserFactory = new FanDuelParserFactory();
+            break;
+          default:
+            throw new Error(`Exchange ${exchangeName} is not supported.`);
+        }
+
+        const pageParser = await parserFactory.createPageParser({ initData: initData });
+        this.set.add(pageParser);
       })
     );
 
