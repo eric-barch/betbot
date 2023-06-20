@@ -2,7 +2,7 @@ import { Team } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
 import { DbUtilityFunctions } from '@/db';
-import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsMatchupParser {
   private parentOddButtonParser: OddButtonParser;

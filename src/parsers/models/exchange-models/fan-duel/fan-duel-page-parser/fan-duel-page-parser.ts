@@ -1,15 +1,14 @@
 import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
-import { FanDuelJsonGamesParser, FanDuelOddButtonParsers } from '@/parsers/models/exchange-models/fan-duel';
-import { OddButtonParsers } from '@/parsers/models/shared-models';
-import { IExchangePageParser, PageParser } from '@/parsers/models/shared-models/page-parser/page-parser';
+import { FanDuelJsonGamesParser, FanDuelOddButtonParserSet } from '@/parsers/models/exchange-models/fan-duel';
+import { IPageParser, PageParser } from '@/parsers/models/common-models/page-parser/page-parser';
 import { PageParserInitData } from '@/setup';
 
-export class FanDuelPageParser implements IExchangePageParser {
+export class FanDuelPageParser implements IPageParser {
   private wrappedPageParser: PageParser | undefined;
   private wrappedJsonGamesParser: FanDuelJsonGamesParser | undefined;
-  private wrappedOddButtonParsers: FanDuelOddButtonParsers | undefined;
+  private wrappedOddButtonParsers: FanDuelOddButtonParserSet | undefined;
 
   public static async create({
     initData,
@@ -24,7 +23,7 @@ export class FanDuelPageParser implements IExchangePageParser {
     fanDuelPageParser.jsonGamesParser = await FanDuelJsonGamesParser.create({
       parentPageParser: fanDuelPageParser,
     });
-    fanDuelPageParser.oddButtonParsers = await FanDuelOddButtonParsers.create({
+    fanDuelPageParser.oddButtonParserSet = await FanDuelOddButtonParserSet.create({
       parentPageParser: fanDuelPageParser,
     });
 
@@ -32,7 +31,7 @@ export class FanDuelPageParser implements IExchangePageParser {
   }
 
   public async updateOdds(): Promise<void> {
-    await this.oddButtonParsers.updateOdds();
+    await this.oddButtonParserSet.updateOdds();
   }
 
   public async disconnect(): Promise<void> {
@@ -51,11 +50,11 @@ export class FanDuelPageParser implements IExchangePageParser {
     return this.pageParser.league;
   }
 
-  private set oddButtonParsers(oddButtonParsers: FanDuelOddButtonParsers) {
+  private set oddButtonParserSet(oddButtonParsers: FanDuelOddButtonParserSet) {
     this.wrappedOddButtonParsers = oddButtonParsers;
   }
 
-  public get oddButtonParsers(): FanDuelOddButtonParsers {
+  public get oddButtonParserSet(): FanDuelOddButtonParserSet {
     if (!this.wrappedOddButtonParsers) {
       throw new Error(`wrappedOddButtonParsers is undefined.`);
     }

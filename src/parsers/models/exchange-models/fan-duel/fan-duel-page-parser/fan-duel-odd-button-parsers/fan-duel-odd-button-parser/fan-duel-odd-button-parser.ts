@@ -4,10 +4,10 @@ import { ElementHandle } from 'puppeteer';
 import {
   FanDuelDbGameInitializer, FanDuelDbStatisticInitializer, FanDuelOddButton
 } from '@/parsers/models/exchange-models/fan-duel';
-import { DbOddInitializer } from '@/parsers/models/shared-models';
+import { DbOddInitializer } from '@/parsers/models/common-models';
 import {
   OddButtonParser,
-} from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
+} from '@/parsers/models/common-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
 
 export class FanDuelOddButtonParser extends OddButtonParser {
   public static async create({

@@ -1,6 +1,6 @@
 import { Statistic } from '@prisma/client';
 
-import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 import { prisma } from '@/db';
 
 export abstract class DbStatisticInitializer {

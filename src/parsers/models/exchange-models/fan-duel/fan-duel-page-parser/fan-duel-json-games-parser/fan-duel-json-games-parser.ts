@@ -1,17 +1,17 @@
 import { Game } from '@prisma/client';
 
 import { DbUtilityFunctions, prisma } from '@/db';
-import { IExchangePageParser } from '@/parsers/models/shared-models';
+import { IPageParser } from '@/parsers/models/common-models';
 
 export class FanDuelJsonGamesParser {
-  private parentPageParser: IExchangePageParser;
+  private parentPageParser: IPageParser;
   private jsonGames: Array<any>;
   private dbGames: Array<Game>;
 
   private constructor({
     parentPageParser,
   }: {
-    parentPageParser: IExchangePageParser,
+    parentPageParser: IPageParser,
   }) {
     this.parentPageParser = parentPageParser;
     this.jsonGames = new Array<any>;
@@ -21,7 +21,7 @@ export class FanDuelJsonGamesParser {
   public static async create({
     parentPageParser,
   }: {
-    parentPageParser: IExchangePageParser,
+    parentPageParser: IPageParser,
   }): Promise<FanDuelJsonGamesParser> {
     const jsonGamesParser = new FanDuelJsonGamesParser({ parentPageParser });
     await jsonGamesParser.ensureGamesInDb();

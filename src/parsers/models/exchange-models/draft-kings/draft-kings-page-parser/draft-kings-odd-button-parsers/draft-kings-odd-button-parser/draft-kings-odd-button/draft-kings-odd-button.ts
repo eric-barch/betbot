@@ -1,7 +1,7 @@
 import { ElementHandle } from 'puppeteer';
 
-import { OddButton } from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/odd-button/odd-button';
-import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButton } from '@/parsers/models/common-models/page-parser/odd-button-parsers/odd-button-parser/odd-button/odd-button';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsOddButton extends OddButton {
   public static async create({
