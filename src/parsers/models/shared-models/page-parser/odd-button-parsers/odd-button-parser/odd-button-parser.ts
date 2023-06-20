@@ -8,8 +8,6 @@ import { OddButton } from './odd-button';
 export abstract class OddButtonParser {
   public readonly exchange: Exchange;
   public readonly league: League;
-  // TODO: Hacky.
-  public readonly seedButton: ElementHandle;
   private wrappedOddButton: OddButton | undefined;
   private wrappedDbGameInitializer: DbGameInitializer | undefined;
   private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
@@ -29,7 +27,6 @@ export abstract class OddButtonParser {
   }) {
     this.exchange = exchange;
     this.league = league;
-    this.seedButton = button;
   }
 
   protected abstract init(): Promise<OddButtonParser>;
