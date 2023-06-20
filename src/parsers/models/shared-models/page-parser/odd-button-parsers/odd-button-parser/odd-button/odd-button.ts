@@ -1,17 +1,21 @@
 import { ElementHandle } from 'puppeteer';
 
+import { OddButtonParser } from '../odd-button-parser';
+
 export abstract class OddButton {
+  protected readonly parentOddButtonParser: OddButtonParser;
   private wrappedButton: ElementHandle;
   private wrappedReferenceSelector: string | undefined;
   private wrappedReference: ElementHandle | undefined;
   private wrappedReferenceToButtonXPath: string | undefined;
 
   protected constructor({
-    button,
+    parentOddButtonParser,
   }: {
-    button: ElementHandle,
+    parentOddButtonParser: OddButtonParser,
   }) {
-    this.wrappedButton = button;
+    this.parentOddButtonParser = parentOddButtonParser;
+    this.wrappedButton = parentOddButtonParser.button;
   }
 
   protected async init(): Promise<OddButton> {
@@ -81,8 +85,9 @@ export abstract class OddButton {
       throw new Error(`button is null.`);
     }
 
-    // Something verifying that the new button is in the right place. Might have to make this an
-    // abstract method and implement it in the child classes.
+    // Something verifying that the new button is in the right place. If not, should trigger refresh
+    // of entire page followed by reset of all odd buttons. Might have to make this an abstract 
+    // method and implement it in the child classes.
 
     this.button = button;
     return this.button

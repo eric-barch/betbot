@@ -9,7 +9,7 @@ export class DraftKingsOddButton extends OddButton {
   }: {
     parentOddButtonParser: OddButtonParser,
   }): Promise<DraftKingsOddButton> {
-    const draftKingsOddButton = new DraftKingsOddButton({ button: parentOddButtonParser.seedButton });
+    const draftKingsOddButton = new DraftKingsOddButton({ parentOddButtonParser });
     await draftKingsOddButton.init();
     return draftKingsOddButton;
   }
