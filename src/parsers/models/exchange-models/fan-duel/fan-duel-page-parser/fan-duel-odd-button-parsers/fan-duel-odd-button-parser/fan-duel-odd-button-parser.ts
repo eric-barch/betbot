@@ -22,19 +22,25 @@ export class FanDuelOddButtonParser extends OddButtonParser {
     const fanDuelOddButtonParser = new FanDuelOddButtonParser({
       exchange,
       league,
+    });
+
+    fanDuelOddButtonParser.oddButton = await FanDuelOddButton.create({
+      parentOddButtonParser: fanDuelOddButtonParser,
       button,
     });
-    await fanDuelOddButtonParser.init();
-    return fanDuelOddButtonParser;
-  }
+    fanDuelOddButtonParser.dbGameInitializer = await FanDuelDbGameInitializer.create({
+      parentOddButtonParser: fanDuelOddButtonParser,
+    });
+    fanDuelOddButtonParser.dbStatisticInitializer = await FanDuelDbStatisticInitializer.create({
+      parentOddButtonParser: fanDuelOddButtonParser,
+    });
+    fanDuelOddButtonParser.dbOddInitializer = await DbOddInitializer.create({
+      parentOddButtonParser: fanDuelOddButtonParser,
+    });
 
-  protected async init(): Promise<FanDuelOddButtonParser> {
-    this.oddButton = await FanDuelOddButton.create({ parentOddButtonParser: this });
-    this.dbGameInitializer = await FanDuelDbGameInitializer.create({ parentOddButtonParser: this });
-    this.dbStatisticInitializer = await FanDuelDbStatisticInitializer.create({ parentOddButtonParser: this });
-    this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
-    await this.updateDbOddFromTextContent();
-    return this;
+    await fanDuelOddButtonParser.updateDbOddFromTextContent();
+
+    return fanDuelOddButtonParser;
   }
 
   public async updateOdd(): Promise<FanDuelOddButtonParser> {

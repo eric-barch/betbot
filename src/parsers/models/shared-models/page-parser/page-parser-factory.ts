@@ -1,7 +1,7 @@
 import { DraftKingsPageParser, FanDuelPageParser } from '@/parsers/models/exchange-models';
 import { PageParserInitData } from '@/setup';
 
-import { PageParser } from './page-parser';
+import { IExchangePageParser } from './page-parser';
 
 
 export class PageParserFactory {
@@ -9,7 +9,7 @@ export class PageParserFactory {
     initData,
   }: {
     initData: PageParserInitData,
-  }): Promise<PageParser> {
+  }): Promise<IExchangePageParser> {
     const exchangeName = initData.exchangeInitData.name;
 
     switch (exchangeName) {

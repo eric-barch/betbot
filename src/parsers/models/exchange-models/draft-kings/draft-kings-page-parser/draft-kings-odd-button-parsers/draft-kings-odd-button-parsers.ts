@@ -19,16 +19,27 @@ export class DraftKingsOddButtonParsers extends OddButtonParsers {
   }
 
   protected async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
-    await Promise.all(
-      this.buttons.map(async (button) => {
-        const draftKingsOddButtonParser = await DraftKingsOddButtonParser.create({
-          exchange: this.parentPageParser.exchange,
-          league: this.parentPageParser.league,
-          button: button,
-        });
-        this.oddButtonParsers.add(draftKingsOddButtonParser);
-      })
-    );
+    // Run in series (development)
+    for (const button of this.buttons) {
+      const draftKingsOddButtonParser = await DraftKingsOddButtonParser.create({
+        exchange: this.parentPageParser.exchange,
+        league: this.parentPageParser.league,
+        button: button,
+      });
+      this.oddButtonParsers.add(draftKingsOddButtonParser);
+    }
+
+    // Run in parallel (production)
+    // await Promise.all(
+    //   this.buttons.map(async (button) => {
+    //     const draftKingsOddButtonParser = await DraftKingsOddButtonParser.create({
+    //       exchange: this.parentPageParser.exchange,
+    //       league: this.parentPageParser.league,
+    //       button: button,
+    //     });
+    //     this.oddButtonParsers.add(draftKingsOddButtonParser);
+    //   })
+    // );
 
     return this.oddButtonParsers;
   }

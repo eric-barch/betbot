@@ -1,11 +1,11 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser } from '@/parsers/models/shared-models';
+import { IExchangePageParser, PageParser } from '@/parsers/models/shared-models';
 
 import { OddButtonParser } from './odd-button-parser';
 
 export abstract class OddButtonParsers {
-  protected readonly parentPageParser: PageParser;
+  protected readonly parentPageParser: IExchangePageParser;
   private wrappedOddButtonSelector: string | undefined;
   private wrappedButtons: Array<ElementHandle> | undefined;
   private wrappedOddButtonParsers: Set<OddButtonParser>;
@@ -13,7 +13,7 @@ export abstract class OddButtonParsers {
   protected constructor({
     parentPageParser,
   }: {
-    parentPageParser: PageParser,
+    parentPageParser: IExchangePageParser,
   }) {
     this.parentPageParser = parentPageParser;
     this.wrappedOddButtonParsers = new Set<OddButtonParser>();
