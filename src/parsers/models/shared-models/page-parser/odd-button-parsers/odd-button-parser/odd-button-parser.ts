@@ -19,17 +19,13 @@ export abstract class OddButtonParser {
   protected constructor({
     exchange,
     league,
-    button,
   }: {
     exchange: Exchange,
     league: League,
-    button: ElementHandle,
   }) {
     this.exchange = exchange;
     this.league = league;
   }
-
-  protected abstract init(): Promise<OddButtonParser>;
 
   public abstract updateOdd(): Promise<OddButtonParser>;
 

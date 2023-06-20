@@ -11,11 +11,13 @@ export abstract class OddButton {
 
   protected constructor({
     parentOddButtonParser,
+    button,
   }: {
     parentOddButtonParser: OddButtonParser,
+    button: ElementHandle,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.wrappedButton = parentOddButtonParser.button;
+    this.wrappedButton = button;
   }
 
   protected async init(): Promise<OddButton> {

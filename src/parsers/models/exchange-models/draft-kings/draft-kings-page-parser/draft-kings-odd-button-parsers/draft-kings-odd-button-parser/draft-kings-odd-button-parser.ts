@@ -18,19 +18,25 @@ export class DraftKingsOddButtonParser extends OddButtonParser {
     const draftKingsOddButtonParser = new DraftKingsOddButtonParser({
       exchange,
       league,
+    });
+
+    draftKingsOddButtonParser.oddButton = await DraftKingsOddButton.create({
+      parentOddButtonParser: draftKingsOddButtonParser,
       button,
     });
-    await draftKingsOddButtonParser.init();
-    return draftKingsOddButtonParser;
-  }
+    draftKingsOddButtonParser.dbGameInitializer = await DraftKingsDbGameInitializer.create({
+      parentOddButtonParser: draftKingsOddButtonParser,
+    });
+    draftKingsOddButtonParser.dbStatisticInitializer = await DraftKingsDbStatisticInitializer.create({
+      parentOddButtonParser: draftKingsOddButtonParser,
+    });
+    draftKingsOddButtonParser.dbOddInitializer = await DbOddInitializer.create({
+      parentOddButtonParser: draftKingsOddButtonParser,
+    });
 
-  protected async init(): Promise<DraftKingsOddButtonParser> {
-    this.oddButton = await DraftKingsOddButton.create({ parentOddButtonParser: this });
-    this.dbGameInitializer = await DraftKingsDbGameInitializer.create({ parentOddButtonParser: this });
-    this.dbStatisticInitializer = await DraftKingsDbStatisticInitializer.create({ parentOddButtonParser: this });
-    this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
-    await this.updateDbOddFromTextContent();
-    return this;
+    await draftKingsOddButtonParser.updateDbOddFromTextContent();
+
+    return draftKingsOddButtonParser;
   }
 
   public async updateOdd(): Promise<DraftKingsOddButtonParser> {

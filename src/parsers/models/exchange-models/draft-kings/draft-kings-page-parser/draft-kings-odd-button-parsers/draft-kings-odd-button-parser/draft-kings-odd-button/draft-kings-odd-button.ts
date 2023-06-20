@@ -6,10 +6,15 @@ import { OddButtonParser } from '@/parsers/models/shared-models';
 export class DraftKingsOddButton extends OddButton {
   public static async create({
     parentOddButtonParser,
+    button,
   }: {
     parentOddButtonParser: OddButtonParser,
+    button: ElementHandle,
   }): Promise<DraftKingsOddButton> {
-    const draftKingsOddButton = new DraftKingsOddButton({ parentOddButtonParser });
+    const draftKingsOddButton = new DraftKingsOddButton({
+      parentOddButtonParser,
+      button,
+    });
     await draftKingsOddButton.init();
     return draftKingsOddButton;
   }

@@ -1,16 +1,16 @@
 import { allPageParserInitData } from '@/setup';
-import { PageParser, PageParserFactory } from '@/parsers';
+import { IExchangePageParser, PageParser, PageParserFactory as ExchangePageParserFactory } from '@/parsers';
 
 class AllPageParsers {
-  private set: Set<PageParser> = new Set<PageParser>();
+  private set: Set<IExchangePageParser> = new Set<IExchangePageParser>();
 
   public async init(): Promise<AllPageParsers> {
     await allPageParserInitData.init();
 
     await Promise.all(
       Array.from(allPageParserInitData).map(async (pageParserInitData) => {
-        const pageParser = await PageParserFactory.create({ initData: pageParserInitData });
-        this.set.add(pageParser);
+        const exchangePageParser = await ExchangePageParserFactory.create({ initData: pageParserInitData });
+        this.set.add(exchangePageParser);
       })
     );
 

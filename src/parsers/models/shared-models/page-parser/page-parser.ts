@@ -7,14 +7,22 @@ import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
 import { OddButtonParsers } from './odd-button-parsers';
 import { Webpage } from './webpage';
 
-export abstract class PageParser {
+export interface IExchangePageParser {
+  page: Page;
+  exchange: Exchange;
+  league: League;
+  oddButtonParsers: OddButtonParsers;
+  updateOdds(): Promise<void>;
+  disconnect(): Promise<void>;
+}
+
+export class PageParser {
   private readonly initData: PageParserInitData;
   private wrappedWebpage: Webpage | undefined;
   private wrappedDbExchangeInitializer: DbExchangeInitializer | undefined;
   private wrappedDbLeagueInitializer: DbLeagueInitializer | undefined;
-  private wrappedOddButtonParsers: OddButtonParsers | undefined;
 
-  protected constructor({
+  private constructor({
     initData,
   }: {
     initData: PageParserInitData,
@@ -22,20 +30,25 @@ export abstract class PageParser {
     this.initData = initData;
   }
 
-  protected async init(): Promise<PageParser> {
-    this.webpage = await Webpage.create({ url: this.initData.url });
-    this.dbExchangeInitializer = await DbExchangeInitializer.create({ initData: this.initData.exchangeInitData });
-    this.dbLeagueInitializer = await DbLeagueInitializer.create({ initData: this.initData.leagueInitData });
-    this.oddButtonParsers = await this.createOddButtonParsers();
-    return this;
+  public static async create({
+    initData,
+  }: {
+    initData: PageParserInitData,
+  }): Promise<PageParser> {
+    const pageParser = new PageParser({ initData });
+
+    pageParser.webpage = await Webpage.create({
+      url: pageParser.initData.url
+    });
+    pageParser.dbExchangeInitializer = await DbExchangeInitializer.create({
+      initData: pageParser.initData.exchangeInitData
+    });
+    pageParser.dbLeagueInitializer = await DbLeagueInitializer.create({
+      initData: pageParser.initData.leagueInitData
+    });
+
+    return pageParser;
   }
-
-  protected abstract createOddButtonParsers(): Promise<OddButtonParsers>;
-
-  public async updateOdds(): Promise<PageParser> {
-    await this.oddButtonParsers.updateOdds();
-    return this;
-  };
 
   public async disconnect(): Promise<void> {
     await this.webpage.disconnect();
@@ -75,18 +88,6 @@ export abstract class PageParser {
     }
 
     return this.wrappedDbLeagueInitializer;
-  }
-
-  protected set oddButtonParsers(oddButtonParsers: OddButtonParsers) {
-    this.wrappedOddButtonParsers = oddButtonParsers;
-  }
-
-  protected get oddButtonParsers(): OddButtonParsers {
-    if (!this.wrappedOddButtonParsers) {
-      throw new Error(`wrappedOddButtonParsers is undefined.`);
-    }
-
-    return this.wrappedOddButtonParsers;
   }
 
   public get page(): Page {
