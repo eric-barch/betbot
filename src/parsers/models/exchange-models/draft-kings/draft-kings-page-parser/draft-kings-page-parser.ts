@@ -1,15 +1,14 @@
 import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
-import { DraftKingsJsonGamesParser, DraftKingsOddButtonParsers } from '@/parsers/models/exchange-models/draft-kings';
-import { OddButtonParsers } from '@/parsers/models/shared-models';
-import { IExchangePageParser, PageParser } from '@/parsers/models/shared-models/page-parser/page-parser';
+import { DraftKingsJsonGamesParser, DraftKingsOddButtonParserSet } from '@/parsers/models/exchange-models/draft-kings';
+import { IPageParser, PageParser } from '@/parsers/models/common-models/page-parser/page-parser';
 import { PageParserInitData } from '@/setup';
 
-export class DraftKingsPageParser implements IExchangePageParser {
+export class DraftKingsPageParser implements IPageParser {
   private wrappedPageParser: PageParser | undefined;
   private wrappedJsonGamesParser: DraftKingsJsonGamesParser | undefined;
-  private wrappedOddButtonParsers: DraftKingsOddButtonParsers | undefined;
+  private wrappedOddButtonParserSet: DraftKingsOddButtonParserSet | undefined;
 
   public static async create({
     initData,
@@ -24,7 +23,7 @@ export class DraftKingsPageParser implements IExchangePageParser {
     draftKingsPageParser.jsonGamesParser = await DraftKingsJsonGamesParser.create({
       parentPageParser: draftKingsPageParser,
     });
-    draftKingsPageParser.oddButtonParsers = await DraftKingsOddButtonParsers.create({
+    draftKingsPageParser.oddButtonParserSet = await DraftKingsOddButtonParserSet.create({
       parentPageParser: draftKingsPageParser,
     });
 
@@ -32,7 +31,7 @@ export class DraftKingsPageParser implements IExchangePageParser {
   }
 
   public async updateOdds(): Promise<void> {
-    await this.oddButtonParsers.updateOdds();
+    await this.oddButtonParserSet.updateOdds();
   }
 
   public async disconnect(): Promise<void> {
@@ -51,16 +50,16 @@ export class DraftKingsPageParser implements IExchangePageParser {
     return this.pageParser.league;
   }
 
-  private set oddButtonParsers(oddButtonParsers: DraftKingsOddButtonParsers) {
-    this.wrappedOddButtonParsers = oddButtonParsers;
+  private set oddButtonParserSet(oddButtonParsers: DraftKingsOddButtonParserSet) {
+    this.wrappedOddButtonParserSet = oddButtonParsers;
   }
 
-  public get oddButtonParsers(): DraftKingsOddButtonParsers {
-    if (!this.wrappedOddButtonParsers) {
+  public get oddButtonParserSet(): DraftKingsOddButtonParserSet {
+    if (!this.wrappedOddButtonParserSet) {
       throw new Error(`wrappedOddButtonParsers is undefined.`);
     }
 
-    return this.wrappedOddButtonParsers;
+    return this.wrappedOddButtonParserSet;
   }
 
   private set pageParser(pageParser: PageParser) {

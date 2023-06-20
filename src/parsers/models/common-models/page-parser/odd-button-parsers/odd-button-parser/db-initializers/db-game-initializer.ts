@@ -1,6 +1,6 @@
 import { Game } from '@prisma/client';
 
-import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export abstract class DbGameInitializer {
   protected readonly parentOddButtonParser: OddButtonParser;

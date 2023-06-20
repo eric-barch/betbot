@@ -1,7 +1,7 @@
 import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsStartDateParser {
   private parentOddButtonParser: OddButtonParser;

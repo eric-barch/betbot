@@ -1,17 +1,17 @@
-import { Page } from 'puppeteer';
 import { Exchange, League } from '@prisma/client';
+import { Page } from 'puppeteer';
 
 import { PageParserInitData } from '@/setup';
 
 import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
-import { OddButtonParsers } from './odd-button-parsers';
+import { IOddButtonParserSet } from './odd-button-parsers';
 import { Webpage } from './webpage';
 
-export interface IExchangePageParser {
+export interface IPageParser {
   page: Page;
   exchange: Exchange;
   league: League;
-  oddButtonParsers: OddButtonParsers;
+  oddButtonParserSet: IOddButtonParserSet;
   updateOdds(): Promise<void>;
   disconnect(): Promise<void>;
 }

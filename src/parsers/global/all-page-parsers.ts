@@ -1,8 +1,8 @@
 import { allPageParserInitData } from '@/setup';
-import { IExchangePageParser, PageParser, PageParserFactory as ExchangePageParserFactory } from '@/parsers';
+import { IPageParser, PageParser, PageParserFactory as ExchangePageParserFactory } from '@/parsers';
 
 class AllPageParsers {
-  private set: Set<IExchangePageParser> = new Set<IExchangePageParser>();
+  private set: Set<IPageParser> = new Set<IPageParser>();
 
   public async init(): Promise<AllPageParsers> {
     await allPageParserInitData.init();

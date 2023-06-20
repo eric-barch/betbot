@@ -1,7 +1,7 @@
 import { Odd } from '@prisma/client';
 
 import { prisma } from '@/db';
-import { OddButtonParser } from '@/parsers/models/shared-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DbOddInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
