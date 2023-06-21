@@ -1,4 +1,4 @@
-import { IPageParser, OddButtonParser } from '@/parsers/models/common-models';
+import { PageParser, OddButtonParser } from '@/parsers/models/common-models';
 import { CommonOddButtonParserSet, IOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
 import { DraftKingsOddButtonParser } from '@/parsers/models/exchange-models/draft-kings';
 
@@ -9,7 +9,7 @@ export class DraftKingsOddButtonParserSet implements IOddButtonParserSet {
   public static async create({
     parentPageParser,
   }: {
-    parentPageParser: IPageParser,
+    parentPageParser: PageParser,
   }): Promise<DraftKingsOddButtonParserSet> {
     const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet();
 

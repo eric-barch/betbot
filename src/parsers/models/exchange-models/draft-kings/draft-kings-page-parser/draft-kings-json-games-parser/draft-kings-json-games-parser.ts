@@ -1,17 +1,17 @@
 import { Game } from '@prisma/client';
 
 import { DbUtilityFunctions, prisma } from '@/db';
-import { IPageParser } from '@/parsers/models/common-models';
+import { PageParser } from '@/parsers/models/common-models';
 
 export class DraftKingsJsonGamesParser {
-  private parentPageParser: IPageParser;
+  private parentPageParser: PageParser;
   private jsonGames: Array<any>;
   private dbGames: Array<Game>;
 
   private constructor({
     parentPageParser,
   }: {
-    parentPageParser: IPageParser,
+    parentPageParser: PageParser,
   }) {
     this.parentPageParser = parentPageParser;
     this.jsonGames = new Array<any>;
@@ -21,7 +21,7 @@ export class DraftKingsJsonGamesParser {
   public static async create({
     parentPageParser,
   }: {
-    parentPageParser: IPageParser,
+    parentPageParser: PageParser,
   }): Promise<DraftKingsJsonGamesParser> {
     const jsonGamesParser = new DraftKingsJsonGamesParser({ parentPageParser });
     await jsonGamesParser.ensureGamesInDb();
