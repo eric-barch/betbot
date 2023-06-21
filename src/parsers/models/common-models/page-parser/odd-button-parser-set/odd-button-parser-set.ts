@@ -1,7 +1,7 @@
 import { ElementHandle, Page } from 'puppeteer';
 import { Exchange, League } from '@prisma/client';
 
-import { IPageParser } from '@/parsers/models/common-models';
+import { PageParser } from '@/parsers/models/common-models';
 
 import { OddButtonParser } from './odd-button-parser';
 
@@ -13,7 +13,7 @@ export interface IOddButtonParserSet {
 }
 
 export class CommonOddButtonParserSet {
-  private readonly parentPageParser: IPageParser;
+  private readonly parentPageParser: PageParser;
   private readonly parentOddButtonParserSet: IOddButtonParserSet;
   private wrappedOddButtonSelector: string | undefined;
   private wrappedButtons: Array<ElementHandle> | undefined;
@@ -22,7 +22,7 @@ export class CommonOddButtonParserSet {
     parentPageParser,
     parentOddButtonParserSet,
   }: {
-    parentPageParser: IPageParser,
+    parentPageParser: PageParser,
     parentOddButtonParserSet: IOddButtonParserSet,
   }) {
     this.parentPageParser = parentPageParser;
@@ -33,7 +33,7 @@ export class CommonOddButtonParserSet {
     parentPageParser,
     parentOddButtonParserSet,
   }: {
-    parentPageParser: IPageParser,
+    parentPageParser: PageParser,
     parentOddButtonParserSet: IOddButtonParserSet,
   }): Promise<CommonOddButtonParserSet> {
     const commonOddButtonParserSet = new CommonOddButtonParserSet({

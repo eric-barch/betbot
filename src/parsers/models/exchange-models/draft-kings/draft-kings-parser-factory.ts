@@ -1,25 +1,21 @@
-import { PageParserInitData } from '@/setup';
+import { IJsonGamesParser, IOddButtonParserSet, PageParser } from '../../common-models';
+import { IParserFactory } from '../../common-models/i-parser-factory';
 
-import { IOddButtonParserSet, IPageParser } from '../../common-models';
-import { IParserFactory } from '../i-parser-factory';
-
-import { DraftKingsOddButtonParserSet, DraftKingsPageParser } from './draft-kings-page-parser';
+import { DraftKingsJsonGamesParser, DraftKingsOddButtonParserSet } from './draft-kings-page-parser';
 
 export class DraftKingsParserFactory implements IParserFactory {
-  public async createPageParser({
-    parserFactory,
-    initData,
+  public async createJsonGamesParser({
+    parentPageParser,
   }: {
-    parserFactory: IParserFactory,
-    initData: PageParserInitData,
-  }): Promise<IPageParser> {
-    return await DraftKingsPageParser.create({ initData });
+    parentPageParser: PageParser,
+  }): Promise<IJsonGamesParser> {
+    return await DraftKingsJsonGamesParser.create({ parentPageParser });
   }
 
   public async createOddButtonParserSet({
     parentPageParser,
   }: {
-    parentPageParser: IPageParser,
+    parentPageParser: PageParser,
   }): Promise<IOddButtonParserSet> {
     return await DraftKingsOddButtonParserSet.create({ parentPageParser });
   }

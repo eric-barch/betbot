@@ -1,3 +1,3 @@
 export * from './page-parser';
-export * from './page-parser-factory';
+export * from './json-games-parser';
 export * from './odd-button-parser-set';

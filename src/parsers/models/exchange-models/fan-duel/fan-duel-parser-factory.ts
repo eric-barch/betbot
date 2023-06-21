@@ -1,23 +1,21 @@
-import { PageParserInitData } from '@/setup';
+import { IJsonGamesParser, IOddButtonParserSet, PageParser } from '../../common-models';
+import { IParserFactory } from '../../common-models/i-parser-factory';
 
-import { IOddButtonParserSet, IPageParser } from '../../common-models';
-import { IParserFactory } from '../i-parser-factory';
-
-import { FanDuelOddButtonParserSet, FanDuelPageParser } from './fan-duel-page-parser';
+import { FanDuelJsonGamesParser, FanDuelOddButtonParserSet } from './fan-duel-page-parser';
 
 export class FanDuelParserFactory implements IParserFactory {
-  public async createPageParser({
-    initData,
+  public async createJsonGamesParser({
+    parentPageParser,
   }: {
-    initData: PageParserInitData,
-  }): Promise<IPageParser> {
-    return await FanDuelPageParser.create({ initData });
+    parentPageParser: PageParser,
+  }): Promise<IJsonGamesParser> {
+    return await FanDuelJsonGamesParser.create({ parentPageParser });
   }
 
   public async createOddButtonParserSet({
     parentPageParser,
   }: {
-    parentPageParser: IPageParser,
+    parentPageParser: PageParser,
   }): Promise<IOddButtonParserSet> {
     return await FanDuelOddButtonParserSet.create({ parentPageParser });
   }
