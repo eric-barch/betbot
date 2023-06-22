@@ -66,26 +66,26 @@ export class OddButtonParserSet {
     this.oddButtonParsers = new Set<OddButtonParser>();
 
     // Run in series (development)
-    for (const button of this.oddButtons) {
-      const oddButtonParser = await OddButtonParser.create({
-        parentPageParser: this.parentPageParser,
-        parserFactory: this.parserFactory,
-        initializationButton: button,
-      });
-      this.oddButtonParsers.add(oddButtonParser);
-    }
+    // for (const oddButton of this.oddButtons) {
+    //   const oddButtonParser = await OddButtonParser.create({
+    //     parentPageParser: this.parentPageParser,
+    //     parserFactory: this.parserFactory,
+    //     initializationButton: oddButton,
+    //   });
+    //   this.oddButtonParsers.add(oddButtonParser);
+    // }
 
     // Run in parallel (production)
-    // await Promise.all(
-    //   this.buttons.map(async (button) => {
-    //     const oddButtonParser = await this.parentPageParser.parserFactory.createOddButtonParser({
-    //       exchange: this.parentPageParser.exchange,
-    //       league: this.parentPageParser.league,
-    //       button,
-    //     });
-    //     this.oddButtonParsers.add(oddButtonParser);
-    //   })
-    // );
+    await Promise.all(
+      this.oddButtons.map(async (oddButton) => {
+        const oddButtonParser = await OddButtonParser.create({
+          parentPageParser: this.parentPageParser,
+          parserFactory: this.parserFactory,
+          initializationButton: oddButton,
+        });
+        this.oddButtonParsers.add(oddButtonParser);
+      })
+    );
 
     return this.oddButtonParsers;
   }
