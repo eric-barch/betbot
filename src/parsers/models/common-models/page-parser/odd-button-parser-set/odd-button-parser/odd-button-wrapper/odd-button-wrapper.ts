@@ -1,32 +1,62 @@
 import { ElementHandle } from 'puppeteer';
 
+import { ParserFactory } from '@/parsers/models/common-models/parser-factory';
+
 import { OddButtonParser } from '../odd-button-parser';
 
-export abstract class OddButtonWrapper {
-  protected readonly parentOddButtonParser: OddButtonParser;
+export interface SpecializedOddButtonWrapper {
+  generateReferenceSelector(): Promise<string>;
+}
+
+export class OddButtonWrapper {
+  private readonly parentOddButtonParser: OddButtonParser;
+  private readonly parserFactory: ParserFactory;
+  private wrappedSpecializedOddButtonWrapper: SpecializedOddButtonWrapper | undefined;
   private wrappedButton: ElementHandle;
   private wrappedReferenceSelector: string | undefined;
   private wrappedReference: ElementHandle | undefined;
   private wrappedReferenceToButtonXPath: string | undefined;
 
-  protected constructor({
+  private constructor({
     parentOddButtonParser,
-    button,
+    parserFactory,
+    initializationButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    button: ElementHandle,
+    parserFactory: ParserFactory,
+    initializationButton: ElementHandle,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.wrappedButton = button;
+    this.parserFactory = parserFactory;
+    this.wrappedButton = initializationButton;
+  }
+
+  public static async create({
+    parentOddButtonParser,
+    parserFactory,
+    initializationButton,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+    parserFactory: ParserFactory,
+    initializationButton: ElementHandle,
+  }): Promise<OddButtonWrapper> {
+    const oddButtonWrapper = new OddButtonWrapper({
+      parentOddButtonParser,
+      parserFactory,
+      initializationButton,
+    });
+    await oddButtonWrapper.init();
+    return oddButtonWrapper;
   }
 
   protected async init(): Promise<OddButtonWrapper> {
-    this.referenceSelector = await this.initReferenceSelector();
+    this.specializedOddButtonWrapper = await this.parserFactory.createOddButtonWrapper();
+
+    this.referenceSelector = await this.specializedOddButtonWrapper.generateReferenceSelector();
     this.reference = await this.initReference();
+
     return this;
   }
-
-  protected abstract initReferenceSelector(): Promise<string>;
 
   private async initReference(): Promise<ElementHandle> {
     let element = this.button;
@@ -93,6 +123,18 @@ export abstract class OddButtonWrapper {
 
     this.button = button;
     return this.button
+  }
+
+  private set specializedOddButtonWrapper(specializedOddButtonWrapper: SpecializedOddButtonWrapper) {
+    this.wrappedSpecializedOddButtonWrapper = specializedOddButtonWrapper;
+  }
+
+  private get specializedOddButtonWrapper(): SpecializedOddButtonWrapper {
+    if (!this.wrappedSpecializedOddButtonWrapper) {
+      throw new Error(`wrappedSpecializedOddButtonWrapper is undefined.`);
+    }
+
+    return this.wrappedSpecializedOddButtonWrapper;
   }
 
   private set button(button: ElementHandle) {
