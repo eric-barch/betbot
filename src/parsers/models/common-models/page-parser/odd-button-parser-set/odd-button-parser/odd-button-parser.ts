@@ -68,7 +68,10 @@ export class OddButtonParser {
       parentOddButtonParser: this,
       parserFactory: this.parserFactory,
     });
-    this.dbStatisticInitializer = await DbStatisticInitializer.create({ parentOddButtonParser: this });
+    this.dbStatisticInitializer = await DbStatisticInitializer.create({
+      parentOddButtonParser: this,
+      parserFactory: this.parserFactory,
+    });
     this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
 
     return this;
