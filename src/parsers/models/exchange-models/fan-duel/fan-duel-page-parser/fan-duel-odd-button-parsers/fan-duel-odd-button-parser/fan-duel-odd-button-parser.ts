@@ -6,10 +6,10 @@ import {
 } from '@/parsers/models/exchange-models/fan-duel';
 import { DbOddInitializer } from '@/parsers/models/common-models';
 import {
-  CommonOddButtonParser,
+  OddButtonParser,
 } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
 
-export class FanDuelOddButtonParser extends CommonOddButtonParser {
+export class FanDuelOddButtonParser extends OddButtonParser {
   public static async create({
     exchange,
     league,
@@ -44,7 +44,7 @@ export class FanDuelOddButtonParser extends CommonOddButtonParser {
   }
 
   public async updateOdd(): Promise<FanDuelOddButtonParser> {
-    await this.oddButton.resetFromReference();
+    await this.oddButtonWrapper.resetFromReference();
     await this.updateDbOddFromTextContent();
     return this;
   }

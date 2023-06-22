@@ -1,12 +1,12 @@
 import { prisma } from '@/db';
-import { CommonOddButtonParser } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 import { DbStatisticInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-statistic-initializer';
 
 export class FanDuelDbStatisticInitializer extends DbStatisticInitializer {
   public static async create({
     parentOddButtonParser
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
   }): Promise<FanDuelDbStatisticInitializer> {
     const fanDuelDbStatisticInitializer = new FanDuelDbStatisticInitializer({ parentOddButtonParser });
     await fanDuelDbStatisticInitializer.init();

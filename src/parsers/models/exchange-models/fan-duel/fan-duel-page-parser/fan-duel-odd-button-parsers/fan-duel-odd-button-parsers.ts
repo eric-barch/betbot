@@ -1,11 +1,11 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser, CommonOddButtonParser } from '@/parsers/models/common-models';
-import { CommonOddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
+import { PageParser, OddButtonParser } from '@/parsers/models/common-models';
+import { OddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
 import { FanDuelOddButtonParser } from '@/parsers/models/exchange-models/fan-duel';
 
 export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet {
-  private wrappedCommonOddButtonParserSet: CommonOddButtonParserSet | undefined;
+  private wrappedCommonOddButtonParserSet: OddButtonParserSet | undefined;
   private wrappedOddButtonParsers: Set<FanDuelOddButtonParser> | undefined;
 
   public static async create({
@@ -15,7 +15,7 @@ export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet 
   }): Promise<FanDuelOddButtonParserSet> {
     const fanDuelOddButtonParserSet = new FanDuelOddButtonParserSet();
 
-    fanDuelOddButtonParserSet.commonOddButtonParserSet = await CommonOddButtonParserSet.create({
+    fanDuelOddButtonParserSet.commonOddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser,
       specializedOddButtonParserSet: fanDuelOddButtonParserSet,
     });
@@ -77,11 +77,11 @@ export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet 
     return `.${oddButtonClasses.join('.')}`;
   }
 
-  public async createOddButtonParsers(): Promise<Set<CommonOddButtonParser>> {
+  public async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
     this.oddButtonParsers = new Set<FanDuelOddButtonParser>();
 
     // Run in series (development)
-    for (const button of this.commonOddButtonParserSet.buttons) {
+    for (const button of this.commonOddButtonParserSet.oddButtons) {
       const fanDuelOddButtonParser = await FanDuelOddButtonParser.create({
         exchange: this.commonOddButtonParserSet.exchange,
         league: this.commonOddButtonParserSet.league,
@@ -109,11 +109,11 @@ export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet 
     await this.commonOddButtonParserSet.updateOdds();
   }
 
-  private set commonOddButtonParserSet(commonOddButtonParserSet: CommonOddButtonParserSet) {
+  private set commonOddButtonParserSet(commonOddButtonParserSet: OddButtonParserSet) {
     this.wrappedCommonOddButtonParserSet = commonOddButtonParserSet;
   }
 
-  private get commonOddButtonParserSet(): CommonOddButtonParserSet {
+  private get commonOddButtonParserSet(): OddButtonParserSet {
     if (!this.wrappedCommonOddButtonParserSet) {
       throw new Error(`commonOddButtonParserSet is not defined.`);
     }

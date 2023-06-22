@@ -1,9 +1,9 @@
 import { PageParser } from '@/parsers/models/common-models';
-import { CommonOddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
+import { OddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
 
 export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserSet {
   private readonly parentPageParser: PageParser;
-  private wrappedCommonOddButtonParserSet: CommonOddButtonParserSet | undefined;
+  private wrappedCommonOddButtonParserSet: OddButtonParserSet | undefined;
 
   private constructor({
     parentPageParser,
@@ -24,7 +24,7 @@ export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserS
   }
 
   private async init() {
-    this.commonOddButtonParserSet = await CommonOddButtonParserSet.create({
+    this.commonOddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this.parentPageParser,
       specializedOddButtonParserSet: this,
     });
@@ -38,11 +38,11 @@ export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserS
     await this.commonOddButtonParserSet.updateOdds();
   }
 
-  private set commonOddButtonParserSet(commonOddButtonParserSet: CommonOddButtonParserSet) {
+  private set commonOddButtonParserSet(commonOddButtonParserSet: OddButtonParserSet) {
     this.wrappedCommonOddButtonParserSet = commonOddButtonParserSet;
   }
 
-  private get commonOddButtonParserSet(): CommonOddButtonParserSet {
+  private get commonOddButtonParserSet(): OddButtonParserSet {
     if (!this.wrappedCommonOddButtonParserSet) {
       throw new Error(`wrappedCommonOddButtonParserSet is undefined.`);
     }

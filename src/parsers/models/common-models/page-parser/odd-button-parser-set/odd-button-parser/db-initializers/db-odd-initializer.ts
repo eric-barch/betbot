@@ -1,16 +1,16 @@
 import { Odd } from '@prisma/client';
 
 import { prisma } from '@/db';
-import { CommonOddButtonParser } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DbOddInitializer {
-  private readonly parentOddButtonParser: CommonOddButtonParser;
+  private readonly parentOddButtonParser: OddButtonParser;
   private wrappedOdd: Odd | undefined;
 
   private constructor({
     parentOddButtonParser,
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
   }
@@ -18,7 +18,7 @@ export class DbOddInitializer {
   public static async create({
     parentOddButtonParser,
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
   }): Promise<DbOddInitializer> {
     const dbOddInitializer = new DbOddInitializer({
       parentOddButtonParser,

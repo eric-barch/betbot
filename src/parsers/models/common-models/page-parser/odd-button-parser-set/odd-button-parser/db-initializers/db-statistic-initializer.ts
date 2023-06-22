@@ -1,16 +1,16 @@
 import { Statistic } from '@prisma/client';
 
-import { CommonOddButtonParser } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 import { prisma } from '@/db';
 
 export abstract class DbStatisticInitializer {
-  protected readonly parentOddButtonParser: CommonOddButtonParser;
+  protected readonly parentOddButtonParser: OddButtonParser;
   private wrappedStatistic: Statistic | undefined;
 
   protected constructor({
     parentOddButtonParser,
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
   }
