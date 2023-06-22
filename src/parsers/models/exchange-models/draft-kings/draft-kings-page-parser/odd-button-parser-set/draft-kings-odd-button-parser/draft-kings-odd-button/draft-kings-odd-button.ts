@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonWrapper } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button/odd-button';
+import { OddButtonWrapper } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-wrapper/odd-button-wrapper';
 import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsOddButton extends OddButtonWrapper {

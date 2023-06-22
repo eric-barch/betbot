@@ -5,7 +5,7 @@ import { ParserFactory } from '../../../parser-factory';
 import { PageParser } from '../../page-parser';
 
 import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './db-initializers';
-import { OddButtonWrapper } from './odd-button';
+import { OddButtonWrapper } from './odd-button-wrapper';
 
 export interface SpecializedOddButtonParser {
   updateOdd(): Promise<OddButtonParser>;
@@ -58,7 +58,12 @@ export class OddButtonParser {
 
   private async init(): Promise<OddButtonParser> {
     this.specializedOddButtonParser = await this.parserFactory.createOddButtonParser({ button: this.initializationButton });
-    this.oddButtonWrapper = await OddButtonWrapper.create({ parentOddButtonParser: this });
+
+    this.oddButtonWrapper = await OddButtonWrapper.create({
+      parentOddButtonParser: this,
+      parserFactory: this.parserFactory,
+      initializationButton: this.initializationButton,
+    });
     this.dbGameInitializer = await DbGameInitializer.create({ parentOddButtonParser: this });
     this.dbStatisticInitializer = await DbStatisticInitializer.create({ parentOddButtonParser: this });
     this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
