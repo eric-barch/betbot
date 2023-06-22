@@ -1,26 +1,26 @@
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParser } from '@/parsers/models/common-models';
 import { OddButtonWrapper } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-wrapper/odd-button-wrapper';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
-export class FanDuelOddButton extends OddButtonWrapper {
+export class DraftKingsOddButton extends OddButtonWrapper {
   public static async create({
     parentOddButtonParser,
     button,
   }: {
     parentOddButtonParser: OddButtonParser,
     button: ElementHandle,
-  }): Promise<FanDuelOddButton> {
-    const fanDuelOddButton = new FanDuelOddButton({
+  }): Promise<DraftKingsOddButton> {
+    const draftKingsOddButton = new DraftKingsOddButton({
       parentOddButtonParser,
       button,
     });
-    await fanDuelOddButton.init();
-    return fanDuelOddButton;
+    await draftKingsOddButton.init();
+    return draftKingsOddButton;
   }
 
   protected async initReferenceSelector(): Promise<string> {
-    this.referenceSelector = 'li';
+    this.referenceSelector = 'tr';
     return this.referenceSelector;
   }
 }
