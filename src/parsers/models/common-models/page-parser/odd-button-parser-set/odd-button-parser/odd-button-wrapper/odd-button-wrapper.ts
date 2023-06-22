@@ -110,7 +110,7 @@ export class OddButtonWrapper {
     return `/${tag}[${index}]`;
   }
 
-  public async resetFromReference(): Promise<ElementHandle> {
+  public async resetOddButtonFromReference(): Promise<ElementHandle> {
     const button = await this.reference.$(`xpath${this.referenceToButtonXPath}`);
 
     if (!button) {

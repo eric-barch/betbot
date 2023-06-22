@@ -8,7 +8,7 @@ import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './d
 import { OddButtonWrapper } from './odd-button-wrapper';
 
 export interface SpecializedOddButtonParser {
-  updateOdd(): Promise<OddButtonParser>;
+  updateOdd(): Promise<void>;
 }
 
 export class OddButtonParser {
@@ -81,7 +81,11 @@ export class OddButtonParser {
     await this.specializedOddButtonParser.updateOdd();
   }
 
-  protected async updateDbOddFromTextContent(): Promise<void> {
+  public async resetOddButtonFromReference(): Promise<void> {
+    await this.oddButtonWrapper.resetOddButtonFromReference();
+  }
+
+  public async updateDbOddFromOddButtonTextContent(): Promise<void> {
     await this.getTextContent();
     await this.parseTextContent();
 
@@ -129,6 +133,7 @@ export class OddButtonParser {
 
     throw new Error(`More than two numbers found in textContent.`);
   }
+
 
   public get exchange(): Exchange {
     return this.parentPageParser.exchange;
