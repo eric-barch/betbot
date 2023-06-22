@@ -2,10 +2,11 @@
 import { Game } from '@prisma/client';
 
 import { DbUtilityFunctions, prisma } from '@/db';
-import {
-  DraftKingsMatchupParser, DraftKingsStartDateParser
-} from '@/parsers/models/exchange-models/draft-kings';
 import { OddButtonParser } from '@/parsers/models/common-models';
+
+import { DraftKingsMatchupParser } from './draft-kings-matchup-parser';
+import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
+
 
 export class DraftKingsGameParser {
   private parentOddButtonParser: OddButtonParser;
