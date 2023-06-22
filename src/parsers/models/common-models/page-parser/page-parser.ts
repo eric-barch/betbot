@@ -3,28 +3,28 @@ import { Page } from 'puppeteer';
 
 import { PageParserInitData } from '@/setup';
 
-import { IParserFactory } from '../i-parser-factory';
+import { ParserFactory } from '../parser-factory';
 
 import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
-import { IJsonGamesParser } from './json-games-parser/json-games-parser';
-import { IOddButtonParserSet } from './odd-button-parser-set';
+import { SpecializedJsonGamesParser } from './json-games-parser/json-games-parser';
+import { SpecializedOddButtonParserSet } from './odd-button-parser-set';
 import { Webpage } from './webpage';
 
 export class PageParser {
   private readonly initData: PageParserInitData;
-  public readonly parserFactory: IParserFactory;
+  private readonly parserFactory: ParserFactory;
   private wrappedWebpage: Webpage | undefined;
   private wrappedDbExchangeInitializer: DbExchangeInitializer | undefined;
   private wrappedDbLeagueInitializer: DbLeagueInitializer | undefined;
-  private wrappedJsonGamesParser: IJsonGamesParser | undefined;
-  private wrappedOddButtonParserSet: IOddButtonParserSet | undefined;
+  private wrappedJsonGamesParser: SpecializedJsonGamesParser | undefined;
+  private wrappedOddButtonParserSet: SpecializedOddButtonParserSet | undefined;
 
   private constructor({
     initData,
     parserFactory,
   }: {
     initData: PageParserInitData,
-    parserFactory: IParserFactory,
+    parserFactory: ParserFactory,
   }) {
     this.initData = initData;
     this.parserFactory = parserFactory;
@@ -35,7 +35,7 @@ export class PageParser {
     parserFactory,
   }: {
     initData: PageParserInitData,
-    parserFactory: IParserFactory,
+    parserFactory: ParserFactory,
   }): Promise<PageParser> {
     const pageParser = new PageParser({
       initData,
@@ -51,12 +51,8 @@ export class PageParser {
     pageParser.dbLeagueInitializer = await DbLeagueInitializer.create({
       initData: pageParser.initData.leagueInitData
     });
-    pageParser.jsonGamesParser = await pageParser.parserFactory.createJsonGamesParser({
-      parentPageParser: pageParser,
-    });
-    pageParser.oddButtonParserSet = await pageParser.parserFactory.createOddButtonParserSet({
-      parentPageParser: pageParser,
-    });
+    pageParser.jsonGamesParser = await pageParser.parserFactory.createJsonGamesParser();
+    pageParser.oddButtonParserSet = await pageParser.parserFactory.createOddButtonParserSet();
 
     return pageParser;
   }
@@ -105,11 +101,11 @@ export class PageParser {
     return this.wrappedDbLeagueInitializer;
   }
 
-  private set jsonGamesParser(jsonGamesParser: IJsonGamesParser) {
+  private set jsonGamesParser(jsonGamesParser: SpecializedJsonGamesParser) {
     this.wrappedJsonGamesParser = jsonGamesParser;
   }
 
-  private get jsonGamesParser(): IJsonGamesParser {
+  private get jsonGamesParser(): SpecializedJsonGamesParser {
     if (!this.wrappedJsonGamesParser) {
       throw new Error(`wrappedJsonGamesParser is undefined.`);
     }
@@ -117,11 +113,11 @@ export class PageParser {
     return this.wrappedJsonGamesParser;
   }
 
-  private set oddButtonParserSet(oddButtonParserSet: IOddButtonParserSet) {
+  private set oddButtonParserSet(oddButtonParserSet: SpecializedOddButtonParserSet) {
     this.wrappedOddButtonParserSet = oddButtonParserSet;
   }
 
-  public get oddButtonParserSet(): IOddButtonParserSet {
+  public get oddButtonParserSet(): SpecializedOddButtonParserSet {
     if (!this.wrappedOddButtonParserSet) {
       throw new Error(`wrappedOddButtonParserSet is undefined.`);
     }

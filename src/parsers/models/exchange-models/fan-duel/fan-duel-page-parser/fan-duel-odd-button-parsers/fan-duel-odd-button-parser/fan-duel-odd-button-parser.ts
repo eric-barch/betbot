@@ -6,10 +6,10 @@ import {
 } from '@/parsers/models/exchange-models/fan-duel';
 import { DbOddInitializer } from '@/parsers/models/common-models';
 import {
-  OddButtonParser,
+  CommonOddButtonParser,
 } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
 
-export class FanDuelOddButtonParser extends OddButtonParser {
+export class FanDuelOddButtonParser extends CommonOddButtonParser {
   public static async create({
     exchange,
     league,

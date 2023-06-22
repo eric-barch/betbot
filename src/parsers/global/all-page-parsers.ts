@@ -3,7 +3,7 @@ import { allPageParserInitData } from '@/setup';
 
 import { DraftKingsParserFactory } from '../models/exchange-models/draft-kings/draft-kings-parser-factory';
 import { FanDuelParserFactory } from '../models/exchange-models/fan-duel/fan-duel-parser-factory';
-import { IParserFactory } from '../models/common-models/i-parser-factory';
+import { ParserFactory } from '../models/common-models/parser-factory';
 
 class AllPageParsers {
   private set: Set<PageParser> = new Set<PageParser>();
@@ -15,7 +15,7 @@ class AllPageParsers {
       Array.from(allPageParserInitData).map(async (initData) => {
         const exchangeName = initData.exchangeInitData.name;
 
-        let parserFactory: IParserFactory;
+        let parserFactory: ParserFactory;
 
         switch (exchangeName) {
           case 'DraftKings':

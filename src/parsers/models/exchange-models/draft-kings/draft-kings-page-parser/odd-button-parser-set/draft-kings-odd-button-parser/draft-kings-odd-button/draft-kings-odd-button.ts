@@ -1,14 +1,14 @@
 import { ElementHandle } from 'puppeteer';
 
 import { OddButton } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button/odd-button';
-import { OddButtonParser } from '@/parsers/models/common-models';
+import { CommonOddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsOddButton extends OddButton {
   public static async create({
     parentOddButtonParser,
     button,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parentOddButtonParser: CommonOddButtonParser,
     button: ElementHandle,
   }): Promise<DraftKingsOddButton> {
     const draftKingsOddButton = new DraftKingsOddButton({
