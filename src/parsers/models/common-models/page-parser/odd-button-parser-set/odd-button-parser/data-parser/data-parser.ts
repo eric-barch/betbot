@@ -1,9 +1,9 @@
 import { ElementHandle } from 'puppeteer';
 
-import { CommonOddButtonParser } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export abstract class DataParser {
-  protected readonly parentOddButtonParser: CommonOddButtonParser;
+  protected readonly parentOddButtonParser: OddButtonParser;
   private wrappedSelector: string | null | undefined;
   private wrappedElement: ElementHandle | null | undefined;
   private wrappedValue: number | null | undefined;
@@ -11,7 +11,7 @@ export abstract class DataParser {
   protected constructor({
     parentOddButtonParser,
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
   }

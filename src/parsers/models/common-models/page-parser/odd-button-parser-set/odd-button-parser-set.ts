@@ -1,79 +1,74 @@
-import { ElementHandle, Page } from 'puppeteer';
-import { Exchange, League } from '@prisma/client';
+import { ElementHandle } from 'puppeteer';
 
 import { PageParser } from '@/parsers/models/common-models';
 
 import { ParserFactory } from '../../parser-factory';
 
-import { CommonOddButtonParser, SpecializedOddButtonParser } from './odd-button-parser';
+import { OddButtonParser, SpecializedOddButtonParser } from './odd-button-parser';
 
 export interface SpecializedOddButtonParserSet {
   generateOddButtonSelector(): Promise<string>;
   updateOdds(): Promise<void>;
 }
 
-export class CommonOddButtonParserSet {
+export class OddButtonParserSet {
   private readonly parentPageParser: PageParser;
   private readonly parserFactory: ParserFactory;
-  private readonly specializedOddButtonParserSet: SpecializedOddButtonParserSet;
+  private wrappedSpecializedOddButtonParserSet: SpecializedOddButtonParserSet | undefined;
   private wrappedOddButtonSelector: string | undefined;
   private wrappedButtons: Array<ElementHandle> | undefined;
-  private wrappedOddButtonParsers: Set<SpecializedOddButtonParser> | undefined;
+  private wrappedOddButtonParsers: Set<OddButtonParser> | undefined;
 
   private constructor({
     parentPageParser,
     parserFactory,
-    specializedOddButtonParserSet,
   }: {
     parentPageParser: PageParser,
     parserFactory: ParserFactory,
-    specializedOddButtonParserSet: SpecializedOddButtonParserSet,
   }) {
     this.parentPageParser = parentPageParser;
     this.parserFactory = parserFactory;
-    this.specializedOddButtonParserSet = specializedOddButtonParserSet;
   }
 
   public static async create({
     parentPageParser,
     parserFactory,
-    specializedOddButtonParserSet,
   }: {
     parentPageParser: PageParser,
     parserFactory: ParserFactory,
-    specializedOddButtonParserSet: SpecializedOddButtonParserSet,
-  }): Promise<CommonOddButtonParserSet> {
-    const commonOddButtonParserSet = new CommonOddButtonParserSet({
+  }): Promise<OddButtonParserSet> {
+    const commonOddButtonParserSet = new OddButtonParserSet({
       parentPageParser,
       parserFactory,
-      specializedOddButtonParserSet,
     });
     await commonOddButtonParserSet.init();
     return commonOddButtonParserSet;
   }
 
-  private async init(): Promise<CommonOddButtonParserSet> {
+  private async init(): Promise<OddButtonParserSet> {
+    this.specializedOddButtonParserSet = await this.parserFactory.createOddButtonParserSet();
     this.oddButtonSelector = await this.specializedOddButtonParserSet.generateOddButtonSelector();
-    this.buttons = await this.scrapeButtons();
+    this.oddButtons = await this.scrapeOddButtons();
     this.oddButtonParsers = await this.createOddButtonParsers();
 
     return this;
   }
 
-  private async scrapeButtons(): Promise<Array<ElementHandle>> {
+  private async scrapeOddButtons(): Promise<Array<ElementHandle>> {
     const page = this.parentPageParser.page;
-    this.buttons = await page.$$(this.oddButtonSelector);
-    return this.buttons;
+    this.oddButtons = await page.$$(this.oddButtonSelector);
+    return this.oddButtons;
   }
 
-  private async createOddButtonParsers(): Promise<Set<SpecializedOddButtonParser>> {
-    this.oddButtonParsers = new Set<SpecializedOddButtonParser>();
+  private async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
+    this.oddButtonParsers = new Set<OddButtonParser>();
 
     // Run in series (development)
-    for (const button of this.buttons) {
-      const oddButtonParser = await this.parserFactory.createOddButtonParser({
+    for (const button of this.oddButtons) {
+      const oddButtonParser = await OddButtonParser.create({
         parentPageParser: this.parentPageParser,
-        button,
+        parserFactory: this.parserFactory,
+        initializationButton: button,
       });
       this.oddButtonParsers.add(oddButtonParser);
     }
@@ -99,16 +94,16 @@ export class CommonOddButtonParserSet {
     );
   };
 
-  public get page(): Page {
-    return this.parentPageParser.page;
+  private set specializedOddButtonParserSet(specializedOddButtonParserSet: SpecializedOddButtonParserSet) {
+    this.wrappedSpecializedOddButtonParserSet = specializedOddButtonParserSet;
   }
 
-  public get exchange(): Exchange {
-    return this.parentPageParser.exchange;
-  }
+  private get specializedOddButtonParserSet(): SpecializedOddButtonParserSet {
+    if (!this.wrappedSpecializedOddButtonParserSet) {
+      throw new Error(`wrappedSpecializedOddButtonParserSet is undefined.`);
+    }
 
-  public get league(): League {
-    return this.parentPageParser.league;
+    return this.wrappedSpecializedOddButtonParserSet;
   }
 
   private set oddButtonSelector(oddButtonSelector: string) {
@@ -123,11 +118,11 @@ export class CommonOddButtonParserSet {
     return this.wrappedOddButtonSelector;
   }
 
-  private set buttons(buttons: Array<ElementHandle>) {
+  private set oddButtons(buttons: Array<ElementHandle>) {
     this.wrappedButtons = buttons;
   }
 
-  private get buttons(): Array<ElementHandle> {
+  private get oddButtons(): Array<ElementHandle> {
     if (!this.wrappedButtons) {
       throw new Error(`wrappedButtons is undefined.`);
     }
@@ -135,11 +130,11 @@ export class CommonOddButtonParserSet {
     return this.wrappedButtons;
   }
 
-  private set oddButtonParsers(oddButtonParsers: Set<SpecializedOddButtonParser>) {
+  private set oddButtonParsers(oddButtonParsers: Set<OddButtonParser>) {
     this.wrappedOddButtonParsers = oddButtonParsers;
   }
 
-  private get oddButtonParsers(): Set<SpecializedOddButtonParser> {
+  private get oddButtonParsers(): Set<OddButtonParser> {
     if (!this.wrappedOddButtonParsers) {
       throw new Error(`wrappedOddButtonParsers is undefined.`);
     }

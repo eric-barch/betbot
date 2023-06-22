@@ -1,13 +1,13 @@
 import { Exchange, League } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
-import { CommonOddButtonParser, SpecializedOddButtonParser } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
+import { OddButtonParser, SpecializedOddButtonParser } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
 import { DraftKingsDbGameInitializer, DraftKingsDbStatisticInitializer, DraftKingsOddButton } from '@/parsers/models/exchange-models/draft-kings';
 import { DbOddInitializer, PageParser } from '@/parsers/models/common-models';
 
 export class DraftKingsOddButtonParser implements SpecializedOddButtonParser {
   public readonly parentPageParser: PageParser;
-  private wrappedCommonOddButtonParser: CommonOddButtonParser | undefined;
+  private wrappedCommonOddButtonParser: OddButtonParser | undefined;
 
   private constructor({
     parentPageParser,
@@ -48,7 +48,7 @@ export class DraftKingsOddButtonParser implements SpecializedOddButtonParser {
   }
 
   private async init() {
-    this.commonOddButtonParser = await CommonOddButtonParser.create({
+    this.commonOddButtonParser = await OddButtonParser.create({
       parentPageParser: this.parentPageParser,
       button: this.button,
     });

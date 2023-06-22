@@ -5,10 +5,10 @@ import { DbUtilityFunctions, prisma } from '@/db';
 import {
   DraftKingsMatchupParser, DraftKingsStartDateParser
 } from '@/parsers/models/exchange-models/draft-kings';
-import { CommonOddButtonParser } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsGameParser {
-  private parentOddButtonParser: CommonOddButtonParser;
+  private parentOddButtonParser: OddButtonParser;
   private exchangeAssignedGameId: string;
   private startDateParser: DraftKingsStartDateParser;
   private matchupParser: DraftKingsMatchupParser;
@@ -18,7 +18,7 @@ export class DraftKingsGameParser {
     parentOddButtonParser,
     exchangeAssignedGameId,
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
     exchangeAssignedGameId: string,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
@@ -31,7 +31,7 @@ export class DraftKingsGameParser {
     parentOddButtonParser,
     exchangeAssignedGameId,
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
     exchangeAssignedGameId: string,
   }): Promise<DraftKingsGameParser> {
     const gameDetailsParser = new DraftKingsGameParser({

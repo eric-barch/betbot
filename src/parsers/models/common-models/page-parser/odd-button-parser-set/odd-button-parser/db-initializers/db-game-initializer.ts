@@ -1,15 +1,15 @@
 import { Game } from '@prisma/client';
 
-import { CommonOddButtonParser } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export abstract class DbGameInitializer {
-  protected readonly parentOddButtonParser: CommonOddButtonParser;
+  protected readonly parentOddButtonParser: OddButtonParser;
   private wrappedGame: Game | undefined;
 
   protected constructor({
     parentOddButtonParser,
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
   }

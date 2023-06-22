@@ -1,9 +1,9 @@
 import { ElementHandle } from 'puppeteer';
 
-import { CommonOddButtonParser } from '../odd-button-parser';
+import { OddButtonParser } from '../odd-button-parser';
 
-export abstract class OddButton {
-  protected readonly parentOddButtonParser: CommonOddButtonParser;
+export abstract class OddButtonWrapper {
+  protected readonly parentOddButtonParser: OddButtonParser;
   private wrappedButton: ElementHandle;
   private wrappedReferenceSelector: string | undefined;
   private wrappedReference: ElementHandle | undefined;
@@ -13,14 +13,14 @@ export abstract class OddButton {
     parentOddButtonParser,
     button,
   }: {
-    parentOddButtonParser: CommonOddButtonParser,
+    parentOddButtonParser: OddButtonParser,
     button: ElementHandle,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
     this.wrappedButton = button;
   }
 
-  protected async init(): Promise<OddButton> {
+  protected async init(): Promise<OddButtonWrapper> {
     this.referenceSelector = await this.initReferenceSelector();
     this.reference = await this.initReference();
     return this;

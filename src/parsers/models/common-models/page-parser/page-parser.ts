@@ -7,7 +7,7 @@ import { ParserFactory } from '../parser-factory';
 
 import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
 import { SpecializedJsonGamesParser } from './json-games-parser/json-games-parser';
-import { SpecializedOddButtonParserSet } from './odd-button-parser-set';
+import { OddButtonParserSet } from './odd-button-parser-set';
 import { Webpage } from './webpage';
 
 export class PageParser {
@@ -17,7 +17,7 @@ export class PageParser {
   private wrappedDbExchangeInitializer: DbExchangeInitializer | undefined;
   private wrappedDbLeagueInitializer: DbLeagueInitializer | undefined;
   private wrappedJsonGamesParser: SpecializedJsonGamesParser | undefined;
-  private wrappedOddButtonParserSet: SpecializedOddButtonParserSet | undefined;
+  private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
 
   private constructor({
     initData,
@@ -41,20 +41,21 @@ export class PageParser {
       initData,
       parserFactory,
     });
-
-    pageParser.webpage = await Webpage.create({
-      url: pageParser.initData.url
-    });
-    pageParser.dbExchangeInitializer = await DbExchangeInitializer.create({
-      initData: pageParser.initData.exchangeInitData
-    });
-    pageParser.dbLeagueInitializer = await DbLeagueInitializer.create({
-      initData: pageParser.initData.leagueInitData
-    });
-    pageParser.jsonGamesParser = await pageParser.parserFactory.createJsonGamesParser();
-    pageParser.oddButtonParserSet = await pageParser.parserFactory.createOddButtonParserSet();
-
+    await pageParser.init();
     return pageParser;
+  }
+
+  private async init(): Promise<PageParser> {
+    this.webpage = await Webpage.create({ url: this.initData.url });
+    this.dbExchangeInitializer = await DbExchangeInitializer.create({ initData: this.initData.exchangeInitData });
+    this.dbLeagueInitializer = await DbLeagueInitializer.create({ initData: this.initData.leagueInitData });
+    this.jsonGamesParser = await this.parserFactory.createJsonGamesParser();
+    this.oddButtonParserSet = await OddButtonParserSet.create({
+      parentPageParser: this,
+      parserFactory: this.parserFactory,
+    });
+
+    return this;
   }
 
   public async updateOdds(): Promise<void> {
@@ -113,11 +114,11 @@ export class PageParser {
     return this.wrappedJsonGamesParser;
   }
 
-  private set oddButtonParserSet(oddButtonParserSet: SpecializedOddButtonParserSet) {
+  private set oddButtonParserSet(oddButtonParserSet: OddButtonParserSet) {
     this.wrappedOddButtonParserSet = oddButtonParserSet;
   }
 
-  public get oddButtonParserSet(): SpecializedOddButtonParserSet {
+  public get oddButtonParserSet(): OddButtonParserSet {
     if (!this.wrappedOddButtonParserSet) {
       throw new Error(`wrappedOddButtonParserSet is undefined.`);
     }

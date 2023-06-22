@@ -1,20 +1,22 @@
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
-import { ElementHandle } from 'puppeteer';
+import { ElementHandle, Page } from 'puppeteer';
 
-import { PageParser } from '../../page-parser'; import { ParserFactory } from '../../../parser-factory';
+import { ParserFactory } from '../../../parser-factory';
+import { PageParser } from '../../page-parser';
 
-import { OddButton } from './odd-button';
 import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './db-initializers';
+import { OddButtonWrapper } from './odd-button';
 
 export interface SpecializedOddButtonParser {
-  updateOdd(): Promise<CommonOddButtonParser>;
+  updateOdd(): Promise<OddButtonParser>;
 }
 
-export class CommonOddButtonParser {
+export class OddButtonParser {
   private readonly parentPageParser: PageParser;
   private readonly parserFactory: ParserFactory;
-  private readonly specializedOddButtonParser: SpecializedOddButtonParser;
-  private wrappedOddButton: OddButton | undefined;
+  private readonly initializationButton: ElementHandle;
+  private wrappedSpecializedOddButtonParser: SpecializedOddButtonParser | undefined;
+  private wrappedOddButtonWrapper: OddButtonWrapper | undefined;
   private wrappedDbGameInitializer: DbGameInitializer | undefined;
   private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
   private wrappedDbOddInitializer: DbOddInitializer | undefined;
@@ -25,42 +27,47 @@ export class CommonOddButtonParser {
   private constructor({
     parentPageParser,
     parserFactory,
-    specializedOddButtonParser,
+    initializationButton,
   }: {
     parentPageParser: PageParser,
     parserFactory: ParserFactory,
-    specializedOddButtonParser: SpecializedOddButtonParser,
+    initializationButton: ElementHandle,
   }) {
     this.parentPageParser = parentPageParser;
     this.parserFactory = parserFactory;
-    this.specializedOddButtonParser = specializedOddButtonParser;
+    this.initializationButton = initializationButton;
   }
 
   public static async create({
     parentPageParser,
     parserFactory,
-    specializedOddButtonParser,
+    initializationButton,
   }: {
     parentPageParser: PageParser,
     parserFactory: ParserFactory,
-    specializedOddButtonParser: SpecializedOddButtonParser,
-  }): Promise<CommonOddButtonParser> {
-    const commonOddButtonParser = new CommonOddButtonParser({
+    initializationButton: ElementHandle,
+  }): Promise<OddButtonParser> {
+    const commonOddButtonParser = new OddButtonParser({
       parentPageParser,
       parserFactory,
-      specializedOddButtonParser,
+      initializationButton,
     });
     await commonOddButtonParser.init();
     return commonOddButtonParser;
   }
 
-  private async init(): Promise<CommonOddButtonParser> {
-    this.oddButton = await this.parserFactory.createOddButton();
-    this.dbGameInitializer = await this.parserFactory.createDbGameInitializer();
-    this.dbStatisticInitializer = await this.parserFactory.createDbStatisticInitializer();
-    this.dbOddInitializer = await DbOddInitializer.create();
+  private async init(): Promise<OddButtonParser> {
+    this.specializedOddButtonParser = await this.parserFactory.createOddButtonParser({ button: this.initializationButton });
+    this.oddButtonWrapper = await OddButtonWrapper.create({ parentOddButtonParser: this });
+    this.dbGameInitializer = await DbGameInitializer.create({ parentOddButtonParser: this });
+    this.dbStatisticInitializer = await DbStatisticInitializer.create({ parentOddButtonParser: this });
+    this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
 
     return this;
+  }
+
+  public async updateOdd() {
+    await this.specializedOddButtonParser.updateOdd();
   }
 
   protected async updateDbOddFromTextContent(): Promise<void> {
@@ -112,87 +119,31 @@ export class CommonOddButtonParser {
     throw new Error(`More than two numbers found in textContent.`);
   }
 
-  protected set oddButton(oddButton: OddButton) {
-    this.wrappedOddButton = oddButton;
+  public get exchange(): Exchange {
+    return this.parentPageParser.exchange;
   }
 
-  protected get oddButton(): OddButton {
-    if (!this.wrappedOddButton) {
-      throw new Error(`wrappedOddButton is undefined.`);
-    }
-
-    return this.wrappedOddButton;
+  public get league(): League {
+    return this.parentPageParser.league;
   }
 
   public get button(): ElementHandle {
-    return this.oddButton.button;
-  }
-
-  protected set dbGameInitializer(dbGameInitializer: DbGameInitializer) {
-    this.wrappedDbGameInitializer = dbGameInitializer;
-  }
-
-  protected get dbGameInitializer(): DbGameInitializer {
-    if (!this.wrappedDbGameInitializer) {
-      throw new Error(`wrappedDbGameInitializer is undefined.`);
-    }
-
-    return this.wrappedDbGameInitializer;
+    return this.oddButtonWrapper.button;
   }
 
   public get game(): Game {
     return this.dbGameInitializer.game;
   }
 
-  protected set dbStatisticInitializer(dbStatisticInitializer: DbStatisticInitializer) {
-    this.wrappedDbStatisticInitializer = dbStatisticInitializer;
-  }
-
-  protected get dbStatisticInitializer(): DbStatisticInitializer {
-    if (!this.wrappedDbStatisticInitializer) {
-      throw new Error(`wrappedDbStatisticInitializer is undefined.`);
-    }
-
-    return this.wrappedDbStatisticInitializer;
-  }
-
   public get statistic(): Statistic {
     return this.dbStatisticInitializer.statistic;
-  }
-
-  protected set dbOddInitializer(dbOddInitializer: DbOddInitializer) {
-    this.wrappedDbOddInitializer = dbOddInitializer;
-  }
-
-  protected get dbOddInitializer(): DbOddInitializer {
-    if (!this.wrappedDbOddInitializer) {
-      throw new Error(`wrappedDbOddInitializer is undefined.`);
-    }
-
-    return this.wrappedDbOddInitializer;
   }
 
   public get odd(): Odd {
     return this.dbOddInitializer.odd;
   }
 
-  protected set textContent(textContent: string | null) {
-    this.wrappedTextContent = textContent;
-  }
-
-  protected get textContent(): string | null {
-    if (this.wrappedTextContent === undefined) {
-      throw new Error(`wrappedTextContent is undefined.`);
-    }
-
-    return this.wrappedTextContent;
-  }
-
-  protected set price(price: number | null) {
-    this.wrappedPrice = price;
-  }
-
-  protected get price(): number | null {
+  public get price(): number | null {
     if (this.wrappedPrice === undefined) {
       throw new Error(`wrappedPrice is undefined.`);
     }
@@ -200,15 +151,91 @@ export class CommonOddButtonParser {
     return this.wrappedPrice;
   }
 
-  protected set value(value: number | null) {
-    this.wrappedValue = value;
-  }
-
-  protected get value(): number | null {
+  public get value(): number | null {
     if (this.wrappedValue === undefined) {
       throw new Error(`wrappedValue is undefined.`);
     }
 
     return this.wrappedValue;
+  }
+
+  private set specializedOddButtonParser(specializedOddButtonParser: SpecializedOddButtonParser) {
+    this.wrappedSpecializedOddButtonParser = specializedOddButtonParser;
+  }
+
+  private get specializedOddButtonParser(): SpecializedOddButtonParser {
+    if (!this.wrappedSpecializedOddButtonParser) {
+      throw new Error(`wrappedSpecializedOddButtonParser is undefined.`);
+    }
+
+    return this.wrappedSpecializedOddButtonParser;
+  }
+
+  private set oddButtonWrapper(oddButtonWrapper: OddButtonWrapper) {
+    this.wrappedOddButtonWrapper = oddButtonWrapper;
+  }
+
+  private get oddButtonWrapper(): OddButtonWrapper {
+    if (!this.wrappedOddButtonWrapper) {
+      throw new Error(`wrappedOddButtonWrapper is undefined.`);
+    }
+
+    return this.wrappedOddButtonWrapper;
+  }
+
+  private set dbGameInitializer(dbGameInitializer: DbGameInitializer) {
+    this.wrappedDbGameInitializer = dbGameInitializer;
+  }
+
+  private get dbGameInitializer(): DbGameInitializer {
+    if (!this.wrappedDbGameInitializer) {
+      throw new Error(`wrappedDbGameInitializer is undefined.`);
+    }
+
+    return this.wrappedDbGameInitializer;
+  }
+
+  private set dbStatisticInitializer(dbStatisticInitializer: DbStatisticInitializer) {
+    this.wrappedDbStatisticInitializer = dbStatisticInitializer;
+  }
+
+  private get dbStatisticInitializer(): DbStatisticInitializer {
+    if (!this.wrappedDbStatisticInitializer) {
+      throw new Error(`wrappedDbStatisticInitializer is undefined.`);
+    }
+
+    return this.wrappedDbStatisticInitializer;
+  }
+
+  private set dbOddInitializer(dbOddInitializer: DbOddInitializer) {
+    this.wrappedDbOddInitializer = dbOddInitializer;
+  }
+
+  private get dbOddInitializer(): DbOddInitializer {
+    if (!this.wrappedDbOddInitializer) {
+      throw new Error(`wrappedDbOddInitializer is undefined.`);
+    }
+
+    return this.wrappedDbOddInitializer;
+  }
+
+  private set textContent(textContent: string | null) {
+    this.wrappedTextContent = textContent;
+  }
+
+  private get textContent(): string | null {
+    if (this.wrappedTextContent === undefined) {
+      throw new Error(`wrappedTextContent is undefined.`);
+    }
+
+    return this.wrappedTextContent;
+  }
+
+  private set price(price: number | null) {
+    this.wrappedPrice = price;
+  }
+
+  private set value(value: number | null) {
+    this.wrappedValue = value;
   }
 }
