@@ -1,7 +1,6 @@
 import { Game } from '@prisma/client';
 
-import { OddButtonParser } from '@/parsers/models/common-models';
-import { ParserFactory } from '@/parsers/models/common-models/parser-factory';
+import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbGameInitializer {
   findOrCreateCorrespondingDbGame(): Promise<Game>;

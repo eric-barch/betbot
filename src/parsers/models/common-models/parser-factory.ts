@@ -1,4 +1,9 @@
-import { DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper, PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from './page-parser';
+import {
+  DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
+  PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer,
+  SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet,
+  SpecializedOddButtonWrapper,
+} from '@/parsers/models/common-models';
 
 export interface ParserFactory {
   createJsonGamesParser({

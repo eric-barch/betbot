@@ -1,14 +1,12 @@
 import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
+
+import {
+  DbExchangeInitializer, DbLeagueInitializer, OddButtonParserSet, ParserFactory,
+  SpecializedJsonGamesParser, Webpage,
+} from '@/parsers/models/common-models';
 import { PageParserInitData } from '@/setup';
-
-import { ParserFactory } from '../parser-factory';
-
-import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
-import { SpecializedJsonGamesParser } from './json-games-parser/json-games-parser';
-import { OddButtonParserSet } from './odd-button-parser-set';
-import { Webpage } from './webpage';
 
 export class PageParser {
   private readonly initData: PageParserInitData;

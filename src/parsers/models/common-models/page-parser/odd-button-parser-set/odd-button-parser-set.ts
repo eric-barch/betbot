@@ -1,10 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser } from '@/parsers/models/common-models';
-
-import { ParserFactory } from '../../parser-factory';
-
-import { OddButtonParser, SpecializedOddButtonParser } from './odd-button-parser';
+import { OddButtonParser, PageParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParserSet {
   generateOddButtonSelector(): Promise<string>;

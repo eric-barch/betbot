@@ -9,7 +9,7 @@ import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
 
 
 export class DraftKingsGameParser {
-  private parentOddButtonParser: OddButtonParser;
+  private readonly parentOddButtonParser: OddButtonParser;
   private exchangeAssignedGameId: string;
   private startDateParser: DraftKingsStartDateParser;
   private matchupParser: DraftKingsMatchupParser;
@@ -24,8 +24,8 @@ export class DraftKingsGameParser {
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
     this.exchangeAssignedGameId = exchangeAssignedGameId;
-    this.startDateParser = new DraftKingsStartDateParser({ parentOddButtonParser: this.parentOddButtonParser });
-    this.matchupParser = new DraftKingsMatchupParser({ parentOddButtonParser: this.parentOddButtonParser });
+    this.startDateParser = new DraftKingsStartDateParser({ parentOddButtonParser });
+    this.matchupParser = new DraftKingsMatchupParser({ parentOddButtonParser });
   }
 
   public static async create({
