@@ -41,7 +41,10 @@ export class DbStatisticInitializer {
   }
 
   private async init(): Promise<DbStatisticInitializer> {
-    this.specializedDbStatisticInitializer = await this.parserFactory.createDbStatisticInitializer();
+    this.specializedDbStatisticInitializer = await this.parserFactory.createDbStatisticInitializer({
+      parentOddButtonParser: this.parentOddButtonParser,
+      parentDbStatisticInitializer: this,
+    });
 
     this.statistic = await this.updateDbStatistic();
 
