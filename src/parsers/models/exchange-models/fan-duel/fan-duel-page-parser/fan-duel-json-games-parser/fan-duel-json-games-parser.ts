@@ -1,7 +1,7 @@
 import { Game } from '@prisma/client';
 
 import { DbUtilityFunctions, prisma } from '@/db';
-import { PageParser } from '@/parsers/models/shared-models';
+import { PageParser } from '@/parsers/models/common-models';
 
 export class FanDuelJsonGamesParser {
   private parentPageParser: PageParser;

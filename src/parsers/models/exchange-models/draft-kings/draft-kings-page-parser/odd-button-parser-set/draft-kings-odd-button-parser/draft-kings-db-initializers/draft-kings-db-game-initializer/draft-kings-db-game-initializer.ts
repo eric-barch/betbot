@@ -1,21 +1,22 @@
 import { Game } from '@prisma/client';
 
+import { prisma } from '@/db';
+import { DraftKingsGameParser } from '@/parsers/models/exchange-models/draft-kings';
 import { CommonOddButtonParser } from '@/parsers/models/common-models';
 import { DbGameInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-game-initializer';
-import { prisma } from '@/db';
 
-export class FanDuelDbGameInitializer extends DbGameInitializer {
+export class DraftKingsDbGameInitializer extends DbGameInitializer {
   private wrappedExchangeAssignedGameId: string | undefined;
-  // private wrappedGameParser: FanDuelGameParser | undefined;
+  private wrappedGameParser: DraftKingsGameParser | undefined;
 
   public static async create({
     parentOddButtonParser,
   }: {
     parentOddButtonParser: CommonOddButtonParser;
-  }): Promise<FanDuelDbGameInitializer> {
-    const fanDuelDbGameInitializer = new FanDuelDbGameInitializer({ parentOddButtonParser });
-    await fanDuelDbGameInitializer.init();
-    return fanDuelDbGameInitializer;
+  }): Promise<DraftKingsDbGameInitializer> {
+    const draftKingsDbGameInitializer = new DraftKingsDbGameInitializer({ parentOddButtonParser });
+    await draftKingsDbGameInitializer.init();
+    return draftKingsDbGameInitializer;
   }
 
   protected async updateDbGame(): Promise<Game> {
@@ -26,6 +27,7 @@ export class FanDuelDbGameInitializer extends DbGameInitializer {
     } catch {
       this.game = await this.findOrCreateGameWithoutExchangeAssignedId();
     }
+
     return this.game;
   }
 
@@ -36,24 +38,11 @@ export class FanDuelDbGameInitializer extends DbGameInitializer {
       throw new Error(`button is null.`);
     }
 
-    const className = await (await button.getProperty('className')).jsonValue();
-    const textContent = await (await button.getProperty('textContent')).jsonValue();
+    const dataTracking = await this.parentOddButtonParser.button.evaluate(
+      el => JSON.parse(el.getAttribute('data-tracking') || '')
+    );
 
-    const linkElement = await button.$('xpath/../../../a');
-
-    if (!linkElement) {
-      throw new Error(`linkElement is null.`);
-    }
-
-    const href = await linkElement.evaluate(el => el.getAttribute('href'));
-
-    if (!href) {
-      throw new Error(`href is null.`);
-    }
-
-    const lastHyphenPos = href.lastIndexOf('-');
-
-    this.exchangeAssignedGameId = href.substring(lastHyphenPos + 1);
+    this.exchangeAssignedGameId = dataTracking.eventId;
     return this.exchangeAssignedGameId;
   }
 
@@ -75,7 +64,12 @@ export class FanDuelDbGameInitializer extends DbGameInitializer {
   }
 
   private async findOrCreateGameWithoutExchangeAssignedId(): Promise<Game> {
-    throw new Error(`findOrCreateGameWithoutExchangeAssignedId not implemented.`);
+    this.gameParser = await DraftKingsGameParser.create({
+      parentOddButtonParser: this.parentOddButtonParser,
+      exchangeAssignedGameId: this.exchangeAssignedGameId,
+    });
+    this.game = this.gameParser.game;
+    return this.game;
   }
 
   private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
@@ -88,5 +82,17 @@ export class FanDuelDbGameInitializer extends DbGameInitializer {
     }
 
     return this.wrappedExchangeAssignedGameId;
+  }
+
+  private set gameParser(gameParser: DraftKingsGameParser) {
+    this.wrappedGameParser = gameParser;
+  }
+
+  private get gameParser(): DraftKingsGameParser {
+    if (!this.wrappedGameParser) {
+      throw new Error(`wrappedGameParser is undefined.`);
+    }
+
+    return this.wrappedGameParser;
   }
 }

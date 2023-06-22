@@ -4,12 +4,12 @@ import { ElementHandle } from 'puppeteer';
 import {
   FanDuelDbGameInitializer, FanDuelDbStatisticInitializer, FanDuelOddButton
 } from '@/parsers/models/exchange-models/fan-duel';
-import { DbOddInitializer } from '@/parsers/models/shared-models';
+import { DbOddInitializer } from '@/parsers/models/common-models';
 import {
-  OddButtonParser,
-} from '@/parsers/models/shared-models/page-parser/odd-button-parsers/odd-button-parser/odd-button-parser';
+  CommonOddButtonParser,
+} from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-parser';
 
-export class FanDuelOddButtonParser extends OddButtonParser {
+export class FanDuelOddButtonParser extends CommonOddButtonParser {
   public static async create({
     exchange,
     league,
@@ -22,19 +22,25 @@ export class FanDuelOddButtonParser extends OddButtonParser {
     const fanDuelOddButtonParser = new FanDuelOddButtonParser({
       exchange,
       league,
+    });
+
+    fanDuelOddButtonParser.oddButton = await FanDuelOddButton.create({
+      parentOddButtonParser: fanDuelOddButtonParser,
       button,
     });
-    await fanDuelOddButtonParser.init();
-    return fanDuelOddButtonParser;
-  }
+    fanDuelOddButtonParser.dbGameInitializer = await FanDuelDbGameInitializer.create({
+      parentOddButtonParser: fanDuelOddButtonParser,
+    });
+    fanDuelOddButtonParser.dbStatisticInitializer = await FanDuelDbStatisticInitializer.create({
+      parentOddButtonParser: fanDuelOddButtonParser,
+    });
+    fanDuelOddButtonParser.dbOddInitializer = await DbOddInitializer.create({
+      parentOddButtonParser: fanDuelOddButtonParser,
+    });
 
-  protected async init(): Promise<FanDuelOddButtonParser> {
-    this.oddButton = await FanDuelOddButton.create({ parentOddButtonParser: this });
-    this.dbGameInitializer = await FanDuelDbGameInitializer.create({ parentOddButtonParser: this });
-    this.dbStatisticInitializer = await FanDuelDbStatisticInitializer.create({ parentOddButtonParser: this });
-    this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
-    await this.updateDbOddFromTextContent();
-    return this;
+    await fanDuelOddButtonParser.updateDbOddFromTextContent();
+
+    return fanDuelOddButtonParser;
   }
 
   public async updateOdd(): Promise<FanDuelOddButtonParser> {
