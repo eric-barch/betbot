@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from './page-parser';
+import { OddButtonParserSet, PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from './page-parser';
 
 export interface ParserFactory {
   createJsonGamesParser({
@@ -9,7 +9,13 @@ export interface ParserFactory {
     parentPageParser: PageParser,
   }): Promise<SpecializedJsonGamesParser>;
 
-  createOddButtonParserSet(): Promise<SpecializedOddButtonParserSet>;
+  createOddButtonParserSet({
+    parentPageParser,
+    parentOddButtonParserSet,
+  }: {
+    parentPageParser: PageParser,
+    parentOddButtonParserSet: OddButtonParserSet,
+  }): Promise<SpecializedOddButtonParserSet>;
 
   createOddButtonParser({
     button,

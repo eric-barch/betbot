@@ -1,2 +1,2 @@
 export * from './draft-kings-odd-button-parser-set';
-export * from './draft-kings-odd-button-parser';
+export * from './odd-button-parser';
