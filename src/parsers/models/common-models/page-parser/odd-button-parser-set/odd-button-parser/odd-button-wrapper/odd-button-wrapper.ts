@@ -4,6 +4,7 @@ import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonWrapper {
   generateReferenceSelector(): Promise<string>;
+  confirmCorrectOddButtonPosition(): Promise<boolean>;
 }
 
 export class OddButtonWrapper {
@@ -118,9 +119,11 @@ export class OddButtonWrapper {
       throw new Error(`button is null.`);
     }
 
-    // Something verifying that the new button is in the right place. If not, should trigger refresh
-    // of entire page followed by reset of all odd buttons. Might have to make this an abstract 
-    // method and implement it in the child classes.
+    const correctOddButtonPosition = await this.specializedOddButtonWrapper.confirmCorrectOddButtonPosition();
+
+    if (!correctOddButtonPosition) {
+      throw new Error(`Odd button is not in correct position.`);
+    }
 
     this.button = button;
     return this.button

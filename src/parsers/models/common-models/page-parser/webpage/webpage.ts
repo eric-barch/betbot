@@ -91,6 +91,14 @@ export class Webpage {
     return this.page;
   }
 
+  public async reloadPage(): Promise<void> {
+    await Promise.all([
+      this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
+      this.page.reload(),
+    ]);
+
+  }
+
   public async disconnect(): Promise<void> {
     this.browser.disconnect();
   }
