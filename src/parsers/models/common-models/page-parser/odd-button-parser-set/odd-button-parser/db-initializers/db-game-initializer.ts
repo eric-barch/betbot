@@ -40,7 +40,10 @@ export class DbGameInitializer {
   }
 
   private async init(): Promise<DbGameInitializer> {
-    this.specializedDbGameInitializer = await this.parserFactory.createDbGameInitializer();
+    this.specializedDbGameInitializer = await this.parserFactory.createDbGameInitializer({
+      parentOddButtonParser: this.parentOddButtonParser,
+      parentDbGameInitializer: this,
+    });
 
     this.game = await this.specializedDbGameInitializer.findOrCreateCorrespondingDbGame();
 
