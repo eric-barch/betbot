@@ -1,7 +1,4 @@
-
-import { Game } from '@prisma/client';
-
-import { DbUtilityFunctions, prisma } from '@/db';
+import { DbUtilityFunctions, GameWithTeams, prisma } from '@/db';
 import { OddButtonParser } from '@/parsers/models/common-models';
 
 import { DraftKingsMatchupParser } from './draft-kings-matchup-parser';
@@ -13,7 +10,7 @@ export class DraftKingsGameParser {
   private exchangeAssignedGameId: string;
   private startDateParser: DraftKingsStartDateParser;
   private matchupParser: DraftKingsMatchupParser;
-  private wrappedGame: Game | undefined;
+  private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
     parentOddButtonParser,
@@ -43,7 +40,7 @@ export class DraftKingsGameParser {
     return gameDetailsParser;
   }
 
-  private async parse(): Promise<Game> {
+  private async parse(): Promise<GameWithTeams> {
     await this.startDateParser.parse();
     await this.matchupParser.parse();
 
@@ -77,7 +74,7 @@ export class DraftKingsGameParser {
     return this.game;
   }
 
-  public get game(): Game {
+  public get game(): GameWithTeams {
     if (!this.wrappedGame) {
       throw new Error(`wrappedGame is undefined.`);
     }
@@ -85,7 +82,7 @@ export class DraftKingsGameParser {
     return this.wrappedGame;
   }
 
-  private set game(game: Game) {
+  private set game(game: GameWithTeams) {
     this.wrappedGame = game;
   }
 }

@@ -1,6 +1,7 @@
-import { Game, League, Team } from '@prisma/client';
+import { League, Team } from '@prisma/client';
 
 import { prisma } from './prisma-client';
+import { GameWithTeams } from './game-with-teams';
 
 export class DbUtilityFunctions {
   public static async findOrCreateGameByMatchupAndStartDate({
@@ -11,14 +12,14 @@ export class DbUtilityFunctions {
     awayTeam: Team,
     homeTeam: Team,
     startDate: Date,
-  }): Promise<Game> {
+  }): Promise<GameWithTeams> {
     const startDateToleranceInHours = 2;
     const startDateToleranceInMilliseconds = startDateToleranceInHours * 60 * 60 * 1000;
 
     const toleranceBeforeStartDate = new Date(startDate.getTime() - startDateToleranceInMilliseconds);
     const toleranceAfterStartDate = new Date(startDate.getTime() + startDateToleranceInMilliseconds);
 
-    let game: Game;
+    let game: GameWithTeams;
 
     try {
       game = await prisma.game.findFirstOrThrow({
@@ -29,7 +30,11 @@ export class DbUtilityFunctions {
             { startDate: { gte: toleranceBeforeStartDate } },
             { startDate: { lte: toleranceAfterStartDate } },
           ],
-        }
+        },
+        include: {
+          awayTeam: true,
+          homeTeam: true,
+        },
       });
     } catch (e) {
       game = await prisma.game.create({
@@ -38,7 +43,11 @@ export class DbUtilityFunctions {
           homeTeam: { connect: { id: homeTeam.id } },
           startDate,
           active: true,
-        }
+        },
+        include: {
+          awayTeam: true,
+          homeTeam: true,
+        },
       })
     }
 
