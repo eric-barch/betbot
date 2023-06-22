@@ -60,6 +60,10 @@ export class PageParser {
     await this.oddButtonParserSet.updateOddsForEachButtonParser();
   }
 
+  public async reloadPage(): Promise<void> {
+    await this.webpage.reloadPage();
+  }
+
   public async disconnect(): Promise<void> {
     await this.webpage.disconnect();
   }
