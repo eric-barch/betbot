@@ -1,6 +1,4 @@
-import { ElementHandle } from 'puppeteer';
-
-import { SpecializedJsonGamesParser, SpecializedOddButtonParserSet, PageParser, SpecializedOddButtonParser } from '../../common-models';
+import { OddButtonParser, OddButtonParserSet, PageParser, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet } from '../../common-models';
 import { ParserFactory } from '../../common-models/parser-factory';
 
 import { DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet } from './page-parser';
@@ -16,22 +14,27 @@ export class DraftKingsParserFactory implements ParserFactory {
 
   public async createOddButtonParserSet({
     parentPageParser,
+    parentOddButtonParserSet,
   }: {
     parentPageParser: PageParser,
+    parentOddButtonParserSet: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet> {
-    return await DraftKingsOddButtonParserSet.create({ parentPageParser });
+    return new DraftKingsOddButtonParserSet({
+      parentPageParser,
+      parentOddButtonParserSet,
+    });
   }
 
   public async createOddButtonParser({
     parentPageParser,
-    button,
+    parentOddButtonParser,
   }: {
     parentPageParser: PageParser,
-    button: ElementHandle,
+    parentOddButtonParser: OddButtonParser,
   }): Promise<SpecializedOddButtonParser> {
-    return await DraftKingsOddButtonParser.create({
+    return new DraftKingsOddButtonParser({
       parentPageParser,
-      button,
+      parentOddButtonParser,
     });
   }
 }

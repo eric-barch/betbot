@@ -5,7 +5,7 @@ export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserS
   private readonly parentPageParser: PageParser;
   private readonly parentOddButtonParserSet: OddButtonParserSet;
 
-  private constructor({
+  public constructor({
     parentPageParser,
     parentOddButtonParserSet,
   }: {
@@ -14,20 +14,6 @@ export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserS
   }) {
     this.parentPageParser = parentPageParser;
     this.parentOddButtonParserSet = parentOddButtonParserSet;
-  }
-
-  public static async create({
-    parentPageParser,
-    parentOddButtonParserSet,
-  }: {
-    parentPageParser: PageParser,
-    parentOddButtonParserSet: OddButtonParserSet,
-  }): Promise<DraftKingsOddButtonParserSet> {
-    const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet({
-      parentPageParser,
-      parentOddButtonParserSet,
-    });
-    return draftKingsOddButtonParserSet;
   }
 
   public async generateOddButtonSelector(): Promise<string> {

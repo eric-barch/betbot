@@ -1,6 +1,4 @@
-import { ElementHandle } from 'puppeteer';
-
-import { OddButtonParserSet, PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from './page-parser';
+import { DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper, PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from './page-parser';
 
 export interface ParserFactory {
   createJsonGamesParser({
@@ -18,14 +16,34 @@ export interface ParserFactory {
   }): Promise<SpecializedOddButtonParserSet>;
 
   createOddButtonParser({
-    button,
+    parentPageParser,
+    parentOddButtonParser,
   }: {
-    button: ElementHandle,
+    parentPageParser: PageParser,
+    parentOddButtonParser: OddButtonParser,
   }): Promise<SpecializedOddButtonParser>;
 
-  createOddButtonWrapper(): Promise<SpecializedOddButtonWrapper>;
+  createOddButtonWrapper({
+    parentPageParser,
+    parentOddButtonWrapper,
+  }: {
+    parentPageParser: PageParser,
+    parentOddButtonWrapper: OddButtonWrapper,
+  }): Promise<SpecializedOddButtonWrapper>;
 
-  createDbGameInitializer(): Promise<SpecializedDbGameInitializer>;
+  createDbGameInitializer({
+    parentPageParser,
+    parentDbGameInitializer,
+  }: {
+    parentPageParser: PageParser,
+    parentDbGameInitializer: DbGameInitializer,
+  }): Promise<SpecializedDbGameInitializer>;
 
-  createDbStatisticInitializer(): Promise<SpecializedDbStatisticInitializer>;
+  createDbStatisticInitializer({
+    parentPageParser,
+    parentDbStatisticInitializer,
+  }: {
+    parentPageParser: PageParser,
+    parentDbStatisticInitializer: DbStatisticInitializer,
+  }): Promise<SpecializedDbStatisticInitializer>;
 }
