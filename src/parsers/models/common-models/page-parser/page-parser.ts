@@ -59,7 +59,7 @@ export class PageParser {
   }
 
   public async updateOdds(): Promise<void> {
-    await this.oddButtonParserSet.updateOdds();
+    await this.oddButtonParserSet.updateOddsForEachButtonParser();
   }
 
   public async disconnect(): Promise<void> {
