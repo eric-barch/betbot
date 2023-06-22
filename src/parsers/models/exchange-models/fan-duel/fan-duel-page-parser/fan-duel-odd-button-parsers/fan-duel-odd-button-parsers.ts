@@ -1,10 +1,10 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser, OddButtonParser } from '@/parsers/models/common-models';
-import { CommonOddButtonParserSet, IOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
+import { PageParser, CommonOddButtonParser } from '@/parsers/models/common-models';
+import { CommonOddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
 import { FanDuelOddButtonParser } from '@/parsers/models/exchange-models/fan-duel';
 
-export class FanDuelOddButtonParserSet implements IOddButtonParserSet {
+export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet {
   private wrappedCommonOddButtonParserSet: CommonOddButtonParserSet | undefined;
   private wrappedOddButtonParsers: Set<FanDuelOddButtonParser> | undefined;
 
@@ -17,7 +17,7 @@ export class FanDuelOddButtonParserSet implements IOddButtonParserSet {
 
     fanDuelOddButtonParserSet.commonOddButtonParserSet = await CommonOddButtonParserSet.create({
       parentPageParser,
-      parentOddButtonParserSet: fanDuelOddButtonParserSet,
+      specializedOddButtonParserSet: fanDuelOddButtonParserSet,
     });
 
     fanDuelOddButtonParserSet.oddButtonParsers = await fanDuelOddButtonParserSet.createOddButtonParsers();
@@ -77,7 +77,7 @@ export class FanDuelOddButtonParserSet implements IOddButtonParserSet {
     return `.${oddButtonClasses.join('.')}`;
   }
 
-  public async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
+  public async createOddButtonParsers(): Promise<Set<CommonOddButtonParser>> {
     this.oddButtonParsers = new Set<FanDuelOddButtonParser>();
 
     // Run in series (development)

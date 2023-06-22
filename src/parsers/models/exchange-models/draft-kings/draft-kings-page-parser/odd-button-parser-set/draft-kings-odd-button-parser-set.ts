@@ -1,58 +1,37 @@
-import { PageParser, OddButtonParser } from '@/parsers/models/common-models';
-import { CommonOddButtonParserSet, IOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
-import { DraftKingsOddButtonParser } from '@/parsers/models/exchange-models/draft-kings';
+import { PageParser } from '@/parsers/models/common-models';
+import { CommonOddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
 
-export class DraftKingsOddButtonParserSet implements IOddButtonParserSet {
+export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserSet {
+  private readonly parentPageParser: PageParser;
   private wrappedCommonOddButtonParserSet: CommonOddButtonParserSet | undefined;
-  private wrappedOddButtonParsers: Set<DraftKingsOddButtonParser> | undefined;
+
+  private constructor({
+    parentPageParser,
+  }: {
+    parentPageParser: PageParser,
+  }) {
+    this.parentPageParser = parentPageParser;
+  }
 
   public static async create({
     parentPageParser,
   }: {
     parentPageParser: PageParser,
   }): Promise<DraftKingsOddButtonParserSet> {
-    const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet();
-
-    draftKingsOddButtonParserSet.commonOddButtonParserSet = await CommonOddButtonParserSet.create({
-      parentPageParser,
-      parentOddButtonParserSet: draftKingsOddButtonParserSet,
-    });
-
-    draftKingsOddButtonParserSet.oddButtonParsers = await draftKingsOddButtonParserSet.createOddButtonParsers();
-
+    const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet({ parentPageParser });
+    await draftKingsOddButtonParserSet.init();
     return draftKingsOddButtonParserSet;
+  }
+
+  private async init() {
+    this.commonOddButtonParserSet = await CommonOddButtonParserSet.create({
+      parentPageParser: this.parentPageParser,
+      specializedOddButtonParserSet: this,
+    });
   }
 
   public async generateOddButtonSelector(): Promise<string> {
     return 'div[role="button"].sportsbook-outcome-cell__body';
-  }
-
-  public async createOddButtonParsers(): Promise<Set<OddButtonParser>> {
-    this.oddButtonParsers = new Set<DraftKingsOddButtonParser>();
-
-    // Run in series (development)
-    for (const button of this.commonOddButtonParserSet.buttons) {
-      const draftKingsOddButtonParser = await DraftKingsOddButtonParser.create({
-        exchange: this.commonOddButtonParserSet.exchange,
-        league: this.commonOddButtonParserSet.league,
-        button: button,
-      });
-      this.oddButtonParsers.add(draftKingsOddButtonParser);
-    }
-
-    // Run in parallel (production)
-    // await Promise.all(
-    //   this.buttons.map(async (button) => {
-    //     const draftKingsOddButtonParser = await DraftKingsOddButtonParser.create({
-    //       exchange: this.commonOddButtonParserSet.exchange,
-    //       league: this.commonOddButtonParserSet.league,
-    //       button: button,
-    //     });
-    //     this.oddButtonParsers.add(draftKingsOddButtonParser);
-    //   })
-    // );
-
-    return this.oddButtonParsers;
   }
 
   public async updateOdds(): Promise<void> {
@@ -69,17 +48,5 @@ export class DraftKingsOddButtonParserSet implements IOddButtonParserSet {
     }
 
     return this.wrappedCommonOddButtonParserSet;
-  }
-
-  private set oddButtonParsers(oddButtonParsers: Set<DraftKingsOddButtonParser>) {
-    this.wrappedOddButtonParsers = oddButtonParsers;
-  }
-
-  public get oddButtonParsers(): Set<DraftKingsOddButtonParser> {
-    if (!this.wrappedOddButtonParsers) {
-      throw new Error(`wrappedOddButtonParsers is undefined.`);
-    }
-
-    return this.wrappedOddButtonParsers;
   }
 }

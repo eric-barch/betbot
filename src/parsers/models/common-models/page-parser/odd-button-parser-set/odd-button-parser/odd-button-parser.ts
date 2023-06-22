@@ -1,13 +1,19 @@
-import { ElementHandle } from 'puppeteer';
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
+import { ElementHandle } from 'puppeteer';
 
-import { DataParser } from './data-parser';
-import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './db-initializers';
+import { PageParser } from '../../page-parser'; import { ParserFactory } from '../../../parser-factory';
+
 import { OddButton } from './odd-button';
+import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './db-initializers';
 
-export abstract class OddButtonParser {
-  public readonly exchange: Exchange;
-  public readonly league: League;
+export interface SpecializedOddButtonParser {
+  updateOdd(): Promise<CommonOddButtonParser>;
+}
+
+export class CommonOddButtonParser {
+  private readonly parentPageParser: PageParser;
+  private readonly parserFactory: ParserFactory;
+  private readonly specializedOddButtonParser: SpecializedOddButtonParser;
   private wrappedOddButton: OddButton | undefined;
   private wrappedDbGameInitializer: DbGameInitializer | undefined;
   private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
@@ -16,18 +22,46 @@ export abstract class OddButtonParser {
   private wrappedPrice: number | null | undefined;
   private wrappedValue: number | null | undefined;
 
-  protected constructor({
-    exchange,
-    league,
+  private constructor({
+    parentPageParser,
+    parserFactory,
+    specializedOddButtonParser,
   }: {
-    exchange: Exchange,
-    league: League,
+    parentPageParser: PageParser,
+    parserFactory: ParserFactory,
+    specializedOddButtonParser: SpecializedOddButtonParser,
   }) {
-    this.exchange = exchange;
-    this.league = league;
+    this.parentPageParser = parentPageParser;
+    this.parserFactory = parserFactory;
+    this.specializedOddButtonParser = specializedOddButtonParser;
   }
 
-  public abstract updateOdd(): Promise<OddButtonParser>;
+  public static async create({
+    parentPageParser,
+    parserFactory,
+    specializedOddButtonParser,
+  }: {
+    parentPageParser: PageParser,
+    parserFactory: ParserFactory,
+    specializedOddButtonParser: SpecializedOddButtonParser,
+  }): Promise<CommonOddButtonParser> {
+    const commonOddButtonParser = new CommonOddButtonParser({
+      parentPageParser,
+      parserFactory,
+      specializedOddButtonParser,
+    });
+    await commonOddButtonParser.init();
+    return commonOddButtonParser;
+  }
+
+  private async init(): Promise<CommonOddButtonParser> {
+    this.oddButton = await this.parserFactory.createOddButton();
+    this.dbGameInitializer = await this.parserFactory.createDbGameInitializer();
+    this.dbStatisticInitializer = await this.parserFactory.createDbStatisticInitializer();
+    this.dbOddInitializer = await DbOddInitializer.create();
+
+    return this;
+  }
 
   protected async updateDbOddFromTextContent(): Promise<void> {
     await this.getTextContent();

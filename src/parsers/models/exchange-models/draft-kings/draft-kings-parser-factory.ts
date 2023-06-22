@@ -1,14 +1,16 @@
-import { IJsonGamesParser, IOddButtonParserSet, PageParser } from '../../common-models';
-import { IParserFactory } from '../../common-models/i-parser-factory';
+import { ElementHandle } from 'puppeteer';
 
-import { DraftKingsJsonGamesParser, DraftKingsOddButtonParserSet } from './draft-kings-page-parser';
+import { SpecializedJsonGamesParser, SpecializedOddButtonParserSet, PageParser, SpecializedOddButtonParser } from '../../common-models';
+import { ParserFactory } from '../../common-models/parser-factory';
 
-export class DraftKingsParserFactory implements IParserFactory {
+import { DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet } from './draft-kings-page-parser';
+
+export class DraftKingsParserFactory implements ParserFactory {
   public async createJsonGamesParser({
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<IJsonGamesParser> {
+  }): Promise<SpecializedJsonGamesParser> {
     return await DraftKingsJsonGamesParser.create({ parentPageParser });
   }
 
@@ -16,7 +18,20 @@ export class DraftKingsParserFactory implements IParserFactory {
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<IOddButtonParserSet> {
+  }): Promise<SpecializedOddButtonParserSet> {
     return await DraftKingsOddButtonParserSet.create({ parentPageParser });
+  }
+
+  public async createOddButtonParser({
+    parentPageParser,
+    button,
+  }: {
+    parentPageParser: PageParser,
+    button: ElementHandle,
+  }): Promise<SpecializedOddButtonParser> {
+    return await DraftKingsOddButtonParser.create({
+      parentPageParser,
+      button,
+    });
   }
 }

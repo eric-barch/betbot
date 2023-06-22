@@ -2,10 +2,10 @@ import { Team } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
 import { DbUtilityFunctions } from '@/db';
-import { OddButtonParser } from '@/parsers/models/common-models';
+import { CommonOddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsMatchupParser {
-  private parentOddButtonParser: OddButtonParser;
+  private parentOddButtonParser: CommonOddButtonParser;
   private wrappedTeamRowElement: ElementHandle | undefined;
   private wrappedGameLinkElement: ElementHandle | undefined;
   private wrappedGameLinkString: string | undefined;
@@ -15,7 +15,7 @@ export class DraftKingsMatchupParser {
   constructor({
     parentOddButtonParser,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parentOddButtonParser: CommonOddButtonParser,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
   }

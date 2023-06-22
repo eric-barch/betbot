@@ -1,10 +1,10 @@
 import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParser } from '@/parsers/models/common-models';
+import { CommonOddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsStartDateParser {
-  private parentOddButtonParser: OddButtonParser;
+  private parentOddButtonParser: CommonOddButtonParser;
   private wrappedDateString: string | undefined;
   private wrappedTimeString: string | undefined;
   private wrappedStartDate: Date | undefined;
@@ -12,7 +12,7 @@ export class DraftKingsStartDateParser {
   constructor({
     parentOddButtonParser,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parentOddButtonParser: CommonOddButtonParser,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
   }
