@@ -1,6 +1,4 @@
-import { Game } from '@prisma/client';
-
-import { prisma } from '@/db';
+import { GameWithTeams, prisma } from '@/db';
 import { DbGameInitializer, OddButtonParser, SpecializedDbGameInitializer } from '@/parsers/models/common-models';
 
 import { DraftKingsGameParser } from './draft-kings-game-parser';
@@ -22,7 +20,7 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
     this.parentDbGameInitializer = parentDbGameInitializer;
   }
 
-  public async findOrCreateCorrespondingDbGame(): Promise<Game> {
+  public async findOrCreateCorrespondingDbGame(): Promise<GameWithTeams> {
     await this.parseExchangeAssignedGameId();
 
     try {
@@ -47,7 +45,7 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
     return this.exchangeAssignedGameId;
   }
 
-  private async findGameWithExchangeAssignedId(): Promise<Game> {
+  private async findGameWithExchangeAssignedId(): Promise<GameWithTeams> {
     const exchangeToGame = await prisma.exchangeToGame.findUniqueOrThrow({
       where: {
         exchangeId_exchangeAssignedGameId: {
@@ -55,15 +53,22 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
           exchangeAssignedGameId: this.exchangeAssignedGameId,
         },
       },
+    });
+
+    const game = await prisma.game.findUniqueOrThrow({
+      where: {
+        id: exchangeToGame.gameId,
+      },
       include: {
-        game: true,
+        awayTeam: true,
+        homeTeam: true,
       },
     });
 
-    return exchangeToGame.game;
+    return game;
   }
 
-  private async findOrCreateGameWithoutExchangeAssignedId(): Promise<Game> {
+  private async findOrCreateGameWithoutExchangeAssignedId(): Promise<GameWithTeams> {
     this.gameParser = await DraftKingsGameParser.create({
       parentOddButtonParser: this.parentOddButtonParser,
       exchangeAssignedGameId: this.exchangeAssignedGameId,

@@ -1,16 +1,15 @@
-import { Game } from '@prisma/client';
-
+import { GameWithTeams } from '@/db';
 import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbGameInitializer {
-  findOrCreateCorrespondingDbGame(): Promise<Game>;
+  findOrCreateCorrespondingDbGame(): Promise<GameWithTeams>;
 }
 
 export class DbGameInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
   private readonly parserFactory: ParserFactory;
   private wrappedSpecializedDbGameInitializer: SpecializedDbGameInitializer | undefined;
-  private wrappedGame: Game | undefined;
+  private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
     parentOddButtonParser,
@@ -61,7 +60,7 @@ export class DbGameInitializer {
     return this.wrappedSpecializedDbGameInitializer;
   }
 
-  public get game(): Game {
+  public get game(): GameWithTeams {
     if (!this.wrappedGame) {
       throw new Error(`wrappedGame is undefined.`);
     }
@@ -69,7 +68,7 @@ export class DbGameInitializer {
     return this.wrappedGame;
   }
 
-  private set game(game: Game) {
+  private set game(game: GameWithTeams) {
     this.wrappedGame = game;
   }
 }
