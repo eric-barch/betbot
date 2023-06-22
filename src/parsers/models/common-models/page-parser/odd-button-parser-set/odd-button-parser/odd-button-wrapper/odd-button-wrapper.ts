@@ -50,7 +50,10 @@ export class OddButtonWrapper {
   }
 
   protected async init(): Promise<OddButtonWrapper> {
-    this.specializedOddButtonWrapper = await this.parserFactory.createOddButtonWrapper();
+    this.specializedOddButtonWrapper = await this.parserFactory.createOddButtonWrapper({
+      parentOddButtonParser: this.parentOddButtonParser,
+      parentOddButtonWrapper: this,
+    });
 
     this.referenceSelector = await this.specializedOddButtonWrapper.generateReferenceSelector();
     this.reference = await this.initReference();
