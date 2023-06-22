@@ -4,14 +4,14 @@ import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonWrapper {
   generateReferenceSelector(): Promise<string>;
-  confirmCorrectOddButtonPosition(): Promise<boolean>;
+  confirmOddButtonPosition(): Promise<boolean>;
 }
 
 export class OddButtonWrapper {
   private readonly parentOddButtonParser: OddButtonParser;
   private readonly parserFactory: ParserFactory;
   private wrappedSpecializedOddButtonWrapper: SpecializedOddButtonWrapper | undefined;
-  private wrappedButton: ElementHandle;
+  private wrappedOddButton: ElementHandle;
   private wrappedReferenceSelector: string | undefined;
   private wrappedReference: ElementHandle | undefined;
   private wrappedReferenceToButtonXPath: string | undefined;
@@ -27,7 +27,7 @@ export class OddButtonWrapper {
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
     this.parserFactory = parserFactory;
-    this.wrappedButton = initializationButton;
+    this.wrappedOddButton = initializationButton;
   }
 
   public static async create({
@@ -61,7 +61,7 @@ export class OddButtonWrapper {
   }
 
   private async initReference(): Promise<ElementHandle> {
-    let element = this.button;
+    let element = this.oddButton;
     this.referenceToButtonXPath = '';
 
     while (element) {
@@ -119,14 +119,15 @@ export class OddButtonWrapper {
       throw new Error(`button is null.`);
     }
 
-    const correctOddButtonPosition = await this.specializedOddButtonWrapper.confirmCorrectOddButtonPosition();
+    this.oddButton = button;
 
-    if (!correctOddButtonPosition) {
-      throw new Error(`Odd button is not in correct position.`);
+    const oddButtonPositionIsConfirmed = await this.specializedOddButtonWrapper.confirmOddButtonPosition();
+
+    if (!oddButtonPositionIsConfirmed) {
+      throw new Error(`Odd button position is not confirmed.`);
     }
 
-    this.button = button;
-    return this.button
+    return this.oddButton
   }
 
   private set specializedOddButtonWrapper(specializedOddButtonWrapper: SpecializedOddButtonWrapper) {
@@ -141,16 +142,16 @@ export class OddButtonWrapper {
     return this.wrappedSpecializedOddButtonWrapper;
   }
 
-  private set button(button: ElementHandle) {
-    this.wrappedButton = button;
+  private set oddButton(oddButton: ElementHandle) {
+    this.wrappedOddButton = oddButton;
   }
 
-  public get button(): ElementHandle {
-    if (!this.wrappedButton) {
-      throw new Error(`wrappedButton is undefined.`);
+  public get oddButton(): ElementHandle {
+    if (!this.wrappedOddButton) {
+      throw new Error(`wrappedOddButton is undefined.`);
     }
 
-    return this.wrappedButton;
+    return this.wrappedOddButton;
   }
 
   protected set referenceSelector(referenceSelector: string) {
@@ -169,7 +170,7 @@ export class OddButtonWrapper {
     this.wrappedReference = reference;
   }
 
-  private get reference(): ElementHandle {
+  public get reference(): ElementHandle {
     if (!this.wrappedReference) {
       throw new Error(`wrappedReference is undefined.`);
     }

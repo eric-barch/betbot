@@ -146,7 +146,7 @@ export class OddButtonParser {
   }
 
   public get button(): ElementHandle {
-    return this.oddButtonWrapper.button;
+    return this.oddButtonWrapper.oddButton;
   }
 
   public get game(): Game {
