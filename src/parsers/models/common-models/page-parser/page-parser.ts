@@ -1,14 +1,12 @@
 import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
+
+import {
+  DbExchangeInitializer, DbLeagueInitializer, OddButtonParserSet, ParserFactory,
+  SpecializedJsonGamesParser, Webpage,
+} from '@/parsers/models/common-models';
 import { PageParserInitData } from '@/setup';
-
-import { ParserFactory } from '../parser-factory';
-
-import { DbExchangeInitializer, DbLeagueInitializer } from './db-initializers';
-import { SpecializedJsonGamesParser } from './json-games-parser/json-games-parser';
-import { OddButtonParserSet } from './odd-button-parser-set';
-import { Webpage } from './webpage';
 
 export class PageParser {
   private readonly initData: PageParserInitData;
@@ -49,7 +47,7 @@ export class PageParser {
     this.webpage = await Webpage.create({ url: this.initData.url });
     this.dbExchangeInitializer = await DbExchangeInitializer.create({ initData: this.initData.exchangeInitData });
     this.dbLeagueInitializer = await DbLeagueInitializer.create({ initData: this.initData.leagueInitData });
-    this.jsonGamesParser = await this.parserFactory.createJsonGamesParser();
+    this.jsonGamesParser = await this.parserFactory.createJsonGamesParser({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
       parserFactory: this.parserFactory,
@@ -59,7 +57,7 @@ export class PageParser {
   }
 
   public async updateOdds(): Promise<void> {
-    await this.oddButtonParserSet.updateOdds();
+    await this.oddButtonParserSet.updateOddsForEachButtonParser();
   }
 
   public async disconnect(): Promise<void> {

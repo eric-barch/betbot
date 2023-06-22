@@ -1,7 +1,6 @@
 import { Game } from '@prisma/client';
 
-import { OddButtonParser } from '@/parsers/models/common-models';
-import { ParserFactory } from '@/parsers/models/common-models/parser-factory';
+import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbGameInitializer {
   findOrCreateCorrespondingDbGame(): Promise<Game>;
@@ -40,7 +39,10 @@ export class DbGameInitializer {
   }
 
   private async init(): Promise<DbGameInitializer> {
-    this.specializedDbGameInitializer = await this.parserFactory.createDbGameInitializer();
+    this.specializedDbGameInitializer = await this.parserFactory.createDbGameInitializer({
+      parentOddButtonParser: this.parentOddButtonParser,
+      parentDbGameInitializer: this,
+    });
 
     this.game = await this.specializedDbGameInitializer.findOrCreateCorrespondingDbGame();
 

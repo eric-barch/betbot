@@ -1,21 +1,54 @@
-import { ElementHandle } from 'puppeteer';
-
-import { SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from './page-parser';
+import {
+  DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
+  PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer,
+  SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet,
+  SpecializedOddButtonWrapper,
+} from '@/parsers/models/common-models';
 
 export interface ParserFactory {
-  createJsonGamesParser(): Promise<SpecializedJsonGamesParser>;
+  createJsonGamesParser({
+    parentPageParser,
+  }: {
+    parentPageParser: PageParser,
+  }): Promise<SpecializedJsonGamesParser>;
 
-  createOddButtonParserSet(): Promise<SpecializedOddButtonParserSet>;
+  createOddButtonParserSet({
+    parentPageParser,
+    parentOddButtonParserSet,
+  }: {
+    parentPageParser: PageParser,
+    parentOddButtonParserSet: OddButtonParserSet,
+  }): Promise<SpecializedOddButtonParserSet>;
 
   createOddButtonParser({
-    button,
+    parentPageParser,
+    parentOddButtonParser,
   }: {
-    button: ElementHandle,
+    parentPageParser: PageParser,
+    parentOddButtonParser: OddButtonParser,
   }): Promise<SpecializedOddButtonParser>;
 
-  createOddButtonWrapper(): Promise<SpecializedOddButtonWrapper>;
+  createOddButtonWrapper({
+    parentOddButtonParser,
+    parentOddButtonWrapper,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+    parentOddButtonWrapper: OddButtonWrapper,
+  }): Promise<SpecializedOddButtonWrapper>;
 
-  createDbGameInitializer(): Promise<SpecializedDbGameInitializer>;
+  createDbGameInitializer({
+    parentOddButtonParser,
+    parentDbGameInitializer,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+    parentDbGameInitializer: DbGameInitializer,
+  }): Promise<SpecializedDbGameInitializer>;
 
-  createDbStatisticInitializer(): Promise<SpecializedDbStatisticInitializer>;
+  createDbStatisticInitializer({
+    parentOddButtonParser,
+    parentDbStatisticInitializer,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+    parentDbStatisticInitializer: DbStatisticInitializer,
+  }): Promise<SpecializedDbStatisticInitializer>;
 }

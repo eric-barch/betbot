@@ -1,2 +1,2 @@
 export * from './common-models';
-export * from './exchange-models';
+export * from './specialized-models';

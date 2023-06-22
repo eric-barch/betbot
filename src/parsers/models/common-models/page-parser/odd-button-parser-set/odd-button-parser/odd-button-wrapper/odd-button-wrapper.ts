@@ -1,8 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { ParserFactory } from '@/parsers/models/common-models/parser-factory';
-
-import { OddButtonParser } from '../odd-button-parser';
+import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonWrapper {
   generateReferenceSelector(): Promise<string>;
@@ -50,7 +48,10 @@ export class OddButtonWrapper {
   }
 
   protected async init(): Promise<OddButtonWrapper> {
-    this.specializedOddButtonWrapper = await this.parserFactory.createOddButtonWrapper();
+    this.specializedOddButtonWrapper = await this.parserFactory.createOddButtonWrapper({
+      parentOddButtonParser: this.parentOddButtonParser,
+      parentOddButtonWrapper: this,
+    });
 
     this.referenceSelector = await this.specializedOddButtonWrapper.generateReferenceSelector();
     this.reference = await this.initReference();
@@ -110,7 +111,7 @@ export class OddButtonWrapper {
     return `/${tag}[${index}]`;
   }
 
-  public async resetFromReference(): Promise<ElementHandle> {
+  public async resetOddButtonFromReference(): Promise<ElementHandle> {
     const button = await this.reference.$(`xpath${this.referenceToButtonXPath}`);
 
     if (!button) {

@@ -1,10 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { PageParser } from '@/parsers/models/common-models';
-
-import { ParserFactory } from '../../parser-factory';
-
-import { OddButtonParser, SpecializedOddButtonParser } from './odd-button-parser';
+import { OddButtonParser, PageParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParserSet {
   generateOddButtonSelector(): Promise<string>;
@@ -46,7 +42,10 @@ export class OddButtonParserSet {
   }
 
   private async init(): Promise<OddButtonParserSet> {
-    this.specializedOddButtonParserSet = await this.parserFactory.createOddButtonParserSet();
+    this.specializedOddButtonParserSet = await this.parserFactory.createOddButtonParserSet({
+      parentPageParser: this.parentPageParser,
+      parentOddButtonParserSet: this,
+    });
     this.oddButtonSelector = await this.specializedOddButtonParserSet.generateOddButtonSelector();
     this.oddButtons = await this.scrapeOddButtons();
     this.oddButtonParsers = await this.createOddButtonParsers();
@@ -89,6 +88,10 @@ export class OddButtonParserSet {
   }
 
   public async updateOdds(): Promise<void> {
+    await this.specializedOddButtonParserSet.updateOdds();
+  }
+
+  public async updateOddsForEachButtonParser(): Promise<void> {
     await Promise.all(
       Array.from(this.oddButtonParsers).map(oddButtonParser => oddButtonParser.updateOdd())
     );

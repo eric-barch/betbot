@@ -1,14 +1,13 @@
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
-import { ElementHandle, Page } from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
 
-import { ParserFactory } from '../../../parser-factory';
-import { PageParser } from '../../page-parser';
-
-import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './db-initializers';
-import { OddButtonWrapper } from './odd-button-wrapper';
+import {
+  DbGameInitializer, DbOddInitializer, DbStatisticInitializer, OddButtonWrapper, PageParser,
+  ParserFactory,
+} from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParser {
-  updateOdd(): Promise<OddButtonParser>;
+  updateOdd(): Promise<void>;
 }
 
 export class OddButtonParser {
@@ -57,7 +56,10 @@ export class OddButtonParser {
   }
 
   private async init(): Promise<OddButtonParser> {
-    this.specializedOddButtonParser = await this.parserFactory.createOddButtonParser({ button: this.initializationButton });
+    this.specializedOddButtonParser = await this.parserFactory.createOddButtonParser({
+      parentPageParser: this.parentPageParser,
+      parentOddButtonParser: this,
+    });
 
     this.oddButtonWrapper = await OddButtonWrapper.create({
       parentOddButtonParser: this,
@@ -81,7 +83,11 @@ export class OddButtonParser {
     await this.specializedOddButtonParser.updateOdd();
   }
 
-  protected async updateDbOddFromTextContent(): Promise<void> {
+  public async resetOddButtonFromReference(): Promise<void> {
+    await this.oddButtonWrapper.resetOddButtonFromReference();
+  }
+
+  public async updateDbOddFromOddButtonTextContent(): Promise<void> {
     await this.getTextContent();
     await this.parseTextContent();
 
@@ -129,6 +135,7 @@ export class OddButtonParser {
 
     throw new Error(`More than two numbers found in textContent.`);
   }
+
 
   public get exchange(): Exchange {
     return this.parentPageParser.exchange;

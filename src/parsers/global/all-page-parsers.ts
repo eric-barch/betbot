@@ -1,8 +1,7 @@
 import { PageParser } from '@/parsers';
 import { allPageParserInitData } from '@/setup';
 
-import { DraftKingsParserFactory } from '../models/exchange-models/draft-kings/draft-kings-parser-factory';
-import { FanDuelParserFactory } from '../models/exchange-models/fan-duel/fan-duel-parser-factory';
+import { DraftKingsParserFactory } from '../models/specialized-models/draft-kings/draft-kings-parser-factory';
 import { ParserFactory } from '../models/common-models/parser-factory';
 
 class AllPageParsers {
@@ -20,9 +19,6 @@ class AllPageParsers {
         switch (exchangeName) {
           case 'DraftKings':
             parserFactory = new DraftKingsParserFactory();
-            break;
-          case 'FanDuel':
-            parserFactory = new FanDuelParserFactory();
             break;
           default:
             throw new Error(`Exchange ${exchangeName} is not supported.`);
