@@ -44,8 +44,8 @@ export class FanDuelOddButtonParser extends OddButtonParser {
   }
 
   public async updateOdd(): Promise<FanDuelOddButtonParser> {
-    await this.oddButtonWrapper.resetFromReference();
-    await this.updateDbOddFromTextContent();
+    await this.oddButtonWrapper.resetOddButtonFromReference();
+    await this.updateDbOddFromOddButtonTextContent();
     return this;
   }
 }

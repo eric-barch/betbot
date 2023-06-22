@@ -1,2 +1,2 @@
-export * from './draft-kings-json-games-parser';
+export * from './json-games-parser';
 export * from './odd-button-parser-set';
