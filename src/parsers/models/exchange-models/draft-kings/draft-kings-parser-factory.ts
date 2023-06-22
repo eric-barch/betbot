@@ -1,7 +1,7 @@
-import { OddButtonParser, OddButtonParserSet, OddButtonWrapper, PageParser, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from '../../common-models';
+import { DbGameInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper, PageParser, SpecializedDbGameInitializer, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from '../../common-models';
 import { ParserFactory } from '../../common-models/parser-factory';
 
-import { DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper } from './page-parser';
+import { DraftKingsDbGameInitializer, DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper } from './page-parser';
 
 export class DraftKingsParserFactory implements ParserFactory {
   public async createJsonGamesParser({
@@ -48,6 +48,19 @@ export class DraftKingsParserFactory implements ParserFactory {
     return new DraftKingsOddButtonWrapper({
       parentOddButtonParser,
       parentOddButtonWrapper,
+    });
+  }
+
+  public async createDbGameInitializer({
+    parentOddButtonParser,
+    parentDbGameInitializer,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+    parentDbGameInitializer: DbGameInitializer,
+  }): Promise<SpecializedDbGameInitializer> {
+    return new DraftKingsDbGameInitializer({
+      parentOddButtonParser,
+      parentDbGameInitializer,
     });
   }
 }

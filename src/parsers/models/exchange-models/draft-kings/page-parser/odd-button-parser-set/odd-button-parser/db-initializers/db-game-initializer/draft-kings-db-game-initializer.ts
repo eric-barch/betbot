@@ -1,34 +1,36 @@
 import { Game } from '@prisma/client';
 
 import { prisma } from '@/db';
-import { DraftKingsGameParser } from '@/parsers/models/exchange-models/draft-kings';
 import { OddButtonParser } from '@/parsers/models/common-models';
-import { DbGameInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-game-initializer';
+import { DbGameInitializer, SpecializedDbGameInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-game-initializer';
 
-export class DraftKingsDbGameInitializer extends DbGameInitializer {
+import { DraftKingsGameParser } from './draft-kings-game-parser';
+
+export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer {
+  private readonly parentOddButtonParser: OddButtonParser;
+  private readonly parentDbGameInitializer: DbGameInitializer;
   private wrappedExchangeAssignedGameId: string | undefined;
   private wrappedGameParser: DraftKingsGameParser | undefined;
 
-  public static async create({
+  public constructor({
     parentOddButtonParser,
+    parentDbGameInitializer,
   }: {
     parentOddButtonParser: OddButtonParser;
-  }): Promise<DraftKingsDbGameInitializer> {
-    const draftKingsDbGameInitializer = new DraftKingsDbGameInitializer({ parentOddButtonParser });
-    await draftKingsDbGameInitializer.init();
-    return draftKingsDbGameInitializer;
+    parentDbGameInitializer: DbGameInitializer;
+  }) {
+    this.parentOddButtonParser = parentOddButtonParser;
+    this.parentDbGameInitializer = parentDbGameInitializer;
   }
 
-  protected async updateDbGame(): Promise<Game> {
+  public async findOrCreateCorrespondingDbGame(): Promise<Game> {
     await this.parseExchangeAssignedGameId();
 
     try {
-      this.game = await this.findGameWithExchangeAssignedId();
+      return await this.findGameWithExchangeAssignedId();
     } catch {
-      this.game = await this.findOrCreateGameWithoutExchangeAssignedId();
+      return await this.findOrCreateGameWithoutExchangeAssignedId();
     }
-
-    return this.game;
   }
 
   private async parseExchangeAssignedGameId(): Promise<string> {
@@ -59,8 +61,7 @@ export class DraftKingsDbGameInitializer extends DbGameInitializer {
       },
     });
 
-    this.game = exchangeToGame.game;
-    return this.game;
+    return exchangeToGame.game;
   }
 
   private async findOrCreateGameWithoutExchangeAssignedId(): Promise<Game> {
@@ -68,8 +69,7 @@ export class DraftKingsDbGameInitializer extends DbGameInitializer {
       parentOddButtonParser: this.parentOddButtonParser,
       exchangeAssignedGameId: this.exchangeAssignedGameId,
     });
-    this.game = this.gameParser.game;
-    return this.game;
+    return this.gameParser.game;
   }
 
   private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
