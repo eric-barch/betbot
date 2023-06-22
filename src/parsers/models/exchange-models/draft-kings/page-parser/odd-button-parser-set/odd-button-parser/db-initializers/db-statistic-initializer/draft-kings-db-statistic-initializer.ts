@@ -1,22 +1,23 @@
-
-import { Statistic } from '@prisma/client';
-
 import { prisma } from '@/db';
 import { OddButtonParser } from '@/parsers/models/common-models';
-import { DbStatisticInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-statistic-initializer';
+import { DbStatisticInitializer, SpecializedDbStatisticInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-statistic-initializer';
 
-export class DraftKingsDbStatisticInitializer extends DbStatisticInitializer {
-  public static async create({
+export class DraftKingsDbStatisticInitializer implements SpecializedDbStatisticInitializer {
+  private readonly parentOddButtonParser: OddButtonParser;
+  private readonly parentDbStatisticInitializer: DbStatisticInitializer;
+
+  public constructor({
     parentOddButtonParser,
+    parentDbStatisticInitializer,
   }: {
-    parentOddButtonParser: OddButtonParser,
-  }): Promise<DraftKingsDbStatisticInitializer> {
-    const draftKingsDbStatisticInitializer = new DraftKingsDbStatisticInitializer({ parentOddButtonParser });
-    await draftKingsDbStatisticInitializer.init();
-    return draftKingsDbStatisticInitializer;
+    parentOddButtonParser: OddButtonParser;
+    parentDbStatisticInitializer: DbStatisticInitializer;
+  }) {
+    this.parentOddButtonParser = parentOddButtonParser;
+    this.parentDbStatisticInitializer = parentDbStatisticInitializer;
   }
 
-  protected async parseStatisticName(): Promise<string> {
+  public async parseStatisticName(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
     const game = this.parentOddButtonParser.game;
 
