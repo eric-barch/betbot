@@ -106,7 +106,7 @@ export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet 
   }
 
   public async updateOdds(): Promise<void> {
-    await this.commonOddButtonParserSet.updateOdds();
+    await this.commonOddButtonParserSet.updateOddsForEachButtonParser();
   }
 
   private set commonOddButtonParserSet(commonOddButtonParserSet: OddButtonParserSet) {

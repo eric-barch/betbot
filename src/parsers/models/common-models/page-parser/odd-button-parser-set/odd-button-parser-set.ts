@@ -89,6 +89,10 @@ export class OddButtonParserSet {
   }
 
   public async updateOdds(): Promise<void> {
+    await this.specializedOddButtonParserSet.updateOdds();
+  }
+
+  public async updateOddsForEachButtonParser(): Promise<void> {
     await Promise.all(
       Array.from(this.oddButtonParsers).map(oddButtonParser => oddButtonParser.updateOdd())
     );

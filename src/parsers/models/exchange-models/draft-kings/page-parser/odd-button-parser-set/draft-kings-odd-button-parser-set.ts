@@ -3,31 +3,31 @@ import { OddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/mod
 
 export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserSet {
   private readonly parentPageParser: PageParser;
-  private wrappedCommonOddButtonParserSet: OddButtonParserSet | undefined;
+  private readonly parentOddButtonParserSet: OddButtonParserSet;
 
   private constructor({
     parentPageParser,
+    parentOddButtonParserSet,
   }: {
     parentPageParser: PageParser,
+    parentOddButtonParserSet: OddButtonParserSet,
   }) {
     this.parentPageParser = parentPageParser;
+    this.parentOddButtonParserSet = parentOddButtonParserSet;
   }
 
   public static async create({
     parentPageParser,
+    parentOddButtonParserSet,
   }: {
     parentPageParser: PageParser,
+    parentOddButtonParserSet: OddButtonParserSet,
   }): Promise<DraftKingsOddButtonParserSet> {
-    const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet({ parentPageParser });
-    await draftKingsOddButtonParserSet.init();
-    return draftKingsOddButtonParserSet;
-  }
-
-  private async init() {
-    this.commonOddButtonParserSet = await OddButtonParserSet.create({
-      parentPageParser: this.parentPageParser,
-      specializedOddButtonParserSet: this,
+    const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet({
+      parentPageParser,
+      parentOddButtonParserSet,
     });
+    return draftKingsOddButtonParserSet;
   }
 
   public async generateOddButtonSelector(): Promise<string> {
@@ -35,18 +35,6 @@ export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserS
   }
 
   public async updateOdds(): Promise<void> {
-    await this.commonOddButtonParserSet.updateOdds();
-  }
-
-  private set commonOddButtonParserSet(commonOddButtonParserSet: OddButtonParserSet) {
-    this.wrappedCommonOddButtonParserSet = commonOddButtonParserSet;
-  }
-
-  private get commonOddButtonParserSet(): OddButtonParserSet {
-    if (!this.wrappedCommonOddButtonParserSet) {
-      throw new Error(`wrappedCommonOddButtonParserSet is undefined.`);
-    }
-
-    return this.wrappedCommonOddButtonParserSet;
+    await this.parentOddButtonParserSet.updateOddsForEachButtonParser();
   }
 }
