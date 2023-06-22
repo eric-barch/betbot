@@ -57,7 +57,10 @@ export class OddButtonParser {
   }
 
   private async init(): Promise<OddButtonParser> {
-    this.specializedOddButtonParser = await this.parserFactory.createOddButtonParser({ button: this.initializationButton });
+    this.specializedOddButtonParser = await this.parserFactory.createOddButtonParser({
+      parentPageParser: this.parentPageParser,
+      parentOddButtonParser: this,
+    });
 
     this.oddButtonWrapper = await OddButtonWrapper.create({
       parentOddButtonParser: this,

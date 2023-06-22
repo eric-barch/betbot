@@ -1,7 +1,7 @@
-import { OddButtonParser, OddButtonParserSet, PageParser, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet } from '../../common-models';
+import { OddButtonParser, OddButtonParserSet, OddButtonWrapper, PageParser, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from '../../common-models';
 import { ParserFactory } from '../../common-models/parser-factory';
 
-import { DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet } from './page-parser';
+import { DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper } from './page-parser';
 
 export class DraftKingsParserFactory implements ParserFactory {
   public async createJsonGamesParser({
@@ -35,6 +35,19 @@ export class DraftKingsParserFactory implements ParserFactory {
     return new DraftKingsOddButtonParser({
       parentPageParser,
       parentOddButtonParser,
+    });
+  }
+
+  public async createOddButtonWrapper({
+    parentOddButtonParser,
+    parentOddButtonWrapper,
+  }: {
+    parentOddButtonParser: OddButtonParser,
+    parentOddButtonWrapper: OddButtonWrapper,
+  }): Promise<SpecializedOddButtonWrapper> {
+    return new DraftKingsOddButtonWrapper({
+      parentOddButtonParser,
+      parentOddButtonWrapper,
     });
   }
 }

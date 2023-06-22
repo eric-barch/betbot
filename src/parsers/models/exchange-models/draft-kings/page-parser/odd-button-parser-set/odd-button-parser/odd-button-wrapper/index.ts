@@ -1,1 +1,1 @@
-export * from './draft-kings-odd-button';
+export * from './draft-kings-odd-button-wrapper';

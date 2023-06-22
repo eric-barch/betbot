@@ -24,26 +24,26 @@ export interface ParserFactory {
   }): Promise<SpecializedOddButtonParser>;
 
   createOddButtonWrapper({
-    parentPageParser,
+    parentOddButtonParser,
     parentOddButtonWrapper,
   }: {
-    parentPageParser: PageParser,
+    parentOddButtonParser: OddButtonParser,
     parentOddButtonWrapper: OddButtonWrapper,
   }): Promise<SpecializedOddButtonWrapper>;
 
   createDbGameInitializer({
-    parentPageParser,
+    parentOddButtonParser,
     parentDbGameInitializer,
   }: {
-    parentPageParser: PageParser,
+    parentOddButtonParser: OddButtonParser,
     parentDbGameInitializer: DbGameInitializer,
   }): Promise<SpecializedDbGameInitializer>;
 
   createDbStatisticInitializer({
-    parentPageParser,
+    parentOddButtonParser,
     parentDbStatisticInitializer,
   }: {
-    parentPageParser: PageParser,
+    parentOddButtonParser: OddButtonParser,
     parentDbStatisticInitializer: DbStatisticInitializer,
   }): Promise<SpecializedDbStatisticInitializer>;
 }
