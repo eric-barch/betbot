@@ -1,10 +1,10 @@
 import { Game } from '@prisma/client';
 
 import { DbUtilityFunctions, prisma } from '@/db';
-import { PageParser } from '@/parsers/models/common-models';
+import { PageParser, SpecializedJsonGamesParser } from '@/parsers/models/common-models';
 
-export class DraftKingsJsonGamesParser {
-  private parentPageParser: PageParser;
+export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
+  private readonly parentPageParser: PageParser;
   private jsonGames: Array<any>;
   private dbGames: Array<Game>;
 

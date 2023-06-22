@@ -3,7 +3,7 @@ import { ElementHandle } from 'puppeteer';
 import { SpecializedJsonGamesParser, SpecializedOddButtonParserSet, PageParser, SpecializedOddButtonParser } from '../../common-models';
 import { ParserFactory } from '../../common-models/parser-factory';
 
-import { DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet } from './draft-kings-page-parser';
+import { DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet } from './page-parser';
 
 export class DraftKingsParserFactory implements ParserFactory {
   public async createJsonGamesParser({

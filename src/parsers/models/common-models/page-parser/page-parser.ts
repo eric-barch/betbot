@@ -49,7 +49,7 @@ export class PageParser {
     this.webpage = await Webpage.create({ url: this.initData.url });
     this.dbExchangeInitializer = await DbExchangeInitializer.create({ initData: this.initData.exchangeInitData });
     this.dbLeagueInitializer = await DbLeagueInitializer.create({ initData: this.initData.leagueInitData });
-    this.jsonGamesParser = await this.parserFactory.createJsonGamesParser();
+    this.jsonGamesParser = await this.parserFactory.createJsonGamesParser({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
       parserFactory: this.parserFactory,

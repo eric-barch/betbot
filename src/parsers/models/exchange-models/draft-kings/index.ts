@@ -1,1 +1,1 @@
-export * from './draft-kings-page-parser';
+export * from './page-parser';
