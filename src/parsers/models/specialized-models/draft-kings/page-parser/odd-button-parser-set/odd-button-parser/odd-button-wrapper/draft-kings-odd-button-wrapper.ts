@@ -1,5 +1,6 @@
-import { OddButtonParser } from '@/parsers/models/common-models';
-import { OddButtonWrapper, SpecializedOddButtonWrapper } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-wrapper/odd-button-wrapper';
+import {
+  OddButtonParser, OddButtonWrapper, SpecializedOddButtonWrapper,
+} from '@/parsers/models/common-models';
 
 export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
   private readonly parentOddButtonParser: OddButtonParser;

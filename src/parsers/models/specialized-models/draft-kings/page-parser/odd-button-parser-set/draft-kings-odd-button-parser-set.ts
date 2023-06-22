@@ -1,5 +1,6 @@
-import { PageParser } from '@/parsers/models/common-models';
-import { OddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
+import {
+  OddButtonParserSet, PageParser, SpecializedOddButtonParserSet,
+} from '@/parsers/models/common-models';
 
 export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserSet {
   private readonly parentPageParser: PageParser;

@@ -1,11 +1,10 @@
 import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
-import { ElementHandle, Page } from 'puppeteer';
+import { ElementHandle } from 'puppeteer';
 
-import { ParserFactory } from '../../../parser-factory';
-import { PageParser } from '../../page-parser';
-
-import { DbGameInitializer, DbOddInitializer, DbStatisticInitializer } from './db-initializers';
-import { OddButtonWrapper } from './odd-button-wrapper';
+import {
+  DbGameInitializer, DbOddInitializer, DbStatisticInitializer, OddButtonWrapper, PageParser,
+  ParserFactory,
+} from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParser {
   updateOdd(): Promise<void>;

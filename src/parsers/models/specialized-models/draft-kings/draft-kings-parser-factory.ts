@@ -1,7 +1,13 @@
-import { DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper, PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper } from '../../common-models';
-import { ParserFactory } from '../../common-models/parser-factory';
-
-import { DraftKingsDbGameInitializer, DraftKingsDbStatisticInitializer, DraftKingsJsonGamesParser, DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper } from './page-parser';
+import {
+  DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
+  PageParser, ParserFactory, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer,
+  SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet,
+  SpecializedOddButtonWrapper,
+} from '@/parsers/models/common-models';
+import {
+  DraftKingsDbGameInitializer, DraftKingsDbStatisticInitializer, DraftKingsJsonGamesParser,
+  DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper,
+} from '@/parsers/models/specialized-models/draft-kings';
 
 export class DraftKingsParserFactory implements ParserFactory {
   public async createJsonGamesParser({

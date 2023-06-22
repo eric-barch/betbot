@@ -1,8 +1,7 @@
 import { Statistic } from '@prisma/client';
 
-import { OddButtonParser } from '@/parsers/models/common-models';
 import { prisma } from '@/db';
-import { ParserFactory } from '@/parsers/models/common-models/parser-factory';
+import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbStatisticInitializer {
   parseStatisticName(): Promise<string>;

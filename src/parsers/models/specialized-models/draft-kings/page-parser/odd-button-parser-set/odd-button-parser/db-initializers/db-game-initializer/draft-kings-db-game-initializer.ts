@@ -1,8 +1,7 @@
 import { Game } from '@prisma/client';
 
 import { prisma } from '@/db';
-import { OddButtonParser } from '@/parsers/models/common-models';
-import { DbGameInitializer, SpecializedDbGameInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-game-initializer';
+import { DbGameInitializer, OddButtonParser, SpecializedDbGameInitializer } from '@/parsers/models/common-models';
 
 import { DraftKingsGameParser } from './draft-kings-game-parser';
 

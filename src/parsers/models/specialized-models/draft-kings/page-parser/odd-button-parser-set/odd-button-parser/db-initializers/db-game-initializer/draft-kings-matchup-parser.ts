@@ -5,7 +5,7 @@ import { DbUtilityFunctions } from '@/db';
 import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsMatchupParser {
-  private parentOddButtonParser: OddButtonParser;
+  private readonly parentOddButtonParser: OddButtonParser;
   private wrappedTeamRowElement: ElementHandle | undefined;
   private wrappedGameLinkElement: ElementHandle | undefined;
   private wrappedGameLinkString: string | undefined;
