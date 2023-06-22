@@ -27,21 +27,8 @@ export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
   public async confirmOddButtonPosition(): Promise<boolean> {
     const game = this.parentOddButtonParser.game;
 
-    // TODO: Eagerly load participating teams elsewhere in application so we don't have to do 
-    // this here.
-    const awayTeam = await prisma.team.findUniqueOrThrow({
-      where: {
-        id: game.awayTeamId,
-      }
-    });
-    const homeTeam = await prisma.team.findUniqueOrThrow({
-      where: {
-        id: game.homeTeamId,
-      }
-    });
-
-    const awayTeamIdentifierFull = awayTeam.identifierFull.toLowerCase();
-    const homeTeamIdentifierFull = homeTeam.identifierFull.toLowerCase();
+    const awayTeamIdentifierFull = game.awayTeam.identifierFull.toLowerCase();
+    const homeTeamIdentifierFull = game.homeTeam.identifierFull.toLowerCase();
 
     const reference = this.parentOddButtonWrapper.reference;
     const teamNameElement = await reference.$('th');

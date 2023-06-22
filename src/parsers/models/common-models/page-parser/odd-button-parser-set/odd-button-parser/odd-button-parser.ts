@@ -5,6 +5,7 @@ import {
   DbGameInitializer, DbOddInitializer, DbStatisticInitializer, OddButtonWrapper, PageParser,
   ParserFactory,
 } from '@/parsers/models/common-models';
+import { GameWithTeams } from '@/db';
 
 export interface SpecializedOddButtonParser {
   updateOdd(): Promise<void>;
@@ -149,7 +150,7 @@ export class OddButtonParser {
     return this.oddButtonWrapper.oddButton;
   }
 
-  public get game(): Game {
+  public get game(): GameWithTeams {
     return this.dbGameInitializer.game;
   }
 
