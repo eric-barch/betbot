@@ -2,38 +2,41 @@ import { Team } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
 import { DbUtilityFunctions } from '@/db';
-import { OddButtonParser } from '@/parsers/models/common-models';
+import { DbGameInitializer, OddButtonParser } from '@/parsers/models/common-models';
 
 export class DraftKingsMatchupParser {
-  private readonly parentOddButtonParser: OddButtonParser;
+  private readonly parentDbGameInitializer: DbGameInitializer;
   private wrappedTeamRowElement: ElementHandle | undefined;
   private wrappedGameLinkElement: ElementHandle | undefined;
   private wrappedGameLinkString: string | undefined;
   private wrappedAwayTeam: Team | undefined;
   private wrappedHomeTeam: Team | undefined;
 
-  constructor({
-    parentOddButtonParser,
+  private constructor({
+    parentDbGameInitializer,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parentDbGameInitializer: DbGameInitializer,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
+    this.parentDbGameInitializer = parentDbGameInitializer;
   }
 
-  public async parse(): Promise<{
-    awayTeam: Team,
-    homeTeam: Team,
-  }> {
-    await this.updateGameLinkString();
+  public static async create({
+    parentDbGameInitializer,
+  }: {
+    parentDbGameInitializer: DbGameInitializer,
+  }): Promise<DraftKingsMatchupParser> {
+    const matchupParser = new DraftKingsMatchupParser({ parentDbGameInitializer });
+    await matchupParser.init();
+    return matchupParser;
+  }
+
+  private async init(): Promise<DraftKingsMatchupParser> {
+    this.gameLinkString = await this.getGameLinkString();
     await this.parseGameLinkString();
-
-    return {
-      awayTeam: this.awayTeam,
-      homeTeam: this.homeTeam,
-    }
+    return this;
   }
 
-  private async updateGameLinkString(): Promise<string> {
+  private async getGameLinkString(): Promise<string> {
     await this.updateGameLinkElement();
 
     const gameLinkString = await this.gameLinkElement.evaluate(el => el.getAttribute('href'));
@@ -62,7 +65,7 @@ export class DraftKingsMatchupParser {
   }
 
   private async updateTeamRowElement(): Promise<ElementHandle> {
-    let ancestor = this.parentOddButtonParser.button;
+    let ancestor = this.parentDbGameInitializer.button;
 
     const nodeNameToFind = 'tr';
 
@@ -86,10 +89,7 @@ export class DraftKingsMatchupParser {
     throw new Error(`Did not find teamRowElement.`);
   }
 
-  private async parseGameLinkString(): Promise<{
-    awayTeam: Team,
-    homeTeam: Team,
-  }> {
+  private async parseGameLinkString(): Promise<void> {
     const teamNamesMatchPattern = new RegExp(/\/([^/]+)%40([^/]+)\//);
     const teamNameMatches = teamNamesMatchPattern.exec(this.gameLinkString);
 
@@ -97,7 +97,7 @@ export class DraftKingsMatchupParser {
       throw new Error(`teamNameMatches is null.`);
     }
 
-    const league = this.parentOddButtonParser.league;
+    const league = this.parentDbGameInitializer.league;
 
     this.awayTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
       league,
@@ -107,12 +107,7 @@ export class DraftKingsMatchupParser {
     this.homeTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
       league,
       unformattedName: teamNameMatches[2],
-    })
-
-    return {
-      awayTeam: this.awayTeam,
-      homeTeam: this.homeTeam,
-    };
+    });
   }
 
   private get teamRowElement(): ElementHandle {
