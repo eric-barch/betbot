@@ -20,7 +20,7 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
     this.parentDbGameInitializer = parentDbGameInitializer;
   }
 
-  public async findOrCreateCorrespondingDbGame(): Promise<GameWithTeams> {
+  public async findOrCreateGame(): Promise<GameWithTeams> {
     await this.parseExchangeAssignedGameId();
 
     try {

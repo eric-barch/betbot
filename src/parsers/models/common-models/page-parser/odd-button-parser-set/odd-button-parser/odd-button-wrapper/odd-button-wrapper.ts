@@ -1,20 +1,20 @@
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParser, ParserFactory, SpecializedParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonWrapper {
   generateReferenceSelector(): Promise<string>;
-  confirmOddButtonPosition(): Promise<boolean>;
+  verifyOddButtonPosition(): Promise<boolean>;
 }
 
 export class OddButtonWrapper {
   private readonly parentOddButtonParser: OddButtonParser;
   private readonly specializedParserFactory: SpecializedParserFactory;
-  private wrappedSpecializedOddButtonWrapper: SpecializedOddButtonWrapper | undefined;
   private wrappedOddButton: ElementHandle;
+  private wrappedSpecializedOddButtonWrapper: SpecializedOddButtonWrapper | undefined;
   private wrappedReferenceSelector: string | undefined;
-  private wrappedReference: ElementHandle | undefined;
-  private wrappedReferenceToButtonXPath: string | undefined;
+  private wrappedReferenceElement: ElementHandle | undefined;
+  private wrappedReferenceElementToOddButtonXPath: string | undefined;
 
   private constructor({
     parentOddButtonParser,
@@ -48,21 +48,20 @@ export class OddButtonWrapper {
     return oddButtonWrapper;
   }
 
-  protected async init(): Promise<OddButtonWrapper> {
+  private async init(): Promise<OddButtonWrapper> {
     this.specializedOddButtonWrapper = await this.specializedParserFactory.createOddButtonWrapper({
       parentOddButtonParser: this.parentOddButtonParser,
       parentOddButtonWrapper: this,
     });
-
     this.referenceSelector = await this.specializedOddButtonWrapper.generateReferenceSelector();
-    this.reference = await this.initReference();
-
+    this.referenceElement = await this.findReferenceElement();
     return this;
   }
 
-  private async initReference(): Promise<ElementHandle> {
+  private async findReferenceElement(): Promise<ElementHandle> {
+    this.referenceElementToOddButtonXPath = '';
+
     let element = this.oddButton;
-    this.referenceToButtonXPath = '';
 
     while (element) {
       const matchesSelector = await element.evaluate(
@@ -71,12 +70,12 @@ export class OddButtonWrapper {
       );
 
       if (matchesSelector) {
-        this.reference = element;
-        return this.reference;
+        this.referenceElement = element;
+        return this.referenceElement;
       }
 
       const elementTagWithIndex = await this.getElementTagWithIndex({ element });
-      this.referenceToButtonXPath = elementTagWithIndex + this.referenceToButtonXPath;
+      this.referenceElementToOddButtonXPath = elementTagWithIndex + this.referenceElementToOddButtonXPath;
 
       const elementProperty = await element.getProperty('parentElement');
 
@@ -112,8 +111,9 @@ export class OddButtonWrapper {
     return `/${tag}[${index}]`;
   }
 
-  public async resetOddButtonFromReference(): Promise<ElementHandle> {
-    const button = await this.reference.$(`xpath${this.referenceToButtonXPath}`);
+  public async resetFromReference(): Promise<ElementHandle> {
+    // TODO: If there is anywhere to gain some consistent performance it's probably here
+    const button = await this.referenceElement.$(`xpath${this.referenceElementToOddButtonXPath}`);
 
     if (!button) {
       throw new Error(`button is null.`);
@@ -121,10 +121,10 @@ export class OddButtonWrapper {
 
     this.oddButton = button;
 
-    const oddButtonPositionIsConfirmed = await this.specializedOddButtonWrapper.confirmOddButtonPosition();
+    const oddButtonPositionVerified = await this.specializedOddButtonWrapper.verifyOddButtonPosition();
 
-    if (!oddButtonPositionIsConfirmed) {
-      throw new Error(`Odd button position is not confirmed.`);
+    if (!oddButtonPositionVerified) {
+      throw new Error(`Odd button position failed verification.`);
     }
 
     return this.oddButton
@@ -166,27 +166,27 @@ export class OddButtonWrapper {
     return this.wrappedReferenceSelector;
   }
 
-  private set reference(reference: ElementHandle) {
-    this.wrappedReference = reference;
+  private set referenceElement(referenceElement: ElementHandle) {
+    this.wrappedReferenceElement = referenceElement;
   }
 
-  public get reference(): ElementHandle {
-    if (!this.wrappedReference) {
-      throw new Error(`wrappedReference is undefined.`);
+  public get referenceElement(): ElementHandle {
+    if (!this.wrappedReferenceElement) {
+      throw new Error(`wrappedReferenceElement is undefined.`);
     }
 
-    return this.wrappedReference;
+    return this.wrappedReferenceElement;
   }
 
-  private set referenceToButtonXPath(referenceToButtonXPath: string) {
-    this.wrappedReferenceToButtonXPath = referenceToButtonXPath;
+  private set referenceElementToOddButtonXPath(referenceToButtonXPath: string) {
+    this.wrappedReferenceElementToOddButtonXPath = referenceToButtonXPath;
   }
 
-  private get referenceToButtonXPath(): string {
-    if (this.wrappedReferenceToButtonXPath === undefined) {
+  private get referenceElementToOddButtonXPath(): string {
+    if (this.wrappedReferenceElementToOddButtonXPath === undefined) {
       throw new Error(`wrappedReferenceToButtonXPath is undefined.`);
     }
 
-    return this.wrappedReferenceToButtonXPath;
+    return this.wrappedReferenceElementToOddButtonXPath;
   }
 }

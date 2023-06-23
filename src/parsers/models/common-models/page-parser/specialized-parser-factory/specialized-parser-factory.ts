@@ -37,10 +37,8 @@ export interface SpecializedParserFactory {
   }): Promise<SpecializedOddButtonParserSet>;
 
   createOddButtonParser({
-    parentPageParser,
     parentOddButtonParser,
   }: {
-    parentPageParser: PageParser,
     parentOddButtonParser: OddButtonParser,
   }): Promise<SpecializedOddButtonParser>;
 

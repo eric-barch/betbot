@@ -1,15 +1,14 @@
-import { Exchange, Game, League, Odd, Statistic } from '@prisma/client';
+import { Exchange, League, Odd, Statistic } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
+import { GameWithTeams } from '@/db';
 import {
   DbGameInitializer, DbOddInitializer, DbStatisticInitializer, OddButtonWrapper, PageParser,
-  ParserFactory,
-  SpecializedParserFactory,
+  SpecializedParserFactory
 } from '@/parsers/models/common-models';
-import { GameWithTeams } from '@/db';
 
 export interface SpecializedOddButtonParser {
-  updateOdd(): Promise<void>;
+  updateOdd(): Promise<Odd>;
 }
 
 export class OddButtonParser {
@@ -59,7 +58,6 @@ export class OddButtonParser {
 
   private async init(): Promise<OddButtonParser> {
     this.specializedOddButtonParser = await this.specializedParserFactory.createOddButtonParser({
-      parentPageParser: this.parentPageParser,
       parentOddButtonParser: this,
     });
     this.oddButtonWrapper = await OddButtonWrapper.create({
@@ -80,30 +78,26 @@ export class OddButtonParser {
     return this;
   }
 
-  public async updateOdd() {
-    await this.specializedOddButtonParser.updateOdd();
+  public async updateOdd(): Promise<Odd> {
+    return await this.specializedOddButtonParser.updateOdd();
   }
 
   public async resetOddButtonFromReference(): Promise<void> {
-    await this.oddButtonWrapper.resetOddButtonFromReference();
+    await this.oddButtonWrapper.resetFromReference();
   }
 
-  public async updateDbOddFromOddButtonTextContent(): Promise<void> {
-    await this.getTextContent();
+  public async writeTextContentToDb(): Promise<Odd> {
     await this.parseTextContent();
 
-    await this.dbOddInitializer.updateData({
+    return await this.dbOddInitializer.updateData({
       price: this.price,
       value: this.value,
     });
   }
 
-  private async getTextContent(): Promise<string | null> {
-    this.textContent = await (await this.button.getProperty('textContent')).jsonValue();
-    return this.textContent;
-  }
-
   private async parseTextContent(): Promise<void> {
+    this.textContent = await (await this.button.getProperty('textContent')).jsonValue();
+
     if (!this.textContent) {
       this.value = null;
       this.price = null;
@@ -137,7 +131,6 @@ export class OddButtonParser {
     throw new Error(`More than two numbers found in textContent.`);
   }
 
-
   public get exchange(): Exchange {
     return this.parentPageParser.exchange;
   }
@@ -160,22 +153,6 @@ export class OddButtonParser {
 
   public get odd(): Odd {
     return this.dbOddInitializer.odd;
-  }
-
-  public get price(): number | null {
-    if (this.wrappedPrice === undefined) {
-      throw new Error(`wrappedPrice is undefined.`);
-    }
-
-    return this.wrappedPrice;
-  }
-
-  public get value(): number | null {
-    if (this.wrappedValue === undefined) {
-      throw new Error(`wrappedValue is undefined.`);
-    }
-
-    return this.wrappedValue;
   }
 
   private set specializedOddButtonParser(specializedOddButtonParser: SpecializedOddButtonParser) {
@@ -254,7 +231,23 @@ export class OddButtonParser {
     this.wrappedPrice = price;
   }
 
+  private get price(): number | null {
+    if (this.wrappedPrice === undefined) {
+      throw new Error(`wrappedPrice is undefined.`);
+    }
+
+    return this.wrappedPrice;
+  }
+
   private set value(value: number | null) {
     this.wrappedValue = value;
+  }
+
+  private get value(): number | null {
+    if (this.wrappedValue === undefined) {
+      throw new Error(`wrappedValue is undefined.`);
+    }
+
+    return this.wrappedValue;
   }
 }

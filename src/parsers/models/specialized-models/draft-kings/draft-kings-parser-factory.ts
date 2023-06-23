@@ -39,7 +39,6 @@ export class DraftKingsParserFactory implements SpecializedParserFactory {
     parentOddButtonParser: OddButtonParser,
   }): Promise<SpecializedOddButtonParser> {
     return new DraftKingsOddButtonParser({
-      parentPageParser,
       parentOddButtonParser,
     });
   }

@@ -1,8 +1,8 @@
 import { GameWithTeams } from '@/db';
-import { OddButtonParser, ParserFactory, SpecializedParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbGameInitializer {
-  findOrCreateCorrespondingDbGame(): Promise<GameWithTeams>;
+  findOrCreateGame(): Promise<GameWithTeams>;
 }
 
 export class DbGameInitializer {
@@ -43,9 +43,17 @@ export class DbGameInitializer {
       parentDbGameInitializer: this,
     });
 
-    this.game = await this.specializedDbGameInitializer.findOrCreateCorrespondingDbGame();
+    this.game = await this.specializedDbGameInitializer.findOrCreateGame();
 
     return this;
+  }
+
+  public get game(): GameWithTeams {
+    if (!this.wrappedGame) {
+      throw new Error(`wrappedGame is undefined.`);
+    }
+
+    return this.wrappedGame;
   }
 
   private set specializedDbGameInitializer(specializedDbGameInitializer: SpecializedDbGameInitializer) {
@@ -58,14 +66,6 @@ export class DbGameInitializer {
     }
 
     return this.wrappedSpecializedDbGameInitializer;
-  }
-
-  public get game(): GameWithTeams {
-    if (!this.wrappedGame) {
-      throw new Error(`wrappedGame is undefined.`);
-    }
-
-    return this.wrappedGame;
   }
 
   private set game(game: GameWithTeams) {

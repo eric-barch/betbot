@@ -22,6 +22,6 @@ export class DraftKingsOddButtonParserSet implements SpecializedOddButtonParserS
   }
 
   public async updateOdds(): Promise<void> {
-    await this.parentOddButtonParserSet.updateOddsForEachButtonParser();
+    await this.parentOddButtonParserSet.updateOdds();
   }
 }
