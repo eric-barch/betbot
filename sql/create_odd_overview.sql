@@ -16,3 +16,5 @@ FROM
     INNER JOIN "Statistic" s ON g."id" = s."gameId"
     INNER JOIN "Odd" o ON s."id" = o."statisticId"
     INNER JOIN "Exchange" e ON o."exchangeId" = e."id"
+WHERE
+    (o."price" IS NOT NULL OR o."value" IS NOT NULL);

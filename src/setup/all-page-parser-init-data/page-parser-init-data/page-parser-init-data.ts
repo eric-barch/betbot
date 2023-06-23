@@ -1,19 +1,16 @@
-
 import { Exchange, League, Team } from '@prisma/client';
 
 import { prisma } from '@/db';
 
 import {
-  ExchangeInitData, LeagueInitData, PageTypeInitData, TeamsInitDataFactory, draftKingsInitData,
-  fanDuelInitData, gamesPageTypeInitData, mlbInitData, nbaInitData, nflInitData, sugarHouseInitData,
+  ExchangeInitData, LeagueInitData, TeamsInitDataFactory, draftKingsInitData, fanDuelInitData,
+  mlbInitData, nbaInitData, nflInitData, sugarHouseInitData,
 } from './init-data';
-
 
 export class PageParserInitData {
   private wrappedUrl: string;
   private wrappedExchangeInitData: ExchangeInitData;
   private wrappedLeagueInitData: LeagueInitData;
-  private wrappedPageTypeInitData: PageTypeInitData;
   private wrappedExchange: Exchange | undefined;
   private wrappedLeague: League | undefined;
 
@@ -25,16 +22,15 @@ export class PageParserInitData {
     this.wrappedUrl = pageUrl;
     this.wrappedExchangeInitData = this.parseExchangeInitData();
     this.wrappedLeagueInitData = this.parseLeagueInitData();
-    this.wrappedPageTypeInitData = this.parsePageTypeInitData();
   }
 
   public static async create({
     pageUrl,
   }: {
     pageUrl: string,
-  }) {
+  }): Promise<PageParserInitData> {
     const pageParserInitData = new PageParserInitData({ pageUrl });
-    await pageParserInitData.ensureObjectsInDb();
+    await pageParserInitData.init();
     return pageParserInitData;
   }
 
@@ -90,31 +86,10 @@ export class PageParserInitData {
     return this.leagueInitData;
   }
 
-  private parsePageTypeInitData(): PageTypeInitData {
-    switch (this.exchangeInitData) {
-      case draftKingsInitData:
-        this.pageTypeInitData = gamesPageTypeInitData;
-        break;
-      case fanDuelInitData:
-        this.pageTypeInitData = gamesPageTypeInitData;
-        break;
-        break;
-      case sugarHouseInitData:
-        this.pageTypeInitData = gamesPageTypeInitData;
-        break;
-    }
+  private async init(): Promise<PageParserInitData> {
+    this.exchange = await this.ensureExchangeInDb();
+    this.league = await this.ensureLeagueInDb();
 
-    if (!this.pageTypeInitData) {
-      throw new Error(`Did not find matching pageTypeInitData.`);
-    }
-
-    return this.wrappedPageTypeInitData;
-  }
-
-  private async ensureObjectsInDb(): Promise<PageParserInitData> {
-    await this.ensureExchangeInDb();
-    await this.ensureLeagueInDb();
-    await this.ensureTeamsInDb();
     return this;
   }
 
@@ -146,10 +121,12 @@ export class PageParserInitData {
       },
     });
 
+    await this.ensureLeagueTeamsInDb();
+
     return this.league;
   }
 
-  private async ensureTeamsInDb(): Promise<Array<Team>> {
+  private async ensureLeagueTeamsInDb(): Promise<Array<Team>> {
     const teamsInitData = TeamsInitDataFactory.getLeagueTeams({ league: this.league });
 
     const teams = await Promise.all(
@@ -180,60 +157,11 @@ export class PageParserInitData {
     return teams;
   }
 
-
-  public matches({
-    exchangeInitData,
-    leagueInitData,
-    pageTypeInitData,
-  }: {
-    exchangeInitData: ExchangeInitData,
-    leagueInitData: LeagueInitData,
-    pageTypeInitData: PageTypeInitData,
-  }): boolean {
-    const exchangeMatches = (this.wrappedExchangeInitData === exchangeInitData);
-    const leagueMatches = (this.wrappedLeagueInitData === leagueInitData);
-    const pageTypeMatches = (this.wrappedPageTypeInitData === pageTypeInitData);
-
-    if (exchangeMatches && leagueMatches && pageTypeMatches) {
-      return true;
-    }
-
-    return false;
-  }
-
   public get url(): string {
     return this.wrappedUrl;
   }
 
-  private set exchangeInitData(exchangeInitData: ExchangeInitData) {
-    this.wrappedExchangeInitData = exchangeInitData;
-  }
-
-  public get exchangeInitData(): ExchangeInitData {
-    return this.wrappedExchangeInitData;
-  }
-
-  private set leagueInitData(leagueInitData: LeagueInitData) {
-    this.wrappedLeagueInitData = leagueInitData;
-  }
-
-  public get leagueInitData(): LeagueInitData {
-    return this.wrappedLeagueInitData;
-  }
-
-  private set pageTypeInitData(pageTypeInitData: PageTypeInitData) {
-    this.wrappedPageTypeInitData = pageTypeInitData;
-  }
-
-  public get pageTypeInitData(): PageTypeInitData {
-    return this.wrappedPageTypeInitData;
-  }
-
-  private set exchange(exchange: Exchange) {
-    this.wrappedExchange = exchange;
-  }
-
-  private get exchange(): Exchange {
+  public get exchange(): Exchange {
     if (!this.wrappedExchange) {
       throw new Error(`wrappedExchange is undefined.`);
     }
@@ -241,15 +169,35 @@ export class PageParserInitData {
     return this.wrappedExchange;
   }
 
-  private set league(league: League) {
-    this.wrappedLeague = league;
-  }
-
-  private get league(): League {
+  public get league(): League {
     if (!this.wrappedLeague) {
       throw new Error(`wrappedLeague is undefined.`);
     }
 
     return this.wrappedLeague;
+  }
+
+  private set exchangeInitData(exchangeInitData: ExchangeInitData) {
+    this.wrappedExchangeInitData = exchangeInitData;
+  }
+
+  private get exchangeInitData(): ExchangeInitData {
+    return this.wrappedExchangeInitData;
+  }
+
+  private set leagueInitData(leagueInitData: LeagueInitData) {
+    this.wrappedLeagueInitData = leagueInitData;
+  }
+
+  private get leagueInitData(): LeagueInitData {
+    return this.wrappedLeagueInitData;
+  }
+
+  private set exchange(exchange: Exchange) {
+    this.wrappedExchange = exchange;
+  }
+
+  private set league(league: League) {
+    this.wrappedLeague = league;
   }
 }

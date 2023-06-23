@@ -55,7 +55,6 @@ model Game {
   awayTeamId Int
   homeTeam   Team             @relation("HomeTeamOnGame", fields: [homeTeamId], references: [id])
   homeTeamId Int
-  active     Boolean
   exchanges  ExchangeToGame[]
   statistics Statistic[]
 }
