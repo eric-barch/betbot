@@ -1,4 +1,4 @@
-import { Exchange } from '@prisma/client';
+import { Exchange, League } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
 import { GameWithTeams } from '@/db';
@@ -56,6 +56,10 @@ export class DbGameInitializer {
 
   public get exchange(): Exchange {
     return this.parentOddButtonParser.exchange;
+  }
+
+  public get league(): League {
+    return this.parentOddButtonParser.league;
   }
 
   public get game(): GameWithTeams {
