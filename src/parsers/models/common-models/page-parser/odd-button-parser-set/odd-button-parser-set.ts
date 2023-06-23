@@ -9,7 +9,7 @@ export interface SpecializedOddButtonParserSet {
 
 export class OddButtonParserSet {
   private readonly parentPageParser: PageParser;
-  private readonly parserFactory: SpecializedParserFactory;
+  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedOddButtonParserSet: SpecializedOddButtonParserSet | undefined;
   private wrappedOddButtonSelector: string | undefined;
   private wrappedButtons: Array<ElementHandle> | undefined;
@@ -17,25 +17,25 @@ export class OddButtonParserSet {
 
   private constructor({
     parentPageParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentPageParser: PageParser,
-    parserFactory: SpecializedParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentPageParser = parentPageParser;
-    this.parserFactory = parserFactory;
+    this.specializedParserFactory = specializedParserFactory;
   }
 
   public static async create({
     parentPageParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentPageParser: PageParser,
-    parserFactory: SpecializedParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }): Promise<OddButtonParserSet> {
     const commonOddButtonParserSet = new OddButtonParserSet({
       parentPageParser,
-      parserFactory,
+      specializedParserFactory,
     });
     await commonOddButtonParserSet.init();
     return commonOddButtonParserSet;
@@ -44,7 +44,7 @@ export class OddButtonParserSet {
   private async init(): Promise<OddButtonParserSet> {
     await this.parentPageParser.reloadPage();
 
-    this.specializedOddButtonParserSet = await this.parserFactory.createOddButtonParserSet({
+    this.specializedOddButtonParserSet = await this.specializedParserFactory.createOddButtonParserSet({
       parentPageParser: this.parentPageParser,
       parentOddButtonParserSet: this,
     });
@@ -69,7 +69,7 @@ export class OddButtonParserSet {
     // for (const oddButton of this.oddButtons) {
     //   const oddButtonParser = await OddButtonParser.create({
     //     parentPageParser: this.parentPageParser,
-    //     parserFactory: this.parserFactory,
+    //     specializedParserFactory: this.specializedParserFactory,
     //     initializationButton: oddButton,
     //   });
     //   this.oddButtonParsers.add(oddButtonParser);
@@ -80,7 +80,7 @@ export class OddButtonParserSet {
       this.oddButtons.map(async (oddButton) => {
         const oddButtonParser = await OddButtonParser.create({
           parentPageParser: this.parentPageParser,
-          parserFactory: this.parserFactory,
+          specializedParserFactory: this.specializedParserFactory,
           initializationButton: oddButton,
         });
         this.oddButtonParsers.add(oddButtonParser);

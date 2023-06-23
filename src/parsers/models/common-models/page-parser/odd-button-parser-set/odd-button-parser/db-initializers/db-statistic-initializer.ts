@@ -9,38 +9,38 @@ export interface SpecializedDbStatisticInitializer {
 
 export class DbStatisticInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly parserFactory: SpecializedParserFactory;
+  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbStatisticInitializer: SpecializedDbStatisticInitializer | undefined;
   private wrappedStatistic: Statistic | undefined;
 
   private constructor({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: SpecializedParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.parserFactory = parserFactory;
+    this.specializedParserFactory = specializedParserFactory;
   }
 
   public static async create({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: SpecializedParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }): Promise<DbStatisticInitializer> {
     const dbStatisticInitializer = new DbStatisticInitializer({
       parentOddButtonParser,
-      parserFactory,
+      specializedParserFactory,
     });
     await dbStatisticInitializer.init();
     return dbStatisticInitializer;
   }
 
   private async init(): Promise<DbStatisticInitializer> {
-    this.specializedDbStatisticInitializer = await this.parserFactory.createDbStatisticInitializer({
+    this.specializedDbStatisticInitializer = await this.specializedParserFactory.createDbStatisticInitializer({
       parentOddButtonParser: this.parentOddButtonParser,
       parentDbStatisticInitializer: this,
     });

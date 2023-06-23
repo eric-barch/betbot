@@ -9,7 +9,7 @@ export interface SpecializedOddButtonWrapper {
 
 export class OddButtonWrapper {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly parserFactory: SpecializedParserFactory;
+  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedOddButtonWrapper: SpecializedOddButtonWrapper | undefined;
   private wrappedOddButton: ElementHandle;
   private wrappedReferenceSelector: string | undefined;
@@ -18,30 +18,30 @@ export class OddButtonWrapper {
 
   private constructor({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
     initializationButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: SpecializedParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.parserFactory = parserFactory;
+    this.specializedParserFactory = specializedParserFactory;
     this.wrappedOddButton = initializationButton;
   }
 
   public static async create({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
     initializationButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: SpecializedParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }): Promise<OddButtonWrapper> {
     const oddButtonWrapper = new OddButtonWrapper({
       parentOddButtonParser,
-      parserFactory,
+      specializedParserFactory,
       initializationButton,
     });
     await oddButtonWrapper.init();
@@ -49,7 +49,7 @@ export class OddButtonWrapper {
   }
 
   protected async init(): Promise<OddButtonWrapper> {
-    this.specializedOddButtonWrapper = await this.parserFactory.createOddButtonWrapper({
+    this.specializedOddButtonWrapper = await this.specializedParserFactory.createOddButtonWrapper({
       parentOddButtonParser: this.parentOddButtonParser,
       parentOddButtonWrapper: this,
     });
