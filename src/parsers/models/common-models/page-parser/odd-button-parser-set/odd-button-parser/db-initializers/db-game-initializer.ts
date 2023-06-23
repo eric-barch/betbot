@@ -7,38 +7,38 @@ export interface SpecializedDbGameInitializer {
 
 export class DbGameInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly parserFactory: SpecializedParserFactory;
+  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbGameInitializer: SpecializedDbGameInitializer | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: SpecializedParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.parserFactory = parserFactory;
+    this.specializedParserFactory = specializedParserFactory;
   }
 
   public static async create({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: SpecializedParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }): Promise<DbGameInitializer> {
     const dbGameInitializer = new DbGameInitializer({
       parentOddButtonParser,
-      parserFactory,
+      specializedParserFactory,
     });
     await dbGameInitializer.init();
     return dbGameInitializer;
   }
 
   private async init(): Promise<DbGameInitializer> {
-    this.specializedDbGameInitializer = await this.parserFactory.createDbGameInitializer({
+    this.specializedDbGameInitializer = await this.specializedParserFactory.createDbGameInitializer({
       parentOddButtonParser: this.parentOddButtonParser,
       parentDbGameInitializer: this,
     });

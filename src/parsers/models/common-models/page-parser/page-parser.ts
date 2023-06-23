@@ -42,7 +42,7 @@ export class PageParser {
     this.jsonGamesParser = await this.specializedParserFactory.createJsonGamesParser({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
-      parserFactory: this.specializedParserFactory,
+      specializedParserFactory: this.specializedParserFactory,
     });
 
     return this;
