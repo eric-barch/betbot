@@ -75,7 +75,7 @@ export class DraftKingsDbStatisticInitializer implements SpecializedDbStatisticI
       throw new Error(`button is null.`);
     }
 
-    const ariaLabel = await (await button.getProperty('ariaLabel')).jsonValue();
+    const ariaLabel = await button.evaluate(el => el.ariaLabel);
 
     if (!ariaLabel) {
       throw new Error(`ariaLabel is null.`)

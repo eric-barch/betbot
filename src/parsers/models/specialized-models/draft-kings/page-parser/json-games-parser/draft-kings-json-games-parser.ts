@@ -39,7 +39,7 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
 
     const jsonGames = await Promise.all(
       gameScriptElements.map(async (gameScriptElement) => {
-        const textContent = await (await gameScriptElement.getProperty('textContent')).jsonValue();
+        const textContent = await gameScriptElement.evaluate(el => el.textContent);
 
         if (!textContent) {
           return;

@@ -70,7 +70,7 @@ export class DraftKingsMatchupParser {
     const nodeNameToFind = 'tr';
 
     while (ancestor) {
-      const nodeName = await (await ancestor.getProperty('nodeName')).jsonValue();
+      const nodeName = await ancestor.evaluate(el => el.nodeName);
 
       if (nodeName.toLowerCase() === nodeNameToFind) {
         this.teamRowElement = ancestor;

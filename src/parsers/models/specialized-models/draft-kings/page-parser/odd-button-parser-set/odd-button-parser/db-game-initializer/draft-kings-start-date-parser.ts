@@ -42,7 +42,7 @@ export class DraftKingsStartDateParser {
       throw new Error(`dateTableHeaderElement is null.`);
     }
 
-    const dateString = await (await dateTableHeaderElement.getProperty('textContent')).jsonValue();
+    const dateString = await dateTableElement.evaluate(el => el.textContent);
 
     if (!dateString) {
       throw new Error(`dateString is null.`);
@@ -59,7 +59,7 @@ export class DraftKingsStartDateParser {
     const classNameToFind = 'parlay-card-10-a';
 
     while (ancestor) {
-      const className = await (await ancestor.getProperty('className')).jsonValue();
+      const className = await ancestor.evaluate(el => el.className);
 
       if (className === classNameToFind) {
         return ancestor;
@@ -85,7 +85,7 @@ export class DraftKingsStartDateParser {
       throw new Error(`timeElement is null.`);
     }
 
-    const timeString = await (await timeElement.getProperty('textContent')).jsonValue();
+    const timeString = await timeElement.evaluate(el => el.textContent);
 
     if (!timeString) {
       throw new Error(`timeString is null.`);
@@ -102,7 +102,7 @@ export class DraftKingsStartDateParser {
     const nodeNameToFind = 'tr';
 
     while (ancestor) {
-      const nodeName = await (await ancestor.getProperty('nodeName')).jsonValue();
+      const nodeName = await ancestor.evaluate(el => el.nodeName);
 
       if (nodeName.toLowerCase() === nodeNameToFind) {
         return ancestor;
