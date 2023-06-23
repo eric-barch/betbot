@@ -1,35 +1,47 @@
-import { PageParser } from '@/parsers';
-import { allPageParserInitData } from '@/setup';
+import { PageParser, ParserFactory } from '@/parsers/models/common-models';
+import { DraftKingsParserFactory } from '@/parsers/models/specialized-models';
+import { AllPageParserInitData, pageUrls } from '@/setup';
 
-import { DraftKingsParserFactory } from '../models/specialized-models/draft-kings/draft-kings-parser-factory';
-import { ParserFactory } from '../models/common-models/parser-factory';
+// TODO: Implement as a singleton
+export class AllPageParsers {
+  private wrappedPageParsers: Set<PageParser> | undefined;
 
-class AllPageParsers {
-  private set: Set<PageParser> = new Set<PageParser>();
+  public static async create(): Promise<AllPageParsers> {
+    const allPageParsers = new AllPageParsers();
+    await allPageParsers.init();
+    return allPageParsers;
+  }
 
   public async init(): Promise<AllPageParsers> {
-    await allPageParserInitData.init();
+    const allPageParserInitData = await AllPageParserInitData.create({ pageUrls });
+
+    this.pageParsers = new Set<PageParser>();
 
     await Promise.all(
-      Array.from(allPageParserInitData).map(async (initData) => {
-        const exchangeName = initData.exchangeInitData.name;
+      Array.from(allPageParserInitData.pageParserInitData).map(async (pageParserInitData) => {
+        const exchange = pageParserInitData.exchange;
+        const league = pageParserInitData.league;
 
         let parserFactory: ParserFactory;
 
-        switch (exchangeName) {
+        switch (exchange.name) {
           case 'DraftKings':
+            // TODO: Do we want to instantiate a new parser factory for each DraftKings page? Or 
+            // should we just use one parser factory for all DraftKings pages?
             parserFactory = new DraftKingsParserFactory();
             break;
           default:
-            throw new Error(`Exchange ${exchangeName} is not supported.`);
+            throw new Error(`Exchange ${exchange.name} is not supported.`);
         }
 
         const pageParser = await PageParser.create({
-          initData,
+          exchange,
+          league,
+          url: pageParserInitData.url,
           parserFactory,
         });
 
-        this.set.add(pageParser);
+        this.pageParsers.add(pageParser);
       })
     );
 
@@ -40,11 +52,10 @@ class AllPageParsers {
     const start = Date.now();
 
     await Promise.all(
-      Array.from(this.set).map(async (pageParser) => {
+      Array.from(this.pageParsers).map(async (pageParser) => {
         await pageParser.updateOdds();
       })
     );
-
 
     const end = Date.now();
 
@@ -54,13 +65,23 @@ class AllPageParsers {
 
   public async disconnect(): Promise<AllPageParsers> {
     await Promise.all(
-      Array.from(this.set).map(async (pageParser) => {
+      Array.from(this.pageParsers).map(async (pageParser) => {
         await pageParser.disconnect();
       })
     );
 
     return this;
   }
-}
 
-export const allPageParsers = new AllPageParsers();
+  private set pageParsers(pageParsers: Set<PageParser>) {
+    this.wrappedPageParsers = pageParsers;
+  }
+
+  private get pageParsers(): Set<PageParser> {
+    if (!this.wrappedPageParsers) {
+      throw new Error('Page parsers have not been initialized.');
+    }
+
+    return this.wrappedPageParsers;
+  }
+}

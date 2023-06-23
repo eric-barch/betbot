@@ -42,7 +42,6 @@ export class DbUtilityFunctions {
           awayTeam: { connect: { id: awayTeam.id } },
           homeTeam: { connect: { id: homeTeam.id } },
           startDate,
-          active: true,
         },
         include: {
           awayTeam: true,

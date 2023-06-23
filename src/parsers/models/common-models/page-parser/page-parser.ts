@@ -1,42 +1,51 @@
 import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
-
 import {
-  DbExchangeInitializer, DbLeagueInitializer, OddButtonParserSet, ParserFactory,
-  SpecializedJsonGamesParser, Webpage,
+  OddButtonParserSet, ParserFactory, SpecializedJsonGamesParser, Webpage,
 } from '@/parsers/models/common-models';
-import { PageParserInitData } from '@/setup';
 
 export class PageParser {
-  private readonly initData: PageParserInitData;
+  public readonly exchange: Exchange;
+  public readonly league: League;
+  private readonly url: string;
   private readonly parserFactory: ParserFactory;
   private wrappedWebpage: Webpage | undefined;
-  private wrappedDbExchangeInitializer: DbExchangeInitializer | undefined;
-  private wrappedDbLeagueInitializer: DbLeagueInitializer | undefined;
   private wrappedJsonGamesParser: SpecializedJsonGamesParser | undefined;
   private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
 
   private constructor({
-    initData,
+    exchange,
+    league,
+    url,
     parserFactory,
   }: {
-    initData: PageParserInitData,
+    exchange: Exchange,
+    league: League,
+    url: string,
     parserFactory: ParserFactory,
   }) {
-    this.initData = initData;
+    this.exchange = exchange;
+    this.league = league;
+    this.url = url;
     this.parserFactory = parserFactory;
   }
 
   public static async create({
-    initData,
+    exchange,
+    league,
+    url,
     parserFactory,
   }: {
-    initData: PageParserInitData,
+    exchange: Exchange,
+    league: League,
+    url: string,
     parserFactory: ParserFactory,
   }): Promise<PageParser> {
     const pageParser = new PageParser({
-      initData,
+      url,
+      exchange,
+      league,
       parserFactory,
     });
     await pageParser.init();
@@ -44,9 +53,7 @@ export class PageParser {
   }
 
   private async init(): Promise<PageParser> {
-    this.webpage = await Webpage.create({ url: this.initData.url });
-    this.dbExchangeInitializer = await DbExchangeInitializer.create({ initData: this.initData.exchangeInitData });
-    this.dbLeagueInitializer = await DbLeagueInitializer.create({ initData: this.initData.leagueInitData });
+    this.webpage = await Webpage.create({ url: this.url });
     this.jsonGamesParser = await this.parserFactory.createJsonGamesParser({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
@@ -68,6 +75,10 @@ export class PageParser {
     await this.webpage.disconnect();
   }
 
+  public get page(): Page {
+    return this.webpage.page;
+  }
+
   private set webpage(webpage: Webpage) {
     this.wrappedWebpage = webpage;
   }
@@ -78,30 +89,6 @@ export class PageParser {
     }
 
     return this.wrappedWebpage;
-  }
-
-  private set dbExchangeInitializer(dbExchangeInitializer: DbExchangeInitializer) {
-    this.wrappedDbExchangeInitializer = dbExchangeInitializer;
-  }
-
-  private get dbExchangeInitializer(): DbExchangeInitializer {
-    if (!this.wrappedDbExchangeInitializer) {
-      throw new Error(`wrappedDbExchangeInitializer is undefined.`);
-    }
-
-    return this.wrappedDbExchangeInitializer;
-  }
-
-  private set dbLeagueInitializer(dbLeagueInitializer: DbLeagueInitializer) {
-    this.wrappedDbLeagueInitializer = dbLeagueInitializer;
-  }
-
-  private get dbLeagueInitializer(): DbLeagueInitializer {
-    if (!this.wrappedDbLeagueInitializer) {
-      throw new Error(`wrappedDbLeagueInitializer is undefined.`);
-    }
-
-    return this.wrappedDbLeagueInitializer;
   }
 
   private set jsonGamesParser(jsonGamesParser: SpecializedJsonGamesParser) {
@@ -120,23 +107,11 @@ export class PageParser {
     this.wrappedOddButtonParserSet = oddButtonParserSet;
   }
 
-  public get oddButtonParserSet(): OddButtonParserSet {
+  private get oddButtonParserSet(): OddButtonParserSet {
     if (!this.wrappedOddButtonParserSet) {
       throw new Error(`wrappedOddButtonParserSet is undefined.`);
     }
 
     return this.wrappedOddButtonParserSet;
-  }
-
-  public get page(): Page {
-    return this.webpage.page;
-  }
-
-  public get exchange(): Exchange {
-    return this.dbExchangeInitializer.exchange;
-  }
-
-  public get league(): League {
-    return this.dbLeagueInitializer.league
   }
 }

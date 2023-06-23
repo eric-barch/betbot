@@ -1,2 +1,2 @@
 export * from './all-page-parser-init-data';
-export * from './page-urls';
+export * from './page-parser-init-data';
