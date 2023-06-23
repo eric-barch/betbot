@@ -4,12 +4,11 @@ import { DbGameInitializer } from '@/parsers/models/common-models';
 import { DraftKingsMatchupParser } from './draft-kings-matchup-parser';
 import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
 
-
 export class DraftKingsGameParser {
   private readonly parentDbGameInitializer: DbGameInitializer;
   private exchangeAssignedGameId: string;
-  private startDateParser: DraftKingsStartDateParser;
-  private matchupParser: DraftKingsMatchupParser;
+  private wrappedStartDateParser: DraftKingsStartDateParser | undefined;
+  private wrappedMatchupParser: DraftKingsMatchupParser | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
@@ -21,8 +20,6 @@ export class DraftKingsGameParser {
   }) {
     this.parentDbGameInitializer = parentDbGameInitializer;
     this.exchangeAssignedGameId = exchangeAssignedGameId;
-    this.startDateParser = new DraftKingsStartDateParser({ parentDbGameInitializer });
-    this.matchupParser = new DraftKingsMatchupParser({ parentDbGameInitializer });
   }
 
   public static async create({
@@ -36,13 +33,13 @@ export class DraftKingsGameParser {
       parentDbGameInitializer,
       exchangeAssignedGameId,
     });
-    await gameDetailsParser.parse();
+    await gameDetailsParser.init();
     return gameDetailsParser;
   }
 
-  private async parse(): Promise<GameWithTeams> {
-    await this.startDateParser.parse();
-    await this.matchupParser.parse();
+  private async init(): Promise<GameWithTeams> {
+    this.startDateParser = await DraftKingsStartDateParser.create({ parentDbGameInitializer: this.parentDbGameInitializer });
+    this.matchupParser = await DraftKingsMatchupParser.create({ parentDbGameInitializer: this.parentDbGameInitializer });
 
     this.game = await DbUtilityFunctions.findOrCreateGameByMatchupAndStartDate({
       awayTeam: this.matchupParser.awayTeam,
@@ -80,6 +77,30 @@ export class DraftKingsGameParser {
     }
 
     return this.wrappedGame;
+  }
+
+  private set startDateParser(startDateParser: DraftKingsStartDateParser) {
+    this.wrappedStartDateParser = startDateParser;
+  }
+
+  private get startDateParser(): DraftKingsStartDateParser {
+    if (!this.wrappedStartDateParser) {
+      throw new Error(`wrappedStartDateParser is undefined.`);
+    }
+
+    return this.wrappedStartDateParser;
+  }
+
+  private set matchupParser(matchupParser: DraftKingsMatchupParser) {
+    this.wrappedMatchupParser = matchupParser;
+  }
+
+  private get matchupParser(): DraftKingsMatchupParser {
+    if (!this.wrappedMatchupParser) {
+      throw new Error(`wrappedMatchupParser is undefined.`);
+    }
+
+    return this.wrappedMatchupParser;
   }
 
   private set game(game: GameWithTeams) {

@@ -1,27 +1,37 @@
 import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParser } from '@/parsers/models/common-models';
+import { DbGameInitializer } from '@/parsers/models/common-models';
 
 export class DraftKingsStartDateParser {
-  private parentOddButtonParser: OddButtonParser;
+  private readonly parentDbGameInitializer: DbGameInitializer;
   private wrappedDateString: string | undefined;
   private wrappedTimeString: string | undefined;
   private wrappedStartDate: Date | undefined;
 
-  constructor({
-    parentOddButtonParser,
+  private constructor({
+    parentDbGameInitializer,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parentDbGameInitializer: DbGameInitializer,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
+    this.parentDbGameInitializer = parentDbGameInitializer;
   }
 
-  public async parse(): Promise<Date> {
-    await this.parseDateString();
-    await this.parseTimeString();
-    this.parseStartDate();
-    return this.startDate;
+  public static async create({
+    parentDbGameInitializer,
+  }: {
+    parentDbGameInitializer: DbGameInitializer,
+  }): Promise<DraftKingsStartDateParser> {
+    const startDateParser = new DraftKingsStartDateParser({ parentDbGameInitializer });
+    await startDateParser.init();
+    return startDateParser;
+  }
+
+  public async init(): Promise<DraftKingsStartDateParser> {
+    this.dateString = await this.parseDateString();
+    this.timeString = await this.parseTimeString();
+    this.startDate = this.parseStartDate();
+    return this;
   }
 
   private async parseDateString(): Promise<string> {
@@ -44,7 +54,7 @@ export class DraftKingsStartDateParser {
   }
 
   private async getDateTableElement(): Promise<ElementHandle> {
-    let ancestor = this.parentOddButtonParser.button;
+    let ancestor = this.parentDbGameInitializer.button;
 
     const classNameToFind = 'parlay-card-10-a';
 
@@ -87,7 +97,7 @@ export class DraftKingsStartDateParser {
   }
 
   private async getTeamRowElement(): Promise<ElementHandle> {
-    let ancestor = this.parentOddButtonParser.button;
+    let ancestor = this.parentDbGameInitializer.button;
 
     const nodeNameToFind = 'tr';
 
