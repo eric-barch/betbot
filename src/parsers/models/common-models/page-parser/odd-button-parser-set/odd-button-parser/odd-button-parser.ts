@@ -96,7 +96,7 @@ export class OddButtonParser {
   }
 
   private async parseTextContent(): Promise<void> {
-    this.textContent = await (await this.button.getProperty('textContent')).jsonValue();
+    this.textContent = await this.button.evaluate(el => el.textContent);
 
     if (!this.textContent) {
       this.value = null;

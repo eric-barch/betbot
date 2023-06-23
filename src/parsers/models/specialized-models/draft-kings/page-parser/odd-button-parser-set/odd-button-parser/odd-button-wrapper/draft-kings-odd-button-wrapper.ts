@@ -32,7 +32,6 @@ export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
       return false;
     }
 
-    // TODO: Replace all 'getProperty's with 'evaluate's.
     const teamNameElementTextContent = (await teamNameElement.evaluate((el) => el.textContent))?.toLowerCase();
 
     if (!teamNameElementTextContent) {
