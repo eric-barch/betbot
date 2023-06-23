@@ -1,5 +1,6 @@
 import { PageParserInitData } from './page-parser-init-data';
 
+// TODO: Implement as singleton
 export class AllPageParserInitData {
   private pageUrls: Array<string>;
   private wrappedPageParserInitData: Set<PageParserInitData> | undefined;

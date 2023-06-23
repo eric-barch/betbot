@@ -43,9 +43,9 @@ export class PageParser {
     parserFactory: ParserFactory,
   }): Promise<PageParser> {
     const pageParser = new PageParser({
-      url,
       exchange,
       league,
+      url,
       parserFactory,
     });
     await pageParser.init();
@@ -54,6 +54,7 @@ export class PageParser {
 
   private async init(): Promise<PageParser> {
     this.webpage = await Webpage.create({ url: this.url });
+    // TODO: Don't believe jsonGames are re-polled when the page is reloaded
     this.jsonGamesParser = await this.parserFactory.createJsonGamesParser({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
@@ -68,7 +69,7 @@ export class PageParser {
   }
 
   public async reloadPage(): Promise<void> {
-    await this.webpage.reloadPage();
+    await this.webpage.reload();
   }
 
   public async disconnect(): Promise<void> {

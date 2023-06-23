@@ -91,7 +91,7 @@ export class Webpage {
     return this.page;
   }
 
-  public async reloadPage(): Promise<void> {
+  public async reload(): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
       this.page.reload(),
