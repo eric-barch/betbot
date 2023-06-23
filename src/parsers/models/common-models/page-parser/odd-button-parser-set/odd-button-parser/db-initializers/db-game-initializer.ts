@@ -1,51 +1,73 @@
+import { Exchange, League } from '@prisma/client';
+import { ElementHandle } from 'puppeteer';
+
 import { GameWithTeams } from '@/db';
-import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbGameInitializer {
-  findOrCreateCorrespondingDbGame(): Promise<GameWithTeams>;
+  findOrCreateGame(): Promise<GameWithTeams>;
 }
 
 export class DbGameInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly parserFactory: ParserFactory;
+  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbGameInitializer: SpecializedDbGameInitializer | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.parserFactory = parserFactory;
+    this.specializedParserFactory = specializedParserFactory;
   }
 
   public static async create({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }): Promise<DbGameInitializer> {
     const dbGameInitializer = new DbGameInitializer({
       parentOddButtonParser,
-      parserFactory,
+      specializedParserFactory,
     });
     await dbGameInitializer.init();
     return dbGameInitializer;
   }
 
   private async init(): Promise<DbGameInitializer> {
-    this.specializedDbGameInitializer = await this.parserFactory.createDbGameInitializer({
-      parentOddButtonParser: this.parentOddButtonParser,
+    this.specializedDbGameInitializer = await this.specializedParserFactory.createDbGameInitializer({
       parentDbGameInitializer: this,
     });
 
-    this.game = await this.specializedDbGameInitializer.findOrCreateCorrespondingDbGame();
+    this.game = await this.specializedDbGameInitializer.findOrCreateGame();
 
     return this;
+  }
+
+  public get button(): ElementHandle | null {
+    return this.parentOddButtonParser.button;
+  }
+
+  public get exchange(): Exchange {
+    return this.parentOddButtonParser.exchange;
+  }
+
+  public get league(): League {
+    return this.parentOddButtonParser.league;
+  }
+
+  public get game(): GameWithTeams {
+    if (!this.wrappedGame) {
+      throw new Error(`wrappedGame is undefined.`);
+    }
+
+    return this.wrappedGame;
   }
 
   private set specializedDbGameInitializer(specializedDbGameInitializer: SpecializedDbGameInitializer) {
@@ -58,14 +80,6 @@ export class DbGameInitializer {
     }
 
     return this.wrappedSpecializedDbGameInitializer;
-  }
-
-  public get game(): GameWithTeams {
-    if (!this.wrappedGame) {
-      throw new Error(`wrappedGame is undefined.`);
-    }
-
-    return this.wrappedGame;
   }
 
   private set game(game: GameWithTeams) {

@@ -1,15 +1,14 @@
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParser, PageParser, ParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser, PageParser, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParserSet {
   generateOddButtonSelector(): Promise<string>;
-  updateOdds(): Promise<void>;
 }
 
 export class OddButtonParserSet {
   private readonly parentPageParser: PageParser;
-  private readonly parserFactory: ParserFactory;
+  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedOddButtonParserSet: SpecializedOddButtonParserSet | undefined;
   private wrappedOddButtonSelector: string | undefined;
   private wrappedButtons: Array<ElementHandle> | undefined;
@@ -17,42 +16,35 @@ export class OddButtonParserSet {
 
   private constructor({
     parentPageParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentPageParser: PageParser,
-    parserFactory: ParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentPageParser = parentPageParser;
-    this.parserFactory = parserFactory;
+    this.specializedParserFactory = specializedParserFactory;
   }
 
   public static async create({
     parentPageParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentPageParser: PageParser,
-    parserFactory: ParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }): Promise<OddButtonParserSet> {
     const commonOddButtonParserSet = new OddButtonParserSet({
       parentPageParser,
-      parserFactory,
+      specializedParserFactory,
     });
     await commonOddButtonParserSet.init();
     return commonOddButtonParserSet;
   }
 
   private async init(): Promise<OddButtonParserSet> {
-    await this.parentPageParser.reloadPage();
-
-    this.specializedOddButtonParserSet = await this.parserFactory.createOddButtonParserSet({
-      parentPageParser: this.parentPageParser,
-      parentOddButtonParserSet: this,
-    });
-
+    this.specializedOddButtonParserSet = await this.specializedParserFactory.createOddButtonParserSet({ parentOddButtonParserSet: this });
     this.oddButtonSelector = await this.specializedOddButtonParserSet.generateOddButtonSelector();
     this.oddButtons = await this.scrapeOddButtons();
     this.oddButtonParsers = await this.createOddButtonParsers();
-
     return this;
   }
 
@@ -69,7 +61,7 @@ export class OddButtonParserSet {
     // for (const oddButton of this.oddButtons) {
     //   const oddButtonParser = await OddButtonParser.create({
     //     parentPageParser: this.parentPageParser,
-    //     parserFactory: this.parserFactory,
+    //     specializedParserFactory: this.specializedParserFactory,
     //     initializationButton: oddButton,
     //   });
     //   this.oddButtonParsers.add(oddButtonParser);
@@ -80,7 +72,7 @@ export class OddButtonParserSet {
       this.oddButtons.map(async (oddButton) => {
         const oddButtonParser = await OddButtonParser.create({
           parentPageParser: this.parentPageParser,
-          parserFactory: this.parserFactory,
+          specializedParserFactory: this.specializedParserFactory,
           initializationButton: oddButton,
         });
         this.oddButtonParsers.add(oddButtonParser);
@@ -91,25 +83,13 @@ export class OddButtonParserSet {
   }
 
   public async updateOdds(): Promise<void> {
-    await this.specializedOddButtonParserSet.updateOdds();
-  }
-
-  public async updateOddsForEachButtonParser(): Promise<void> {
     // Run in series (development)
-    // try {
-    //   for (const oddButtonParser of this.oddButtonParsers) {
-    //     await oddButtonParser.updateOdd();
-    //   }
-    // } catch {
-    //   await this.init();
+    // for (const oddButtonParser of this.oddButtonParsers) {
+    //   await oddButtonParser.updateOdd();
     // }
 
     // Run in parallel (production)
-    try {
-      await Promise.all(Array.from(this.oddButtonParsers).map(oddButtonParser => oddButtonParser.updateOdd()));
-    } catch {
-      await this.init();
-    }
+    await Promise.all(Array.from(this.oddButtonParsers).map(oddButtonParser => oddButtonParser.updateOdd()));
   };
 
   private set specializedOddButtonParserSet(specializedOddButtonParserSet: SpecializedOddButtonParserSet) {

@@ -1,7 +1,8 @@
 import { Statistic } from '@prisma/client';
+import { ElementHandle } from 'puppeteer';
 
-import { prisma } from '@/db';
-import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
+import { GameWithTeams, prisma } from '@/db';
+import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbStatisticInitializer {
   parseStatisticName(): Promise<string>;
@@ -9,41 +10,38 @@ export interface SpecializedDbStatisticInitializer {
 
 export class DbStatisticInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly parserFactory: ParserFactory;
+  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbStatisticInitializer: SpecializedDbStatisticInitializer | undefined;
   private wrappedStatistic: Statistic | undefined;
 
   private constructor({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.parserFactory = parserFactory;
+    this.specializedParserFactory = specializedParserFactory;
   }
 
   public static async create({
     parentOddButtonParser,
-    parserFactory,
+    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    specializedParserFactory: SpecializedParserFactory,
   }): Promise<DbStatisticInitializer> {
     const dbStatisticInitializer = new DbStatisticInitializer({
       parentOddButtonParser,
-      parserFactory,
+      specializedParserFactory,
     });
     await dbStatisticInitializer.init();
     return dbStatisticInitializer;
   }
 
   private async init(): Promise<DbStatisticInitializer> {
-    this.specializedDbStatisticInitializer = await this.parserFactory.createDbStatisticInitializer({
-      parentOddButtonParser: this.parentOddButtonParser,
-      parentDbStatisticInitializer: this,
-    });
+    this.specializedDbStatisticInitializer = await this.specializedParserFactory.createDbStatisticInitializer({ parentDbStatisticInitializer: this });
 
     this.statistic = await this.updateDbStatistic();
 
@@ -69,6 +67,14 @@ export class DbStatisticInitializer {
     });
 
     return this.statistic;
+  }
+
+  public get button(): ElementHandle | null {
+    return this.parentOddButtonParser.button;
+  }
+
+  public get game(): GameWithTeams {
+    return this.parentOddButtonParser.game;
   }
 
   private set specializedDbStatisticInitializer(specializedDbStatisticInitializer: SpecializedDbStatisticInitializer) {

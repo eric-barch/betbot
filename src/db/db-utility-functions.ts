@@ -3,6 +3,7 @@ import { League, Team } from '@prisma/client';
 import { prisma } from './prisma-client';
 import { GameWithTeams } from './game-with-teams';
 
+// TODO: I really don't like having this class at all.
 export class DbUtilityFunctions {
   public static async findOrCreateGameByMatchupAndStartDate({
     awayTeam,
@@ -67,6 +68,10 @@ export class DbUtilityFunctions {
         leagueId: league.id,
       }
     });
+
+    if (leagueTeams.length < 1) {
+      throw new Error(`No teams found for league ${league.name}`);
+    }
 
     const foundTeam = await Promise.any(leagueTeams.map((team) => {
       return new Promise<Team>((resolve, reject) => {

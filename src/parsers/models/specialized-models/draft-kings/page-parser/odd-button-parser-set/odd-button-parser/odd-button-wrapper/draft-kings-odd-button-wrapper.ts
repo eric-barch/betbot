@@ -1,21 +1,16 @@
-import { prisma } from '@/db';
 import {
-  OddButtonParser, OddButtonWrapper, SpecializedOddButtonWrapper,
+  OddButtonWrapper, SpecializedOddButtonWrapper
 } from '@/parsers/models/common-models';
 
 export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
-  private readonly parentOddButtonParser: OddButtonParser;
   private readonly parentOddButtonWrapper: OddButtonWrapper;
   private wrappedReferenceSelector: string | undefined;
 
   public constructor({
-    parentOddButtonParser,
     parentOddButtonWrapper,
   }: {
-    parentOddButtonParser: OddButtonParser,
     parentOddButtonWrapper: OddButtonWrapper,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
     this.parentOddButtonWrapper = parentOddButtonWrapper;
     this.referenceSelector = 'tr';
   }
@@ -24,20 +19,19 @@ export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
     return this.referenceSelector;
   }
 
-  public async confirmOddButtonPosition(): Promise<boolean> {
-    const game = this.parentOddButtonParser.game;
+  public async verifyOddButtonPosition(): Promise<boolean> {
+    const game = this.parentOddButtonWrapper.game;
 
     const awayTeamIdentifierFull = game.awayTeam.identifierFull.toLowerCase();
     const homeTeamIdentifierFull = game.homeTeam.identifierFull.toLowerCase();
 
-    const reference = this.parentOddButtonWrapper.reference;
+    const reference = this.parentOddButtonWrapper.referenceElement;
     const teamNameElement = await reference.$('th');
 
     if (!teamNameElement) {
       return false;
     }
 
-    // TODO: Replace all 'getProperty's with 'evaluate's.
     const teamNameElementTextContent = (await teamNameElement.evaluate((el) => el.textContent))?.toLowerCase();
 
     if (!teamNameElementTextContent) {
