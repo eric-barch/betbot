@@ -1,25 +1,22 @@
 import { prisma } from '@/db';
-import { OddButtonParser } from '@/parsers/models/common-models';
-import { DbStatisticInitializer, SpecializedDbStatisticInitializer } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-initializers/db-statistic-initializer';
+import {
+  DbStatisticInitializer, SpecializedDbStatisticInitializer,
+} from '@/parsers/models/common-models';
 
 export class DraftKingsDbStatisticInitializer implements SpecializedDbStatisticInitializer {
-  private readonly parentOddButtonParser: OddButtonParser;
   private readonly parentDbStatisticInitializer: DbStatisticInitializer;
 
   public constructor({
-    parentOddButtonParser,
     parentDbStatisticInitializer,
   }: {
-    parentOddButtonParser: OddButtonParser;
     parentDbStatisticInitializer: DbStatisticInitializer;
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
     this.parentDbStatisticInitializer = parentDbStatisticInitializer;
   }
 
   public async parseStatisticName(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
-    const game = this.parentOddButtonParser.game;
+    const game = this.parentDbStatisticInitializer.game;
 
     const awayTeam = await prisma.team.findFirstOrThrow({ where: { id: game.awayTeamId } });
     const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: game.homeTeamId } });
@@ -72,7 +69,7 @@ export class DraftKingsDbStatisticInitializer implements SpecializedDbStatisticI
   }
 
   private async getAriaLabel(): Promise<string> {
-    const button = this.parentOddButtonParser.button;
+    const button = this.parentDbStatisticInitializer.button;
 
     if (!button) {
       throw new Error(`button is null.`);
