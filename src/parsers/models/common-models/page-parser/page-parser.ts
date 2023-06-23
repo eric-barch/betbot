@@ -38,22 +38,26 @@ export class PageParser {
     this.dbLeagueInitializer = await DbLeagueInitializer.create({ parentPageParser: this });
     this.specializedParserFactory = await ParserFactory.create({ parentPageParser: this });
     this.webpage = await Webpage.create({ url: this.pageUrl });
-    // TODO: Don't believe jsonGames are re-polled when the page is reloaded
+    await this.reset();
+    return this;
+  }
+
+  private async reset(): Promise<PageParser> {
+    await this.webpage.reload();
     this.jsonGamesParser = await this.specializedParserFactory.createJsonGamesParser({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
       specializedParserFactory: this.specializedParserFactory,
     });
-
     return this;
   }
 
   public async updateOdds(): Promise<void> {
-    await this.oddButtonParserSet.updateOddsForEachButtonParser();
-  }
-
-  public async reloadPage(): Promise<void> {
-    await this.webpage.reload();
+    try {
+      await this.oddButtonParserSet.updateOdds();
+    } catch {
+      await this.reset();
+    }
   }
 
   public async disconnect(): Promise<void> {

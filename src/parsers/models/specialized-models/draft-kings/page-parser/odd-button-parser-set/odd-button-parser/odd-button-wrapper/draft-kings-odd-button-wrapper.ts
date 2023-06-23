@@ -24,13 +24,13 @@ export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
     return this.referenceSelector;
   }
 
-  public async confirmOddButtonPosition(): Promise<boolean> {
+  public async verifyOddButtonPosition(): Promise<boolean> {
     const game = this.parentOddButtonParser.game;
 
     const awayTeamIdentifierFull = game.awayTeam.identifierFull.toLowerCase();
     const homeTeamIdentifierFull = game.homeTeam.identifierFull.toLowerCase();
 
-    const reference = this.parentOddButtonWrapper.reference;
+    const reference = this.parentOddButtonWrapper.referenceElement;
     const teamNameElement = await reference.$('th');
 
     if (!teamNameElement) {
