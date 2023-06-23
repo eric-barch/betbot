@@ -1,7 +1,8 @@
 import { Statistic } from '@prisma/client';
+import { ElementHandle } from 'puppeteer';
 
-import { prisma } from '@/db';
-import { OddButtonParser, ParserFactory, SpecializedParserFactory } from '@/parsers/models/common-models';
+import { GameWithTeams, prisma } from '@/db';
+import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbStatisticInitializer {
   parseStatisticName(): Promise<string>;
@@ -40,10 +41,7 @@ export class DbStatisticInitializer {
   }
 
   private async init(): Promise<DbStatisticInitializer> {
-    this.specializedDbStatisticInitializer = await this.specializedParserFactory.createDbStatisticInitializer({
-      parentOddButtonParser: this.parentOddButtonParser,
-      parentDbStatisticInitializer: this,
-    });
+    this.specializedDbStatisticInitializer = await this.specializedParserFactory.createDbStatisticInitializer({ parentDbStatisticInitializer: this });
 
     this.statistic = await this.updateDbStatistic();
 
@@ -69,6 +67,14 @@ export class DbStatisticInitializer {
     });
 
     return this.statistic;
+  }
+
+  public get button(): ElementHandle | null {
+    return this.parentOddButtonParser.button;
+  }
+
+  public get game(): GameWithTeams {
+    return this.parentOddButtonParser.game;
   }
 
   private set specializedDbStatisticInitializer(specializedDbStatisticInitializer: SpecializedDbStatisticInitializer) {
