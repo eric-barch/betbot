@@ -55,11 +55,18 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
   }
 
   private async parseGames(): Promise<Array<Game>> {
-    this.games = await Promise.all(
-      this.jsonGames.map(async (jsonGame) => {
-        return await this.parseGame({ jsonGame });
-      })
-    );
+    this.games = new Array<Game>();
+
+    for (const jsonGame of this.jsonGames) {
+      const game = await this.parseGame({ jsonGame });
+      this.games.push(game);
+    }
+
+    // this.games = await Promise.all(
+    //   this.jsonGames.map(async (jsonGame) => {
+    //     return await this.parseGame({ jsonGame });
+    //   })
+    // );
 
     return this.games;
   }

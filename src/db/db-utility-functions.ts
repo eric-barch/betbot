@@ -69,6 +69,10 @@ export class DbUtilityFunctions {
       }
     });
 
+    if (leagueTeams.length < 1) {
+      throw new Error(`No teams found for league ${league.name}`);
+    }
+
     const foundTeam = await Promise.any(leagueTeams.map((team) => {
       return new Promise<Team>((resolve, reject) => {
         const regex = new RegExp(`\\b${team.identifierFull}\\b`, 'i');

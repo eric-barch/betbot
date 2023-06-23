@@ -23,12 +23,17 @@ export class AllPageParsers {
   public async init(): Promise<AllPageParsers> {
     this.pageParsers = new Set<PageParser>();
 
-    await Promise.all(
-      this.pageUrls.map(async (pageUrl) => {
-        const pageParser = await PageParser.create({ pageUrl });
-        this.pageParsers.add(pageParser);
-      })
-    );
+    for (const pageUrl of this.pageUrls) {
+      const pageParser = await PageParser.create({ pageUrl });
+      this.pageParsers.add(pageParser);
+    }
+
+    // await Promise.all(
+    //   this.pageUrls.map(async (pageUrl) => {
+    //     const pageParser = await PageParser.create({ pageUrl });
+    //     this.pageParsers.add(pageParser);
+    //   })
+    // );
 
     return this;
   }

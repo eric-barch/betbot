@@ -1,7 +1,7 @@
-import { Exchange, League } from '@prisma/client';
+import { Exchange, League, Team } from '@prisma/client';
 
 import { PageParser } from '@/parsers/models/common-models';
-import { LeagueInitData, mlbInitData, nbaInitData, nflInitData } from '@/setup';
+import { LeagueInitData, TeamsInitDataFactory, mlbInitData, nbaInitData, nflInitData } from '@/setup';
 import { prisma } from '@/db';
 
 export class DbLeagueInitializer {
@@ -83,7 +83,7 @@ export class DbLeagueInitializer {
   }: {
     leagueInitData: LeagueInitData,
   }): Promise<League> {
-    return await prisma.league.upsert({
+    this.league = await prisma.league.upsert({
       where: {
         name: leagueInitData.name,
       },
@@ -95,6 +95,41 @@ export class DbLeagueInitializer {
         abbreviation: leagueInitData.abbreviation,
       }
     });
+
+    await this.findOrCreateLeagueTeams();
+
+    return this.league;
+  }
+
+  private async findOrCreateLeagueTeams(): Promise<Array<Team>> {
+    const teamsInitData = TeamsInitDataFactory.getLeagueTeams({ league: this.league });
+
+    const teams = await Promise.all(
+      teamsInitData.map((teamInitData) =>
+        prisma.team.upsert({
+          where: {
+            leagueId_identifierFull: {
+              leagueId: this.league.id,
+              identifierFull: teamInitData.identifierFull,
+            },
+          },
+          update: {
+            regionAbbr: teamInitData.regionAbbr,
+            regionFull: teamInitData.regionFull,
+            identifierAbbr: teamInitData.identifierAbbr,
+          },
+          create: {
+            leagueId: this.league.id,
+            regionAbbr: teamInitData.regionAbbr,
+            regionFull: teamInitData.regionFull,
+            identifierAbbr: teamInitData.identifierAbbr,
+            identifierFull: teamInitData.identifierFull,
+          },
+        })
+      )
+    );
+
+    return teams;
   }
 
   public get league(): League {
