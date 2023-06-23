@@ -5,8 +5,8 @@ import { PageParser, SpecializedJsonGamesParser } from '@/parsers/models/common-
 
 export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
   private readonly parentPageParser: PageParser;
-  private jsonGames: Array<any>;
-  private dbGames: Array<Game>;
+  private wrappedJsonGames: Array<any> | undefined;
+  private wrappedGames: Array<Game> | undefined;
 
   private constructor({
     parentPageParser,
@@ -14,8 +14,6 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
     parentPageParser: PageParser,
   }) {
     this.parentPageParser = parentPageParser;
-    this.jsonGames = new Array<any>;
-    this.dbGames = new Array<Game>;
   }
 
   public static async create({
@@ -24,14 +22,14 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
     parentPageParser: PageParser,
   }): Promise<DraftKingsJsonGamesParser> {
     const jsonGamesParser = new DraftKingsJsonGamesParser({ parentPageParser });
-    await jsonGamesParser.ensureGamesInDb();
+    await jsonGamesParser.init();
     return jsonGamesParser;
   }
 
-  public async ensureGamesInDb(): Promise<Array<Game>> {
-    await this.scrapeJsonGames();
-    await this.parseDbGames();
-    return this.dbGames;
+  private async init(): Promise<DraftKingsJsonGamesParser> {
+    this.jsonGames = await this.scrapeJsonGames();
+    this.games = await this.parseGames();
+    return this;
   }
 
   private async scrapeJsonGames(): Promise<Array<any>> {
@@ -56,17 +54,17 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
     return this.jsonGames;
   }
 
-  private async parseDbGames(): Promise<Array<Game>> {
-    this.dbGames = await Promise.all(
+  private async parseGames(): Promise<Array<Game>> {
+    this.games = await Promise.all(
       this.jsonGames.map(async (jsonGame) => {
-        return await this.parseDbGame({ jsonGame });
+        return await this.parseGame({ jsonGame });
       })
     );
 
-    return this.dbGames;
+    return this.games;
   }
 
-  private async parseDbGame({
+  private async parseGame({
     jsonGame,
   }: {
     jsonGame: any,
@@ -122,5 +120,29 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
     const lastHyphenPos: number = identifier.lastIndexOf("-");
     const exchangeAssignedGameId = identifier.substring(lastHyphenPos + 1);
     return exchangeAssignedGameId;
+  }
+
+  public get games(): Array<Game> {
+    if (!this.wrappedGames) {
+      throw new Error('games is undefined.');
+    }
+
+    return this.wrappedGames;
+  }
+
+  private set jsonGames(jsonGames: Array<any>) {
+    this.wrappedJsonGames = jsonGames;
+  }
+
+  private get jsonGames(): Array<any> {
+    if (!this.wrappedJsonGames) {
+      throw new Error('jsonGames is undefined.');
+    }
+
+    return this.wrappedJsonGames;
+  }
+
+  private set games(games: Array<Game>) {
+    this.wrappedGames = games;
   }
 }

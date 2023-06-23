@@ -1,3 +1,6 @@
+import { Exchange } from '@prisma/client';
+import { ElementHandle } from 'puppeteer';
+
 import { GameWithTeams } from '@/db';
 import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
 
@@ -39,13 +42,20 @@ export class DbGameInitializer {
 
   private async init(): Promise<DbGameInitializer> {
     this.specializedDbGameInitializer = await this.specializedParserFactory.createDbGameInitializer({
-      parentOddButtonParser: this.parentOddButtonParser,
       parentDbGameInitializer: this,
     });
 
     this.game = await this.specializedDbGameInitializer.findOrCreateGame();
 
     return this;
+  }
+
+  public get button(): ElementHandle | null {
+    return this.parentOddButtonParser.button;
+  }
+
+  public get exchange(): Exchange {
+    return this.parentOddButtonParser.exchange;
   }
 
   public get game(): GameWithTeams {

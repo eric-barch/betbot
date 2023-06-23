@@ -3,6 +3,7 @@ import { League, Team } from '@prisma/client';
 import { prisma } from './prisma-client';
 import { GameWithTeams } from './game-with-teams';
 
+// TODO: I really don't like having this class at all.
 export class DbUtilityFunctions {
   public static async findOrCreateGameByMatchupAndStartDate({
     awayTeam,
