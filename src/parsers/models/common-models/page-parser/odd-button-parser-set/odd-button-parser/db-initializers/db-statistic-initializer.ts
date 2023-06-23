@@ -1,7 +1,7 @@
 import { Statistic } from '@prisma/client';
 
 import { prisma } from '@/db';
-import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser, ParserFactory, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbStatisticInitializer {
   parseStatisticName(): Promise<string>;
@@ -9,7 +9,7 @@ export interface SpecializedDbStatisticInitializer {
 
 export class DbStatisticInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly parserFactory: ParserFactory;
+  private readonly parserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbStatisticInitializer: SpecializedDbStatisticInitializer | undefined;
   private wrappedStatistic: Statistic | undefined;
 
@@ -18,7 +18,7 @@ export class DbStatisticInitializer {
     parserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    parserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
     this.parserFactory = parserFactory;
@@ -29,7 +29,7 @@ export class DbStatisticInitializer {
     parserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    parserFactory: SpecializedParserFactory,
   }): Promise<DbStatisticInitializer> {
     const dbStatisticInitializer = new DbStatisticInitializer({
       parentOddButtonParser,

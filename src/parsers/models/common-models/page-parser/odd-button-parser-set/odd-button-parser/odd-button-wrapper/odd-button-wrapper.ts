@@ -1,6 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser, ParserFactory, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonWrapper {
   generateReferenceSelector(): Promise<string>;
@@ -9,7 +9,7 @@ export interface SpecializedOddButtonWrapper {
 
 export class OddButtonWrapper {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly parserFactory: ParserFactory;
+  private readonly parserFactory: SpecializedParserFactory;
   private wrappedSpecializedOddButtonWrapper: SpecializedOddButtonWrapper | undefined;
   private wrappedOddButton: ElementHandle;
   private wrappedReferenceSelector: string | undefined;
@@ -22,7 +22,7 @@ export class OddButtonWrapper {
     initializationButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    parserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
@@ -36,7 +36,7 @@ export class OddButtonWrapper {
     initializationButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    parserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }): Promise<OddButtonWrapper> {
     const oddButtonWrapper = new OddButtonWrapper({

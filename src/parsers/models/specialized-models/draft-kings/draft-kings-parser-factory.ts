@@ -1,6 +1,6 @@
 import {
   DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  PageParser, ParserFactory, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer,
+  PageParser, SpecializedParserFactory, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer,
   SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet,
   SpecializedOddButtonWrapper,
 } from '@/parsers/models/common-models';
@@ -9,7 +9,7 @@ import {
   DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper,
 } from '@/parsers/models/specialized-models/draft-kings';
 
-export class DraftKingsParserFactory implements ParserFactory {
+export class DraftKingsParserFactory implements SpecializedParserFactory {
   public async createJsonGamesParser({
     parentPageParser,
   }: {

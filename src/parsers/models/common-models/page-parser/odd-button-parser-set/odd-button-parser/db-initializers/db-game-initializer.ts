@@ -1,5 +1,5 @@
 import { GameWithTeams } from '@/db';
-import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser, ParserFactory, SpecializedParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbGameInitializer {
   findOrCreateCorrespondingDbGame(): Promise<GameWithTeams>;
@@ -7,7 +7,7 @@ export interface SpecializedDbGameInitializer {
 
 export class DbGameInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly parserFactory: ParserFactory;
+  private readonly parserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbGameInitializer: SpecializedDbGameInitializer | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
@@ -16,7 +16,7 @@ export class DbGameInitializer {
     parserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    parserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
     this.parserFactory = parserFactory;
@@ -27,7 +27,7 @@ export class DbGameInitializer {
     parserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    parserFactory: ParserFactory,
+    parserFactory: SpecializedParserFactory,
   }): Promise<DbGameInitializer> {
     const dbGameInitializer = new DbGameInitializer({
       parentOddButtonParser,

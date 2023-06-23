@@ -4,6 +4,7 @@ import { ElementHandle } from 'puppeteer';
 import {
   DbGameInitializer, DbOddInitializer, DbStatisticInitializer, OddButtonWrapper, PageParser,
   ParserFactory,
+  SpecializedParserFactory,
 } from '@/parsers/models/common-models';
 import { GameWithTeams } from '@/db';
 
@@ -13,7 +14,7 @@ export interface SpecializedOddButtonParser {
 
 export class OddButtonParser {
   private readonly parentPageParser: PageParser;
-  private readonly parserFactory: ParserFactory;
+  private readonly parserFactory: SpecializedParserFactory;
   private readonly initializationButton: ElementHandle;
   private wrappedSpecializedOddButtonParser: SpecializedOddButtonParser | undefined;
   private wrappedOddButtonWrapper: OddButtonWrapper | undefined;
@@ -30,7 +31,7 @@ export class OddButtonParser {
     initializationButton,
   }: {
     parentPageParser: PageParser,
-    parserFactory: ParserFactory,
+    parserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }) {
     this.parentPageParser = parentPageParser;
@@ -44,7 +45,7 @@ export class OddButtonParser {
     initializationButton,
   }: {
     parentPageParser: PageParser,
-    parserFactory: ParserFactory,
+    parserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }): Promise<OddButtonParser> {
     const commonOddButtonParser = new OddButtonParser({
@@ -61,7 +62,6 @@ export class OddButtonParser {
       parentPageParser: this.parentPageParser,
       parentOddButtonParser: this,
     });
-
     this.oddButtonWrapper = await OddButtonWrapper.create({
       parentOddButtonParser: this,
       parserFactory: this.parserFactory,

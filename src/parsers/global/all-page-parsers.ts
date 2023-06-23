@@ -1,49 +1,32 @@
-import { PageParser, ParserFactory } from '@/parsers/models/common-models';
-import { DraftKingsParserFactory } from '@/parsers/models/specialized-models';
-import { AllPageParserInitData, pageUrls } from '@/setup';
+import { PageParser } from '@/parsers/models/common-models';
+import { pageUrls } from '@/setup';
 
 // TODO: Implement as a singleton
 export class AllPageParsers {
+  private readonly pageUrls: Array<string>;
   private wrappedPageParsers: Set<PageParser> | undefined;
 
+  private constructor({
+    pageUrls,
+  }: {
+    pageUrls: Array<string>,
+  }) {
+    this.pageUrls = pageUrls;
+  }
+
   public static async create(): Promise<AllPageParsers> {
-    const allPageParsers = new AllPageParsers();
+    const allPageParsers = new AllPageParsers({ pageUrls });
     await allPageParsers.init();
     return allPageParsers;
   }
 
   public async init(): Promise<AllPageParsers> {
-    const allPageParserInitData = await AllPageParserInitData.create({ pageUrls });
-
     this.pageParsers = new Set<PageParser>();
 
-    await Promise.all(
-      Array.from(allPageParserInitData.pageParserInitData).map(async (pageParserInitData) => {
-        const exchange = pageParserInitData.exchange;
-        const league = pageParserInitData.league;
-
-        let parserFactory: ParserFactory;
-
-        switch (exchange.name) {
-          case 'DraftKings':
-            // TODO: Do we want to instantiate a new parser factory for each DraftKings page? Or 
-            // should we just use one parser factory for all DraftKings pages?
-            parserFactory = new DraftKingsParserFactory();
-            break;
-          default:
-            throw new Error(`Exchange ${exchange.name} is not supported.`);
-        }
-
-        const pageParser = await PageParser.create({
-          exchange,
-          league,
-          url: pageParserInitData.url,
-          parserFactory,
-        });
-
-        this.pageParsers.add(pageParser);
-      })
-    );
+    for (const pageUrl of this.pageUrls) {
+      const pageParser = await PageParser.create({ pageUrl });
+      this.pageParsers.add(pageParser);
+    }
 
     return this;
   }
@@ -60,6 +43,7 @@ export class AllPageParsers {
     const end = Date.now();
 
     console.log(`Updated in ${end - start}ms`);
+
     return this;
   }
 
