@@ -29,10 +29,8 @@ export interface SpecializedParserFactory {
   }): Promise<SpecializedJsonGamesParser>;
 
   createOddButtonParserSet({
-    parentPageParser,
     parentOddButtonParserSet,
   }: {
-    parentPageParser: PageParser,
     parentOddButtonParserSet: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet>;
 
@@ -43,26 +41,20 @@ export interface SpecializedParserFactory {
   }): Promise<SpecializedOddButtonParser>;
 
   createOddButtonWrapper({
-    parentOddButtonParser,
     parentOddButtonWrapper,
   }: {
-    parentOddButtonParser: OddButtonParser,
     parentOddButtonWrapper: OddButtonWrapper,
   }): Promise<SpecializedOddButtonWrapper>;
 
   createDbGameInitializer({
-    parentOddButtonParser,
     parentDbGameInitializer,
   }: {
-    parentOddButtonParser: OddButtonParser,
     parentDbGameInitializer: DbGameInitializer,
   }): Promise<SpecializedDbGameInitializer>;
 
   createDbStatisticInitializer({
-    parentOddButtonParser,
     parentDbStatisticInitializer,
   }: {
-    parentOddButtonParser: OddButtonParser,
     parentDbStatisticInitializer: DbStatisticInitializer,
   }): Promise<SpecializedDbStatisticInitializer>;
 }

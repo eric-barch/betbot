@@ -1,21 +1,16 @@
-import { prisma } from '@/db';
 import {
-  OddButtonParser, OddButtonWrapper, SpecializedOddButtonWrapper,
+  OddButtonWrapper, SpecializedOddButtonWrapper
 } from '@/parsers/models/common-models';
 
 export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
-  private readonly parentOddButtonParser: OddButtonParser;
   private readonly parentOddButtonWrapper: OddButtonWrapper;
   private wrappedReferenceSelector: string | undefined;
 
   public constructor({
-    parentOddButtonParser,
     parentOddButtonWrapper,
   }: {
-    parentOddButtonParser: OddButtonParser,
     parentOddButtonWrapper: OddButtonWrapper,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
     this.parentOddButtonWrapper = parentOddButtonWrapper;
     this.referenceSelector = 'tr';
   }
@@ -25,7 +20,7 @@ export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
   }
 
   public async verifyOddButtonPosition(): Promise<boolean> {
-    const game = this.parentOddButtonParser.game;
+    const game = this.parentOddButtonWrapper.game;
 
     const awayTeamIdentifierFull = game.awayTeam.identifierFull.toLowerCase();
     const homeTeamIdentifierFull = game.homeTeam.identifierFull.toLowerCase();

@@ -4,7 +4,6 @@ import { OddButtonParser, PageParser, SpecializedParserFactory } from '@/parsers
 
 export interface SpecializedOddButtonParserSet {
   generateOddButtonSelector(): Promise<string>;
-  updateOdds(): Promise<void>;
 }
 
 export class OddButtonParserSet {

@@ -4,19 +4,15 @@ import { DbGameInitializer, OddButtonParser, SpecializedDbGameInitializer } from
 import { DraftKingsGameParser } from './draft-kings-game-parser';
 
 export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer {
-  private readonly parentOddButtonParser: OddButtonParser;
   private readonly parentDbGameInitializer: DbGameInitializer;
   private wrappedExchangeAssignedGameId: string | undefined;
   private wrappedGameParser: DraftKingsGameParser | undefined;
 
   public constructor({
-    parentOddButtonParser,
     parentDbGameInitializer,
   }: {
-    parentOddButtonParser: OddButtonParser;
-    parentDbGameInitializer: DbGameInitializer;
+    parentDbGameInitializer: DbGameInitializer,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
     this.parentDbGameInitializer = parentDbGameInitializer;
   }
 
@@ -31,17 +27,21 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
   }
 
   private async parseExchangeAssignedGameId(): Promise<string> {
-    const button = this.parentOddButtonParser.button;
+    const button = this.parentDbGameInitializer.button;
 
     if (!button) {
       throw new Error(`button is null.`);
     }
 
-    const dataTracking = await this.parentOddButtonParser.button.evaluate(
-      el => JSON.parse(el.getAttribute('data-tracking') || '')
-    );
+    const dataTrackingObject = await button.evaluate((el) => (el.getAttribute('data-tracking')));
 
-    this.exchangeAssignedGameId = dataTracking.eventId;
+    if (!dataTrackingObject) {
+      throw new Error(`dataTrackingObject is null.`);
+    }
+
+    const parsedDataTrackingObject = JSON.parse(dataTrackingObject);
+
+    this.exchangeAssignedGameId = parsedDataTrackingObject.eventId;
     return this.exchangeAssignedGameId;
   }
 
@@ -49,28 +49,26 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
     const exchangeToGame = await prisma.exchangeToGame.findUniqueOrThrow({
       where: {
         exchangeId_exchangeAssignedGameId: {
-          exchangeId: this.parentOddButtonParser.exchange.id,
+          exchangeId: this.parentDbGameInitializer.exchange.id,
           exchangeAssignedGameId: this.exchangeAssignedGameId,
         },
       },
-    });
-
-    const game = await prisma.game.findUniqueOrThrow({
-      where: {
-        id: exchangeToGame.gameId,
-      },
       include: {
-        awayTeam: true,
-        homeTeam: true,
-      },
+        game: {
+          include: {
+            awayTeam: true,
+            homeTeam: true,
+          }
+        }
+      }
     });
 
-    return game;
+    return exchangeToGame.game;
   }
 
   private async findOrCreateGameWithoutExchangeAssignedId(): Promise<GameWithTeams> {
     this.gameParser = await DraftKingsGameParser.create({
-      parentOddButtonParser: this.parentOddButtonParser,
+      parentDbGameInitializer: this.parentDbGameInitializer,
       exchangeAssignedGameId: this.exchangeAssignedGameId,
     });
     return this.gameParser.game;

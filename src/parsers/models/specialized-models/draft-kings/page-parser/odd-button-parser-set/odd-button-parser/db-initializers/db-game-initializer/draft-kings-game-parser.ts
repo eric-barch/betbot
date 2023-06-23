@@ -1,39 +1,39 @@
 import { DbUtilityFunctions, GameWithTeams, prisma } from '@/db';
-import { OddButtonParser } from '@/parsers/models/common-models';
+import { DbGameInitializer } from '@/parsers/models/common-models';
 
 import { DraftKingsMatchupParser } from './draft-kings-matchup-parser';
 import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
 
 
 export class DraftKingsGameParser {
-  private readonly parentOddButtonParser: OddButtonParser;
+  private readonly parentDbGameInitializer: DbGameInitializer;
   private exchangeAssignedGameId: string;
   private startDateParser: DraftKingsStartDateParser;
   private matchupParser: DraftKingsMatchupParser;
   private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
-    parentOddButtonParser,
+    parentDbGameInitializer,
     exchangeAssignedGameId,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parentDbGameInitializer: DbGameInitializer,
     exchangeAssignedGameId: string,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
+    this.parentDbGameInitializer = parentDbGameInitializer;
     this.exchangeAssignedGameId = exchangeAssignedGameId;
-    this.startDateParser = new DraftKingsStartDateParser({ parentOddButtonParser });
-    this.matchupParser = new DraftKingsMatchupParser({ parentOddButtonParser });
+    this.startDateParser = new DraftKingsStartDateParser({ parentDbGameInitializer });
+    this.matchupParser = new DraftKingsMatchupParser({ parentDbGameInitializer });
   }
 
   public static async create({
-    parentOddButtonParser,
+    parentDbGameInitializer,
     exchangeAssignedGameId,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parentDbGameInitializer: DbGameInitializer,
     exchangeAssignedGameId: string,
   }): Promise<DraftKingsGameParser> {
     const gameDetailsParser = new DraftKingsGameParser({
-      parentOddButtonParser,
+      parentDbGameInitializer,
       exchangeAssignedGameId,
     });
     await gameDetailsParser.parse();
@@ -50,7 +50,7 @@ export class DraftKingsGameParser {
       startDate: this.startDateParser.startDate,
     });
 
-    const exchangeId = this.parentOddButtonParser.exchange.id;
+    const exchangeId = this.parentDbGameInitializer.exchange.id;
     const gameId = this.game.id;
     const exchangeAssignedGameId = this.exchangeAssignedGameId;
 
