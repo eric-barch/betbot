@@ -4,8 +4,24 @@ import {
   SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet,
   SpecializedOddButtonWrapper,
 } from '@/parsers/models/common-models';
+import { DraftKingsParserFactory } from '@/parsers/models/specialized-models';
 
-export interface ParserFactory {
+export class ParserFactory {
+  public static async create({
+    parentPageParser,
+  }: {
+    parentPageParser: PageParser,
+  }): Promise<SpecializedParserFactory> {
+    switch (parentPageParser.exchange.name) {
+      case 'DraftKings':
+        return new DraftKingsParserFactory();
+      default:
+        throw new Error(`No specialized parser factory found for exchange ${parentPageParser.exchange.name}`);
+    }
+  }
+}
+
+export interface SpecializedParserFactory {
   createJsonGamesParser({
     parentPageParser,
   }: {
