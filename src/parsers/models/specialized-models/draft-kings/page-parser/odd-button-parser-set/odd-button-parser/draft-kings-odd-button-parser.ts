@@ -17,6 +17,6 @@ export class DraftKingsOddButtonParser implements SpecializedOddButtonParser {
 
   public async updateOdd(): Promise<Odd> {
     await this.parentOddButtonParser.resetOddButtonFromReference();
-    return await this.parentOddButtonParser.writeTextContentToDb();
+    return await this.parentOddButtonParser.writeTextContentToDbOdd();
   }
 }
