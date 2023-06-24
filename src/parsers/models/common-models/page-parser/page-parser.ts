@@ -56,11 +56,13 @@ export class PageParser {
     try {
       await this.oddButtonParserSet.updateOdds();
     } catch {
+      await this.oddButtonParserSet.nullifyOdds();
       await this.reset();
     }
   }
 
   public async disconnect(): Promise<void> {
+    await this.oddButtonParserSet.nullifyOdds();
     await this.webpage.disconnect();
   }
 

@@ -28,11 +28,11 @@ export class DbOddInitializer {
   }
 
   private async init(): Promise<DbOddInitializer> {
-    this.odd = await this.updateDbOdd();
+    this.odd = await this.findOrCreateOdd();
     return this;
   }
 
-  private async updateDbOdd(): Promise<Odd> {
+  private async findOrCreateOdd(): Promise<Odd> {
     const exchangeId = this.parentOddButtonParser.exchange.id;
     const statisticId = this.parentOddButtonParser.statistic.id;
 
@@ -53,7 +53,7 @@ export class DbOddInitializer {
     return this.odd;
   }
 
-  public async updateData({
+  public async updateOdd({
     price,
     value,
   }: {
@@ -67,6 +67,20 @@ export class DbOddInitializer {
       data: {
         price,
         value,
+      }
+    });
+
+    return this.odd;
+  }
+
+  public async nullify(): Promise<Odd> {
+    this.odd = await prisma.odd.update({
+      where: {
+        id: this.odd.id,
+      },
+      data: {
+        price: null,
+        value: null,
       }
     });
 
