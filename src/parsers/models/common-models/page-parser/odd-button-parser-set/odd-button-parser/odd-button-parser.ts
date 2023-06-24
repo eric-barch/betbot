@@ -82,14 +82,18 @@ export class OddButtonParser {
     return await this.specializedOddButtonParser.updateOdd();
   }
 
-  public async resetOddButtonFromReference(): Promise<void> {
-    await this.oddButtonWrapper.resetFromReference();
+  public async nullifyOdd(): Promise<Odd> {
+    return await this.dbOddInitializer.nullify();
   }
 
-  public async writeTextContentToDb(): Promise<Odd> {
+  public async resetOddButtonFromReference(): Promise<ElementHandle> {
+    return await this.oddButtonWrapper.resetFromReference();
+  }
+
+  public async writeTextContentToDbOdd(): Promise<Odd> {
     await this.parseTextContent();
 
-    return await this.dbOddInitializer.updateData({
+    return await this.dbOddInitializer.updateOdd({
       price: this.price,
       value: this.value,
     });
