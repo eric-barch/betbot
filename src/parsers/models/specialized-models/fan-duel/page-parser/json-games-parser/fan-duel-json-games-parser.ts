@@ -1,9 +1,9 @@
 import { Game } from '@prisma/client';
 
-import { DbUtilityFunctions, prisma } from '@/db';
 import { PageParser, SpecializedJsonGamesParser } from '@/parsers/models/common-models';
+import { DbUtilityFunctions, prisma } from '@/db';
 
-export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
+export class FanDuelJsonGamesParser implements SpecializedJsonGamesParser {
   private readonly parentPageParser: PageParser;
   private wrappedJsonGames: Array<any> | undefined;
   private wrappedGames: Array<Game> | undefined;
@@ -20,37 +20,34 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<DraftKingsJsonGamesParser> {
-    const jsonGamesParser = new DraftKingsJsonGamesParser({ parentPageParser });
+  }): Promise<FanDuelJsonGamesParser> {
+    const jsonGamesParser = new FanDuelJsonGamesParser({ parentPageParser });
     await jsonGamesParser.init();
     return jsonGamesParser;
   }
 
-  private async init(): Promise<DraftKingsJsonGamesParser> {
+  private async init(): Promise<FanDuelJsonGamesParser> {
     this.jsonGames = await this.scrapeJsonGames();
     this.games = await this.parseGames();
     return this;
   }
 
   private async scrapeJsonGames(): Promise<Array<any>> {
-    const gameScriptElements = await this.parentPageParser.page.$$(
-      'script[type="application/ld+json"]'
+    const jsonGames = await this.parentPageParser.page.$(
+      `script[type="application/ld+json"][data-react-helmet="true"]`
     );
 
-    const jsonGames = await Promise.all(
-      gameScriptElements.map(async (gameScriptElement) => {
-        const textContent = await gameScriptElement.evaluate(el => el.textContent);
+    if (!jsonGames) {
+      throw new Error('jsonGames is undefined.');
+    }
 
-        if (!textContent) {
-          return;
-        }
+    const textContent = await jsonGames.evaluate(el => el.textContent);
 
-        const jsonGame = JSON.parse(textContent);
-        return jsonGame;
-      })
-    );
+    if (!textContent) {
+      throw new Error('textContent is undefined.');
+    }
 
-    this.jsonGames = jsonGames.filter(Boolean);
+    this.jsonGames = JSON.parse(textContent);
     return this.jsonGames;
   }
 
@@ -105,7 +102,7 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
         exchangeId_gameId: {
           exchangeId,
           gameId,
-        },
+        }
       },
       update: {
         exchangeAssignedGameId,
@@ -114,7 +111,7 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
         exchangeId,
         gameId,
         exchangeAssignedGameId,
-      },
+      }
     });
 
     return game;
@@ -125,15 +122,15 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
   }: {
     jsonGame: any,
   }): string {
-    const identifier = jsonGame.identifier;
-    const lastHyphenPos: number = identifier.lastIndexOf("-");
-    const exchangeAssignedGameId = identifier.substring(lastHyphenPos + 1);
+    const url = jsonGame.url;
+    const lastHyphenPos = url.lastIndexOf('-');
+    const exchangeAssignedGameId = url.substring(lastHyphenPos + 1);
     return exchangeAssignedGameId;
   }
 
   public get games(): Array<Game> {
     if (!this.wrappedGames) {
-      throw new Error('games is undefined.');
+      throw new Error('wrappedGames is undefined.');
     }
 
     return this.wrappedGames;
@@ -145,7 +142,7 @@ export class DraftKingsJsonGamesParser implements SpecializedJsonGamesParser {
 
   private get jsonGames(): Array<any> {
     if (!this.wrappedJsonGames) {
-      throw new Error('jsonGames is undefined.');
+      throw new Error('wrappedJsonGames is undefined.');
     }
 
     return this.wrappedJsonGames;
