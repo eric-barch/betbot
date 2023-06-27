@@ -6,7 +6,7 @@ let running = true;
 async function main() {
   const allPageParsers = await AllPageParsers.create();
 
-  process.on('SIGINT', function () {
+  process.on('SIGINT', () => {
     running = false;
   });
 
@@ -16,14 +16,11 @@ async function main() {
   }
 
   await allPageParsers.disconnect();
+  await prisma.$disconnect();
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
+  .catch(async (err) => {
+    console.error(err);
     process.exit(1);
   });
