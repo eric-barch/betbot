@@ -43,10 +43,13 @@ export class DbOddInitializer {
           statisticId,
         },
       },
-      update: {},
+      update: {
+        isVisible: true,
+      },
       create: {
         exchangeId,
         statisticId,
+        isVisible: true,
       },
     });
 
@@ -81,6 +84,19 @@ export class DbOddInitializer {
       data: {
         price: null,
         value: null,
+      }
+    });
+
+    return this.odd;
+  }
+
+  public async markAsNotVisible(): Promise<Odd> {
+    this.odd = await prisma.odd.update({
+      where: {
+        id: this.odd.id,
+      },
+      data: {
+        isVisible: false,
       }
     });
 

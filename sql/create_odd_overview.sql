@@ -6,8 +6,8 @@ SELECT
     g."startDate" AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York' AS "start_date_east_coast_time",
     e."name" AS "exchange_name",
     s."name" AS "statistic_name",
-    o."price" AS "odd_price",
-    o."value" AS "odd_value"
+    o."value" AS "odd_value",
+    o."price" AS "odd_price"
 FROM
     "Game" g
     INNER JOIN "Team" at ON g."awayTeamId" = at."id"
@@ -17,4 +17,4 @@ FROM
     INNER JOIN "Odd" o ON s."id" = o."statisticId"
     INNER JOIN "Exchange" e ON o."exchangeId" = e."id"
 WHERE
-    (o."price" IS NOT NULL OR o."value" IS NOT NULL);
+    o."isVisible" = true;
