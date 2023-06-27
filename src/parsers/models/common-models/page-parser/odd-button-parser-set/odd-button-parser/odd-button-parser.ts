@@ -82,12 +82,8 @@ export class OddButtonParser {
     return await this.specializedOddButtonParser.updateOdd();
   }
 
-  public async nullifyOdd(): Promise<Odd> {
-    return await this.dbOddInitializer.nullify();
-  }
-
-  public async markOddAsNotVisible(): Promise<Odd> {
-    return await this.dbOddInitializer.markAsNotVisible();
+  public async deactivateOdd(): Promise<Odd> {
+    return await this.dbOddInitializer.deactivate();
   }
 
   public async resetOddButtonFromReference(): Promise<ElementHandle> {
