@@ -57,12 +57,14 @@ export class PageParser {
       await this.oddButtonParserSet.updateOdds();
     } catch {
       await this.oddButtonParserSet.nullifyOdds();
+      await this.oddButtonParserSet.markOddsAsNotVisible();
       await this.reset();
     }
   }
 
   public async disconnect(): Promise<void> {
     await this.oddButtonParserSet.nullifyOdds();
+    await this.oddButtonParserSet.markOddsAsNotVisible();
     await this.webpage.disconnect();
   }
 
