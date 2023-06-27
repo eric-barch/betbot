@@ -76,7 +76,7 @@ export class DbOddInitializer {
     return this.odd;
   }
 
-  public async nullify(): Promise<Odd> {
+  public async deactivate(): Promise<Odd> {
     this.odd = await prisma.odd.update({
       where: {
         id: this.odd.id,
@@ -84,18 +84,6 @@ export class DbOddInitializer {
       data: {
         price: null,
         value: null,
-      }
-    });
-
-    return this.odd;
-  }
-
-  public async markAsNotVisible(): Promise<Odd> {
-    this.odd = await prisma.odd.update({
-      where: {
-        id: this.odd.id,
-      },
-      data: {
         isVisible: false,
       }
     });
