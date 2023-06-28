@@ -42,7 +42,7 @@ export class DraftKingsStartDateParser {
       throw new Error(`dateTableHeaderElement is null.`);
     }
 
-    const dateString = await dateTableElement.evaluate(el => el.textContent);
+    const dateString = await dateTableHeaderElement.evaluate(el => el.textContent);
 
     if (!dateString) {
       throw new Error(`dateString is null.`);
@@ -54,27 +54,19 @@ export class DraftKingsStartDateParser {
   }
 
   private async getDateTableElement(): Promise<ElementHandle> {
-    let ancestor = this.parentDbGameInitializer.button;
+    const button = this.parentDbGameInitializer.button;
 
-    const classNameToFind = 'parlay-card-10-a';
-
-    while (ancestor) {
-      const className = await ancestor.evaluate(el => el.className);
-
-      if (className === classNameToFind) {
-        return ancestor;
-      }
-
-      const parentElement = await ancestor.$('xpath/..');
-
-      if (!parentElement) {
-        throw new Error(`parentElement is null.`);
-      }
-
-      ancestor = parentElement;
+    if (!button) {
+      throw new Error(`button is null.`);
     }
 
-    throw new Error(`Did not find dateTableElement.`);
+    const parentDateTable = await button.evaluateHandle((el) => (el.closest('div.parlay-card-10-a')));
+
+    if (!(parentDateTable instanceof ElementHandle)) {
+      throw new Error(`Did not find dateTableElement.`);
+    }
+
+    return parentDateTable;
   }
 
   private async parseTimeString(): Promise<string> {
