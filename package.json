@@ -5,6 +5,7 @@
   "main": "main.ts",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "reset": "npx prisma migrate reset && npx prisma generate",
     "test": "jest"
   },
   "keywords": [],

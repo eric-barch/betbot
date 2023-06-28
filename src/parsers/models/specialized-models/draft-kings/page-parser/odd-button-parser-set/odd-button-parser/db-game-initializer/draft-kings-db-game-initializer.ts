@@ -127,6 +127,8 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
       parentDbGameInitializer: this.parentDbGameInitializer,
     });
 
+    const startDate = this.startDateParser.startDate;
+
     this.game = await DbUtilityFunctions.findOrCreateGameByMatchupAndStartDate({
       awayTeam: this.awayTeam,
       homeTeam: this.homeTeam,
