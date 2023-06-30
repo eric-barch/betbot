@@ -3,18 +3,17 @@ import {
   SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
   SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
 } from '@/parsers/models/common-models';
-import {
-  DraftKingsDbGameConnection, DraftKingsDbStatisticConnection,
-  DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper
-} from '@/parsers/models/specialized-models/draft-kings';
 
-export class DraftKingsParserFactory implements SpecializedParserFactory {
+
+
+export class FanDuelParserFactory implements SpecializedParserFactory {
   public async createOddButtonParserSet({
     parentOddButtonParserSet,
   }: {
     parentOddButtonParserSet: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet> {
-    return new DraftKingsOddButtonParserSet();
+    throw new Error(`Implement createOddButtonParserSet.`);
+    // return new FanDuelOddButtonParserSet();
   }
 
   public async createOddButtonParser({
@@ -22,9 +21,10 @@ export class DraftKingsParserFactory implements SpecializedParserFactory {
   }: {
     parentOddButtonParser: OddButtonParser,
   }): Promise<SpecializedOddButtonParser> {
-    return new DraftKingsOddButtonParser({
-      parentOddButtonParser,
-    });
+    throw new Error(`Implement createOddButtonParser.`);
+    // return new FanDuelOddButtonParser({
+    //   parentOddButtonParser,
+    // });
   }
 
   public async createOddButtonWrapper({
@@ -32,9 +32,10 @@ export class DraftKingsParserFactory implements SpecializedParserFactory {
   }: {
     parentOddButtonWrapper: OddButtonWrapper,
   }): Promise<SpecializedOddButtonWrapper> {
-    return new DraftKingsOddButtonWrapper({
-      parentOddButtonWrapper,
-    });
+    throw new Error(`Implement createOddButtonWrapper.`);
+    // return new FanDuelOddButtonWrapper({
+    //   parentOddButtonWrapper,
+    // });
   }
 
   public async createDbGameConnection({
@@ -42,9 +43,10 @@ export class DraftKingsParserFactory implements SpecializedParserFactory {
   }: {
     parentDbGameConnection: DbGameConnection,
   }): Promise<SpecializedDbGameConnection> {
-    return new DraftKingsDbGameConnection({
-      parentDbGameConnection,
-    });
+    throw new Error(`Implement createDbGameConnection.`);
+    // return new FanDuelDbGameConnection({
+    //   parentDbGameConnection,
+    // });
   }
 
   public async createDbStatisticConnection({
@@ -52,8 +54,9 @@ export class DraftKingsParserFactory implements SpecializedParserFactory {
   }: {
     parentDbStatisticConnection: DbStatisticConnection,
   }): Promise<SpecializedDbStatisticConnection> {
-    return new DraftKingsDbStatisticConnection({
-      parentDbStatisticConnection,
-    });
+    throw new Error(`Implement createDbStatisticConnection.`);
+    // return new FanDuelDbStatisticConnection({
+    //   parentDbStatisticConnection,
+    // });
   }
 }

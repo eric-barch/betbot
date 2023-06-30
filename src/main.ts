@@ -1,19 +1,19 @@
 import { prisma } from '@/db';
 import { AllPageParsers } from '@/parsers/global';
 
-let running = true;
-
 async function main() {
   const allPageParsers = await AllPageParsers.create();
 
-  process.on('SIGINT', () => {
-    running = false;
-  });
+  let running = true;
+
+  process.on('SIGINT', () => running = false);
 
   while (running) {
-    await allPageParsers.updateOdds();
+    await allPageParsers.update();
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
+
+  console.log(`\nStopping betbot...`);
 
   await allPageParsers.disconnect();
   await prisma.$disconnect();

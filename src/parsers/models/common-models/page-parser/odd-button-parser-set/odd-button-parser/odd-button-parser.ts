@@ -3,12 +3,12 @@ import { ElementHandle } from 'puppeteer';
 
 import { GameWithTeams } from '@/db';
 import {
-  DbGameInitializer, DbOddInitializer, DbStatisticInitializer, OddButtonWrapper, PageParser,
+  DbGameConnection, DbOddConnection, DbStatisticConnection, OddButtonWrapper, PageParser,
   SpecializedParserFactory
 } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParser {
-  updateOdd(): Promise<Odd>;
+  update(): Promise<Odd>;
 }
 
 export class OddButtonParser {
@@ -17,9 +17,9 @@ export class OddButtonParser {
   private readonly initializationButton: ElementHandle;
   private wrappedSpecializedOddButtonParser: SpecializedOddButtonParser | undefined;
   private wrappedOddButtonWrapper: OddButtonWrapper | undefined;
-  private wrappedDbGameInitializer: DbGameInitializer | undefined;
-  private wrappedDbStatisticInitializer: DbStatisticInitializer | undefined;
-  private wrappedDbOddInitializer: DbOddInitializer | undefined;
+  private wrappedDbGameConnection: DbGameConnection | undefined;
+  private wrappedDbStatisticConnection: DbStatisticConnection | undefined;
+  private wrappedDbOddConnection: DbOddConnection | undefined;
   private wrappedTextContent: string | null | undefined;
   private wrappedPrice: number | null | undefined;
   private wrappedValue: number | null | undefined;
@@ -65,29 +65,47 @@ export class OddButtonParser {
       specializedParserFactory: this.specializedParserFactory,
       initializationButton: this.initializationButton,
     });
-    this.dbGameInitializer = await DbGameInitializer.create({
-      parentOddButtonParser: this,
-      specializedParserFactory: this.specializedParserFactory,
-    });
-    this.dbStatisticInitializer = await DbStatisticInitializer.create({
-      parentOddButtonParser: this,
-      specializedParserFactory: this.specializedParserFactory,
-    });
-    this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
+
+    try {
+      await this.createDbConnections();
+    } catch { }
 
     return this;
   }
 
-  public async updateOdd(): Promise<Odd> {
-    return await this.specializedOddButtonParser.updateOdd();
+  private async createDbConnections(): Promise<void> {
+    this.dbGameConnection = await DbGameConnection.create({
+      parentOddButtonParser: this,
+      specializedParserFactory: this.specializedParserFactory,
+    });
+    this.dbStatisticConnection = await DbStatisticConnection.create({
+      parentOddButtonParser: this,
+      specializedParserFactory: this.specializedParserFactory,
+    });
+    this.dbOddConnection = await DbOddConnection.create({
+      parentOddButtonParser: this,
+    });
   }
 
-  public async nullifyOdd(): Promise<Odd> {
-    return await this.dbOddInitializer.nullify();
+  private async reset(): Promise<OddButtonParser> {
+    try {
+      await this.createDbConnections();
+      console.log(`OddButtonParser reset.`);
+    } catch { }
+
+    return this;
   }
 
-  public async markOddAsNotVisible(): Promise<Odd> {
-    return await this.dbOddInitializer.markAsNotVisible();
+  public async update(): Promise<void> {
+    try {
+      await this.specializedOddButtonParser.update();
+    } catch {
+      await this.reset();
+    }
+  }
+
+  public async disconnect(): Promise<Odd> {
+    return await this.dbOddConnection.disconnect();
   }
 
   public async resetOddButtonFromReference(): Promise<ElementHandle> {
@@ -97,7 +115,7 @@ export class OddButtonParser {
   public async writeTextContentToDbOdd(): Promise<Odd> {
     await this.parseTextContent();
 
-    return await this.dbOddInitializer.updateOdd({
+    return await this.dbOddConnection.update({
       price: this.price,
       value: this.value,
     });
@@ -152,15 +170,19 @@ export class OddButtonParser {
   }
 
   public get game(): GameWithTeams {
-    return this.dbGameInitializer.game;
+    return this.dbGameConnection.game;
   }
 
   public get statistic(): Statistic {
-    return this.dbStatisticInitializer.statistic;
+    if (this.dbStatisticConnection.statistic === null) {
+      throw new Error(`statistic is null.`);
+    }
+
+    return this.dbStatisticConnection.statistic;
   }
 
   public get odd(): Odd {
-    return this.dbOddInitializer.odd;
+    return this.dbOddConnection.odd;
   }
 
   private set specializedOddButtonParser(specializedOddButtonParser: SpecializedOddButtonParser) {
@@ -187,40 +209,40 @@ export class OddButtonParser {
     return this.wrappedOddButtonWrapper;
   }
 
-  private set dbGameInitializer(dbGameInitializer: DbGameInitializer) {
-    this.wrappedDbGameInitializer = dbGameInitializer;
+  private set dbGameConnection(dbGameConnection: DbGameConnection) {
+    this.wrappedDbGameConnection = dbGameConnection;
   }
 
-  private get dbGameInitializer(): DbGameInitializer {
-    if (!this.wrappedDbGameInitializer) {
-      throw new Error(`wrappedDbGameInitializer is undefined.`);
+  private get dbGameConnection(): DbGameConnection {
+    if (!this.wrappedDbGameConnection) {
+      throw new Error(`wrappedDbGameConnection is undefined.`);
     }
 
-    return this.wrappedDbGameInitializer;
+    return this.wrappedDbGameConnection;
   }
 
-  private set dbStatisticInitializer(dbStatisticInitializer: DbStatisticInitializer) {
-    this.wrappedDbStatisticInitializer = dbStatisticInitializer;
+  private set dbStatisticConnection(dbStatisticConnection: DbStatisticConnection) {
+    this.wrappedDbStatisticConnection = dbStatisticConnection;
   }
 
-  private get dbStatisticInitializer(): DbStatisticInitializer {
-    if (!this.wrappedDbStatisticInitializer) {
-      throw new Error(`wrappedDbStatisticInitializer is undefined.`);
+  private get dbStatisticConnection(): DbStatisticConnection {
+    if (!this.wrappedDbStatisticConnection) {
+      throw new Error(`wrappedDbStatisticConnection is undefined.`);
     }
 
-    return this.wrappedDbStatisticInitializer;
+    return this.wrappedDbStatisticConnection;
   }
 
-  private set dbOddInitializer(dbOddInitializer: DbOddInitializer) {
-    this.wrappedDbOddInitializer = dbOddInitializer;
+  private set dbOddConnection(dbOddConnection: DbOddConnection) {
+    this.wrappedDbOddConnection = dbOddConnection;
   }
 
-  private get dbOddInitializer(): DbOddInitializer {
-    if (!this.wrappedDbOddInitializer) {
-      throw new Error(`wrappedDbOddInitializer is undefined.`);
+  private get dbOddConnection(): DbOddConnection {
+    if (!this.wrappedDbOddConnection) {
+      throw new Error(`wrappedDbOddConnection is undefined.`);
     }
 
-    return this.wrappedDbOddInitializer;
+    return this.wrappedDbOddConnection;
   }
 
   private set textContent(textContent: string | null) {

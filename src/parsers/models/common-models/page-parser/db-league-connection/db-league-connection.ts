@@ -1,11 +1,12 @@
 import { Exchange, League, Team } from '@prisma/client';
 
-import { PageParser } from '@/parsers/models/common-models';
-import { LeagueInitData, TeamsInitDataFactory, mlbInitData, nbaInitData, nflInitData } from '@/setup';
 import { prisma } from '@/db';
+import { PageParser } from '@/parsers/models/common-models';
+import {
+  LeagueInitData, TeamsInitDataFactory, mlbInitData, nbaInitData, nflInitData
+} from '@/setup';
 
-export class DbLeagueInitializer {
-  private readonly parentPageParser: PageParser;
+export class DbLeagueConnection {
   private readonly pageUrl: string;
   private readonly exchange: Exchange;
   private wrappedLeague: League | undefined;
@@ -15,7 +16,6 @@ export class DbLeagueInitializer {
   }: {
     parentPageParser: PageParser,
   }) {
-    this.parentPageParser = parentPageParser;
     this.pageUrl = parentPageParser.pageUrl;
     this.exchange = parentPageParser.exchange;
   }
@@ -24,13 +24,13 @@ export class DbLeagueInitializer {
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<DbLeagueInitializer> {
-    const dbLeagueInitializer = new DbLeagueInitializer({ parentPageParser });
-    await dbLeagueInitializer.init();
-    return dbLeagueInitializer;
+  }): Promise<DbLeagueConnection> {
+    const dbLeagueConnection = new DbLeagueConnection({ parentPageParser });
+    await dbLeagueConnection.init();
+    return dbLeagueConnection;
   }
 
-  private async init(): Promise<DbLeagueInitializer> {
+  private async init(): Promise<DbLeagueConnection> {
     this.league = await this.findOrCreateLeagueFromPageUrl();
     return this;
   }

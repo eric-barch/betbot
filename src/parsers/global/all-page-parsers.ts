@@ -23,27 +23,22 @@ export class AllPageParsers {
   public async init(): Promise<AllPageParsers> {
     this.pageParsers = new Set<PageParser>();
 
+    /**Do not run in parallel. PageParsers must be created in series to avoid dual entries in db.
+     * TODO: Optimize if possible. */
     for (const pageUrl of this.pageUrls) {
       const pageParser = await PageParser.create({ pageUrl });
       this.pageParsers.add(pageParser);
     }
 
-    // await Promise.all(
-    //   this.pageUrls.map(async (pageUrl) => {
-    //     const pageParser = await PageParser.create({ pageUrl });
-    //     this.pageParsers.add(pageParser);
-    //   })
-    // );
-
     return this;
   }
 
-  public async updateOdds(): Promise<AllPageParsers> {
+  public async update(): Promise<AllPageParsers> {
     const start = Date.now();
 
     await Promise.all(
       Array.from(this.pageParsers).map(async (pageParser) => {
-        await pageParser.updateOdds();
+        await pageParser.update();
       })
     );
 

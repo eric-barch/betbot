@@ -1,28 +1,28 @@
 import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import { DbGameInitializer } from '@/parsers/models/common-models';
+import { DbGameConnection } from '@/parsers/models/common-models';
 
 export class DraftKingsStartDateParser {
-  private readonly parentDbGameInitializer: DbGameInitializer;
+  private readonly parentDbGameConnection: DbGameConnection;
   private wrappedDateString: string | undefined;
   private wrappedTimeString: string | undefined;
   private wrappedStartDate: Date | undefined;
 
   private constructor({
-    parentDbGameInitializer,
+    parentDbGameConnection,
   }: {
-    parentDbGameInitializer: DbGameInitializer,
+    parentDbGameConnection: DbGameConnection,
   }) {
-    this.parentDbGameInitializer = parentDbGameInitializer;
+    this.parentDbGameConnection = parentDbGameConnection;
   }
 
   public static async create({
-    parentDbGameInitializer,
+    parentDbGameConnection,
   }: {
-    parentDbGameInitializer: DbGameInitializer,
+    parentDbGameConnection: DbGameConnection,
   }): Promise<DraftKingsStartDateParser> {
-    const startDateParser = new DraftKingsStartDateParser({ parentDbGameInitializer });
+    const startDateParser = new DraftKingsStartDateParser({ parentDbGameConnection });
     await startDateParser.init();
     return startDateParser;
   }
@@ -42,7 +42,7 @@ export class DraftKingsStartDateParser {
       throw new Error(`dateTableHeaderElement is null.`);
     }
 
-    const dateString = await dateTableElement.evaluate(el => el.textContent);
+    const dateString = await dateTableHeaderElement.evaluate(el => el.textContent);
 
     if (!dateString) {
       throw new Error(`dateString is null.`);
@@ -54,27 +54,19 @@ export class DraftKingsStartDateParser {
   }
 
   private async getDateTableElement(): Promise<ElementHandle> {
-    let ancestor = this.parentDbGameInitializer.button;
+    const button = this.parentDbGameConnection.button;
 
-    const classNameToFind = 'parlay-card-10-a';
-
-    while (ancestor) {
-      const className = await ancestor.evaluate(el => el.className);
-
-      if (className === classNameToFind) {
-        return ancestor;
-      }
-
-      const parentElement = await ancestor.$('xpath/..');
-
-      if (!parentElement) {
-        throw new Error(`parentElement is null.`);
-      }
-
-      ancestor = parentElement;
+    if (!button) {
+      throw new Error(`button is null.`);
     }
 
-    throw new Error(`Did not find dateTableElement.`);
+    const parentDateTable = await button.evaluateHandle((el) => (el.closest('div.parlay-card-10-a')));
+
+    if (!(parentDateTable instanceof ElementHandle)) {
+      throw new Error(`Did not find dateTableElement.`);
+    }
+
+    return parentDateTable;
   }
 
   private async parseTimeString(): Promise<string> {
@@ -97,7 +89,7 @@ export class DraftKingsStartDateParser {
   }
 
   private async getTeamRowElement(): Promise<ElementHandle> {
-    let ancestor = this.parentDbGameInitializer.button;
+    let ancestor = this.parentDbGameConnection.button;
 
     const nodeNameToFind = 'tr';
 
