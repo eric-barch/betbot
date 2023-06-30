@@ -6,7 +6,6 @@ import { draftKingsInitData, ExchangeInitData, fanDuelInitData, sugarHouseInitDa
 
 
 export class DbExchangeInitializer {
-  private readonly parentPageParser: PageParser;
   private readonly pageUrl: string;
   private wrappedExchange: Exchange | undefined;
 
@@ -15,7 +14,6 @@ export class DbExchangeInitializer {
   }: {
     parentPageParser: PageParser,
   }) {
-    this.parentPageParser = parentPageParser;
     this.pageUrl = parentPageParser.pageUrl;
   }
 

@@ -36,7 +36,7 @@ export class PageParser {
     this.dbExchangeInitializer = await DbExchangeInitializer.create({ parentPageParser: this });
     this.dbLeagueInitializer = await DbLeagueInitializer.create({ parentPageParser: this });
     this.specializedParserFactory = await SpecializedParserFactoryFactory.create({ parentPageParser: this });
-    this.webpage = await Webpage.create({ url: this.pageUrl });
+    this.webpage = await Webpage.create({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
       specializedParserFactory: this.specializedParserFactory,
@@ -46,10 +46,7 @@ export class PageParser {
 
   private async reset(): Promise<PageParser> {
     await this.webpage.reload();
-    this.oddButtonParserSet = await OddButtonParserSet.create({
-      parentPageParser: this,
-      specializedParserFactory: this.specializedParserFactory,
-    });
+    await this.oddButtonParserSet.reset();
     return this;
   }
 
@@ -57,13 +54,12 @@ export class PageParser {
     try {
       await this.oddButtonParserSet.updateOdds();
     } catch {
-      await this.oddButtonParserSet.deactivateOdds();
       await this.reset();
     }
   }
 
   public async disconnect(): Promise<void> {
-    await this.oddButtonParserSet.deactivateOdds();
+    await this.oddButtonParserSet.disconnect();
     await this.webpage.disconnect();
   }
 

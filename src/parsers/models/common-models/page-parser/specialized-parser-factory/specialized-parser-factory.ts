@@ -5,7 +5,9 @@ import {
 } from '@/parsers/models/common-models';
 import { DraftKingsParserFactory, FanDuelParserFactory } from '@/parsers/models/specialized-models';
 
-// TODO: HATE this name
+/**TODO: HATE this name. Is there some way we can make SpecializedParserFactory have a static
+ * create method to avoid having two classes here? Attempted to implement that before but ran into
+ * circular dependency issues. */
 export class SpecializedParserFactoryFactory {
   public static async create({
     parentPageParser,
