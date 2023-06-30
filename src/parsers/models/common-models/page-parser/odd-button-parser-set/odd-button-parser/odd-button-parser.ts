@@ -107,7 +107,7 @@ export class OddButtonParser {
     }
   }
 
-  public async deactivateOdd(): Promise<Odd> {
+  public async disconnect(): Promise<Odd> {
     return await this.dbOddInitializer.deactivate();
   }
 
