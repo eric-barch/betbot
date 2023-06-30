@@ -44,9 +44,7 @@ export class DbGameInitializer {
     this.specializedDbGameInitializer = await this.specializedParserFactory.createDbGameInitializer({
       parentDbGameInitializer: this,
     });
-
     this.game = await this.specializedDbGameInitializer.findOrCreateGame();
-
     return this;
   }
 

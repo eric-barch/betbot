@@ -1,9 +1,9 @@
 import { Game } from '@prisma/client';
 
-import { PageParser, SpecializedJsonGamesParser } from '@/parsers/models/common-models';
+import { PageParser } from '@/parsers/models/common-models';
 import { DbUtilityFunctions, prisma } from '@/db';
 
-export class FanDuelJsonGamesParser implements SpecializedJsonGamesParser {
+export class FanDuelJsonGamesParser {
   private readonly parentPageParser: PageParser;
   private wrappedJsonGames: Array<any> | undefined;
   private wrappedGames: Array<Game> | undefined;

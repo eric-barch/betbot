@@ -12,7 +12,7 @@ export class DbStatisticInitializer {
   private readonly parentOddButtonParser: OddButtonParser;
   private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbStatisticInitializer: SpecializedDbStatisticInitializer | undefined;
-  private wrappedStatistic: Statistic | undefined;
+  private wrappedStatistic: Statistic | null | undefined;
 
   private constructor({
     parentOddButtonParser,
@@ -43,12 +43,16 @@ export class DbStatisticInitializer {
   private async init(): Promise<DbStatisticInitializer> {
     this.specializedDbStatisticInitializer = await this.specializedParserFactory.createDbStatisticInitializer({ parentDbStatisticInitializer: this });
 
-    this.statistic = await this.updateDbStatistic();
+    try {
+      this.statistic = await this.findOrCreateStatistic();
+    } catch (error) {
+      this.statistic = null;
+    }
 
     return this;
   }
 
-  private async updateDbStatistic(): Promise<Statistic> {
+  private async findOrCreateStatistic(): Promise<Statistic> {
     const name = await this.specializedDbStatisticInitializer.parseStatisticName();
     const gameId = this.parentOddButtonParser.game.id;
 
@@ -89,12 +93,12 @@ export class DbStatisticInitializer {
     return this.wrappedSpecializedDbStatisticInitializer;
   }
 
-  private set statistic(statistic: Statistic) {
+  private set statistic(statistic: Statistic | null) {
     this.wrappedStatistic = statistic;
   }
 
-  public get statistic(): Statistic {
-    if (!this.wrappedStatistic) {
+  public get statistic(): Statistic | null {
+    if (this.wrappedStatistic === undefined) {
       throw new Error(`wrappedStatistic is undefined.`);
     }
 

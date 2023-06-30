@@ -41,7 +41,9 @@ export class OddButtonParserSet {
   }
 
   private async init(): Promise<OddButtonParserSet> {
-    this.specializedOddButtonParserSet = await this.specializedParserFactory.createOddButtonParserSet({ parentOddButtonParserSet: this });
+    this.specializedOddButtonParserSet = await this.specializedParserFactory.createOddButtonParserSet({
+      parentOddButtonParserSet: this,
+    });
     this.oddButtonSelector = await this.specializedOddButtonParserSet.generateOddButtonSelector();
     this.oddButtons = await this.scrapeOddButtons();
     this.oddButtonParsers = await this.createOddButtonParsers();
@@ -78,7 +80,11 @@ export class OddButtonParserSet {
     // }
 
     // Run in parallel (production)
-    await Promise.all(Array.from(this.oddButtonParsers).map(oddButtonParser => oddButtonParser.updateOdd()));
+    await Promise.all(
+      Array.from(this.oddButtonParsers).map(async (oddButtonParser) => {
+        await oddButtonParser.updateOdd();
+      })
+    );
   };
 
   public async deactivateOdds(): Promise<void> {
@@ -88,7 +94,11 @@ export class OddButtonParserSet {
     // }
 
     // Run in parallel (production)
-    await Promise.all(Array.from(this.oddButtonParsers).map(async (oddButtonParser) => await oddButtonParser.deactivateOdd()));
+    await Promise.all(
+      Array.from(this.oddButtonParsers).map(async (oddButtonParser) => {
+        await oddButtonParser.deactivateOdd();
+      })
+    );
   };
 
   private set specializedOddButtonParserSet(specializedOddButtonParserSet: SpecializedOddButtonParserSet) {
