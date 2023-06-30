@@ -104,8 +104,10 @@ export class OddButtonParser {
     }
   }
 
-  public async disconnect(): Promise<Odd> {
-    return await this.dbOddConnection.disconnect();
+  public async disconnect(): Promise<void> {
+    try {
+      await this.dbOddConnection.disconnect();
+    } catch { }
   }
 
   public async resetOddButtonFromReference(): Promise<ElementHandle> {
