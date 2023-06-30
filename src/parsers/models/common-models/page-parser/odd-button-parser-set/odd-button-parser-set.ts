@@ -32,12 +32,12 @@ export class OddButtonParserSet {
     parentPageParser: PageParser,
     specializedParserFactory: SpecializedParserFactory,
   }): Promise<OddButtonParserSet> {
-    const commonOddButtonParserSet = new OddButtonParserSet({
+    const oddButttonParserSet = new OddButtonParserSet({
       parentPageParser,
       specializedParserFactory,
     });
-    await commonOddButtonParserSet.init();
-    return commonOddButtonParserSet;
+    await oddButttonParserSet.init();
+    return oddButttonParserSet;
   }
 
   private async init(): Promise<OddButtonParserSet> {
@@ -87,7 +87,7 @@ export class OddButtonParserSet {
     );
   };
 
-  public async deactivateOdds(): Promise<void> {
+  public async disconnect(): Promise<void> {
     // Run in series (development)
     // for (const oddButtonParser of this.oddButtonParsers) {
     //   await oddButtonParser.deactivateOdd();

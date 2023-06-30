@@ -1,24 +1,26 @@
 import { Browser, connect, Page } from 'puppeteer';
 
+import { PageParser } from '@/parsers/models/common-models';
+
 export class Webpage {
   private readonly url: string;
   private wrappedBrowser: Browser | undefined;
   private wrappedPage: Page | undefined;
 
   constructor({
-    url,
+    parentPageParser,
   }: {
-    url: string,
+    parentPageParser: PageParser,
   }) {
-    this.url = url;
+    this.url = parentPageParser.pageUrl;
   }
 
   public static async create({
-    url,
+    parentPageParser,
   }: {
-    url: string,
+    parentPageParser: PageParser,
   }): Promise<Webpage> {
-    const webpageConnection = new Webpage({ url });
+    const webpageConnection = new Webpage({ parentPageParser });
     await webpageConnection.connect();
     return webpageConnection;
   }
