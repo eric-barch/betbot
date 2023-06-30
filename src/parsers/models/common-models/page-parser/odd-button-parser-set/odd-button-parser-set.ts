@@ -81,16 +81,16 @@ export class OddButtonParserSet {
     return this.oddButtonParsers;
   }
 
-  public async updateOdds(): Promise<void> {
+  public async update(): Promise<void> {
     // Run in series (development)
     // for (const oddButtonParser of this.oddButtonParsers) {
-    //   await oddButtonParser.updateOdd();
+    //   await oddButtonParser.update();
     // }
 
     // Run in parallel (production)
     await Promise.all(
       Array.from(this.oddButtonParsers).map(async (oddButtonParser) => {
-        await oddButtonParser.updateOdd();
+        await oddButtonParser.update();
       })
     );
   };

@@ -56,7 +56,7 @@ export class DbOddConnection {
     return this.odd;
   }
 
-  public async updateOdd({
+  public async update({
     price,
     value,
   }: {

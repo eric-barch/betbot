@@ -9,7 +9,7 @@ async function main() {
   process.on('SIGINT', () => running = false);
 
   while (running) {
-    await allPageParsers.updateOdds();
+    await allPageParsers.update();
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
