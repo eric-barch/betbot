@@ -4,14 +4,14 @@ import { ElementHandle } from 'puppeteer';
 import { GameWithTeams } from '@/db';
 import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
 
-export interface SpecializedDbGameInitializer {
+export interface SpecializedDbGameConnection {
   findOrCreateGame(): Promise<GameWithTeams>;
 }
 
-export class DbGameInitializer {
+export class DbGameConnection {
   private readonly parentOddButtonParser: OddButtonParser;
   private readonly specializedParserFactory: SpecializedParserFactory;
-  private wrappedSpecializedDbGameInitializer: SpecializedDbGameInitializer | undefined;
+  private wrappedSpecializedDbGameConnection: SpecializedDbGameConnection | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
@@ -31,20 +31,20 @@ export class DbGameInitializer {
   }: {
     parentOddButtonParser: OddButtonParser,
     specializedParserFactory: SpecializedParserFactory,
-  }): Promise<DbGameInitializer> {
-    const dbGameInitializer = new DbGameInitializer({
+  }): Promise<DbGameConnection> {
+    const dbGameConnection = new DbGameConnection({
       parentOddButtonParser,
       specializedParserFactory,
     });
-    await dbGameInitializer.init();
-    return dbGameInitializer;
+    await dbGameConnection.init();
+    return dbGameConnection;
   }
 
-  private async init(): Promise<DbGameInitializer> {
-    this.specializedDbGameInitializer = await this.specializedParserFactory.createDbGameInitializer({
-      parentDbGameInitializer: this,
+  private async init(): Promise<DbGameConnection> {
+    this.specializedDbGameConnection = await this.specializedParserFactory.createDbGameConnection({
+      parentDbGameConnection: this,
     });
-    this.game = await this.specializedDbGameInitializer.findOrCreateGame();
+    this.game = await this.specializedDbGameConnection.findOrCreateGame();
     return this;
   }
 
@@ -68,16 +68,16 @@ export class DbGameInitializer {
     return this.wrappedGame;
   }
 
-  private set specializedDbGameInitializer(specializedDbGameInitializer: SpecializedDbGameInitializer) {
-    this.wrappedSpecializedDbGameInitializer = specializedDbGameInitializer;
+  private set specializedDbGameConnection(specializedDbGameConnection: SpecializedDbGameConnection) {
+    this.wrappedSpecializedDbGameConnection = specializedDbGameConnection;
   }
 
-  private get specializedDbGameInitializer(): SpecializedDbGameInitializer {
-    if (!this.wrappedSpecializedDbGameInitializer) {
-      throw new Error(`wrappedSpecializedDbGameInitializer is undefined.`);
+  private get specializedDbGameConnection(): SpecializedDbGameConnection {
+    if (!this.wrappedSpecializedDbGameConnection) {
+      throw new Error(`wrappedSpecializedDbGameConnection is undefined.`);
     }
 
-    return this.wrappedSpecializedDbGameInitializer;
+    return this.wrappedSpecializedDbGameConnection;
   }
 
   private set game(game: GameWithTeams) {

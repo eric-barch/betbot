@@ -5,7 +5,7 @@ import { PageParser } from '@/parsers/models/common-models';
 import { draftKingsInitData, ExchangeInitData, fanDuelInitData, sugarHouseInitData } from '@/setup';
 
 
-export class DbExchangeInitializer {
+export class DbExchangeConnection {
   private readonly pageUrl: string;
   private wrappedExchange: Exchange | undefined;
 
@@ -21,13 +21,13 @@ export class DbExchangeInitializer {
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<DbExchangeInitializer> {
-    const dbExchangeInitializer = new DbExchangeInitializer({ parentPageParser });
-    await dbExchangeInitializer.init();
-    return dbExchangeInitializer;
+  }): Promise<DbExchangeConnection> {
+    const dbExchangeConnection = new DbExchangeConnection({ parentPageParser });
+    await dbExchangeConnection.init();
+    return dbExchangeConnection;
   }
 
-  private async init(): Promise<DbExchangeInitializer> {
+  private async init(): Promise<DbExchangeConnection> {
     this.exchange = await this.findOrCreateExchangeFromPageUrl();
     return this;
   }

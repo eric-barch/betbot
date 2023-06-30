@@ -3,7 +3,7 @@ import { Odd } from '@prisma/client';
 import { prisma } from '@/db';
 import { OddButtonParser } from '@/parsers/models/common-models';
 
-export class DbOddInitializer {
+export class DbOddConnection {
   private readonly parentOddButtonParser: OddButtonParser;
   private wrappedOdd: Odd | undefined;
 
@@ -19,15 +19,15 @@ export class DbOddInitializer {
     parentOddButtonParser,
   }: {
     parentOddButtonParser: OddButtonParser,
-  }): Promise<DbOddInitializer> {
-    const dbOddInitializer = new DbOddInitializer({
+  }): Promise<DbOddConnection> {
+    const dbOddConnection = new DbOddConnection({
       parentOddButtonParser,
     });
-    await dbOddInitializer.init();
-    return dbOddInitializer;
+    await dbOddConnection.init();
+    return dbOddConnection;
   }
 
-  private async init(): Promise<DbOddInitializer> {
+  private async init(): Promise<DbOddConnection> {
     this.odd = await this.findOrCreateOdd();
     return this;
   }
@@ -76,7 +76,7 @@ export class DbOddInitializer {
     return this.odd;
   }
 
-  public async deactivate(): Promise<Odd> {
+  public async disconnect(): Promise<Odd> {
     this.odd = await prisma.odd.update({
       where: {
         id: this.odd.id,

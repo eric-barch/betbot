@@ -1,22 +1,22 @@
 import { prisma } from '@/db';
 import {
-  DbStatisticInitializer, SpecializedDbStatisticInitializer,
+  DbStatisticConnection, SpecializedDbStatisticConnection,
 } from '@/parsers/models/common-models';
 
-export class DraftKingsDbStatisticInitializer implements SpecializedDbStatisticInitializer {
-  private readonly parentDbStatisticInitializer: DbStatisticInitializer;
+export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticConnection {
+  private readonly parentDbStatisticConnection: DbStatisticConnection;
 
   public constructor({
-    parentDbStatisticInitializer,
+    parentDbStatisticConnection,
   }: {
-    parentDbStatisticInitializer: DbStatisticInitializer;
+    parentDbStatisticConnection: DbStatisticConnection;
   }) {
-    this.parentDbStatisticInitializer = parentDbStatisticInitializer;
+    this.parentDbStatisticConnection = parentDbStatisticConnection;
   }
 
   public async parseStatisticName(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
-    const game = this.parentDbStatisticInitializer.game;
+    const game = this.parentDbStatisticConnection.game;
 
     const awayTeam = await prisma.team.findFirstOrThrow({ where: { id: game.awayTeamId } });
     const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: game.homeTeamId } });
@@ -69,7 +69,7 @@ export class DraftKingsDbStatisticInitializer implements SpecializedDbStatisticI
   }
 
   private async getAriaLabel(): Promise<string> {
-    const button = this.parentDbStatisticInitializer.button;
+    const button = this.parentDbStatisticConnection.button;
 
     if (!button) {
       throw new Error(`button is null.`);
