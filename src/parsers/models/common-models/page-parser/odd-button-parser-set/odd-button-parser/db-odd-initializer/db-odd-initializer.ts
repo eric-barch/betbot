@@ -96,7 +96,7 @@ export class DbOddInitializer {
   }
 
   public get odd(): Odd {
-    if (!this.wrappedOdd) {
+    if (this.wrappedOdd === undefined) {
       throw new Error(`wrappedOdd is undefined.`);
     }
 

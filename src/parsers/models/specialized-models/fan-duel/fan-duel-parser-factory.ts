@@ -1,22 +1,12 @@
 import {
   DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer,
-  SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet,
-  SpecializedOddButtonWrapper, SpecializedParserFactory,
+  SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedOddButtonParser,
+  SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
 } from '@/parsers/models/common-models';
-import { FanDuelJsonGamesParser } from '@/parsers/models/specialized-models/fan-duel';
 
 
 
 export class FanDuelParserFactory implements SpecializedParserFactory {
-  public async createJsonGamesParser({
-    parentPageParser,
-  }: {
-    parentPageParser: PageParser,
-  }): Promise<SpecializedJsonGamesParser> {
-    return await FanDuelJsonGamesParser.create({ parentPageParser });
-  }
-
   public async createOddButtonParserSet({
     parentOddButtonParserSet,
   }: {

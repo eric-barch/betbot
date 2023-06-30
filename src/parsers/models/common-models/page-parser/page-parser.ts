@@ -2,8 +2,8 @@ import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
 import {
-  DbExchangeInitializer, DbLeagueInitializer, OddButtonParserSet, SpecializedParserFactoryFactory,
-  SpecializedJsonGamesParser, SpecializedParserFactory, Webpage,
+  DbExchangeInitializer, DbLeagueInitializer, OddButtonParserSet, SpecializedParserFactory,
+  SpecializedParserFactoryFactory, Webpage,
 } from '@/parsers/models/common-models';
 
 export class PageParser {
@@ -12,7 +12,6 @@ export class PageParser {
   private wrappedDbLeagueInitializer: DbLeagueInitializer | undefined;
   private wrappedSpecializedParserFactory: SpecializedParserFactory | undefined;
   private wrappedWebpage: Webpage | undefined;
-  private wrappedJsonGamesParser: SpecializedJsonGamesParser | undefined;
   private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
 
   private constructor({
@@ -38,7 +37,6 @@ export class PageParser {
     this.dbLeagueInitializer = await DbLeagueInitializer.create({ parentPageParser: this });
     this.specializedParserFactory = await SpecializedParserFactoryFactory.create({ parentPageParser: this });
     this.webpage = await Webpage.create({ url: this.pageUrl });
-    this.jsonGamesParser = await this.specializedParserFactory.createJsonGamesParser({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
       specializedParserFactory: this.specializedParserFactory,
@@ -48,7 +46,6 @@ export class PageParser {
 
   private async reset(): Promise<PageParser> {
     await this.webpage.reload();
-    this.jsonGamesParser = await this.specializedParserFactory.createJsonGamesParser({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
       specializedParserFactory: this.specializedParserFactory,
@@ -128,18 +125,6 @@ export class PageParser {
     }
 
     return this.wrappedWebpage;
-  }
-
-  private set jsonGamesParser(jsonGamesParser: SpecializedJsonGamesParser) {
-    this.wrappedJsonGamesParser = jsonGamesParser;
-  }
-
-  private get jsonGamesParser(): SpecializedJsonGamesParser {
-    if (!this.wrappedJsonGamesParser) {
-      throw new Error(`wrappedJsonGamesParser is undefined.`);
-    }
-
-    return this.wrappedJsonGamesParser;
   }
 
   private set oddButtonParserSet(oddButtonParserSet: OddButtonParserSet) {

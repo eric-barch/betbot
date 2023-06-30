@@ -65,6 +65,17 @@ export class OddButtonParser {
       specializedParserFactory: this.specializedParserFactory,
       initializationButton: this.initializationButton,
     });
+
+    try {
+      await this.createDbInitializers();
+    } catch {
+      console.log(`Error initializing db initializers. They remain undefined.`);
+    }
+
+    return this;
+  }
+
+  private async createDbInitializers(): Promise<void> {
     this.dbGameInitializer = await DbGameInitializer.create({
       parentOddButtonParser: this,
       specializedParserFactory: this.specializedParserFactory,
@@ -73,13 +84,27 @@ export class OddButtonParser {
       parentOddButtonParser: this,
       specializedParserFactory: this.specializedParserFactory,
     });
-    this.dbOddInitializer = await DbOddInitializer.create({ parentOddButtonParser: this });
+    this.dbOddInitializer = await DbOddInitializer.create({
+      parentOddButtonParser: this,
+    });
+  }
+
+  private async reset(): Promise<OddButtonParser> {
+    try {
+      await this.createDbInitializers();
+    } catch {
+      console.log(`Error resetting db initializers. They remain unchanged.`);
+    }
 
     return this;
   }
 
-  public async updateOdd(): Promise<Odd> {
-    return await this.specializedOddButtonParser.updateOdd();
+  public async updateOdd(): Promise<void> {
+    try {
+      await this.specializedOddButtonParser.updateOdd();
+    } catch {
+      await this.reset();
+    }
   }
 
   public async deactivateOdd(): Promise<Odd> {
@@ -152,6 +177,10 @@ export class OddButtonParser {
   }
 
   public get statistic(): Statistic {
+    if (this.dbStatisticInitializer.statistic === null) {
+      throw new Error(`statistic is null.`);
+    }
+
     return this.dbStatisticInitializer.statistic;
   }
 

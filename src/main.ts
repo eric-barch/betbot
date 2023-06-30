@@ -6,9 +6,7 @@ async function main() {
 
   let running = true;
 
-  process.on('SIGINT', () => {
-    running = false;
-  });
+  process.on('SIGINT', () => running = false);
 
   while (running) {
     await allPageParsers.updateOdds();

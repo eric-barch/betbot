@@ -1,8 +1,7 @@
 import {
   DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
   PageParser, SpecializedDbGameInitializer, SpecializedDbStatisticInitializer,
-  SpecializedJsonGamesParser, SpecializedOddButtonParser, SpecializedOddButtonParserSet,
-  SpecializedOddButtonWrapper,
+  SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper,
 } from '@/parsers/models/common-models';
 import { DraftKingsParserFactory, FanDuelParserFactory } from '@/parsers/models/specialized-models';
 
@@ -25,12 +24,6 @@ export class SpecializedParserFactoryFactory {
 }
 
 export interface SpecializedParserFactory {
-  createJsonGamesParser({
-    parentPageParser,
-  }: {
-    parentPageParser: PageParser,
-  }): Promise<SpecializedJsonGamesParser>;
-
   createOddButtonParserSet({
     parentOddButtonParserSet,
   }: {
