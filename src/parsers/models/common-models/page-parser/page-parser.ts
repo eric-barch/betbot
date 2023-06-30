@@ -51,9 +51,9 @@ export class PageParser {
     return this;
   }
 
-  public async updateOdds(): Promise<void> {
+  public async update(): Promise<void> {
     try {
-      await this.oddButtonParserSet.updateOdds();
+      await this.oddButtonParserSet.update();
     } catch {
       await this.reset();
     }

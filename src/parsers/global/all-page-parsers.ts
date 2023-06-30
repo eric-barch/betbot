@@ -33,12 +33,12 @@ export class AllPageParsers {
     return this;
   }
 
-  public async updateOdds(): Promise<AllPageParsers> {
+  public async update(): Promise<AllPageParsers> {
     const start = Date.now();
 
     await Promise.all(
       Array.from(this.pageParsers).map(async (pageParser) => {
-        await pageParser.updateOdds();
+        await pageParser.update();
       })
     );
 

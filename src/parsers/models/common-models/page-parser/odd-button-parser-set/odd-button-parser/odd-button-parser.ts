@@ -8,7 +8,7 @@ import {
 } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParser {
-  updateOdd(): Promise<Odd>;
+  update(): Promise<Odd>;
 }
 
 export class OddButtonParser {
@@ -96,9 +96,9 @@ export class OddButtonParser {
     return this;
   }
 
-  public async updateOdd(): Promise<void> {
+  public async update(): Promise<void> {
     try {
-      await this.specializedOddButtonParser.updateOdd();
+      await this.specializedOddButtonParser.update();
     } catch {
       await this.reset();
     }
@@ -115,7 +115,7 @@ export class OddButtonParser {
   public async writeTextContentToDbOdd(): Promise<Odd> {
     await this.parseTextContent();
 
-    return await this.dbOddConnection.updateOdd({
+    return await this.dbOddConnection.update({
       price: this.price,
       value: this.value,
     });
