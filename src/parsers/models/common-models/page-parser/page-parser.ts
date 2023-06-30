@@ -2,14 +2,14 @@ import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
 import {
-  DbExchangeInitializer, DbLeagueInitializer, OddButtonParserSet, SpecializedParserFactory,
+  DbExchangeConnection, DbLeagueConnection, OddButtonParserSet, SpecializedParserFactory,
   SpecializedParserFactoryFactory, Webpage,
 } from '@/parsers/models/common-models';
 
 export class PageParser {
   public readonly pageUrl: string;
-  private wrappedDbExchangeInitializer: DbExchangeInitializer | undefined;
-  private wrappedDbLeagueInitializer: DbLeagueInitializer | undefined;
+  private wrappedDbExchangeConnection: DbExchangeConnection | undefined;
+  private wrappedDbLeagueConnection: DbLeagueConnection | undefined;
   private wrappedSpecializedParserFactory: SpecializedParserFactory | undefined;
   private wrappedWebpage: Webpage | undefined;
   private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
@@ -33,8 +33,8 @@ export class PageParser {
   }
 
   private async init(): Promise<PageParser> {
-    this.dbExchangeInitializer = await DbExchangeInitializer.create({ parentPageParser: this });
-    this.dbLeagueInitializer = await DbLeagueInitializer.create({ parentPageParser: this });
+    this.dbExchangeConnection = await DbExchangeConnection.create({ parentPageParser: this });
+    this.dbLeagueConnection = await DbLeagueConnection.create({ parentPageParser: this });
     this.specializedParserFactory = await SpecializedParserFactoryFactory.create({ parentPageParser: this });
     this.webpage = await Webpage.create({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
@@ -47,6 +47,7 @@ export class PageParser {
   private async reset(): Promise<PageParser> {
     await this.webpage.reload();
     await this.oddButtonParserSet.reset();
+    console.log(`${this.pageUrl} PageParser reset.`);
     return this;
   }
 
@@ -68,35 +69,35 @@ export class PageParser {
   }
 
   public get exchange(): Exchange {
-    return this.dbExchangeInitializer.exchange;
+    return this.dbExchangeConnection.exchange;
   }
 
   public get league(): League {
-    return this.dbLeagueInitializer.league;
+    return this.dbLeagueConnection.league;
   }
 
-  private set dbExchangeInitializer(dbExchangeInitializer: DbExchangeInitializer) {
-    this.wrappedDbExchangeInitializer = dbExchangeInitializer;
+  private set dbExchangeConnection(dbExchangeConnection: DbExchangeConnection) {
+    this.wrappedDbExchangeConnection = dbExchangeConnection;
   }
 
-  private get dbExchangeInitializer(): DbExchangeInitializer {
-    if (!this.wrappedDbExchangeInitializer) {
-      throw new Error(`wrappedDbExchangeInitializer is undefined.`);
+  private get dbExchangeConnection(): DbExchangeConnection {
+    if (!this.wrappedDbExchangeConnection) {
+      throw new Error(`wrappedDbExchangeConnection is undefined.`);
     }
 
-    return this.wrappedDbExchangeInitializer;
+    return this.wrappedDbExchangeConnection;
   }
 
-  private set dbLeagueInitializer(dbLeagueInitializer: DbLeagueInitializer) {
-    this.wrappedDbLeagueInitializer = dbLeagueInitializer;
+  private set dbLeagueConnection(dbLeagueConnection: DbLeagueConnection) {
+    this.wrappedDbLeagueConnection = dbLeagueConnection;
   }
 
-  private get dbLeagueInitializer(): DbLeagueInitializer {
-    if (!this.wrappedDbLeagueInitializer) {
-      throw new Error(`wrappedDbLeagueInitializer is undefined.`);
+  private get dbLeagueConnection(): DbLeagueConnection {
+    if (!this.wrappedDbLeagueConnection) {
+      throw new Error(`wrappedDbLeagueConnection is undefined.`);
     }
 
-    return this.wrappedDbLeagueInitializer;
+    return this.wrappedDbLeagueConnection;
   }
 
   private set specializedParserFactory(specializedParserFactory: SpecializedParserFactory) {

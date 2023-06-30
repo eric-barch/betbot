@@ -1,10 +1,10 @@
 import {
-  DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedOddButtonParser,
+  DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
+  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
   SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
 } from '@/parsers/models/common-models';
 import {
-  DraftKingsDbGameInitializer, DraftKingsDbStatisticInitializer,
+  DraftKingsDbGameConnection, DraftKingsDbStatisticConnection,
   DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper
 } from '@/parsers/models/specialized-models/draft-kings';
 
@@ -37,23 +37,23 @@ export class DraftKingsParserFactory implements SpecializedParserFactory {
     });
   }
 
-  public async createDbGameInitializer({
-    parentDbGameInitializer,
+  public async createDbGameConnection({
+    parentDbGameConnection,
   }: {
-    parentDbGameInitializer: DbGameInitializer,
-  }): Promise<SpecializedDbGameInitializer> {
-    return new DraftKingsDbGameInitializer({
-      parentDbGameInitializer,
+    parentDbGameConnection: DbGameConnection,
+  }): Promise<SpecializedDbGameConnection> {
+    return new DraftKingsDbGameConnection({
+      parentDbGameConnection,
     });
   }
 
-  public async createDbStatisticInitializer({
-    parentDbStatisticInitializer,
+  public async createDbStatisticConnection({
+    parentDbStatisticConnection,
   }: {
-    parentDbStatisticInitializer: DbStatisticInitializer,
-  }): Promise<SpecializedDbStatisticInitializer> {
-    return new DraftKingsDbStatisticInitializer({
-      parentDbStatisticInitializer,
+    parentDbStatisticConnection: DbStatisticConnection,
+  }): Promise<SpecializedDbStatisticConnection> {
+    return new DraftKingsDbStatisticConnection({
+      parentDbStatisticConnection,
     });
   }
 }

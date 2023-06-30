@@ -1,5 +1,5 @@
-export * from './db-exchange-initializer';
-export * from './db-league-initializer';
+export * from './db-exchange-connection';
+export * from './db-league-connection';
 export * from './odd-button-parser-set';
 export * from './page-parser';
 export * from './specialized-parser-factory';

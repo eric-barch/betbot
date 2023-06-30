@@ -2,12 +2,12 @@ import { Team } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
 import { DbUtilityFunctions, GameWithTeams, prisma } from '@/db';
-import { DbGameInitializer, SpecializedDbGameInitializer } from '@/parsers/models/common-models';
+import { DbGameConnection, SpecializedDbGameConnection } from '@/parsers/models/common-models';
 
 import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
 
-export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer {
-  private readonly parentDbGameInitializer: DbGameInitializer;
+export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
+  private readonly parentDbGameConnection: DbGameConnection;
   private wrappedAwayTeam: Team | undefined;
   private wrappedHomeTeam: Team | undefined;
   private wrappedStartDateParser: DraftKingsStartDateParser | undefined;
@@ -15,11 +15,11 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
   private wrappedGame: GameWithTeams | undefined;
 
   public constructor({
-    parentDbGameInitializer,
+    parentDbGameConnection,
   }: {
-    parentDbGameInitializer: DbGameInitializer,
+    parentDbGameConnection: DbGameConnection,
   }) {
-    this.parentDbGameInitializer = parentDbGameInitializer;
+    this.parentDbGameConnection = parentDbGameConnection;
   }
 
   public async findOrCreateGame(): Promise<GameWithTeams> {
@@ -33,7 +33,7 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
   }
 
   private async parseMatchupAndExchangeAssignedGameId(): Promise<void> {
-    const button = this.parentDbGameInitializer.button;
+    const button = this.parentDbGameConnection.button;
 
     if (!button) {
       throw new Error(`button is null.`);
@@ -73,7 +73,7 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
       throw new Error(`Incorrect number of teamNameMatches.`);
     }
 
-    const league = this.parentDbGameInitializer.league;
+    const league = this.parentDbGameConnection.league;
 
     this.awayTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
       league,
@@ -105,7 +105,7 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
     const exchangeToGame = await prisma.exchangeToGame.findUniqueOrThrow({
       where: {
         exchangeId_exchangeAssignedGameId: {
-          exchangeId: this.parentDbGameInitializer.exchange.id,
+          exchangeId: this.parentDbGameConnection.exchange.id,
           exchangeAssignedGameId: this.exchangeAssignedGameId,
         },
       },
@@ -124,7 +124,7 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
 
   private async findOrCreateGameByMatchupAndStartDate(): Promise<GameWithTeams> {
     this.startDateParser = await DraftKingsStartDateParser.create({
-      parentDbGameInitializer: this.parentDbGameInitializer,
+      parentDbGameConnection: this.parentDbGameConnection,
     });
 
     const startDate = this.startDateParser.startDate;
@@ -135,7 +135,7 @@ export class DraftKingsDbGameInitializer implements SpecializedDbGameInitializer
       startDate: this.startDateParser.startDate,
     });
 
-    const exchangeId = this.parentDbGameInitializer.exchange.id;
+    const exchangeId = this.parentDbGameConnection.exchange.id;
     const gameId = this.game.id;
     const exchangeAssignedGameId = this.exchangeAssignedGameId;
 

@@ -6,7 +6,7 @@ import {
   LeagueInitData, TeamsInitDataFactory, mlbInitData, nbaInitData, nflInitData
 } from '@/setup';
 
-export class DbLeagueInitializer {
+export class DbLeagueConnection {
   private readonly pageUrl: string;
   private readonly exchange: Exchange;
   private wrappedLeague: League | undefined;
@@ -24,13 +24,13 @@ export class DbLeagueInitializer {
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<DbLeagueInitializer> {
-    const dbLeagueInitializer = new DbLeagueInitializer({ parentPageParser });
-    await dbLeagueInitializer.init();
-    return dbLeagueInitializer;
+  }): Promise<DbLeagueConnection> {
+    const dbLeagueConnection = new DbLeagueConnection({ parentPageParser });
+    await dbLeagueConnection.init();
+    return dbLeagueConnection;
   }
 
-  private async init(): Promise<DbLeagueInitializer> {
+  private async init(): Promise<DbLeagueConnection> {
     this.league = await this.findOrCreateLeagueFromPageUrl();
     return this;
   }

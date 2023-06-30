@@ -1,4 +1,4 @@
-export * from './db-game-initializer';
-export * from './db-statistic-initializer';
+export * from './db-game-connection';
+export * from './db-statistic-connection';
 export * from './draft-kings-odd-button-parser';
 export * from './odd-button-wrapper';

@@ -1,6 +1,6 @@
 import {
-  DbGameInitializer, DbStatisticInitializer, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  SpecializedDbGameInitializer, SpecializedDbStatisticInitializer, SpecializedOddButtonParser,
+  DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
+  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
   SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
 } from '@/parsers/models/common-models';
 
@@ -38,25 +38,25 @@ export class FanDuelParserFactory implements SpecializedParserFactory {
     // });
   }
 
-  public async createDbGameInitializer({
-    parentDbGameInitializer,
+  public async createDbGameConnection({
+    parentDbGameConnection,
   }: {
-    parentDbGameInitializer: DbGameInitializer,
-  }): Promise<SpecializedDbGameInitializer> {
-    throw new Error(`Implement createDbGameInitializer.`);
-    // return new FanDuelDbGameInitializer({
-    //   parentDbGameInitializer,
+    parentDbGameConnection: DbGameConnection,
+  }): Promise<SpecializedDbGameConnection> {
+    throw new Error(`Implement createDbGameConnection.`);
+    // return new FanDuelDbGameConnection({
+    //   parentDbGameConnection,
     // });
   }
 
-  public async createDbStatisticInitializer({
-    parentDbStatisticInitializer,
+  public async createDbStatisticConnection({
+    parentDbStatisticConnection,
   }: {
-    parentDbStatisticInitializer: DbStatisticInitializer,
-  }): Promise<SpecializedDbStatisticInitializer> {
-    throw new Error(`Implement createDbStatisticInitializer.`);
-    // return new FanDuelDbStatisticInitializer({
-    //   parentDbStatisticInitializer,
+    parentDbStatisticConnection: DbStatisticConnection,
+  }): Promise<SpecializedDbStatisticConnection> {
+    throw new Error(`Implement createDbStatisticConnection.`);
+    // return new FanDuelDbStatisticConnection({
+    //   parentDbStatisticConnection,
     // });
   }
 }

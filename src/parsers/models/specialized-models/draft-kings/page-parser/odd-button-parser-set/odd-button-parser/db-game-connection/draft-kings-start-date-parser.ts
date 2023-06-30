@@ -1,28 +1,28 @@
 import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import { DbGameInitializer } from '@/parsers/models/common-models';
+import { DbGameConnection } from '@/parsers/models/common-models';
 
 export class DraftKingsStartDateParser {
-  private readonly parentDbGameInitializer: DbGameInitializer;
+  private readonly parentDbGameConnection: DbGameConnection;
   private wrappedDateString: string | undefined;
   private wrappedTimeString: string | undefined;
   private wrappedStartDate: Date | undefined;
 
   private constructor({
-    parentDbGameInitializer,
+    parentDbGameConnection,
   }: {
-    parentDbGameInitializer: DbGameInitializer,
+    parentDbGameConnection: DbGameConnection,
   }) {
-    this.parentDbGameInitializer = parentDbGameInitializer;
+    this.parentDbGameConnection = parentDbGameConnection;
   }
 
   public static async create({
-    parentDbGameInitializer,
+    parentDbGameConnection,
   }: {
-    parentDbGameInitializer: DbGameInitializer,
+    parentDbGameConnection: DbGameConnection,
   }): Promise<DraftKingsStartDateParser> {
-    const startDateParser = new DraftKingsStartDateParser({ parentDbGameInitializer });
+    const startDateParser = new DraftKingsStartDateParser({ parentDbGameConnection });
     await startDateParser.init();
     return startDateParser;
   }
@@ -54,7 +54,7 @@ export class DraftKingsStartDateParser {
   }
 
   private async getDateTableElement(): Promise<ElementHandle> {
-    const button = this.parentDbGameInitializer.button;
+    const button = this.parentDbGameConnection.button;
 
     if (!button) {
       throw new Error(`button is null.`);
@@ -89,7 +89,7 @@ export class DraftKingsStartDateParser {
   }
 
   private async getTeamRowElement(): Promise<ElementHandle> {
-    let ancestor = this.parentDbGameInitializer.button;
+    let ancestor = this.parentDbGameConnection.button;
 
     const nodeNameToFind = 'tr';
 
