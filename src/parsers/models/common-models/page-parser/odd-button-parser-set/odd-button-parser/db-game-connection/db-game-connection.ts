@@ -1,5 +1,5 @@
 import { Exchange, League } from '@prisma/client';
-import { ElementHandle } from 'puppeteer';
+import { ElementHandle, Page } from 'puppeteer';
 
 import { GameWithTeams } from '@/db';
 import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
@@ -46,6 +46,10 @@ export class DbGameConnection {
     });
     this.game = await this.specializedDbGameConnection.findOrCreateGame();
     return this;
+  }
+
+  public get page(): Page {
+    return this.parentOddButtonParser.parentPageParser.page;
   }
 
   public get button(): ElementHandle | null {

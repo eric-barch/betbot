@@ -12,7 +12,7 @@ export interface SpecializedOddButtonParser {
 }
 
 export class OddButtonParser {
-  private readonly parentPageParser: PageParser;
+  public readonly parentPageParser: PageParser;
   private readonly specializedParserFactory: SpecializedParserFactory;
   private readonly initializationButton: ElementHandle;
   private wrappedSpecializedOddButtonParser: SpecializedOddButtonParser | undefined;
@@ -68,7 +68,9 @@ export class OddButtonParser {
 
     try {
       await this.createDbConnections();
-    } catch { }
+    } catch {
+      const foo = 'foo';
+    }
 
     return this;
   }
@@ -90,8 +92,9 @@ export class OddButtonParser {
   private async reset(): Promise<OddButtonParser> {
     try {
       await this.createDbConnections();
-      console.log(`OddButtonParser reset.`);
-    } catch { }
+    } catch {
+      const foo = 'foo';
+    }
 
     return this;
   }
@@ -107,7 +110,9 @@ export class OddButtonParser {
   public async disconnect(): Promise<void> {
     try {
       await this.dbOddConnection.disconnect();
-    } catch { }
+    } catch {
+      const foo = 'foo';
+    }
   }
 
   public async resetOddButtonFromReference(): Promise<ElementHandle> {

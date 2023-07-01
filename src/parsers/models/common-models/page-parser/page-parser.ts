@@ -47,7 +47,6 @@ export class PageParser {
   private async reset(): Promise<PageParser> {
     await this.webpage.reload();
     await this.oddButtonParserSet.reset();
-    console.log(`${this.pageUrl} PageParser reset.`);
     return this;
   }
 

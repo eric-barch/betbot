@@ -37,7 +37,7 @@ export class DbUtilityFunctions {
           homeTeam: true,
         },
       });
-    } catch (e) {
+    } catch {
       game = await prisma.game.create({
         data: {
           awayTeam: { connect: { id: awayTeam.id } },
