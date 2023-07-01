@@ -5,13 +5,15 @@ import { DbUtilityFunctions, GameWithTeams, prisma } from '@/db';
 import { DbGameConnection, SpecializedDbGameConnection } from '@/parsers/models/common-models';
 
 import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
+import { DraftKingsJsonGameParser } from './draft-kings-json-game-parser';
 
 export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
   private readonly parentDbGameConnection: DbGameConnection;
   private wrappedAwayTeam: Team | undefined;
   private wrappedHomeTeam: Team | undefined;
-  private wrappedStartDateParser: DraftKingsStartDateParser | undefined;
   private wrappedExchangeAssignedGameId: string | undefined;
+  private wrappedStartDateParser: DraftKingsStartDateParser | undefined;
+  private wrappedJsonGameParser: DraftKingsJsonGameParser | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
   public constructor({
@@ -28,8 +30,22 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
     try {
       return await this.findGameByExchangeAssignedGameId();
     } catch {
-      return await this.findOrCreateGameByMatchupAndStartDate();
+      const foo = 'foo';
     }
+
+    try {
+      return await this.findOrCreateGameByJson();
+    } catch {
+      const foo = 'foo';
+    }
+
+    try {
+      return await this.findOrCreateGameByMatchupAndStartDate();
+    } catch {
+      const foo = 'foo';
+    }
+
+    throw new Error(`Unable to find or create game.`);
   }
 
   private async parseMatchupAndExchangeAssignedGameId(): Promise<void> {
@@ -122,12 +138,19 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
     return exchangeToGame.game;
   }
 
+  private async findOrCreateGameByJson(): Promise<GameWithTeams> {
+    this.jsonGameParser = await DraftKingsJsonGameParser.create({
+      parentDbGameConnection: this.parentDbGameConnection,
+      exchangeAssignedGameId: this.exchangeAssignedGameId,
+    });
+
+    return this.game;
+  }
+
   private async findOrCreateGameByMatchupAndStartDate(): Promise<GameWithTeams> {
     this.startDateParser = await DraftKingsStartDateParser.create({
       parentDbGameConnection: this.parentDbGameConnection,
     });
-
-    const startDate = this.startDateParser.startDate;
 
     this.game = await DbUtilityFunctions.findOrCreateGameByMatchupAndStartDate({
       awayTeam: this.awayTeam,
@@ -183,6 +206,18 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
     return this.wrappedHomeTeam;
   }
 
+  private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
+    this.wrappedExchangeAssignedGameId = exchangeAssignedGameId;
+  }
+
+  private get exchangeAssignedGameId(): string {
+    if (!this.wrappedExchangeAssignedGameId) {
+      throw new Error(`wrappedExchangeAssignedGameId is undefined.`);
+    }
+
+    return this.wrappedExchangeAssignedGameId;
+  }
+
   private set startDateParser(startDateParser: DraftKingsStartDateParser) {
     this.wrappedStartDateParser = startDateParser;
   }
@@ -195,16 +230,16 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
     return this.wrappedStartDateParser;
   }
 
-  private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
-    this.wrappedExchangeAssignedGameId = exchangeAssignedGameId;
+  private set jsonGameParser(jsonGameParser: DraftKingsJsonGameParser) {
+    this.wrappedJsonGameParser = jsonGameParser;
   }
 
-  private get exchangeAssignedGameId(): string {
-    if (!this.wrappedExchangeAssignedGameId) {
-      throw new Error(`wrappedExchangeAssignedGameId is undefined.`);
+  private get jsonGameParser(): DraftKingsJsonGameParser {
+    if (this.wrappedJsonGameParser === undefined) {
+      throw new Error(`wrappedJsonGameParser is undefined.`);
     }
 
-    return this.wrappedExchangeAssignedGameId;
+    return this.wrappedJsonGameParser;
   }
 
   private set game(game: GameWithTeams) {

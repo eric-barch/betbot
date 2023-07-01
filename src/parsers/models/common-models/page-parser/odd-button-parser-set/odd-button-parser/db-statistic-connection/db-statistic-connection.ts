@@ -45,7 +45,7 @@ export class DbStatisticConnection {
 
     try {
       this.statistic = await this.findOrCreateStatistic();
-    } catch (error) {
+    } catch {
       this.statistic = null;
     }
 
