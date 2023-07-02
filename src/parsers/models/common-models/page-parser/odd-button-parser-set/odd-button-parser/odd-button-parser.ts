@@ -70,6 +70,7 @@ export class OddButtonParser {
     return this;
   }
 
+  // TODO: Avoid returns of void
   public async resetOddButtonFromReference(): Promise<void> {
     await this.oddButtonWrapper.resetFromReference();
   }

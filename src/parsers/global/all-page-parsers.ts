@@ -3,6 +3,7 @@ import { pageUrls } from '@/setup';
 
 // TODO: Implement as a singleton
 export class AllPageParsers {
+  private static wrappedInstance: AllPageParsers | undefined;
   private readonly pageUrls: Array<string>;
   private wrappedPageParsers: Set<PageParser> | undefined;
 
@@ -14,17 +15,25 @@ export class AllPageParsers {
     this.pageUrls = pageUrls;
   }
 
-  public static async create(): Promise<AllPageParsers> {
-    const allPageParsers = new AllPageParsers({ pageUrls });
-    await allPageParsers.init();
-    return allPageParsers;
+  public static async getInstance(): Promise<AllPageParsers> {
+    try {
+      return this.instance;
+    } catch {
+      this.instance = await AllPageParsers.create();
+      return this.instance;
+    }
+  }
+
+  private static async create(): Promise<AllPageParsers> {
+    this.instance = new AllPageParsers({ pageUrls });
+    await this.instance.init();
+    return this.instance;
   }
 
   public async init(): Promise<AllPageParsers> {
     this.pageParsers = new Set<PageParser>();
 
-    /**Do not run in parallel. PageParsers must be created in series to avoid dual entries in db.
-     * TODO: Optimize if possible. */
+    /**Do not run in parallel. PageParsers must be created in series to avoid dual entries in db. */
     for (const pageUrl of this.pageUrls) {
       const pageParser = await PageParser.create({ pageUrl });
       this.pageParsers.add(pageParser);
@@ -57,6 +66,18 @@ export class AllPageParsers {
     );
 
     return this;
+  }
+
+  private static set instance(instance: AllPageParsers) {
+    AllPageParsers.wrappedInstance = instance;
+  }
+
+  private static get instance(): AllPageParsers {
+    if (!AllPageParsers.wrappedInstance) {
+      throw new Error('AllPageParsers has not been initialized.');
+    }
+
+    return AllPageParsers.wrappedInstance;
   }
 
   private set pageParsers(pageParsers: Set<PageParser>) {

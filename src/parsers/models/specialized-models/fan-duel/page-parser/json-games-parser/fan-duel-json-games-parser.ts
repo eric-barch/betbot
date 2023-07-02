@@ -2,6 +2,7 @@ import { Game } from '@prisma/client';
 
 import { GameService, TeamService, prisma } from '@/db';
 import { PageParser } from '@/parsers/models/common-models';
+import { loopInParallel } from '@/setup';
 
 export class FanDuelJsonGamesParser {
   private readonly parentPageParser: PageParser;
@@ -54,18 +55,20 @@ export class FanDuelJsonGamesParser {
   private async parseGames(): Promise<Array<Game>> {
     this.games = new Array<Game>();
 
-    // Run in series (development)
-    // for (const jsonGame of this.jsonGames) {
-    //   const game = await this.parseGame({ jsonGame });
-    //   this.games.push(game);
-    // }
+    if (loopInParallel) {
+      this.games = await Promise.all(
+        this.jsonGames.map(async (jsonGame) => {
+          return await this.parseGame({ jsonGame });
+        })
+      );
+    }
 
-    // Run in parallel (production)
-    this.games = await Promise.all(
-      this.jsonGames.map(async (jsonGame) => {
-        return await this.parseGame({ jsonGame });
-      })
-    );
+    if (!loopInParallel) {
+      for (const jsonGame of this.jsonGames) {
+        const game = await this.parseGame({ jsonGame });
+        this.games.push(game);
+      }
+    }
 
     return this.games;
   }
