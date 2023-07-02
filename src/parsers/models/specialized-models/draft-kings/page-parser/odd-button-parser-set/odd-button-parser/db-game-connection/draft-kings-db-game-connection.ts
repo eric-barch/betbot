@@ -1,11 +1,11 @@
 import { Team } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
-import { DbUtilityFunctions, GameWithTeams, prisma } from '@/db';
+import { GameService, GameWithTeams, TeamService, prisma } from '@/db';
 import { DbGameConnection, SpecializedDbGameConnection } from '@/parsers/models/common-models';
 
-import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
 import { DraftKingsJsonGameParser } from './draft-kings-json-game-parser';
+import { DraftKingsStartDateParser } from './draft-kings-start-date-parser';
 
 export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
   private readonly parentDbGameConnection: DbGameConnection;
@@ -81,12 +81,12 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
 
     const league = this.parentDbGameConnection.league;
 
-    this.awayTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
+    this.awayTeam = await TeamService.findByUnformattedNameAndLeague({
       league,
       unformattedName: teamNameMatches[1],
     });
 
-    this.homeTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
+    this.homeTeam = await TeamService.findByUnformattedNameAndLeague({
       league,
       unformattedName: teamNameMatches[2],
     });
@@ -142,7 +142,7 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
       parentDbGameConnection: this.parentDbGameConnection,
     });
 
-    this.game = await DbUtilityFunctions.findOrCreateGameByMatchupAndStartDate({
+    this.game = await GameService.findOrCreateByMatchupAndStartDate({
       awayTeam: this.awayTeam,
       homeTeam: this.homeTeam,
       startDate: this.startDateParser.startDate,

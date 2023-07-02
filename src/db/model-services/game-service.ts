@@ -1,11 +1,9 @@
-import { League, Team } from '@prisma/client';
+import { Team } from '@prisma/client';
 
-import { prisma } from './prisma-client';
-import { GameWithTeams } from './game-with-teams';
+import { GameWithTeams, prisma } from '@/db';
 
-// TODO: I really don't like having this class at all.
-export class DbUtilityFunctions {
-  public static async findOrCreateGameByMatchupAndStartDate({
+export class GameService {
+  public static async findOrCreateByMatchupAndStartDate({
     awayTeam,
     homeTeam,
     startDate,
@@ -54,39 +52,5 @@ export class DbUtilityFunctions {
     });
 
     return game;
-  }
-
-  public static async findTeamByUnformattedNameAndLeague({
-    unformattedName,
-    league,
-  }: {
-    unformattedName: string,
-    league: League,
-  }): Promise<Team> {
-    unformattedName = unformattedName.replace(/[^a-zA-Z0-9]/g, ' ');
-
-    const leagueTeams = await prisma.team.findMany({
-      where: {
-        leagueId: league.id,
-      }
-    });
-
-    if (leagueTeams.length < 1) {
-      throw new Error(`No teams found for league ${league.name}`);
-    }
-
-    const foundTeam = await Promise.any(leagueTeams.map((team) => {
-      return new Promise<Team>((resolve, reject) => {
-        const regex = new RegExp(`\\b${team.identifierFull}\\b`, 'i');
-
-        if (regex.test(unformattedName)) {
-          resolve(team);
-        } else {
-          reject();
-        }
-      });
-    }));
-
-    return foundTeam;
   }
 }

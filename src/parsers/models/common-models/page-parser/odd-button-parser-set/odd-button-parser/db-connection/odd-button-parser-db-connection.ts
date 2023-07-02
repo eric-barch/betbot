@@ -61,10 +61,6 @@ export class OddButtonParserDbConnection {
     });
   }
 
-  public async reset(): Promise<void> {
-    await this.init();
-  }
-
   public async disconnect(): Promise<void> {
     await this.dbOddConnection.disconnect();
   }
