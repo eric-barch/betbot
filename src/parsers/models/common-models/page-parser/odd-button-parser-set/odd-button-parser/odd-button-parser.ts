@@ -12,7 +12,6 @@ export interface SpecializedOddButtonParser {
 
 export class OddButtonParser {
   public readonly parentPageParser: PageParser;
-  private readonly specializedParserFactory: SpecializedParserFactory;
   private readonly initializationButton: ElementHandle;
   private wrappedSpecializedOddButtonParser: SpecializedOddButtonParser | undefined;
   private wrappedOddButtonWrapper: OddButtonWrapper | undefined;
@@ -21,30 +20,24 @@ export class OddButtonParser {
 
   private constructor({
     parentPageParser,
-    specializedParserFactory,
     initializationButton,
   }: {
     parentPageParser: PageParser,
-    specializedParserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }) {
     this.parentPageParser = parentPageParser;
-    this.specializedParserFactory = specializedParserFactory;
     this.initializationButton = initializationButton;
   }
 
   public static async create({
     parentPageParser,
-    specializedParserFactory,
     initializationButton,
   }: {
     parentPageParser: PageParser,
-    specializedParserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }): Promise<OddButtonParser> {
     const commonOddButtonParser = new OddButtonParser({
       parentPageParser,
-      specializedParserFactory,
       initializationButton,
     });
     await commonOddButtonParser.init();
@@ -52,17 +45,18 @@ export class OddButtonParser {
   }
 
   private async init(): Promise<OddButtonParser> {
-    this.specializedOddButtonParser = await this.specializedParserFactory.createOddButtonParser({
-      parentOddButtonParser: this,
-    });
+    this.specializedOddButtonParser = await this
+      .parentPageParser
+      .specializedParserFactory
+      .createOddButtonParser({
+        parentOddButtonParser: this,
+      });
     this.oddButtonWrapper = await OddButtonWrapper.create({
       parentOddButtonParser: this,
-      specializedParserFactory: this.specializedParserFactory,
       initializationButton: this.initializationButton,
     });
     this.dbConnection = await OddButtonParserDbConnection.create({
       parentOddButtonParser: this,
-      specializedParserFactory: this.specializedParserFactory,
     });
     this.textContentParser = await TextContentParser.create({
       parentOddButtonParser: this,

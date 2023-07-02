@@ -10,7 +10,6 @@ export interface SpecializedOddButtonWrapper {
 
 export class OddButtonWrapper {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedOddButton: ElementHandle;
   private wrappedSpecializedOddButtonWrapper: SpecializedOddButtonWrapper | undefined;
   private wrappedReferenceSelector: string | undefined;
@@ -19,30 +18,24 @@ export class OddButtonWrapper {
 
   private constructor({
     parentOddButtonParser,
-    specializedParserFactory,
     initializationButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.specializedParserFactory = specializedParserFactory;
     this.wrappedOddButton = initializationButton;
   }
 
   public static async create({
     parentOddButtonParser,
-    specializedParserFactory,
     initializationButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
     initializationButton: ElementHandle,
   }): Promise<OddButtonWrapper> {
     const oddButtonWrapper = new OddButtonWrapper({
       parentOddButtonParser,
-      specializedParserFactory,
       initializationButton,
     });
     await oddButtonWrapper.init();
@@ -50,7 +43,13 @@ export class OddButtonWrapper {
   }
 
   private async init(): Promise<OddButtonWrapper> {
-    this.specializedOddButtonWrapper = await this.specializedParserFactory.createOddButtonWrapper({ parentOddButtonWrapper: this });
+    this.specializedOddButtonWrapper = await this
+      .parentOddButtonParser
+      .parentPageParser
+      .specializedParserFactory
+      .createOddButtonWrapper({
+        parentOddButtonWrapper: this,
+      });
     this.referenceSelector = await this.specializedOddButtonWrapper.generateReferenceSelector();
     this.referenceElement = await this.findReferenceElement();
     return this;
@@ -61,6 +60,7 @@ export class OddButtonWrapper {
 
     let element = this.oddButton;
 
+    // TODO: Can probably simplify this using evaluateHandle -> closest
     while (element) {
       const matchesSelector = await element.evaluate(
         (el, selector) => el.matches(selector),
@@ -110,7 +110,6 @@ export class OddButtonWrapper {
   }
 
   public async resetFromReference(): Promise<ElementHandle> {
-    // TODO: If there is anywhere to gain some consistent performance it's probably here
     const button = await this.referenceElement.$(`xpath${this.referenceElementToOddButtonXPath}`);
 
     if (!button) {
