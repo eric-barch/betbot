@@ -2,7 +2,7 @@ import { prisma } from '@/db';
 import { AllPageParsers } from '@/parsers/global';
 
 async function main() {
-  const allPageParsers = await AllPageParsers.create();
+  const allPageParsers = await AllPageParsers.getInstance();
 
   let running = true;
 
