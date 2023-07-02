@@ -27,14 +27,6 @@ export class PageParserDbConnection {
     return pageParserDbConnection;
   }
 
-  public get exchange(): Exchange {
-    return this.dbExchangeConnection.exchange;
-  }
-
-  public get league(): League {
-    return this.dbLeagueConnection.league;
-  }
-
   private async init(): Promise<PageParserDbConnection> {
     this.dbExchangeConnection = await DbExchangeConnection.create({
       parentPageParser: this.parentPageParser,
@@ -43,6 +35,14 @@ export class PageParserDbConnection {
       parentPageParser: this.parentPageParser,
     });
     return this;
+  }
+
+  public get exchange(): Exchange {
+    return this.dbExchangeConnection.exchange;
+  }
+
+  public get league(): League {
+    return this.dbLeagueConnection.league;
   }
 
   private set dbExchangeConnection(dbExchangeConnection: DbExchangeConnection) {
