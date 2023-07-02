@@ -33,7 +33,7 @@ export class DbOddConnection {
   }
 
   private async findOrCreateOdd(): Promise<Odd> {
-    const exchangeId = this.parentOddButtonParser.exchange.id;
+    const exchangeId = this.parentOddButtonParser.parentPageParser.exchange.id;
     const statisticId = this.parentOddButtonParser.statistic.id;
 
     this.odd = await prisma.odd.upsert({

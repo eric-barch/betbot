@@ -2,16 +2,15 @@ import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
 import {
-  DbExchangeConnection, DbLeagueConnection, OddButtonParserSet, SpecializedParserFactory,
-  SpecializedParserFactoryFactory, Webpage,
+  DbExchangeConnection, DbLeagueConnection, OddButtonParserSet, PageParserDbConnection, SpecializedParserFactory,
+  SpecializedParserFactoryFactory, WebpageConnection,
 } from '@/parsers/models/common-models';
 
 export class PageParser {
   public readonly pageUrl: string;
-  private wrappedDbExchangeConnection: DbExchangeConnection | undefined;
-  private wrappedDbLeagueConnection: DbLeagueConnection | undefined;
+  private wrappedWebpageConnection: WebpageConnection | undefined;
+  private wrappedDbConnection: PageParserDbConnection | undefined;
   private wrappedSpecializedParserFactory: SpecializedParserFactory | undefined;
-  private wrappedWebpage: Webpage | undefined;
   private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
 
   private constructor({
@@ -33,10 +32,9 @@ export class PageParser {
   }
 
   private async init(): Promise<PageParser> {
-    this.dbExchangeConnection = await DbExchangeConnection.create({ parentPageParser: this });
-    this.dbLeagueConnection = await DbLeagueConnection.create({ parentPageParser: this });
+    this.dbConnection = await PageParserDbConnection.create({ parentPageParser: this });
+    this.webpageConnection = await WebpageConnection.create({ parentPageParser: this });
     this.specializedParserFactory = await SpecializedParserFactoryFactory.create({ parentPageParser: this });
-    this.webpage = await Webpage.create({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({
       parentPageParser: this,
       specializedParserFactory: this.specializedParserFactory,
@@ -45,7 +43,7 @@ export class PageParser {
   }
 
   private async reset(): Promise<PageParser> {
-    await this.webpage.reload();
+    await this.webpageConnection.reset();
     await this.oddButtonParserSet.reset();
     return this;
   }
@@ -59,51 +57,39 @@ export class PageParser {
   }
 
   public async disconnect(): Promise<void> {
+    await this.webpageConnection.disconnect();
     await this.oddButtonParserSet.disconnect();
-    await this.webpage.disconnect();
   }
 
   public get page(): Page {
-    return this.webpage.page;
+    return this.webpageConnection.page;
   }
 
   public get exchange(): Exchange {
-    return this.dbExchangeConnection.exchange;
+    return this.dbConnection.exchange;
   }
 
   public get league(): League {
-    return this.dbLeagueConnection.league;
+    return this.dbConnection.league;
   }
 
-  private set dbExchangeConnection(dbExchangeConnection: DbExchangeConnection) {
-    this.wrappedDbExchangeConnection = dbExchangeConnection;
+  private set dbConnection(dbConnection: PageParserDbConnection) {
+    this.wrappedDbConnection = dbConnection;
   }
 
-  private get dbExchangeConnection(): DbExchangeConnection {
-    if (!this.wrappedDbExchangeConnection) {
-      throw new Error(`wrappedDbExchangeConnection is undefined.`);
+  private get dbConnection(): PageParserDbConnection {
+    if (this.wrappedDbConnection === undefined) {
+      throw new Error(`wrappedDbConnection is undefined.`);
     }
 
-    return this.wrappedDbExchangeConnection;
-  }
-
-  private set dbLeagueConnection(dbLeagueConnection: DbLeagueConnection) {
-    this.wrappedDbLeagueConnection = dbLeagueConnection;
-  }
-
-  private get dbLeagueConnection(): DbLeagueConnection {
-    if (!this.wrappedDbLeagueConnection) {
-      throw new Error(`wrappedDbLeagueConnection is undefined.`);
-    }
-
-    return this.wrappedDbLeagueConnection;
+    return this.wrappedDbConnection;
   }
 
   private set specializedParserFactory(specializedParserFactory: SpecializedParserFactory) {
     this.wrappedSpecializedParserFactory = specializedParserFactory;
   }
 
-  private get specializedParserFactory(): SpecializedParserFactory {
+  public get specializedParserFactory(): SpecializedParserFactory {
     if (!this.wrappedSpecializedParserFactory) {
       throw new Error(`wrappedSpecializedParserFactory is undefined.`);
     }
@@ -111,16 +97,16 @@ export class PageParser {
     return this.wrappedSpecializedParserFactory;
   }
 
-  private set webpage(webpage: Webpage) {
-    this.wrappedWebpage = webpage;
+  private set webpageConnection(webpageConnection: WebpageConnection) {
+    this.wrappedWebpageConnection = webpageConnection;
   }
 
-  private get webpage(): Webpage {
-    if (!this.wrappedWebpage) {
-      throw new Error(`wrappedWebpage is undefined.`);
+  private get webpageConnection(): WebpageConnection {
+    if (!this.wrappedWebpageConnection) {
+      throw new Error(`wrappedWebpageConnection is undefined.`);
     }
 
-    return this.wrappedWebpage;
+    return this.wrappedWebpageConnection;
   }
 
   private set oddButtonParserSet(oddButtonParserSet: OddButtonParserSet) {
