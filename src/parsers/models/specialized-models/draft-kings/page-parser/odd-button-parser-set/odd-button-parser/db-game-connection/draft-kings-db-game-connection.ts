@@ -29,23 +29,13 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
 
     try {
       return await this.findGameByExchangeAssignedGameId();
-    } catch {
-      const foo = 'foo';
-    }
+    } catch { }
 
     try {
       return await this.findOrCreateGameByJson();
-    } catch {
-      const foo = 'foo';
-    }
+    } catch { }
 
-    try {
-      return await this.findOrCreateGameByMatchupAndStartDate();
-    } catch {
-      const foo = 'foo';
-    }
-
-    throw new Error(`Unable to find or create game.`);
+    return await this.findOrCreateGameByMatchupAndStartDate();
   }
 
   private async parseMatchupAndExchangeAssignedGameId(): Promise<void> {

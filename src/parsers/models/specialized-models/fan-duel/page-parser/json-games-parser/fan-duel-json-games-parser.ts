@@ -55,17 +55,17 @@ export class FanDuelJsonGamesParser {
     this.games = new Array<Game>();
 
     // Run in series (development)
-    for (const jsonGame of this.jsonGames) {
-      const game = await this.parseGame({ jsonGame });
-      this.games.push(game);
-    }
+    // for (const jsonGame of this.jsonGames) {
+    //   const game = await this.parseGame({ jsonGame });
+    //   this.games.push(game);
+    // }
 
     // Run in parallel (production)
-    // this.games = await Promise.all(
-    //   this.jsonGames.map(async (jsonGame) => {
-    //     return await this.parseGame({ jsonGame });
-    //   })
-    // );
+    this.games = await Promise.all(
+      this.jsonGames.map(async (jsonGame) => {
+        return await this.parseGame({ jsonGame });
+      })
+    );
 
     return this.games;
   }

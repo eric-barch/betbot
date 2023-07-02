@@ -37,19 +37,21 @@ export class DbUtilityFunctions {
           homeTeam: true,
         },
       });
-    } catch {
-      game = await prisma.game.create({
-        data: {
-          awayTeam: { connect: { id: awayTeam.id } },
-          homeTeam: { connect: { id: homeTeam.id } },
-          startDate,
-        },
-        include: {
-          awayTeam: true,
-          homeTeam: true,
-        },
-      })
-    }
+
+      return game;
+    } catch { }
+
+    game = await prisma.game.create({
+      data: {
+        awayTeam: { connect: { id: awayTeam.id } },
+        homeTeam: { connect: { id: homeTeam.id } },
+        startDate,
+      },
+      include: {
+        awayTeam: true,
+        homeTeam: true,
+      },
+    });
 
     return game;
   }

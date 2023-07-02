@@ -3,7 +3,7 @@ import { ElementHandle } from 'puppeteer';
 
 import { GameWithTeams } from '@/db';
 import {
-  OddButtonParserDbConnection, OddButtonWrapper, PageParser, SpecializedParserFactory, TextContentParser,
+  OddButtonParserDbConnection, OddButtonWrapper, PageParser, TextContentParser
 } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParser {
@@ -51,25 +51,23 @@ export class OddButtonParser {
       .createOddButtonParser({
         parentOddButtonParser: this,
       });
+    this.textContentParser = TextContentParser.create({
+      parentOddButtonParser: this,
+    });
     this.oddButtonWrapper = await OddButtonWrapper.create({
       parentOddButtonParser: this,
-      initializationButton: this.initializationButton,
+      oddButton: this.initializationButton,
     });
     this.dbConnection = await OddButtonParserDbConnection.create({
       parentOddButtonParser: this,
     });
-    this.textContentParser = await TextContentParser.create({
-      parentOddButtonParser: this,
-    });
+
     return this;
   }
 
-  public async update(): Promise<void> {
-    try {
-      await this.specializedOddButtonParser.update();
-    } catch {
-      await this.reset();
-    }
+  public async update(): Promise<OddButtonParser> {
+    await this.specializedOddButtonParser.update();
+    return this;
   }
 
   public async resetOddButtonFromReference(): Promise<void> {
@@ -88,10 +86,6 @@ export class OddButtonParser {
     });
 
     return this.odd;
-  }
-
-  private async reset(): Promise<void> {
-    await this.dbConnection.reset();
   }
 
   public async disconnect(): Promise<void> {

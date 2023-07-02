@@ -1,4 +1,4 @@
-import { League, Team } from '@prisma/client';
+import { Exchange, League, Team } from '@prisma/client';
 
 import { prisma } from '@/db';
 import { PageParser } from '@/parsers/models/common-models';
@@ -8,22 +8,31 @@ import {
 
 export class DbLeagueConnection {
   private readonly parentPageParser: PageParser;
+  private readonly exchange: Exchange;
   private wrappedLeague: League | undefined;
 
   private constructor({
     parentPageParser,
+    exchange,
   }: {
     parentPageParser: PageParser,
+    exchange: Exchange,
   }) {
     this.parentPageParser = parentPageParser;
+    this.exchange = exchange;
   }
 
   public static async create({
     parentPageParser,
+    exchange,
   }: {
     parentPageParser: PageParser,
+    exchange: Exchange,
   }): Promise<DbLeagueConnection> {
-    const dbLeagueConnection = new DbLeagueConnection({ parentPageParser });
+    const dbLeagueConnection = new DbLeagueConnection({
+      parentPageParser,
+      exchange,
+    });
     await dbLeagueConnection.init();
     return dbLeagueConnection;
   }
@@ -34,10 +43,9 @@ export class DbLeagueConnection {
   }
 
   private async findOrCreateLeagueFromPageUrl(): Promise<League> {
-    const exchange = this.parentPageParser.exchange;
     const pageUrl = this.parentPageParser.pageUrl;
 
-    switch (exchange.name) {
+    switch (this.exchange.name) {
       case 'DraftKings':
         if (pageUrl.includes('mlb')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: mlbInitData });

@@ -1,7 +1,7 @@
 import { ElementHandle } from 'puppeteer';
 
 import { GameWithTeams } from '@/db';
-import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonWrapper {
   generateReferenceSelector(): Promise<string>;
@@ -18,25 +18,25 @@ export class OddButtonWrapper {
 
   private constructor({
     parentOddButtonParser,
-    initializationButton,
+    oddButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    initializationButton: ElementHandle,
+    oddButton: ElementHandle,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.wrappedOddButton = initializationButton;
+    this.wrappedOddButton = oddButton;
   }
 
   public static async create({
     parentOddButtonParser,
-    initializationButton,
+    oddButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    initializationButton: ElementHandle,
+    oddButton: ElementHandle,
   }): Promise<OddButtonWrapper> {
     const oddButtonWrapper = new OddButtonWrapper({
       parentOddButtonParser,
-      initializationButton,
+      oddButton,
     });
     await oddButtonWrapper.init();
     return oddButtonWrapper;
@@ -51,11 +51,11 @@ export class OddButtonWrapper {
         parentOddButtonWrapper: this,
       });
     this.referenceSelector = await this.specializedOddButtonWrapper.generateReferenceSelector();
-    this.referenceElement = await this.findReferenceElement();
+    this.referenceElement = await this.getReferenceElement();
     return this;
   }
 
-  private async findReferenceElement(): Promise<ElementHandle> {
+  private async getReferenceElement(): Promise<ElementHandle> {
     this.referenceElementToOddButtonXPath = '';
 
     let element = this.oddButton;

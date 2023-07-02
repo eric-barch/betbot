@@ -9,25 +9,32 @@ export interface SpecializedDbStatisticConnection {
 }
 
 export class DbStatisticConnection {
-  private readonly parentOddButtonParser: OddButtonParser;
+  public readonly parentOddButtonParser: OddButtonParser;
+  public readonly game: GameWithTeams;
   private wrappedSpecializedDbStatisticConnection: SpecializedDbStatisticConnection | undefined;
   private wrappedStatistic: Statistic | undefined;
 
   private constructor({
     parentOddButtonParser,
+    game,
   }: {
     parentOddButtonParser: OddButtonParser,
+    game: GameWithTeams,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
+    this.game = game;
   }
 
   public static async create({
     parentOddButtonParser,
+    game,
   }: {
     parentOddButtonParser: OddButtonParser,
+    game: GameWithTeams,
   }): Promise<DbStatisticConnection> {
     const dbStatisticConnection = new DbStatisticConnection({
       parentOddButtonParser,
+      game,
     });
     await dbStatisticConnection.init();
     return dbStatisticConnection;
@@ -47,7 +54,7 @@ export class DbStatisticConnection {
 
   private async findOrCreateStatistic(): Promise<Statistic> {
     const name = await this.specializedDbStatisticConnection.parseStatisticName();
-    const gameId = this.parentOddButtonParser.game.id;
+    const gameId = this.game.id;
 
     this.statistic = await prisma.statistic.upsert({
       where: {
@@ -66,12 +73,8 @@ export class DbStatisticConnection {
     return this.statistic;
   }
 
-  public get button(): ElementHandle | null {
+  public get button(): ElementHandle {
     return this.parentOddButtonParser.button;
-  }
-
-  public get game(): GameWithTeams {
-    return this.parentOddButtonParser.game;
   }
 
   private set specializedDbStatisticConnection(specializedDbStatisticConnection: SpecializedDbStatisticConnection) {

@@ -1,27 +1,34 @@
-import { Odd } from '@prisma/client';
+import { Odd, Statistic } from '@prisma/client';
 
 import { prisma } from '@/db';
 import { OddButtonParser } from '@/parsers/models/common-models';
 
 export class DbOddConnection {
   private readonly parentOddButtonParser: OddButtonParser;
+  private readonly statistic: Statistic;
   private wrappedOdd: Odd | undefined;
 
   private constructor({
     parentOddButtonParser,
+    statistic,
   }: {
     parentOddButtonParser: OddButtonParser,
+    statistic: Statistic,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
+    this.statistic = statistic;
   }
 
   public static async create({
     parentOddButtonParser,
+    statistic,
   }: {
     parentOddButtonParser: OddButtonParser,
+    statistic: Statistic,
   }): Promise<DbOddConnection> {
     const dbOddConnection = new DbOddConnection({
       parentOddButtonParser,
+      statistic,
     });
     await dbOddConnection.init();
     return dbOddConnection;
@@ -34,7 +41,7 @@ export class DbOddConnection {
 
   private async findOrCreateOdd(): Promise<Odd> {
     const exchangeId = this.parentOddButtonParser.parentPageParser.exchange.id;
-    const statisticId = this.parentOddButtonParser.statistic.id;
+    const statisticId = this.statistic.id;
 
     this.odd = await prisma.odd.upsert({
       where: {

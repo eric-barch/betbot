@@ -1,8 +1,6 @@
 import { ElementHandle } from 'puppeteer';
 
-import {
-  OddButtonParser, PageParser, SpecializedParserFactory,
-} from '@/parsers/models/common-models';
+import { OddButtonParser, PageParser } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParserSet {
   generateOddButtonSelector(): Promise<string>;
@@ -76,30 +74,30 @@ export class OddButtonParserSet {
 
   public async update(): Promise<void> {
     // Run in series (development)
-    for (const oddButtonParser of this.oddButtonParsers) {
-      await oddButtonParser.update();
-    }
+    // for (const oddButtonParser of this.oddButtonParsers) {
+    //   await oddButtonParser.update();
+    // }
 
     // Run in parallel (production)
-    // await Promise.all(
-    //   Array.from(this.oddButtonParsers).map(async (oddButtonParser) => {
-    //     await oddButtonParser.update();
-    //   })
-    // );
+    await Promise.all(
+      Array.from(this.oddButtonParsers).map(async (oddButtonParser) => {
+        await oddButtonParser.update();
+      })
+    );
   };
 
   public async disconnect(): Promise<void> {
     // Run in series (development)
-    for (const oddButtonParser of this.oddButtonParsers) {
-      await oddButtonParser.disconnect();
-    }
+    // for (const oddButtonParser of this.oddButtonParsers) {
+    //   await oddButtonParser.disconnect();
+    // }
 
     // Run in parallel (production)
-    // await Promise.all(
-    //   Array.from(this.oddButtonParsers).map(async (oddButtonParser) => {
-    //     await oddButtonParser.disconnect();
-    //   })
-    // );
+    await Promise.all(
+      Array.from(this.oddButtonParsers).map(async (oddButtonParser) => {
+        await oddButtonParser.disconnect();
+      })
+    );
   };
 
   private set specializedOddButtonParserSet(specializedOddButtonParserSet: SpecializedOddButtonParserSet) {

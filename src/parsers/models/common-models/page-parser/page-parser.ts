@@ -2,8 +2,8 @@ import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
 import {
-  DbExchangeConnection, DbLeagueConnection, OddButtonParserSet, PageParserDbConnection, SpecializedParserFactory,
-  SpecializedParserFactoryFactory, WebpageConnection,
+  OddButtonParserSet, PageParserDbConnection, SpecializedParserFactory,
+  SpecializedParserFactoryFactory, WebpageConnection
 } from '@/parsers/models/common-models';
 
 export class PageParser {
@@ -45,12 +45,15 @@ export class PageParser {
     return this;
   }
 
-  public async update(): Promise<void> {
+  public async update(): Promise<PageParser> {
     try {
       await this.oddButtonParserSet.update();
-    } catch {
-      await this.reset();
-    }
+      return this;
+    } catch { }
+
+    console.log(`Resetting page parser...`);
+    await this.reset();
+    return this;
   }
 
   public async disconnect(): Promise<void> {
