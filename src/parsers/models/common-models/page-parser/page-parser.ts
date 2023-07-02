@@ -35,10 +35,7 @@ export class PageParser {
     this.dbConnection = await PageParserDbConnection.create({ parentPageParser: this });
     this.webpageConnection = await WebpageConnection.create({ parentPageParser: this });
     this.specializedParserFactory = await SpecializedParserFactoryFactory.create({ parentPageParser: this });
-    this.oddButtonParserSet = await OddButtonParserSet.create({
-      parentPageParser: this,
-      specializedParserFactory: this.specializedParserFactory,
-    });
+    this.oddButtonParserSet = await OddButtonParserSet.create({ parentPageParser: this });
     return this;
   }
 

@@ -14,25 +14,18 @@ export class OddButtonParserDbConnection {
 
   private constructor({
     parentOddButtonParser,
-    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
   }
 
   public static async create({
     parentOddButtonParser,
-    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
   }): Promise<OddButtonParserDbConnection> {
-    const dbConnection = new OddButtonParserDbConnection({
-      parentOddButtonParser,
-      specializedParserFactory,
-    });
+    const dbConnection = new OddButtonParserDbConnection({ parentOddButtonParser });
     await dbConnection.init();
     return dbConnection;
   }
