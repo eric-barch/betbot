@@ -48,11 +48,11 @@ export class PageParser {
   public async update(): Promise<PageParser> {
     try {
       await this.oddButtonParserSet.update();
-      return this;
-    } catch { }
+    } catch {
+      console.log(`Resetting page parser...`);
+      await this.reset();
+    }
 
-    console.log(`Resetting page parser...`);
-    await this.reset();
     return this;
   }
 

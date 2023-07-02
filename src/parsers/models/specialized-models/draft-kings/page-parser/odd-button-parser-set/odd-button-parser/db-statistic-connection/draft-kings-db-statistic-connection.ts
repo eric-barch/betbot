@@ -17,9 +17,10 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
   public async parseStatisticName(): Promise<string> {
     try {
       return await this.parseStatisticNameByButtonPosition();
-    } catch { }
+    } catch {
+      return await this.parseStatisticNameByAriaLabel();
+    }
 
-    return await this.parseStatisticNameByAriaLabel();
   }
 
   private async parseStatisticNameByButtonPosition(): Promise<string> {
