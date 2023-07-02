@@ -1,4 +1,4 @@
-import { prisma } from '@/db';
+import { TeamService, prisma } from '@/db';
 import {
   DbStatisticConnection, SpecializedDbStatisticConnection,
 } from '@/parsers/models/common-models';
@@ -16,11 +16,11 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
 
   public async parseStatisticName(): Promise<string> {
     try {
-      return await this.parseStatisticNameByButtonPosition();
+      const statisticName = await this.parseStatisticNameByButtonPosition();
+      return statisticName;
     } catch {
       return await this.parseStatisticNameByAriaLabel();
     }
-
   }
 
   private async parseStatisticNameByButtonPosition(): Promise<string> {
@@ -29,16 +29,12 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
 
     const league = this.parentDbStatisticConnection.parentOddButtonParser.parentPageParser.league;
 
-    const teamNameElement = (await trElement.$('div.event-cell__name-text'))!;
-    const teamName = await teamNameElement.evaluate(el => el.textContent!);
+    const unformattedNameElement = (await trElement.$('div.event-cell__name-text'))!;
+    const unformattedName = await unformattedNameElement.evaluate(el => el.textContent!);
 
-    const team = await prisma.team.findUniqueOrThrow({
-      where: {
-        leagueId_identifierFull: {
-          leagueId: league.id,
-          identifierFull: teamName,
-        }
-      }
+    const team = await TeamService.findByUnformattedNameAndLeague({
+      unformattedName,
+      league,
     });
 
     const awayTeam = this.parentDbStatisticConnection.game.awayTeam;
