@@ -6,7 +6,7 @@ import { draftKingsInitData, ExchangeInitData, fanDuelInitData, sugarHouseInitDa
 
 
 export class DbExchangeConnection {
-  private readonly pageUrl: string;
+  private readonly parentPageParser: PageParser;
   private wrappedExchange: Exchange | undefined;
 
   private constructor({
@@ -14,7 +14,7 @@ export class DbExchangeConnection {
   }: {
     parentPageParser: PageParser,
   }) {
-    this.pageUrl = parentPageParser.pageUrl;
+    this.parentPageParser = parentPageParser;
   }
 
   public static async create({
@@ -33,19 +33,21 @@ export class DbExchangeConnection {
   }
 
   private async findOrCreateExchangeFromPageUrl(): Promise<Exchange> {
-    if (this.pageUrl.includes('draftkings.com')) {
+    const pageUrl = this.parentPageParser.pageUrl;
+
+    if (pageUrl.includes('draftkings.com')) {
       return await this.findOrCreateExchangeFromInitData({ exchangeInitData: draftKingsInitData });
     }
 
-    if (this.pageUrl.includes('fanduel.com')) {
+    if (pageUrl.includes('fanduel.com')) {
       return await this.findOrCreateExchangeFromInitData({ exchangeInitData: fanDuelInitData });
     }
 
-    if (this.pageUrl.includes('playsugarhouse.com')) {
+    if (pageUrl.includes('playsugarhouse.com')) {
       return await this.findOrCreateExchangeFromInitData({ exchangeInitData: sugarHouseInitData });
     }
 
-    throw new Error(`No exchange found for pageUrl: ${this.pageUrl}`);
+    throw new Error(`No exchange found for pageUrl: ${pageUrl}`);
   }
 
   private async findOrCreateExchangeFromInitData({

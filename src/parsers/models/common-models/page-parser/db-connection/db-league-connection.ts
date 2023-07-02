@@ -1,4 +1,4 @@
-import { Exchange, League, Team } from '@prisma/client';
+import { League, Team } from '@prisma/client';
 
 import { prisma } from '@/db';
 import { PageParser } from '@/parsers/models/common-models';
@@ -7,8 +7,7 @@ import {
 } from '@/setup';
 
 export class DbLeagueConnection {
-  private readonly pageUrl: string;
-  private readonly exchange: Exchange;
+  private readonly parentPageParser: PageParser;
   private wrappedLeague: League | undefined;
 
   private constructor({
@@ -16,8 +15,7 @@ export class DbLeagueConnection {
   }: {
     parentPageParser: PageParser,
   }) {
-    this.pageUrl = parentPageParser.pageUrl;
-    this.exchange = parentPageParser.exchange;
+    this.parentPageParser = parentPageParser;
   }
 
   public static async create({
@@ -36,46 +34,49 @@ export class DbLeagueConnection {
   }
 
   private async findOrCreateLeagueFromPageUrl(): Promise<League> {
-    switch (this.exchange.name) {
+    const exchange = this.parentPageParser.exchange;
+    const pageUrl = this.parentPageParser.pageUrl;
+
+    switch (exchange.name) {
       case 'DraftKings':
-        if (this.pageUrl.includes('mlb')) {
+        if (pageUrl.includes('mlb')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: mlbInitData });
         }
 
-        if (this.pageUrl.includes('nba')) {
+        if (pageUrl.includes('nba')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: nbaInitData });
         }
 
-        if (this.pageUrl.includes('nfl')) {
+        if (pageUrl.includes('nfl')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: nflInitData });
         }
       case 'FanDuel':
-        if (this.pageUrl.includes('mlb')) {
+        if (pageUrl.includes('mlb')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: mlbInitData });
         }
 
-        if (this.pageUrl.includes('nba')) {
+        if (pageUrl.includes('nba')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: nbaInitData });
         }
 
-        if (this.pageUrl.includes('nfl')) {
+        if (pageUrl.includes('nfl')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: nflInitData });
         }
       case 'SugarHouse':
-        if (this.pageUrl.includes('1000093616')) {
+        if (pageUrl.includes('1000093616')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: mlbInitData });
         }
 
-        if (this.pageUrl.includes('1000093652')) {
+        if (pageUrl.includes('1000093652')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: nbaInitData });
         }
 
-        if (this.pageUrl.includes('1000093656')) {
+        if (pageUrl.includes('1000093656')) {
           return await this.findOrCreateLeagueFromInitData({ leagueInitData: nflInitData });
         }
     }
 
-    throw new Error(`No league found for pageUrl: ${this.pageUrl}`);
+    throw new Error(`No league found for pageUrl: ${pageUrl}`);
   }
 
   private async findOrCreateLeagueFromInitData({
