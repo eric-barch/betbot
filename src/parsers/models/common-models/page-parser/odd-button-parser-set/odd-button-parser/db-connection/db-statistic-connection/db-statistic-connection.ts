@@ -10,45 +10,38 @@ export interface SpecializedDbStatisticConnection {
 
 export class DbStatisticConnection {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbStatisticConnection: SpecializedDbStatisticConnection | undefined;
-  private wrappedStatistic: Statistic | null | undefined;
+  private wrappedStatistic: Statistic | undefined;
 
   private constructor({
     parentOddButtonParser,
-    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.specializedParserFactory = specializedParserFactory;
   }
 
   public static async create({
     parentOddButtonParser,
-    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
   }): Promise<DbStatisticConnection> {
     const dbStatisticConnection = new DbStatisticConnection({
       parentOddButtonParser,
-      specializedParserFactory,
     });
     await dbStatisticConnection.init();
     return dbStatisticConnection;
   }
 
   private async init(): Promise<DbStatisticConnection> {
-    this.specializedDbStatisticConnection = await this.specializedParserFactory.createDbStatisticConnection({ parentDbStatisticConnection: this });
-
-    try {
-      this.statistic = await this.findOrCreateStatistic();
-    } catch {
-      this.statistic = null;
-    }
-
+    this.specializedDbStatisticConnection = await this
+      .parentOddButtonParser
+      .parentPageParser
+      .specializedParserFactory
+      .createDbStatisticConnection({
+        parentDbStatisticConnection: this,
+      });
+    this.statistic = await this.findOrCreateStatistic();
     return this;
   }
 
@@ -93,11 +86,11 @@ export class DbStatisticConnection {
     return this.wrappedSpecializedDbStatisticConnection;
   }
 
-  private set statistic(statistic: Statistic | null) {
+  private set statistic(statistic: Statistic) {
     this.wrappedStatistic = statistic;
   }
 
-  public get statistic(): Statistic | null {
+  public get statistic(): Statistic {
     if (this.wrappedStatistic === undefined) {
       throw new Error(`wrappedStatistic is undefined.`);
     }

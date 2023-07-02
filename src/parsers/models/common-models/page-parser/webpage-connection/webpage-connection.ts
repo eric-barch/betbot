@@ -2,7 +2,7 @@ import { Browser, connect, Page } from 'puppeteer';
 
 import { PageParser } from '@/parsers/models/common-models';
 
-export class Webpage {
+export class WebpageConnection {
   private readonly url: string;
   private wrappedBrowser: Browser | undefined;
   private wrappedPage: Page | undefined;
@@ -19,13 +19,13 @@ export class Webpage {
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<Webpage> {
-    const webpageConnection = new Webpage({ parentPageParser });
+  }): Promise<WebpageConnection> {
+    const webpageConnection = new WebpageConnection({ parentPageParser });
     await webpageConnection.connect();
     return webpageConnection;
   }
 
-  private async connect(): Promise<Webpage> {
+  private async connect(): Promise<WebpageConnection> {
     await this.connectToBrowser();
     await this.connectToPage();
     return this;
@@ -93,7 +93,7 @@ export class Webpage {
     return this.page;
   }
 
-  public async reload(): Promise<void> {
+  public async reset(): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
       this.page.reload(),

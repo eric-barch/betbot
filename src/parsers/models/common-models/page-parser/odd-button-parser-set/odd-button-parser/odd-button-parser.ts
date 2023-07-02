@@ -1,10 +1,9 @@
-import { Exchange, League, Odd, Statistic } from '@prisma/client';
+import { Odd, Statistic } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
 import { GameWithTeams } from '@/db';
 import {
-  DbGameConnection, DbOddConnection, DbStatisticConnection, OddButtonWrapper, PageParser,
-  SpecializedParserFactory
+  OddButtonParserDbConnection, OddButtonWrapper, PageParser, SpecializedParserFactory, TextContentParser,
 } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonParser {
@@ -17,12 +16,8 @@ export class OddButtonParser {
   private readonly initializationButton: ElementHandle;
   private wrappedSpecializedOddButtonParser: SpecializedOddButtonParser | undefined;
   private wrappedOddButtonWrapper: OddButtonWrapper | undefined;
-  private wrappedDbGameConnection: DbGameConnection | undefined;
-  private wrappedDbStatisticConnection: DbStatisticConnection | undefined;
-  private wrappedDbOddConnection: DbOddConnection | undefined;
-  private wrappedTextContent: string | null | undefined;
-  private wrappedPrice: number | null | undefined;
-  private wrappedValue: number | null | undefined;
+  private wrappedDbConnection: OddButtonParserDbConnection | undefined;
+  private wrappedTextContentParser: TextContentParser | undefined;
 
   private constructor({
     parentPageParser,
@@ -65,37 +60,13 @@ export class OddButtonParser {
       specializedParserFactory: this.specializedParserFactory,
       initializationButton: this.initializationButton,
     });
-
-    try {
-      await this.createDbConnections();
-    } catch {
-      const foo = 'foo';
-    }
-
-    return this;
-  }
-
-  private async createDbConnections(): Promise<void> {
-    this.dbGameConnection = await DbGameConnection.create({
+    this.dbConnection = await OddButtonParserDbConnection.create({
       parentOddButtonParser: this,
       specializedParserFactory: this.specializedParserFactory,
     });
-    this.dbStatisticConnection = await DbStatisticConnection.create({
-      parentOddButtonParser: this,
-      specializedParserFactory: this.specializedParserFactory,
-    });
-    this.dbOddConnection = await DbOddConnection.create({
+    this.textContentParser = await TextContentParser.create({
       parentOddButtonParser: this,
     });
-  }
-
-  private async reset(): Promise<OddButtonParser> {
-    try {
-      await this.createDbConnections();
-    } catch {
-      const foo = 'foo';
-    }
-
     return this;
   }
 
@@ -107,69 +78,30 @@ export class OddButtonParser {
     }
   }
 
-  public async disconnect(): Promise<void> {
-    try {
-      await this.dbOddConnection.disconnect();
-    } catch {
-      const foo = 'foo';
-    }
-  }
-
-  public async resetOddButtonFromReference(): Promise<ElementHandle> {
-    return await this.oddButtonWrapper.resetFromReference();
+  public async resetOddButtonFromReference(): Promise<void> {
+    await this.oddButtonWrapper.resetFromReference();
   }
 
   public async writeTextContentToDbOdd(): Promise<Odd> {
-    await this.parseTextContent();
+    await this.textContentParser.parse();
 
-    return await this.dbOddConnection.update({
-      price: this.price,
-      value: this.value,
+    const price = this.textContentParser.price;
+    const value = this.textContentParser.value;
+
+    await this.dbConnection.update({
+      price,
+      value,
     });
+
+    return this.odd;
   }
 
-  private async parseTextContent(): Promise<void> {
-    this.textContent = await this.button.evaluate(el => el.textContent);
-
-    if (!this.textContent) {
-      this.value = null;
-      this.price = null;
-      return;
-    }
-
-    // Normalize minus signs
-    const allHyphens = '−-−‐‑‒–—―';
-    const normalizedMinusSign = this.textContent.replace(new RegExp(`[${allHyphens}]`, 'g'), '-');
-
-    const numbers = normalizedMinusSign.match(/-?\d+(\.\d+)?/g);
-
-    if (!numbers) {
-      this.value = null;
-      this.price = null;
-      return;
-    }
-
-    if (numbers.length === 1) {
-      this.value = null;
-      this.price = parseInt(numbers[0]);
-      return;
-    }
-
-    if (numbers.length === 2) {
-      this.value = parseFloat(numbers[0]);
-      this.price = parseInt(numbers[1]);
-      return;
-    }
-
-    throw new Error(`More than two numbers found in textContent.`);
+  private async reset(): Promise<void> {
+    await this.dbConnection.reset();
   }
 
-  public get exchange(): Exchange {
-    return this.parentPageParser.exchange;
-  }
-
-  public get league(): League {
-    return this.parentPageParser.league;
+  public async disconnect(): Promise<void> {
+    await this.dbConnection.disconnect();
   }
 
   public get button(): ElementHandle {
@@ -177,19 +109,15 @@ export class OddButtonParser {
   }
 
   public get game(): GameWithTeams {
-    return this.dbGameConnection.game;
+    return this.dbConnection.game;
   }
 
   public get statistic(): Statistic {
-    if (this.dbStatisticConnection.statistic === null) {
-      throw new Error(`statistic is null.`);
-    }
-
-    return this.dbStatisticConnection.statistic;
+    return this.dbConnection.statistic;
   }
 
   public get odd(): Odd {
-    return this.dbOddConnection.odd;
+    return this.dbConnection.odd;
   }
 
   private set specializedOddButtonParser(specializedOddButtonParser: SpecializedOddButtonParser) {
@@ -216,75 +144,27 @@ export class OddButtonParser {
     return this.wrappedOddButtonWrapper;
   }
 
-  private set dbGameConnection(dbGameConnection: DbGameConnection) {
-    this.wrappedDbGameConnection = dbGameConnection;
+  private set dbConnection(dbConnection: OddButtonParserDbConnection) {
+    this.wrappedDbConnection = dbConnection;
   }
 
-  private get dbGameConnection(): DbGameConnection {
-    if (!this.wrappedDbGameConnection) {
-      throw new Error(`wrappedDbGameConnection is undefined.`);
+  private get dbConnection(): OddButtonParserDbConnection {
+    if (this.wrappedDbConnection === undefined) {
+      throw new Error(`wrappedDbConnection is undefined.`);
     }
 
-    return this.wrappedDbGameConnection;
+    return this.wrappedDbConnection;
   }
 
-  private set dbStatisticConnection(dbStatisticConnection: DbStatisticConnection) {
-    this.wrappedDbStatisticConnection = dbStatisticConnection;
+  private set textContentParser(textContentParser: TextContentParser) {
+    this.wrappedTextContentParser = textContentParser;
   }
 
-  private get dbStatisticConnection(): DbStatisticConnection {
-    if (!this.wrappedDbStatisticConnection) {
-      throw new Error(`wrappedDbStatisticConnection is undefined.`);
+  private get textContentParser(): TextContentParser {
+    if (this.wrappedTextContentParser === undefined) {
+      throw new Error(`wrappedTextContentParser is undefined.`);
     }
 
-    return this.wrappedDbStatisticConnection;
-  }
-
-  private set dbOddConnection(dbOddConnection: DbOddConnection) {
-    this.wrappedDbOddConnection = dbOddConnection;
-  }
-
-  private get dbOddConnection(): DbOddConnection {
-    if (!this.wrappedDbOddConnection) {
-      throw new Error(`wrappedDbOddConnection is undefined.`);
-    }
-
-    return this.wrappedDbOddConnection;
-  }
-
-  private set textContent(textContent: string | null) {
-    this.wrappedTextContent = textContent;
-  }
-
-  private get textContent(): string | null {
-    if (this.wrappedTextContent === undefined) {
-      throw new Error(`wrappedTextContent is undefined.`);
-    }
-
-    return this.wrappedTextContent;
-  }
-
-  private set price(price: number | null) {
-    this.wrappedPrice = price;
-  }
-
-  private get price(): number | null {
-    if (this.wrappedPrice === undefined) {
-      throw new Error(`wrappedPrice is undefined.`);
-    }
-
-    return this.wrappedPrice;
-  }
-
-  private set value(value: number | null) {
-    this.wrappedValue = value;
-  }
-
-  private get value(): number | null {
-    if (this.wrappedValue === undefined) {
-      throw new Error(`wrappedValue is undefined.`);
-    }
-
-    return this.wrappedValue;
+    return this.wrappedTextContentParser;
   }
 }
