@@ -15,6 +15,65 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
   }
 
   public async parseStatisticName(): Promise<string> {
+    try {
+      return await this.parseStatisticNameByButtonPosition();
+    } catch { }
+
+    return await this.parseStatisticNameByAriaLabel();
+  }
+
+  private async parseStatisticNameByButtonPosition(): Promise<string> {
+    const trElement = await this.parentDbStatisticConnection.button.evaluateHandle(el => el.closest('tr')!);
+    const tdElement = await this.parentDbStatisticConnection.button.evaluateHandle(el => el.closest('td')!);
+
+    const league = this.parentDbStatisticConnection.parentOddButtonParser.parentPageParser.league;
+
+    const teamNameElement = (await trElement.$('div.event-cell__name-text'))!;
+    const teamName = await teamNameElement.evaluate(el => el.textContent!);
+
+    const team = await prisma.team.findUniqueOrThrow({
+      where: {
+        leagueId_identifierFull: {
+          leagueId: league.id,
+          identifierFull: teamName,
+        }
+      }
+    });
+
+    const awayTeam = this.parentDbStatisticConnection.game.awayTeam;
+    const homeTeam = this.parentDbStatisticConnection.game.homeTeam;
+
+    const childIndex = await trElement.evaluate((parent, child) => {
+      const children = Array.from(parent.children);
+      return children.indexOf(child);
+    }, tdElement);
+
+    if (team.id === awayTeam.id) {
+      switch (childIndex) {
+        case 1:
+          return 'spread_away';
+        case 2:
+          return 'total_over';
+        case 3:
+          return 'winner_away';
+      }
+    }
+
+    if (team.id === homeTeam.id) {
+      switch (childIndex) {
+        case 1:
+          return 'spread_home';
+        case 2:
+          return 'total_under';
+        case 3:
+          return 'winner_home';
+      }
+    }
+
+    throw new Error(`Did not find matching statistic name.`);
+  }
+
+  private async parseStatisticNameByAriaLabel(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
     const game = this.parentDbStatisticConnection.game;
 

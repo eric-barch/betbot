@@ -37,10 +37,12 @@ export class OddButtonParserDbConnection {
 
     this.dbStatisticConnection = await DbStatisticConnection.create({
       parentOddButtonParser: this.parentOddButtonParser,
+      game: this.dbGameConnection.game,
     });
 
     this.dbOddConnection = await DbOddConnection.create({
       parentOddButtonParser: this.parentOddButtonParser,
+      statistic: this.dbStatisticConnection.statistic,
     });
 
     return this;
@@ -64,9 +66,7 @@ export class OddButtonParserDbConnection {
   }
 
   public async disconnect(): Promise<void> {
-    try {
-      await this.dbOddConnection.disconnect();
-    } catch { }
+    await this.dbOddConnection.disconnect();
   }
 
   public get game(): GameWithTeams {

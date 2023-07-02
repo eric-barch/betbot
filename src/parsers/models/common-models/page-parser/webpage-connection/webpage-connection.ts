@@ -42,10 +42,10 @@ export class WebpageConnection {
   private async connectToPage(): Promise<Page> {
     try {
       this.page = await this.connectToExistingPage();
-    } catch {
-      this.page = await this.connectToNewPage();
-    }
+      return this.page;
+    } catch { }
 
+    this.page = await this.connectToNewPage();
     return this.page;
   }
 

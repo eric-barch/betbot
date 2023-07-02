@@ -14,21 +14,14 @@ export class TextContentParser {
     this.parentOddButtonParser = parentOddButtonParser;
   }
 
-  public static async create({
+  public static create({
     parentOddButtonParser,
   }: {
     parentOddButtonParser: OddButtonParser,
-  }): Promise<TextContentParser> {
-    const textContentParser = new TextContentParser({
+  }): TextContentParser {
+    return new TextContentParser({
       parentOddButtonParser,
     });
-    await textContentParser.init();
-    return textContentParser;
-  }
-
-  private async init(): Promise<TextContentParser> {
-    await this.parse();
-    return this;
   }
 
   public async parse(): Promise<void> {

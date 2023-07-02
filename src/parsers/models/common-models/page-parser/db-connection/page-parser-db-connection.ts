@@ -33,6 +33,7 @@ export class PageParserDbConnection {
     });
     this.dbLeagueConnection = await DbLeagueConnection.create({
       parentPageParser: this.parentPageParser,
+      exchange: this.exchange,
     });
     return this;
   }

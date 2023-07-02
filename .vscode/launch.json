@@ -17,7 +17,8 @@
       "internalConsoleOptions": "openOnSessionStart",
       "skipFiles": [
         "node_modules/**"
-      ]
+      ],
+      "console": "integratedTerminal"
     }
   ]
 }
