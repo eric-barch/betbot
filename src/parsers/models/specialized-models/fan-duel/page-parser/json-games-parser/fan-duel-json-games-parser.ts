@@ -1,7 +1,7 @@
 import { Game } from '@prisma/client';
 
+import { GameService, TeamService, prisma } from '@/db';
 import { PageParser } from '@/parsers/models/common-models';
-import { DbUtilityFunctions, prisma } from '@/db';
 
 export class FanDuelJsonGamesParser {
   private readonly parentPageParser: PageParser;
@@ -75,19 +75,19 @@ export class FanDuelJsonGamesParser {
   }: {
     jsonGame: any,
   }): Promise<Game> {
-    const awayTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
+    const awayTeam = await TeamService.findByUnformattedNameAndLeague({
       unformattedName: jsonGame.awayTeam.name,
       league: this.parentPageParser.league,
     });
 
-    const homeTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
+    const homeTeam = await TeamService.findByUnformattedNameAndLeague({
       unformattedName: jsonGame.homeTeam.name,
       league: this.parentPageParser.league,
     });
 
     const startDate = new Date(jsonGame.startDate);
 
-    const game = await DbUtilityFunctions.findOrCreateGameByMatchupAndStartDate({
+    const game = await GameService.findOrCreateByMatchupAndStartDate({
       awayTeam,
       homeTeam,
       startDate,

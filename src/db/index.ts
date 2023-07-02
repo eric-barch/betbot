@@ -1,3 +1,3 @@
-export * from './prisma-client';
-export * from './db-utility-functions';
 export * from './game-with-teams';
+export * from './model-services';
+export * from './prisma-client';

@@ -44,13 +44,6 @@ export class OddButtonParserSet {
     return this;
   }
 
-  public async reset(): Promise<OddButtonParserSet> {
-    this.oddButtonSelector = await this.specializedOddButtonParserSet.generateOddButtonSelector();
-    this.oddButtons = await this.scrapeOddButtons();
-    this.oddButtonParsers = await this.createOddButtonParsers();
-    return this;
-  }
-
   private async scrapeOddButtons(): Promise<Array<ElementHandle>> {
     this.oddButtons = await this.parentPageParser.page.$$(this.oddButtonSelector);
     return this.oddButtons;

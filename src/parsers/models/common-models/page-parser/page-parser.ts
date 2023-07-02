@@ -41,7 +41,7 @@ export class PageParser {
 
   private async reset(): Promise<PageParser> {
     await this.webpageConnection.reset();
-    await this.oddButtonParserSet.reset();
+    this.oddButtonParserSet = await OddButtonParserSet.create({ parentPageParser: this });
     return this;
   }
 

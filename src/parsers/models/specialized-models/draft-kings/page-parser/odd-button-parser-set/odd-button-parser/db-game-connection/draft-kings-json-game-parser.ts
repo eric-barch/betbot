@@ -1,4 +1,4 @@
-import { DbUtilityFunctions, GameWithTeams, prisma } from '@/db';
+import { GameService, GameWithTeams, TeamService, prisma } from '@/db';
 import { DbGameConnection } from '@/parsers/models/common-models';
 
 export class DraftKingsJsonGameParser {
@@ -62,19 +62,19 @@ export class DraftKingsJsonGameParser {
   }
 
   private async parseGame(): Promise<GameWithTeams> {
-    const awayTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
+    const awayTeam = await TeamService.findByUnformattedNameAndLeague({
       unformattedName: this.jsonGame.awayTeam.name,
       league: this.parentDbGameConnection.league,
     });
 
-    const homeTeam = await DbUtilityFunctions.findTeamByUnformattedNameAndLeague({
+    const homeTeam = await TeamService.findByUnformattedNameAndLeague({
       unformattedName: this.jsonGame.homeTeam.name,
       league: this.parentDbGameConnection.league,
     });
 
     const startDate = new Date(this.jsonGame.startDate);
 
-    const game = await DbUtilityFunctions.findOrCreateGameByMatchupAndStartDate({
+    const game = await GameService.findOrCreateByMatchupAndStartDate({
       awayTeam,
       homeTeam,
       startDate,
