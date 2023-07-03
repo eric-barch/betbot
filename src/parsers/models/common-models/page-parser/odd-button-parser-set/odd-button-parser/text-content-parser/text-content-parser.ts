@@ -24,13 +24,13 @@ export class TextContentParser {
     });
   }
 
-  public async parse(): Promise<void> {
+  public async parse(): Promise<TextContentParser> {
     this.textContent = await this.parentOddButtonParser.button.evaluate(el => el.textContent);
 
     if (!this.textContent) {
       this.value = null;
       this.price = null;
-      return;
+      return this;
     }
 
     // Normalize minus signs
@@ -42,19 +42,19 @@ export class TextContentParser {
     if (!numbers) {
       this.value = null;
       this.price = null;
-      return;
+      return this;
     }
 
     if (numbers.length === 1) {
       this.value = null;
       this.price = parseInt(numbers[0]);
-      return;
+      return this;
     }
 
     if (numbers.length === 2) {
       this.value = parseFloat(numbers[0]);
       this.price = parseInt(numbers[1]);
-      return;
+      return this;
     }
 
     throw new Error(`More than two numbers found in textContent.`);

@@ -65,7 +65,7 @@ export class OddButtonParserSet {
     return this.oddButtonParsers;
   }
 
-  public async update(): Promise<void> {
+  public async update(): Promise<OddButtonParserSet> {
     if (loopInParallel) {
       await Promise.all(
         Array.from(this.oddButtonParsers).map(async (oddButtonParser) => {
@@ -79,6 +79,8 @@ export class OddButtonParserSet {
         await oddButtonParser.update();
       }
     }
+
+    return this;
   };
 
   public async disconnect(): Promise<void> {

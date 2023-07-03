@@ -93,12 +93,12 @@ export class WebpageConnection {
     return this.page;
   }
 
-  public async reset(): Promise<void> {
+  public async reset(): Promise<WebpageConnection> {
     await Promise.all([
       this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
       this.page.reload(),
     ]);
-
+    return this;
   }
 
   public async disconnect(): Promise<void> {

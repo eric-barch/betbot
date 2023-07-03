@@ -45,7 +45,7 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
     throw new Error(`Failed to find or create db game.`);
   }
 
-  private async parseMatchupAndExchangeAssignedGameId(): Promise<void> {
+  private async parseMatchupAndExchangeAssignedGameId(): Promise<DraftKingsDbGameConnection> {
     const button = this.parentDbGameConnection.button;
 
     if (!button) {
@@ -72,13 +72,15 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
 
     await this.parseMatchup({ href });
     this.parseExchangeAssignedGameId({ href });
+
+    return this;
   }
 
   private async parseMatchup({
     href,
   }: {
     href: string,
-  }): Promise<void> {
+  }): Promise<DraftKingsDbGameConnection> {
     const teamNamesMatchPattern = new RegExp(/\/([^/]+)%40([^/]+)\//);
     const teamNameMatches = teamNamesMatchPattern.exec(href);
 
@@ -97,13 +99,15 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
       league,
       unformattedName: teamNameMatches[2],
     });
+
+    return this;
   }
 
   private parseExchangeAssignedGameId({
     href,
   }: {
     href: string,
-  }): void {
+  }): DraftKingsDbGameConnection {
     const exchangeAssignedGameIdMatchPattern = new RegExp(/\/([^/]+)$/);
     const exchangeAssignedGameIdMatches = exchangeAssignedGameIdMatchPattern.exec(href);
 
@@ -112,6 +116,8 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
     }
 
     this.exchangeAssignedGameId = exchangeAssignedGameIdMatches[1];
+
+    return this;
   }
 
   private async findOrCreateGameByJson(): Promise<GameWithTeams> {
