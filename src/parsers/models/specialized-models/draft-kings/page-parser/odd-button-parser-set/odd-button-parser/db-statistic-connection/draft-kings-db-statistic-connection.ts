@@ -1,4 +1,4 @@
-import { prisma } from '@/db';
+import { TeamService, prisma } from '@/db';
 import {
   DbStatisticConnection, SpecializedDbStatisticConnection,
 } from '@/parsers/models/common-models';
@@ -15,6 +15,73 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
   }
 
   public async parseStatisticName(): Promise<string> {
+    let statisticName: string;
+
+    try {
+      statisticName = await this.parseStatisticNameByButtonPosition();
+      return statisticName;
+    } catch {
+      console.log(`parseStatisticNameByButtonPosition failed.`);
+    }
+
+    try {
+      statisticName = await this.parseStatisticNameByAriaLabel();
+      return statisticName;
+    } catch {
+      console.log(`parseStatisticNameByAriaLabel failed.`);
+    }
+
+    throw new Error(`Failed to find or create db statistic.`);
+  }
+
+  private async parseStatisticNameByButtonPosition(): Promise<string> {
+    const trElement = await this.parentDbStatisticConnection.button.evaluateHandle(el => el.closest('tr')!);
+    const tdElement = await this.parentDbStatisticConnection.button.evaluateHandle(el => el.closest('td')!);
+
+    const league = this.parentDbStatisticConnection.parentOddButtonParser.parentPageParser.league;
+
+    const unformattedNameElement = (await trElement.$('div.event-cell__name-text'))!;
+    const unformattedName = await unformattedNameElement.evaluate(el => el.textContent!);
+
+    const team = await TeamService.findByUnformattedNameAndLeague({
+      unformattedName,
+      league,
+    });
+
+    const awayTeam = this.parentDbStatisticConnection.game.awayTeam;
+    const homeTeam = this.parentDbStatisticConnection.game.homeTeam;
+
+    const childIndex = await trElement.evaluate((parent, child) => {
+      const children = Array.from(parent.children);
+      return children.indexOf(child);
+    }, tdElement);
+
+    if (team.id === awayTeam.id) {
+      switch (childIndex) {
+        case 1:
+          return 'spread_away';
+        case 2:
+          return 'total_over';
+        case 3:
+          return 'winner_away';
+      }
+    }
+
+    if (team.id === homeTeam.id) {
+      switch (childIndex) {
+        case 1:
+          return 'spread_home';
+        case 2:
+          return 'total_under';
+        case 3:
+          return 'winner_home';
+      }
+    }
+
+    throw new Error(`Did not find matching statistic name.`);
+  }
+
+  private async parseStatisticNameByAriaLabel(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
     const game = this.parentDbStatisticConnection.game;
 

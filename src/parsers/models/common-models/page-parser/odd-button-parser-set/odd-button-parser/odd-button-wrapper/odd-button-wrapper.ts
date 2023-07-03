@@ -1,7 +1,7 @@
 import { ElementHandle } from 'puppeteer';
 
 import { GameWithTeams } from '@/db';
-import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export interface SpecializedOddButtonWrapper {
   generateReferenceSelector(): Promise<string>;
@@ -10,7 +10,6 @@ export interface SpecializedOddButtonWrapper {
 
 export class OddButtonWrapper {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedOddButton: ElementHandle;
   private wrappedSpecializedOddButtonWrapper: SpecializedOddButtonWrapper | undefined;
   private wrappedReferenceSelector: string | undefined;
@@ -19,44 +18,44 @@ export class OddButtonWrapper {
 
   private constructor({
     parentOddButtonParser,
-    specializedParserFactory,
-    initializationButton,
+    oddButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
-    initializationButton: ElementHandle,
+    oddButton: ElementHandle,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.specializedParserFactory = specializedParserFactory;
-    this.wrappedOddButton = initializationButton;
+    this.wrappedOddButton = oddButton;
   }
 
   public static async create({
     parentOddButtonParser,
-    specializedParserFactory,
-    initializationButton,
+    oddButton,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
-    initializationButton: ElementHandle,
+    oddButton: ElementHandle,
   }): Promise<OddButtonWrapper> {
     const oddButtonWrapper = new OddButtonWrapper({
       parentOddButtonParser,
-      specializedParserFactory,
-      initializationButton,
+      oddButton,
     });
     await oddButtonWrapper.init();
     return oddButtonWrapper;
   }
 
   private async init(): Promise<OddButtonWrapper> {
-    this.specializedOddButtonWrapper = await this.specializedParserFactory.createOddButtonWrapper({ parentOddButtonWrapper: this });
+    this.specializedOddButtonWrapper = await this
+      .parentOddButtonParser
+      .parentPageParser
+      .specializedParserFactory
+      .createOddButtonWrapper({
+        parentOddButtonWrapper: this,
+      });
     this.referenceSelector = await this.specializedOddButtonWrapper.generateReferenceSelector();
-    this.referenceElement = await this.findReferenceElement();
+    this.referenceElement = await this.getReferenceElement();
     return this;
   }
 
-  private async findReferenceElement(): Promise<ElementHandle> {
+  private async getReferenceElement(): Promise<ElementHandle> {
     this.referenceElementToOddButtonXPath = '';
 
     let element = this.oddButton;
@@ -110,7 +109,6 @@ export class OddButtonWrapper {
   }
 
   public async resetFromReference(): Promise<ElementHandle> {
-    // TODO: If there is anywhere to gain some consistent performance it's probably here
     const button = await this.referenceElement.$(`xpath${this.referenceElementToOddButtonXPath}`);
 
     if (!button) {

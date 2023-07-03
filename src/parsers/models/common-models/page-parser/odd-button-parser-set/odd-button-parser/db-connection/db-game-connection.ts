@@ -1,8 +1,8 @@
 import { Exchange, League } from '@prisma/client';
-import { ElementHandle } from 'puppeteer';
+import { ElementHandle, Page } from 'puppeteer';
 
 import { GameWithTeams } from '@/db';
-import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser } from '@/parsers/models/common-models';
 
 export interface SpecializedDbGameConnection {
   findOrCreateGame(): Promise<GameWithTeams>;
@@ -10,42 +10,43 @@ export interface SpecializedDbGameConnection {
 
 export class DbGameConnection {
   private readonly parentOddButtonParser: OddButtonParser;
-  private readonly specializedParserFactory: SpecializedParserFactory;
   private wrappedSpecializedDbGameConnection: SpecializedDbGameConnection | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
     parentOddButtonParser,
-    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.specializedParserFactory = specializedParserFactory;
   }
 
   public static async create({
     parentOddButtonParser,
-    specializedParserFactory,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
   }): Promise<DbGameConnection> {
     const dbGameConnection = new DbGameConnection({
       parentOddButtonParser,
-      specializedParserFactory,
     });
     await dbGameConnection.init();
     return dbGameConnection;
   }
 
   private async init(): Promise<DbGameConnection> {
-    this.specializedDbGameConnection = await this.specializedParserFactory.createDbGameConnection({
-      parentDbGameConnection: this,
-    });
+    this.specializedDbGameConnection = await this
+      .parentOddButtonParser
+      .parentPageParser
+      .specializedParserFactory
+      .createDbGameConnection({
+        parentDbGameConnection: this,
+      });
     this.game = await this.specializedDbGameConnection.findOrCreateGame();
     return this;
+  }
+
+  public get page(): Page {
+    return this.parentOddButtonParser.parentPageParser.page;
   }
 
   public get button(): ElementHandle | null {
@@ -53,11 +54,11 @@ export class DbGameConnection {
   }
 
   public get exchange(): Exchange {
-    return this.parentOddButtonParser.exchange;
+    return this.parentOddButtonParser.parentPageParser.exchange;
   }
 
   public get league(): League {
-    return this.parentOddButtonParser.league;
+    return this.parentOddButtonParser.parentPageParser.league;
   }
 
   public get game(): GameWithTeams {

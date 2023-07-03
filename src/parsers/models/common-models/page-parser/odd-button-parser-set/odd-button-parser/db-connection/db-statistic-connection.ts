@@ -9,52 +9,52 @@ export interface SpecializedDbStatisticConnection {
 }
 
 export class DbStatisticConnection {
-  private readonly parentOddButtonParser: OddButtonParser;
-  private readonly specializedParserFactory: SpecializedParserFactory;
+  public readonly parentOddButtonParser: OddButtonParser;
+  public readonly game: GameWithTeams;
   private wrappedSpecializedDbStatisticConnection: SpecializedDbStatisticConnection | undefined;
-  private wrappedStatistic: Statistic | null | undefined;
+  private wrappedStatistic: Statistic | undefined;
 
   private constructor({
     parentOddButtonParser,
-    specializedParserFactory,
+    game,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
+    game: GameWithTeams,
   }) {
     this.parentOddButtonParser = parentOddButtonParser;
-    this.specializedParserFactory = specializedParserFactory;
+    this.game = game;
   }
 
   public static async create({
     parentOddButtonParser,
-    specializedParserFactory,
+    game,
   }: {
     parentOddButtonParser: OddButtonParser,
-    specializedParserFactory: SpecializedParserFactory,
+    game: GameWithTeams,
   }): Promise<DbStatisticConnection> {
     const dbStatisticConnection = new DbStatisticConnection({
       parentOddButtonParser,
-      specializedParserFactory,
+      game,
     });
     await dbStatisticConnection.init();
     return dbStatisticConnection;
   }
 
   private async init(): Promise<DbStatisticConnection> {
-    this.specializedDbStatisticConnection = await this.specializedParserFactory.createDbStatisticConnection({ parentDbStatisticConnection: this });
-
-    try {
-      this.statistic = await this.findOrCreateStatistic();
-    } catch (error) {
-      this.statistic = null;
-    }
-
+    this.specializedDbStatisticConnection = await this
+      .parentOddButtonParser
+      .parentPageParser
+      .specializedParserFactory
+      .createDbStatisticConnection({
+        parentDbStatisticConnection: this,
+      });
+    this.statistic = await this.findOrCreateStatistic();
     return this;
   }
 
   private async findOrCreateStatistic(): Promise<Statistic> {
     const name = await this.specializedDbStatisticConnection.parseStatisticName();
-    const gameId = this.parentOddButtonParser.game.id;
+    const gameId = this.game.id;
 
     this.statistic = await prisma.statistic.upsert({
       where: {
@@ -73,12 +73,8 @@ export class DbStatisticConnection {
     return this.statistic;
   }
 
-  public get button(): ElementHandle | null {
+  public get button(): ElementHandle {
     return this.parentOddButtonParser.button;
-  }
-
-  public get game(): GameWithTeams {
-    return this.parentOddButtonParser.game;
   }
 
   private set specializedDbStatisticConnection(specializedDbStatisticConnection: SpecializedDbStatisticConnection) {
@@ -93,11 +89,11 @@ export class DbStatisticConnection {
     return this.wrappedSpecializedDbStatisticConnection;
   }
 
-  private set statistic(statistic: Statistic | null) {
+  private set statistic(statistic: Statistic) {
     this.wrappedStatistic = statistic;
   }
 
-  public get statistic(): Statistic | null {
+  public get statistic(): Statistic {
     if (this.wrappedStatistic === undefined) {
       throw new Error(`wrappedStatistic is undefined.`);
     }
