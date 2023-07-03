@@ -3,6 +3,7 @@ import {
   SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
   SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
 } from '@/parsers/models/common-models';
+import { FanDuelOddButtonParserSet } from '@/parsers/models/specialized-models/fan-duel';
 
 
 
@@ -12,8 +13,9 @@ export class FanDuelParserFactory implements SpecializedParserFactory {
   }: {
     parentOddButtonParserSet: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet> {
-    throw new Error(`Implement createOddButtonParserSet.`);
-    // return new FanDuelOddButtonParserSet();
+    return new FanDuelOddButtonParserSet({
+      parentOddButtonParserSet,
+    });
   }
 
   public async createOddButtonParser({

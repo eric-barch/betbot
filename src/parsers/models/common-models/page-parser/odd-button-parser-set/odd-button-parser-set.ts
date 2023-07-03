@@ -8,7 +8,7 @@ export interface SpecializedOddButtonParserSet {
 }
 
 export class OddButtonParserSet {
-  private readonly parentPageParser: PageParser;
+  public readonly parentPageParser: PageParser;
   private wrappedSpecializedOddButtonParserSet: SpecializedOddButtonParserSet | undefined;
   private wrappedOddButtonSelector: string | undefined;
   private wrappedButtons: Array<ElementHandle> | undefined;

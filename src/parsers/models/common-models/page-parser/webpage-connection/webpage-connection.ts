@@ -1,3 +1,5 @@
+import { exec } from 'child_process';
+
 import { Browser, connect, Page } from 'puppeteer';
 
 import { PageParser } from '@/parsers/models/common-models';
@@ -32,11 +34,31 @@ export class WebpageConnection {
   }
 
   private async connectToBrowser(): Promise<Browser> {
-    this.browser = await connect({
-      browserURL: 'http://127.0.0.1:9222',
-    });
+    try {
+      await this.connectToOpenBrowser();
+    } catch {
+      console.log(`Did not find open browser. Attempting to open a new one and connect...`);
+      exec('"Google Chrome" --profile-directory=Default --remote-debugging-port=9222 --no-first-run --no-default-browser-check');
+      await this.connectToOpenBrowserUntilSuccessful();
+    }
 
     return this.browser;
+  }
+
+  private async connectToOpenBrowser(): Promise<Browser> {
+    this.browser = await connect({
+      browserURL: 'http://127.0.0.1:9222',
+    })
+    return this.browser;
+  }
+
+  private async connectToOpenBrowserUntilSuccessful(): Promise<Browser> {
+    try {
+      return await this.connectToOpenBrowser();
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return await this.connectToOpenBrowserUntilSuccessful();
+    }
   }
 
   private async connectToPage(): Promise<Page> {
