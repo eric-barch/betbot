@@ -62,7 +62,7 @@ export class OddButtonParser {
     return this;
   }
 
-  private async tryToConnectToDb(): Promise<void> {
+  private async tryToConnectToDb(): Promise<OddButtonParser> {
     try {
       this.dbConnection = await OddButtonParserDbConnection.create({
         parentOddButtonParser: this,
@@ -70,6 +70,8 @@ export class OddButtonParser {
     } catch {
       console.log(`dbConnection.create failed. Leaving undefined.`);
     }
+
+    return this;
   }
 
   public async update(): Promise<OddButtonParser> {
@@ -82,9 +84,9 @@ export class OddButtonParser {
     return this;
   }
 
-  // TODO: Avoid returns of void
-  public async resetOddButtonFromReference(): Promise<void> {
+  public async resetOddButtonFromReference(): Promise<OddButtonParser> {
     await this.oddButtonWrapper.resetFromReference();
+    return this;
   }
 
   public async writeTextContentToDbOdd(): Promise<Odd> {

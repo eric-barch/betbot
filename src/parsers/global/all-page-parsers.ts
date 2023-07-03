@@ -17,17 +17,17 @@ export class AllPageParsers {
 
   public static async getInstance(): Promise<AllPageParsers> {
     try {
-      return this.instance;
+      return AllPageParsers.instance;
     } catch {
-      this.instance = await AllPageParsers.create();
-      return this.instance;
+      AllPageParsers.instance = await AllPageParsers.create();
+      return AllPageParsers.instance;
     }
   }
 
   private static async create(): Promise<AllPageParsers> {
-    this.instance = new AllPageParsers({ pageUrls });
-    await this.instance.init();
-    return this.instance;
+    AllPageParsers.instance = new AllPageParsers({ pageUrls });
+    await AllPageParsers.instance.init();
+    return AllPageParsers.instance;
   }
 
   public async init(): Promise<AllPageParsers> {
