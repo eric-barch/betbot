@@ -18,7 +18,7 @@
       "skipFiles": [
         "node_modules/**"
       ],
-      "console": "integratedTerminal"
+      //"console": "integratedTerminal"
     }
   ]
 }

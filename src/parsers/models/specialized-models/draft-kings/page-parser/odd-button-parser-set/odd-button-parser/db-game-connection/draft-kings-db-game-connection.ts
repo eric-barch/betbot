@@ -28,14 +28,21 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
     await this.parseMatchupAndExchangeAssignedGameId();
 
     try {
-      return await this.findGameByExchangeAssignedGameId();
+      return await GameService.findByExchangeAndExchangeAssignedGameId({
+        exchange: this.parentDbGameConnection.exchange,
+        exchangeAssignedGameId: this.exchangeAssignedGameId,
+      });
     } catch { }
 
     try {
       return await this.findOrCreateGameByJson();
     } catch { }
 
-    return await this.findOrCreateGameByMatchupAndStartDate();
+    try {
+      return await this.findOrCreateGameByMatchupAndStartDate();
+    } catch { }
+
+    throw new Error(`Failed to find or create db game.`);
   }
 
   private async parseMatchupAndExchangeAssignedGameId(): Promise<void> {
@@ -107,46 +114,37 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
     this.exchangeAssignedGameId = exchangeAssignedGameIdMatches[1];
   }
 
-  private async findGameByExchangeAssignedGameId(): Promise<GameWithTeams> {
-    const exchangeToGame = await prisma.exchangeToGame.findUniqueOrThrow({
-      where: {
-        exchangeId_exchangeAssignedGameId: {
-          exchangeId: this.parentDbGameConnection.exchange.id,
-          exchangeAssignedGameId: this.exchangeAssignedGameId,
-        },
-      },
-      include: {
-        game: {
-          include: {
-            awayTeam: true,
-            homeTeam: true,
-          }
-        }
-      }
-    });
-
-    return exchangeToGame.game;
-  }
-
   private async findOrCreateGameByJson(): Promise<GameWithTeams> {
     this.jsonGameParser = await DraftKingsJsonGameParser.create({
       parentDbGameConnection: this.parentDbGameConnection,
       exchangeAssignedGameId: this.exchangeAssignedGameId,
     });
-
+    this.game = this.jsonGameParser.game;
     return this.game;
   }
 
   private async findOrCreateGameByMatchupAndStartDate(): Promise<GameWithTeams> {
-    this.startDateParser = await DraftKingsStartDateParser.create({
-      parentDbGameConnection: this.parentDbGameConnection,
-    });
-
-    this.game = await GameService.findOrCreateByMatchupAndStartDate({
-      awayTeam: this.awayTeam,
-      homeTeam: this.homeTeam,
-      startDate: this.startDateParser.startDate,
-    });
+    try {
+      /**If a positive startDate is available, we use it to find OR create the db game. */
+      this.startDateParser = await DraftKingsStartDateParser.create({
+        parentDbGameConnection: this.parentDbGameConnection,
+      });
+      this.game = await GameService.findOrCreateByMatchupAndStartDate({
+        awayTeam: this.awayTeam,
+        homeTeam: this.homeTeam,
+        startDate: this.startDateParser.startDate,
+      });
+    } catch {
+      /**If we can't find a positive startDate, we use the current time only to FIND the game 
+       * if it exists in the db already. We don't use the current time to CREATE a db game
+       * it's not the actual startDate of the game. */
+      const startDate = new Date();
+      this.game = await GameService.findByMatchupAndStartDate({
+        awayTeam: this.awayTeam,
+        homeTeam: this.homeTeam,
+        startDate,
+      });
+    }
 
     const exchangeId = this.parentDbGameConnection.exchange.id;
     const gameId = this.game.id;

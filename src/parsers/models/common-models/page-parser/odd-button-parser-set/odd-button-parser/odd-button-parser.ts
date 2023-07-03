@@ -58,15 +58,27 @@ export class OddButtonParser {
       parentOddButtonParser: this,
       oddButton: this.initializationButton,
     });
-    this.dbConnection = await OddButtonParserDbConnection.create({
-      parentOddButtonParser: this,
-    });
-
+    await this.tryToConnectToDb();
     return this;
   }
 
+  private async tryToConnectToDb(): Promise<void> {
+    try {
+      this.dbConnection = await OddButtonParserDbConnection.create({
+        parentOddButtonParser: this,
+      });
+    } catch {
+      console.log(`dbConnection.create failed. Leaving undefined.`);
+    }
+  }
+
   public async update(): Promise<OddButtonParser> {
-    await this.specializedOddButtonParser.update();
+    try {
+      await this.specializedOddButtonParser.update();
+    } catch {
+      await this.tryToConnectToDb();
+    }
+
     return this;
   }
 
