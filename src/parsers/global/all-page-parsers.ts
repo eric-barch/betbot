@@ -1,7 +1,6 @@
 import { PageParser } from '@/parsers/models/common-models';
 import { pageUrls } from '@/setup';
 
-// TODO: Implement as a singleton
 export class AllPageParsers {
   private static wrappedInstance: AllPageParsers | undefined;
   private readonly pageUrls: Array<string>;

@@ -2,8 +2,7 @@ import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
 import {
-  OddButtonParserSet, PageParserDbConnection, SpecializedParserFactory,
-  SpecializedParserFactoryFactory, WebpageConnection
+  OddButtonParserSet, PageParserDbConnection, SpecializedParserFactory, WebpageConnection
 } from '@/parsers/models/common-models';
 
 export class PageParser {
@@ -34,7 +33,7 @@ export class PageParser {
   private async init(): Promise<PageParser> {
     this.dbConnection = await PageParserDbConnection.create({ parentPageParser: this });
     this.webpageConnection = await WebpageConnection.create({ parentPageParser: this });
-    this.specializedParserFactory = await SpecializedParserFactoryFactory.create({ parentPageParser: this });
+    this.specializedParserFactory = await SpecializedParserFactory.create({ parentPageParser: this });
     this.oddButtonParserSet = await OddButtonParserSet.create({ parentPageParser: this });
     return this;
   }
