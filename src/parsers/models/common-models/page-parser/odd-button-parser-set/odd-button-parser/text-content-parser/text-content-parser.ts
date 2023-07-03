@@ -33,7 +33,6 @@ export class TextContentParser {
       return this;
     }
 
-    // Normalize minus signs
     const allHyphens = '−-−‐‑‒–—―';
     const normalizedMinusSign = this.textContent.replace(new RegExp(`[${allHyphens}]`, 'g'), '-');
 

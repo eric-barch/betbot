@@ -60,7 +60,6 @@ export class OddButtonWrapper {
 
     let element = this.oddButton;
 
-    // TODO: Can probably simplify this using evaluateHandle -> closest
     while (element) {
       const matchesSelector = await element.evaluate(
         (el, selector) => el.matches(selector),

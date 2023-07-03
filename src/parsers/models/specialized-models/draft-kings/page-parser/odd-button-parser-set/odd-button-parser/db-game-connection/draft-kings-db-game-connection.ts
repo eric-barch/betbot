@@ -142,8 +142,7 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
       });
     } catch {
       /**If we can't find a positive startDate, we use the current time only to FIND the game 
-       * if it exists in the db already. We don't use the current time to CREATE a db game
-       * it's not the actual startDate of the game. */
+       * if it exists in the db already. We don't use the current time to CREATE a db game. */
       const startDate = new Date();
       this.game = await GameService.findByMatchupAndStartDate({
         awayTeam: this.awayTeam,
