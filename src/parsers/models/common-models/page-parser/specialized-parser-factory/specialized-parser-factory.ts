@@ -5,10 +5,7 @@ import {
 } from '@/parsers/models/common-models';
 import { DraftKingsParserFactory, FanDuelParserFactory } from '@/parsers/models/specialized-models';
 
-/**TODO: HATE this name. Is there some way we can make SpecializedParserFactory have a static
- * create method to avoid having two classes here? Attempted to implement that before but ran into
- * circular dependency issues. */
-export class SpecializedParserFactoryFactory {
+export abstract class SpecializedParserFactory {
   public static async create({
     parentPageParser,
   }: {
@@ -23,34 +20,32 @@ export class SpecializedParserFactoryFactory {
         throw new Error(`No specialized parser factory found for exchange ${parentPageParser.exchange.name}`);
     }
   }
-}
 
-export interface SpecializedParserFactory {
-  createOddButtonParserSet({
+  abstract createOddButtonParserSet({
     parentOddButtonParserSet,
   }: {
     parentOddButtonParserSet: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet>;
 
-  createOddButtonParser({
+  abstract createOddButtonParser({
     parentOddButtonParser,
   }: {
     parentOddButtonParser: OddButtonParser,
   }): Promise<SpecializedOddButtonParser>;
 
-  createOddButtonWrapper({
+  abstract createOddButtonWrapper({
     parentOddButtonWrapper,
   }: {
     parentOddButtonWrapper: OddButtonWrapper,
   }): Promise<SpecializedOddButtonWrapper>;
 
-  createDbGameConnection({
+  abstract createDbGameConnection({
     parentDbGameConnection,
   }: {
     parentDbGameConnection: DbGameConnection,
   }): Promise<SpecializedDbGameConnection>;
 
-  createDbStatisticConnection({
+  abstract createDbStatisticConnection({
     parentDbStatisticConnection,
   }: {
     parentDbStatisticConnection: DbStatisticConnection,
