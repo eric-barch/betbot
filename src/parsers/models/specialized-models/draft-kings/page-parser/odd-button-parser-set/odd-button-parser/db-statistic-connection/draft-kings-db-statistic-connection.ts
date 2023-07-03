@@ -15,12 +15,23 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
   }
 
   public async parseStatisticName(): Promise<string> {
+    let statisticName: string;
+
     try {
-      const statisticName = await this.parseStatisticNameByButtonPosition();
+      statisticName = await this.parseStatisticNameByButtonPosition();
       return statisticName;
     } catch {
-      return await this.parseStatisticNameByAriaLabel();
+      console.log(`parseStatisticNameByButtonPosition failed.`);
     }
+
+    try {
+      statisticName = await this.parseStatisticNameByAriaLabel();
+      return statisticName;
+    } catch {
+      console.log(`parseStatisticNameByAriaLabel failed.`);
+    }
+
+    throw new Error(`Failed to find or create db statistic.`);
   }
 
   private async parseStatisticNameByButtonPosition(): Promise<string> {

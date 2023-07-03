@@ -1,5 +1,6 @@
 import { GameService, GameWithTeams, TeamService, prisma } from '@/db';
 import { DbGameConnection } from '@/parsers/models/common-models';
+import { loopInParallel } from '@/setup';
 
 export class DraftKingsJsonGameParser {
   private readonly parentDbGameConnection: DbGameConnection;
@@ -44,17 +45,33 @@ export class DraftKingsJsonGameParser {
       'script[type="application/ld+json"]'
     );
 
-    for (const gameScriptElement of gameScriptElements) {
-      const jsonGame = await gameScriptElement.evaluate((el) => {
-        const jsonGame = JSON.parse(el.innerHTML);
-        return jsonGame;
-      });
+    if (loopInParallel) {
+      this.jsonGame = await Promise.any(gameScriptElements.map(async gameScriptElement => {
+        const jsonGame = await gameScriptElement.evaluate(el => JSON.parse(el.innerHTML));
+        const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
 
-      const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
+        if (exchangeAssignedGameId === this.exchangeAssignedGameId) {
+          return jsonGame;
+        } else {
+          throw new Error('exchangeAssignedGameId does not match.');
+        }
+      }));
+      return this.jsonGame;
+    }
 
-      if (exchangeAssignedGameId === this.exchangeAssignedGameId) {
-        this.jsonGame = jsonGame;
-        return this.jsonGame;
+    if (!loopInParallel) {
+      for (const gameScriptElement of gameScriptElements) {
+        const jsonGame = await gameScriptElement.evaluate((el) => {
+          const jsonGame = JSON.parse(el.innerHTML);
+          return jsonGame;
+        });
+
+        const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
+
+        if (exchangeAssignedGameId === this.exchangeAssignedGameId) {
+          this.jsonGame = jsonGame;
+          return this.jsonGame;
+        }
       }
     }
 
@@ -130,7 +147,7 @@ export class DraftKingsJsonGameParser {
     this.wrappedGame = game;
   }
 
-  private get game(): GameWithTeams {
+  public get game(): GameWithTeams {
     if (this.wrappedGame === undefined) {
       throw new Error(`wrappedGame is undefined.`);
     }
