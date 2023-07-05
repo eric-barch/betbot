@@ -1,6 +1,7 @@
 import { Team } from '@prisma/client';
+import { parseDate } from 'chrono-node';
 
-import { GameService, GameWithTeams, TeamService } from '@/db';
+import { GameService, GameWithTeams, TeamService, prisma } from '@/db';
 import { DbGameConnection, SpecializedDbGameConnection } from '@/parsers/models/common-models';
 
 import { FanDuelJsonGameParser } from './fan-duel-json-game-parser';
@@ -9,6 +10,7 @@ export class FanDuelDbGameConnection implements SpecializedDbGameConnection {
   private readonly parentDbGameConnection: DbGameConnection;
   private wrappedAwayTeam: Team | undefined;
   private wrappedHomeTeam: Team | undefined;
+  private wrappedStartDate: Date | undefined;
   private wrappedExchangeAssignedGameId: string | undefined;
   private wrappedJsonGameParser: FanDuelJsonGameParser | undefined;
   private wrappedGame: GameWithTeams | undefined;
@@ -35,7 +37,11 @@ export class FanDuelDbGameConnection implements SpecializedDbGameConnection {
       return await this.findOrCreateGameByJson();
     } catch { }
 
-    throw new Error(`Finish implementing findOrCreateGame.`);
+    try {
+      return await this.findOrCreateGameByMatchupAndStartDate();
+    } catch { }
+
+    throw new Error(`Failed to find or create db game.`);
   }
 
   private async parseMatchupAndExchangeAssignedGameId(): Promise<FanDuelDbGameConnection> {
@@ -97,8 +103,59 @@ export class FanDuelDbGameConnection implements SpecializedDbGameConnection {
       parentDbGameConnection: this.parentDbGameConnection,
       exchangeAssignedGameId: this.exchangeAssignedGameId,
     });
-    //this.game = this.jsonGameParser.game;
+    this.game = this.jsonGameParser.game;
     return this.game;
+  }
+
+  private async findOrCreateGameByMatchupAndStartDate(): Promise<GameWithTeams> {
+    try {
+      this.startDate = await this.getStartDate();
+      this.game = await GameService.findOrCreateByMatchupAndStartDate({
+        awayTeam: this.awayTeam,
+        homeTeam: this.homeTeam,
+        startDate: this.startDate,
+      });
+    } catch {
+      const startDate = new Date();
+      this.game = await GameService.findOrCreateByMatchupAndStartDate({
+        awayTeam: this.awayTeam,
+        homeTeam: this.homeTeam,
+        startDate,
+      });
+    }
+
+    const exchangeId = this.parentDbGameConnection.exchange.id;
+    const gameId = this.game.id;
+    const exchangeAssignedGameId = this.exchangeAssignedGameId;
+
+    await prisma.exchangeToGame.upsert({
+      where: {
+        exchangeId_gameId: {
+          exchangeId,
+          gameId,
+        },
+      },
+      update: {
+        exchangeAssignedGameId,
+      },
+      create: {
+        exchangeId,
+        gameId,
+        exchangeAssignedGameId,
+      },
+    });
+
+    return this.game;
+  }
+
+  private async getStartDate(): Promise<Date> {
+    const button = this.parentDbGameConnection.button!;
+    const liElement = await button.evaluateHandle((el) => (el.closest('li')!));
+    const startDateElement = (await liElement.$('time'))!;
+    const startDateText = await startDateElement.evaluate((el) => (el.textContent!));
+    const foo = startDateText.replace(/(am|pm).*$/i, '');
+    this.startDate = parseDate(foo);
+    return this.startDate;
   }
 
   private set awayTeam(awayTeam: Team) {
@@ -123,6 +180,18 @@ export class FanDuelDbGameConnection implements SpecializedDbGameConnection {
     }
 
     return this.wrappedHomeTeam;
+  }
+
+  private set startDate(startDate: Date) {
+    this.wrappedStartDate = startDate;
+  }
+
+  private get startDate(): Date {
+    if (this.wrappedStartDate === undefined) {
+      throw new Error(`wrappedStartDate is undefined.`);
+    }
+
+    return this.wrappedStartDate;
   }
 
   private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
