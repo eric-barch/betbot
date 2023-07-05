@@ -44,6 +44,8 @@ export class TextContentParser {
       return this;
     }
 
+    /**TODO: This needs to be more rigorous. Cannot assume that price will always be first and value
+     * will always be second. */
     if (numbers.length === 1) {
       this.value = null;
       this.price = parseInt(numbers[0]);
