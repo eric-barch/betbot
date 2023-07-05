@@ -129,7 +129,7 @@ export class FanDuelJsonGameParser {
     this.wrappedGame = game;
   }
 
-  private get game(): GameWithTeams {
+  public get game(): GameWithTeams {
     if (this.wrappedGame === undefined) {
       throw new Error(`wrappedGame is undefined.`);
     }
