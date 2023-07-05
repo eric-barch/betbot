@@ -1,3 +1,5 @@
+import { ElementHandle } from 'puppeteer';
+
 import { OddButtonParserSet, SpecializedOddButtonParserSet } from '@/parsers/models/common-models';
 
 export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet {
@@ -17,17 +19,68 @@ export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet 
     const page = this.parentOddButtonParserSet.parentPageParser.page;
     const buttons = await page.$$('div[role="button"]');
 
-    const classNames = new Set<string>;
+    const classNames = new Set<string>();
 
     for (const button of buttons) {
-      const className = await button.evaluate(el => el.className);
+      const className = (await button.evaluate(el => el.className));
       classNames.add(className);
     }
 
-    /**TODO: Select the two class names that are obviously different than the others, find the 
-     * common classes between them, and return that set of classes as the odd button 
-     * selector. */
+    const oddButtonClassNames = new Array<string>();
 
-    throw new Error(`Finish implementing.`);
+    for (const className of classNames) {
+      const classes = className.split(' ');
+      const firstElement = (await page.$(`div.${classes.join('.')}`))!;
+
+      if (await this.isOddButton({ element: firstElement })) {
+        oddButtonClassNames.push(className);
+      }
+    }
+
+    const commonClasses = this.getCommonClasses({ oddButtonClassNames });
+    const oddButtonSelectorClasses = commonClasses.slice(0, 5);
+    const oddButtonSelector = `div.${oddButtonSelectorClasses.join('.')}`
+
+    return oddButtonSelector;
+  }
+
+  private async isOddButton({
+    element,
+  }: {
+    element: ElementHandle,
+  }): Promise<boolean> {
+    const ariaLabel = (await element.evaluate(el => el.ariaLabel));
+
+    if (!ariaLabel) {
+      return false;
+    }
+
+    const oddKeywords = new Array<string>(
+      'run line',
+      'moneyline',
+      'total runs',
+    )
+
+    if (oddKeywords.some(oddKeyword => ariaLabel.toLowerCase().includes(oddKeyword))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private getCommonClasses({
+    oddButtonClassNames,
+  }: {
+    oddButtonClassNames: Array<string>,
+  }): Array<string> {
+    const classArrays = oddButtonClassNames.map(oddButtonClassName => oddButtonClassName.split(' '));
+
+    let commonClasses = classArrays[0];
+
+    for (let i = 1; i < classArrays.length; i++) {
+      commonClasses = commonClasses.filter(cls => classArrays[i].includes(cls));
+    }
+
+    return commonClasses;
   }
 }
