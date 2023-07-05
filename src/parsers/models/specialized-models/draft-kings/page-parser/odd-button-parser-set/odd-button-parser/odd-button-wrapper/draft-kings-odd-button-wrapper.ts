@@ -53,9 +53,12 @@ export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
     this.wrappedReferenceSelector = referenceSelector;
   }
 
+  /**TODO: Should never check for undefined using !, as there are other things that
+   * could trigger this (e.g. null or empty string). Instead globally change these
+   * getters to check explicitly whether (this.foo === undefined). */
   private get referenceSelector(): string {
     if (!this.wrappedReferenceSelector) {
-      throw new Error(`Reference selector not set.`);
+      throw new Error(`Reference selector is undefined.`);
     }
 
     return this.wrappedReferenceSelector;
