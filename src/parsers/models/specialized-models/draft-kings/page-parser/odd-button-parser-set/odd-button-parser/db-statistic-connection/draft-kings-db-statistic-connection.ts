@@ -1,4 +1,4 @@
-import { TeamService, prisma } from '@/db';
+import { TeamService } from '@/db';
 import {
   DbStatisticConnection, SpecializedDbStatisticConnection,
 } from '@/parsers/models/common-models';
@@ -20,16 +20,12 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
     try {
       statisticName = await this.parseStatisticNameByButtonPosition();
       return statisticName;
-    } catch {
-      console.log(`parseStatisticNameByButtonPosition failed.`);
-    }
+    } catch { }
 
     try {
       statisticName = await this.parseStatisticNameByAriaLabel();
       return statisticName;
-    } catch {
-      console.log(`parseStatisticNameByAriaLabel failed.`);
-    }
+    } catch { }
 
     throw new Error(`Failed to find or create db statistic.`);
   }
@@ -85,8 +81,8 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
     const ariaLabel = await this.getAriaLabel();
     const game = this.parentDbStatisticConnection.game;
 
-    const awayTeam = await prisma.team.findFirstOrThrow({ where: { id: game.awayTeamId } });
-    const homeTeam = await prisma.team.findFirstOrThrow({ where: { id: game.homeTeamId } });
+    const awayTeam = game.awayTeam;
+    const homeTeam = game.homeTeam;
 
     const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b[^\\w\\d]*([+-]?\\d+(\\.\\d+)?).*`, "i");
     const totalPattern = new RegExp("^.*\\b(O|U|Over|Under)\\b[^\\w\\d]*(\\d+(\\.\\d+)?).*$", "i");
@@ -104,8 +100,6 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
       if (spreadPatternMatches[1] === homeTeam.identifierFull) {
         return 'spread_home';
       }
-
-      throw new Error(`Did not find matching spread statistic name.`);
     }
 
     if (totalPatternMatches) {
@@ -116,8 +110,6 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
       if (totalPatternMatches[1].toUpperCase().startsWith('U')) {
         return 'total_under';
       }
-
-      throw new Error(`Did not find matching total statistic name.`);
     }
 
     if (winnerPatternMatches) {
@@ -128,8 +120,6 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
       if (winnerPatternMatches[1] === homeTeam.identifierFull) {
         return 'winner_home';
       }
-
-      throw new Error(`Did not find matching winner statistic name.`);
     }
 
     throw new Error(`Did not find matching statistic name.`);
@@ -137,17 +127,7 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
 
   private async getAriaLabel(): Promise<string> {
     const button = this.parentDbStatisticConnection.button;
-
-    if (!button) {
-      throw new Error(`button is null.`);
-    }
-
-    const ariaLabel = await button.evaluate(el => el.ariaLabel);
-
-    if (!ariaLabel) {
-      throw new Error(`ariaLabel is null.`)
-    }
-
+    const ariaLabel = await button.evaluate(el => el.ariaLabel!);
     return ariaLabel;
   }
 }
