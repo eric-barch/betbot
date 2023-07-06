@@ -4,10 +4,12 @@ import {
   SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
 } from '@/parsers/models/common-models';
 import {
-  FanDuelDbGameConnection, FanDuelOddButtonParser, FanDuelOddButtonParserSet,
-  FanDuelOddButtonWrapper,
+  FanDuelDbGameConnection, FanDuelDbStatisticConnection, FanDuelOddButtonParser,
+  FanDuelOddButtonParserSet, FanDuelOddButtonWrapper,
 } from '@/parsers/models/specialized-models/fan-duel';
 
+/**TODO: Not 100% sure why we are directly invoking constructor here. Should these be asynchronous
+ * instantiations? */
 export class FanDuelParserFactory implements SpecializedParserFactory {
   public async createOddButtonParserSet({
     parentOddButtonParserSet,
@@ -54,9 +56,8 @@ export class FanDuelParserFactory implements SpecializedParserFactory {
   }: {
     parentDbStatisticConnection: DbStatisticConnection,
   }): Promise<SpecializedDbStatisticConnection> {
-    throw new Error(`Implement createDbStatisticConnection.`);
-    // return new FanDuelDbStatisticConnection({
-    //   parentDbStatisticConnection,
-    // });
+    return new FanDuelDbStatisticConnection({
+      parentDbStatisticConnection,
+    });
   }
 }
