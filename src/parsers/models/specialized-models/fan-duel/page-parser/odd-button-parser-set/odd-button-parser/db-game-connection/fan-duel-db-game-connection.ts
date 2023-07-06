@@ -114,10 +114,11 @@ export class FanDuelDbGameConnection implements SpecializedDbGameConnection {
         awayTeam: this.awayTeam,
         homeTeam: this.homeTeam,
         startDate: this.startDate,
+        createdBy: 'FanDuel findOrCreateGameByMatchupAndStartDate',
       });
     } catch {
       const startDate = new Date();
-      this.game = await GameService.findOrCreateByMatchupAndStartDate({
+      this.game = await GameService.findByMatchupAndStartDate({
         awayTeam: this.awayTeam,
         homeTeam: this.homeTeam,
         startDate,
@@ -152,9 +153,9 @@ export class FanDuelDbGameConnection implements SpecializedDbGameConnection {
     const button = this.parentDbGameConnection.button!;
     const liElement = await button.evaluateHandle((el) => (el.closest('li')!));
     const startDateElement = (await liElement.$('time'))!;
-    const startDateText = await startDateElement.evaluate((el) => (el.textContent!));
-    const foo = startDateText.replace(/(am|pm).*$/i, '');
-    this.startDate = parseDate(foo);
+    let startDateText = await startDateElement.evaluate((el) => (el.textContent!));
+    startDateText = startDateText.toLowerCase().replace(/(am|pm)(.*)$/i, '$1');
+    this.startDate = parseDate(startDateText);
     return this.startDate;
   }
 

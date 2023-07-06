@@ -3,6 +3,7 @@ import { exec } from 'child_process';
 import { Browser, connect, Page } from 'puppeteer';
 
 import { PageParser } from '@/parsers/models/common-models';
+import { loopInParallel } from '@/setup';
 
 export class WebpageConnection {
   private readonly url: string;

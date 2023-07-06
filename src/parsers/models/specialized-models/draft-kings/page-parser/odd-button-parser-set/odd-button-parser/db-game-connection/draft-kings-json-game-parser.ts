@@ -106,6 +106,7 @@ export class DraftKingsJsonGameParser {
       awayTeam,
       homeTeam,
       startDate,
+      createdBy: 'DraftKingsJsonGameParser',
     });
 
     const exchangeId = this.parentDbGameConnection.exchange.id;

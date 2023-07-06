@@ -1,5 +1,5 @@
 import { PageParser } from '@/parsers/models/common-models';
-import { pageUrls } from '@/setup';
+import { loopInParallel, pageUrls } from '@/setup';
 
 export class AllPageParsers {
   private static wrappedInstance: AllPageParsers | undefined;
@@ -44,11 +44,19 @@ export class AllPageParsers {
   public async update(): Promise<AllPageParsers> {
     const start = Date.now();
 
-    await Promise.all(
-      Array.from(this.pageParsers).map(async (pageParser) => {
+    if (loopInParallel) {
+      await Promise.all(
+        Array.from(this.pageParsers).map(async (pageParser) => {
+          await pageParser.update();
+        })
+      );
+    }
+
+    if (!loopInParallel) {
+      for (const pageParser of this.pageParsers) {
         await pageParser.update();
-      })
-    );
+      }
+    }
 
     const end = Date.now();
 

@@ -118,6 +118,7 @@ export class DraftKingsDbGameConnection implements SpecializedDbGameConnection {
         awayTeam: this.awayTeam,
         homeTeam: this.homeTeam,
         startDate: this.startDateParser.startDate,
+        createdBy: 'DraftKings findOrCreateGameByMatchupAndStartDate',
       });
     } catch {
       /**If we can't find a positive startDate, we use the current time only to FIND the game 

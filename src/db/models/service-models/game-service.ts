@@ -39,7 +39,7 @@ export class GameService {
     homeTeam: Team,
     startDate: Date,
   }): Promise<GameWithTeams> {
-    const startDateToleranceInHours = 2;
+    const startDateToleranceInHours = 4;
     const startDateToleranceInMilliseconds = startDateToleranceInHours * 60 * 60 * 1000;
 
     const toleranceBeforeStartDate = new Date(startDate.getTime() - startDateToleranceInMilliseconds);
@@ -65,10 +65,12 @@ export class GameService {
     awayTeam,
     homeTeam,
     startDate,
+    createdBy,
   }: {
     awayTeam: Team,
     homeTeam: Team,
     startDate: Date,
+    createdBy: string,
   }): Promise<GameWithTeams> {
     try {
       return await this.findByMatchupAndStartDate({
@@ -82,6 +84,7 @@ export class GameService {
           awayTeam: { connect: { id: awayTeam.id } },
           homeTeam: { connect: { id: homeTeam.id } },
           startDate,
+          createdBy,
         },
         include: {
           awayTeam: true,
