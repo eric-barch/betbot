@@ -1,7 +1,7 @@
 import {
-  DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  PageParser, SpecializedDbGameConnection, SpecializedDbStatisticConnection,
-  SpecializedOddButtonParser, SpecializedOddButtonParserSet, SpecializedOddButtonWrapper,
+  DbGameConnection, DbStatisticConnection, OddButtonParserSet, OddButtonWrapper, PageParser,
+  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParserSet,
+  SpecializedOddButtonWrapper,
 } from '@/parsers/models/common-models';
 import { DraftKingsParserFactory, FanDuelParserFactory } from '@/parsers/models/specialized-models';
 
@@ -26,12 +26,6 @@ export abstract class SpecializedParserFactory {
   }: {
     parent: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet>;
-
-  abstract createOddButtonParser({
-    parentOddButtonParser,
-  }: {
-    parentOddButtonParser: OddButtonParser,
-  }): Promise<SpecializedOddButtonParser>;
 
   abstract createOddButtonWrapper({
     parentOddButtonWrapper,

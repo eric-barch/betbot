@@ -1,11 +1,11 @@
 import {
-  DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
-  SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
+  DbGameConnection, DbStatisticConnection, OddButtonParserSet, OddButtonWrapper,
+  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParserSet,
+  SpecializedOddButtonWrapper, SpecializedParserFactory
 } from '@/parsers/models/common-models';
 import {
-  FanDuelDbGameConnection, FanDuelDbStatisticConnection, FanDuelOddButtonParser,
-  FanDuelOddButtonParserSet, FanDuelOddButtonWrapper,
+  FanDuelDbGameConnection, FanDuelDbStatisticConnection,
+  FanDuelOddButtonParserSet, FanDuelOddButtonWrapper
 } from '@/parsers/models/specialized-models/fan-duel';
 
 /**TODO: Not 100% sure why we are directly invoking constructor here. Should these be asynchronous
@@ -17,16 +17,6 @@ export class FanDuelParserFactory implements SpecializedParserFactory {
     parent: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet> {
     return await FanDuelOddButtonParserSet.create({ parent });
-  }
-
-  public async createOddButtonParser({
-    parentOddButtonParser,
-  }: {
-    parentOddButtonParser: OddButtonParser,
-  }): Promise<SpecializedOddButtonParser> {
-    return new FanDuelOddButtonParser({
-      parentOddButtonParser,
-    })
   }
 
   public async createOddButtonWrapper({

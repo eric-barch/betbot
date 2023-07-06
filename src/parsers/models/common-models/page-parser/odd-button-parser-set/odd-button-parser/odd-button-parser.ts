@@ -6,14 +6,9 @@ import {
   OddButtonParserDbConnection, OddButtonWrapper, PageParser, TextContentParser
 } from '@/parsers/models/common-models';
 
-export interface SpecializedOddButtonParser {
-  update(): Promise<Odd>;
-}
-
 export class OddButtonParser {
   public readonly parentPageParser: PageParser;
   private readonly initializationButton: ElementHandle;
-  private wrappedSpecializedOddButtonParser: SpecializedOddButtonParser | undefined;
   private wrappedOddButtonWrapper: OddButtonWrapper | undefined;
   private wrappedDbConnection: OddButtonParserDbConnection | undefined;
   private wrappedTextContentParser: TextContentParser | undefined;
@@ -45,12 +40,6 @@ export class OddButtonParser {
   }
 
   private async init(): Promise<OddButtonParser> {
-    this.specializedOddButtonParser = await this
-      .parentPageParser
-      .specializedParserFactory
-      .createOddButtonParser({
-        parentOddButtonParser: this,
-      });
     this.textContentParser = TextContentParser.create({
       parentOddButtonParser: this,
     });
@@ -76,7 +65,8 @@ export class OddButtonParser {
 
   public async update(): Promise<OddButtonParser> {
     try {
-      await this.specializedOddButtonParser.update();
+      await this.oddButtonWrapper.resetFromReference();
+      await this.writeTextContentToDb();
     } catch {
       await this.tryToConnectToDb();
     }
@@ -84,23 +74,15 @@ export class OddButtonParser {
     return this;
   }
 
-  public async resetOddButtonFromReference(): Promise<OddButtonParser> {
-    await this.oddButtonWrapper.resetFromReference();
-    return this;
-  }
-
-  public async writeTextContentToDbOdd(): Promise<Odd> {
+  public async writeTextContentToDb(): Promise<OddButtonParser> {
     await this.textContentParser.parse();
 
-    const price = this.textContentParser.price;
-    const value = this.textContentParser.value;
-
     await this.dbConnection.update({
-      price,
-      value,
+      price: this.textContentParser.price,
+      value: this.textContentParser.value,
     });
 
-    return this.odd;
+    return this;
   }
 
   public async disconnect(): Promise<void> {
@@ -121,18 +103,6 @@ export class OddButtonParser {
 
   public get odd(): Odd {
     return this.dbConnection.odd;
-  }
-
-  private set specializedOddButtonParser(specializedOddButtonParser: SpecializedOddButtonParser) {
-    this.wrappedSpecializedOddButtonParser = specializedOddButtonParser;
-  }
-
-  private get specializedOddButtonParser(): SpecializedOddButtonParser {
-    if (!this.wrappedSpecializedOddButtonParser) {
-      throw new Error(`wrappedSpecializedOddButtonParser is undefined.`);
-    }
-
-    return this.wrappedSpecializedOddButtonParser;
   }
 
   private set oddButtonWrapper(oddButtonWrapper: OddButtonWrapper) {
