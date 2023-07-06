@@ -43,6 +43,7 @@ export class OddButtonWrapper {
   }
 
   private async init(): Promise<OddButtonWrapper> {
+
     this.specializedOddButtonWrapper = await this
       .parentOddButtonParser
       .parentPageParser
@@ -52,6 +53,7 @@ export class OddButtonWrapper {
       });
     this.referenceSelector = await this.specializedOddButtonWrapper.generateReferenceSelector();
     this.referenceElement = await this.getReferenceElement();
+
     return this;
   }
 
@@ -73,6 +75,7 @@ export class OddButtonWrapper {
 
       const elementTagWithIndex = await this.getElementTagWithIndex({ element });
       this.referenceElementToOddButtonXPath = elementTagWithIndex + this.referenceElementToOddButtonXPath;
+
 
       const elementProperty = await element.getProperty('parentElement');
 

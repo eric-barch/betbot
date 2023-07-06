@@ -14,6 +14,7 @@ export class FanDuelOddButtonParser implements SpecializedOddButtonParser {
   }
 
   public async update(): Promise<Odd> {
+    // await this.parentOddButtonParser.resetOddButtonFromReference();
     return await this.parentOddButtonParser.writeTextContentToDbOdd();
   }
 }

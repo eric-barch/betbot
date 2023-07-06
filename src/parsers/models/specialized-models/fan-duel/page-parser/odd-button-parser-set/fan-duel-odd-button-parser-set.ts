@@ -38,8 +38,7 @@ export class FanDuelOddButtonParserSet implements SpecializedOddButtonParserSet 
     }
 
     const commonClasses = this.getCommonClasses({ oddButtonClassNames });
-    const oddButtonSelectorClasses = commonClasses.slice(0, 5);
-    const oddButtonSelector = `div.${oddButtonSelectorClasses.join('.')}`
+    const oddButtonSelector = `div.${commonClasses.join('.')}`
 
     return oddButtonSelector;
   }

@@ -39,11 +39,21 @@ export class FanDuelDbStatisticConnection implements SpecializedDbStatisticConne
     }
 
     if (isTotalOdd) {
-      if (ariaLabel.toLowerCase().includes(awayTeam.identifierFull.toLowerCase())) {
+      const awayTeamKeywords = new Array<string>(
+        awayTeam.identifierFull.toLowerCase(),
+        'over',
+      );
+
+      if (awayTeamKeywords.some(keyword => ariaLabel.toLowerCase().includes(keyword))) {
         return 'total_over';
       }
 
-      if (ariaLabel.toLowerCase().includes(homeTeam.identifierFull.toLowerCase())) {
+      const homeTeamKeywords = new Array<string>(
+        homeTeam.identifierFull.toLowerCase(),
+        'under',
+      );
+
+      if (homeTeamKeywords.some(keyword => ariaLabel.toLowerCase().includes(keyword))) {
         return 'total_under';
       }
     }

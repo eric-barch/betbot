@@ -67,8 +67,8 @@ export class OddButtonParser {
       this.dbConnection = await OddButtonParserDbConnection.create({
         parentOddButtonParser: this,
       });
-    } catch {
-      console.log(`dbConnection.create failed. Leaving undefined.`);
+    } catch (error) {
+      console.log(`dbConnection.create failed. Leaving undefined. ${error}`);
     }
 
     return this;
