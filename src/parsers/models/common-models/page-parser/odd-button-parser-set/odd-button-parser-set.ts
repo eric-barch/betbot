@@ -3,8 +3,23 @@ import { ElementHandle } from 'puppeteer';
 import { OddButtonParser, PageParser } from '@/parsers/models/common-models';
 import { loopInParallel } from '@/setup';
 
-export interface SpecializedOddButtonParserSet {
-  generateOddButtonSelector(): Promise<string>;
+export abstract class SpecializedOddButtonParserSet {
+  protected readonly parent: OddButtonParserSet;
+
+  protected constructor({
+    parent,
+  }: {
+    parent: OddButtonParserSet,
+  }) {
+    this.parent = parent;
+  };
+
+  protected async init(): Promise<SpecializedOddButtonParserSet> {
+    this.parent.oddButtonSelector = await this.generateOddButtonSelector();
+    return this;
+  }
+
+  protected abstract generateOddButtonSelector(): Promise<string>;
 }
 
 export class OddButtonParserSet {
@@ -37,9 +52,8 @@ export class OddButtonParserSet {
       .parentPageParser
       .specializedParserFactory
       .createOddButtonParserSet({
-        parentOddButtonParserSet: this,
+        parent: this,
       });
-    this.oddButtonSelector = await this.specializedOddButtonParserSet.generateOddButtonSelector();
     this.oddButtons = await this.scrapeOddButtons();
     this.oddButtonParsers = await this.createOddButtonParsers();
     return this;
@@ -111,11 +125,11 @@ export class OddButtonParserSet {
     return this.wrappedSpecializedOddButtonParserSet;
   }
 
-  private set oddButtonSelector(oddButtonSelector: string) {
+  public set oddButtonSelector(oddButtonSelector: string) {
     this.wrappedOddButtonSelector = oddButtonSelector;
   }
 
-  private get oddButtonSelector(): string {
+  public get oddButtonSelector(): string {
     if (!this.wrappedOddButtonSelector) {
       throw new Error(`wrappedOddButtonSelector is undefined.`);
     }

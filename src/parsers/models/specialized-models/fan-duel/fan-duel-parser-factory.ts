@@ -12,13 +12,11 @@ import {
  * instantiations? */
 export class FanDuelParserFactory implements SpecializedParserFactory {
   public async createOddButtonParserSet({
-    parentOddButtonParserSet,
+    parent,
   }: {
-    parentOddButtonParserSet: OddButtonParserSet,
+    parent: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet> {
-    return new FanDuelOddButtonParserSet({
-      parentOddButtonParserSet,
-    });
+    return await FanDuelOddButtonParserSet.create({ parent });
   }
 
   public async createOddButtonParser({
