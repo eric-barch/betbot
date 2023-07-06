@@ -2,7 +2,7 @@ import { GameService, GameWithTeams, TeamService, prisma } from '@/db';
 import { DbGameConnection } from '@/parsers/models/common-models';
 import { loopInParallel } from '@/setup';
 
-export class DraftKingsJsonGameParser {
+export class FanDuelJsonGameParser {
   private readonly parentDbGameConnection: DbGameConnection;
   private readonly exchangeAssignedGameId: string;
   private wrappedJsonGame: any | undefined;
@@ -25,8 +25,8 @@ export class DraftKingsJsonGameParser {
   }: {
     parentDbGameConnection: DbGameConnection,
     exchangeAssignedGameId: string,
-  }): Promise<DraftKingsJsonGameParser> {
-    const jsonGamesParser = new DraftKingsJsonGameParser({
+  }): Promise<FanDuelJsonGameParser> {
+    const jsonGamesParser = new FanDuelJsonGameParser({
       parentDbGameConnection,
       exchangeAssignedGameId,
     });
@@ -34,20 +34,22 @@ export class DraftKingsJsonGameParser {
     return jsonGamesParser;
   }
 
-  private async init(): Promise<DraftKingsJsonGameParser> {
+  private async init(): Promise<FanDuelJsonGameParser> {
     this.jsonGame = await this.getJsonGame();
     this.game = await this.parseGame();
     return this;
   }
 
   private async getJsonGame(): Promise<any> {
-    const gameScriptElements = await this.parentDbGameConnection.page.$$(
-      'script[type="application/ld+json"]'
-    );
+    const gamesScriptElement = (await this.parentDbGameConnection.page.$(
+      'script[type="application/ld+json"][data-react-helmet="true"]'
+    ))!;
+    const jsonGames: Array<any> = await gamesScriptElement.evaluate(el => {
+      return JSON.parse(el.innerHTML);
+    });
 
     if (loopInParallel) {
-      this.jsonGame = await Promise.any(gameScriptElements.map(async gameScriptElement => {
-        const jsonGame = await gameScriptElement.evaluate(el => JSON.parse(el.innerHTML));
+      this.jsonGame = await Promise.any(jsonGames.map(async (jsonGame: any) => {
         const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
 
         if (exchangeAssignedGameId === this.exchangeAssignedGameId) {
@@ -55,27 +57,21 @@ export class DraftKingsJsonGameParser {
         } else {
           throw new Error('exchangeAssignedGameId does not match.');
         }
-      }));
-      return this.jsonGame;
+      }))
     }
 
     if (!loopInParallel) {
-      for (const gameScriptElement of gameScriptElements) {
-        const jsonGame = await gameScriptElement.evaluate((el) => {
-          const jsonGame = JSON.parse(el.innerHTML);
-          return jsonGame;
-        });
-
+      for (const jsonGame of jsonGames) {
         const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
 
         if (exchangeAssignedGameId === this.exchangeAssignedGameId) {
           this.jsonGame = jsonGame;
-          return this.jsonGame;
+          break;
         }
       }
     }
 
-    throw new Error(`Unable to find jsonGame with exchangeAssignedGameId: ${this.exchangeAssignedGameId}.`);
+    return this.jsonGame;
   }
 
   private getExchangeAssignedGameId({
@@ -83,9 +79,9 @@ export class DraftKingsJsonGameParser {
   }: {
     jsonGame: any,
   }): string {
-    const identifier: string = jsonGame.identifier;
-    const lastHyphenPos = identifier.lastIndexOf("-");
-    const exchangeAssignedGameId = identifier.substring(lastHyphenPos + 1);
+    const url: string = jsonGame.url;
+    const lastHyphenPos = url.lastIndexOf('-');
+    const exchangeAssignedGameId = url.substring(lastHyphenPos + 1);
     return exchangeAssignedGameId;
   }
 
@@ -106,7 +102,7 @@ export class DraftKingsJsonGameParser {
       awayTeam,
       homeTeam,
       startDate,
-      createdBy: 'DraftKingsJsonGameParser',
+      createdBy: 'FanDuelJsonGameParser',
     });
 
     const exchangeId = this.parentDbGameConnection.exchange.id;

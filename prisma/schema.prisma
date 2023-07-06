@@ -50,6 +50,7 @@ model Game {
   id         Int              @id @default(autoincrement())
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
+  createdBy  String           @db.VarChar(255)
   startDate  DateTime
   awayTeam   Team             @relation("AwayTeamOnGame", fields: [awayTeamId], references: [id])
   awayTeamId Int

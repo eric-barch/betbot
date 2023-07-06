@@ -2,8 +2,7 @@ import { Odd, Statistic } from '@prisma/client';
 
 import { GameWithTeams } from '@/db';
 import {
-  DbGameConnection, DbOddConnection, DbStatisticConnection, OddButtonParser,
-  SpecializedParserFactory,
+  DbGameConnection, DbOddConnection, DbStatisticConnection, OddButtonParser
 } from '@/parsers/models/common-models';
 
 export class OddButtonParserDbConnection {

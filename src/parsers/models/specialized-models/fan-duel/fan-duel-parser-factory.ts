@@ -3,17 +3,22 @@ import {
   SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
   SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
 } from '@/parsers/models/common-models';
+import {
+  FanDuelDbGameConnection, FanDuelDbStatisticConnection, FanDuelOddButtonParser,
+  FanDuelOddButtonParserSet, FanDuelOddButtonWrapper,
+} from '@/parsers/models/specialized-models/fan-duel';
 
-
-
+/**TODO: Not 100% sure why we are directly invoking constructor here. Should these be asynchronous
+ * instantiations? */
 export class FanDuelParserFactory implements SpecializedParserFactory {
   public async createOddButtonParserSet({
     parentOddButtonParserSet,
   }: {
     parentOddButtonParserSet: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet> {
-    throw new Error(`Implement createOddButtonParserSet.`);
-    // return new FanDuelOddButtonParserSet();
+    return new FanDuelOddButtonParserSet({
+      parentOddButtonParserSet,
+    });
   }
 
   public async createOddButtonParser({
@@ -21,10 +26,9 @@ export class FanDuelParserFactory implements SpecializedParserFactory {
   }: {
     parentOddButtonParser: OddButtonParser,
   }): Promise<SpecializedOddButtonParser> {
-    throw new Error(`Implement createOddButtonParser.`);
-    // return new FanDuelOddButtonParser({
-    //   parentOddButtonParser,
-    // });
+    return new FanDuelOddButtonParser({
+      parentOddButtonParser,
+    })
   }
 
   public async createOddButtonWrapper({
@@ -32,10 +36,9 @@ export class FanDuelParserFactory implements SpecializedParserFactory {
   }: {
     parentOddButtonWrapper: OddButtonWrapper,
   }): Promise<SpecializedOddButtonWrapper> {
-    throw new Error(`Implement createOddButtonWrapper.`);
-    // return new FanDuelOddButtonWrapper({
-    //   parentOddButtonWrapper,
-    // });
+    return new FanDuelOddButtonWrapper({
+      parentOddButtonWrapper,
+    });
   }
 
   public async createDbGameConnection({
@@ -43,10 +46,9 @@ export class FanDuelParserFactory implements SpecializedParserFactory {
   }: {
     parentDbGameConnection: DbGameConnection,
   }): Promise<SpecializedDbGameConnection> {
-    throw new Error(`Implement createDbGameConnection.`);
-    // return new FanDuelDbGameConnection({
-    //   parentDbGameConnection,
-    // });
+    return new FanDuelDbGameConnection({
+      parentDbGameConnection,
+    });
   }
 
   public async createDbStatisticConnection({
@@ -54,9 +56,8 @@ export class FanDuelParserFactory implements SpecializedParserFactory {
   }: {
     parentDbStatisticConnection: DbStatisticConnection,
   }): Promise<SpecializedDbStatisticConnection> {
-    throw new Error(`Implement createDbStatisticConnection.`);
-    // return new FanDuelDbStatisticConnection({
-    //   parentDbStatisticConnection,
-    // });
+    return new FanDuelDbStatisticConnection({
+      parentDbStatisticConnection,
+    });
   }
 }
