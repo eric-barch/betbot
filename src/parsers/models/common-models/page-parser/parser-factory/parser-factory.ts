@@ -2,16 +2,16 @@ import { ElementHandle } from 'puppeteer';
 
 import {
   DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  PageParser, SpecializedDbGameConnection, SpecializedDbStatisticConnection,
+  PageParser, SpecializedDbStatisticConnection,
 } from '@/parsers/models/common-models';
 import { DraftKingsParserFactory, FanDuelParserFactory } from '@/parsers/models/specialized-models';
 
-export abstract class SpecializedParserFactory {
+export abstract class ParserFactory {
   public static async create({
     parentPageParser,
   }: {
     parentPageParser: PageParser,
-  }): Promise<SpecializedParserFactory> {
+  }): Promise<ParserFactory> {
     switch (parentPageParser.exchange.name) {
       case 'DraftKings':
         return new DraftKingsParserFactory();
@@ -38,10 +38,10 @@ export abstract class SpecializedParserFactory {
   }): Promise<OddButtonWrapper>;
 
   abstract createDbGameConnection({
-    parentDbGameConnection,
+    parent,
   }: {
-    parentDbGameConnection: DbGameConnection,
-  }): Promise<SpecializedDbGameConnection>;
+    parent: OddButtonParser,
+  }): Promise<DbGameConnection>;
 
   abstract createDbStatisticConnection({
     parentDbStatisticConnection,

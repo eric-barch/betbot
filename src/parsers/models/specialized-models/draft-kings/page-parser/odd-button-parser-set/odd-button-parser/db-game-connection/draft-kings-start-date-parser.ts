@@ -1,28 +1,28 @@
 import { parseDate } from 'chrono-node';
 import { ElementHandle } from 'puppeteer';
 
-import { DbGameConnection } from '@/parsers/models/common-models';
+import { DraftKingsDbGameConnection } from '@/parsers/models/specialized-models/draft-kings';
 
 export class DraftKingsStartDateParser {
-  private readonly parentDbGameConnection: DbGameConnection;
+  private readonly parent: DraftKingsDbGameConnection;
   private wrappedDateString: string | undefined;
   private wrappedTimeString: string | undefined;
   private wrappedStartDate: Date | undefined;
 
   private constructor({
-    parentDbGameConnection,
+    parent,
   }: {
-    parentDbGameConnection: DbGameConnection,
+    parent: DraftKingsDbGameConnection,
   }) {
-    this.parentDbGameConnection = parentDbGameConnection;
+    this.parent = parent;
   }
 
   public static async create({
-    parentDbGameConnection,
+    parent,
   }: {
-    parentDbGameConnection: DbGameConnection,
+    parent: DraftKingsDbGameConnection,
   }): Promise<DraftKingsStartDateParser> {
-    const startDateParser = new DraftKingsStartDateParser({ parentDbGameConnection });
+    const startDateParser = new DraftKingsStartDateParser({ parent });
     await startDateParser.init();
     return startDateParser;
   }
@@ -36,25 +36,14 @@ export class DraftKingsStartDateParser {
 
   private async parseDateString(): Promise<string> {
     const dateTableElement = await this.getDateTableElement();
-    const dateTableHeaderElement = await dateTableElement.$('.always-left.column-header');
-
-    if (!dateTableHeaderElement) {
-      throw new Error(`dateTableHeaderElement is null.`);
-    }
-
-    const dateString = await dateTableHeaderElement.evaluate(el => el.textContent);
-
-    if (!dateString) {
-      throw new Error(`dateString is null.`);
-    }
-
+    const dateTableHeaderElement = (await dateTableElement.$('.always-left.column-header'))!;
+    const dateString = await dateTableHeaderElement.evaluate(el => el.textContent!);
     this.dateString = dateString;
-
     return this.dateString;
   }
 
   private async getDateTableElement(): Promise<ElementHandle> {
-    const button = this.parentDbGameConnection.button;
+    const button = this.parent.parent.button;
 
     if (!button) {
       throw new Error(`button is null.`);
@@ -89,7 +78,7 @@ export class DraftKingsStartDateParser {
   }
 
   private async getTeamRowElement(): Promise<ElementHandle> {
-    let ancestor = this.parentDbGameConnection.button;
+    let ancestor = this.parent.parent.button;
 
     const nodeNameToFind = 'tr';
 

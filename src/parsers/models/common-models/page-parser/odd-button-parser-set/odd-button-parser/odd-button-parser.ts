@@ -43,7 +43,7 @@ export class OddButtonParser {
     this.textContentParser = TextContentParser.create({
       parentOddButtonParser: this,
     });
-    this.oddButtonWrapper = await this.parent.specializedParserFactory.createOddButtonWrapper({
+    this.oddButtonWrapper = await this.parent.parserFactory.createOddButtonWrapper({
       parent: this,
       oddButton: this.initializationButton,
     });
