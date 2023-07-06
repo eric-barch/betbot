@@ -6,41 +6,41 @@ import {
 } from '@/parsers/models/common-models';
 
 export class OddButtonParserDbConnection {
-  private readonly parentOddButtonParser: OddButtonParser;
+  private readonly parent: OddButtonParser;
   private wrappedDbGameConnection: DbGameConnection | undefined;
   private wrappedDbStatisticConnection: DbStatisticConnection | undefined;
   private wrappedDbOddConnection: DbOddConnection | undefined;
 
   private constructor({
-    parentOddButtonParser,
+    parent,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parent: OddButtonParser,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
+    this.parent = parent;
   }
 
   public static async create({
-    parentOddButtonParser,
+    parent,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parent: OddButtonParser,
   }): Promise<OddButtonParserDbConnection> {
-    const dbConnection = new OddButtonParserDbConnection({ parentOddButtonParser });
+    const dbConnection = new OddButtonParserDbConnection({ parent: parent });
     await dbConnection.init();
     return dbConnection;
   }
 
   private async init(): Promise<OddButtonParserDbConnection> {
-    this.dbGameConnection = await DbGameConnection.create({
-      parent: this.parentOddButtonParser,
+    this.dbGameConnection = await this.parent.parent.parserFactory.createDbGameConnection({
+      parent: this.parent,
     });
 
     this.dbStatisticConnection = await DbStatisticConnection.create({
-      parentOddButtonParser: this.parentOddButtonParser,
+      parentOddButtonParser: this.parent,
       game: this.dbGameConnection.game,
     });
 
     this.dbOddConnection = await DbOddConnection.create({
-      parentOddButtonParser: this.parentOddButtonParser,
+      parentOddButtonParser: this.parent,
       statistic: this.dbStatisticConnection.statistic,
     });
 

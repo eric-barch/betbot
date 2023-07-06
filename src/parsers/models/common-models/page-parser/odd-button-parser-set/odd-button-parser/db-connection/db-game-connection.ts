@@ -60,4 +60,16 @@ export abstract class DbGameConnection {
 
     return this.wrappedHomeTeam;
   }
+
+  protected set startDate(startDate: Date) {
+    this.wrappedStartDate = startDate;
+  }
+
+  protected get startDate(): Date {
+    if (this.wrappedStartDate === undefined) {
+      throw new Error(`wrappedStartDate is undefined.`);
+    }
+
+    return this.wrappedStartDate;
+  }
 }

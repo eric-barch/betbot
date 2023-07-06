@@ -3,31 +3,31 @@ import { DbGameConnection } from '@/parsers/models/common-models';
 import { loopInParallel } from '@/setup';
 
 export class FanDuelJsonGameParser {
-  private readonly parentDbGameConnection: DbGameConnection;
+  private readonly parent: DbGameConnection;
   private readonly exchangeAssignedGameId: string;
   private wrappedJsonGame: any | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
-    parentDbGameConnection,
+    parent,
     exchangeAssignedGameId,
   }: {
-    parentDbGameConnection: DbGameConnection,
+    parent: DbGameConnection,
     exchangeAssignedGameId: string,
   }) {
-    this.parentDbGameConnection = parentDbGameConnection;
+    this.parent = parent;
     this.exchangeAssignedGameId = exchangeAssignedGameId;
   }
 
   public static async create({
-    parentDbGameConnection,
+    parent,
     exchangeAssignedGameId,
   }: {
-    parentDbGameConnection: DbGameConnection,
+    parent: DbGameConnection,
     exchangeAssignedGameId: string,
   }): Promise<FanDuelJsonGameParser> {
     const jsonGamesParser = new FanDuelJsonGameParser({
-      parentDbGameConnection,
+      parent,
       exchangeAssignedGameId,
     });
     await jsonGamesParser.init();
@@ -41,7 +41,7 @@ export class FanDuelJsonGameParser {
   }
 
   private async getJsonGame(): Promise<any> {
-    const gamesScriptElement = (await this.parentDbGameConnection.page.$(
+    const gamesScriptElement = (await this.parent.parent.parent.page.$(
       'script[type="application/ld+json"][data-react-helmet="true"]'
     ))!;
     const jsonGames: Array<any> = await gamesScriptElement.evaluate(el => {
@@ -88,12 +88,12 @@ export class FanDuelJsonGameParser {
   private async parseGame(): Promise<GameWithTeams> {
     const awayTeam = await TeamService.findByUnformattedNameAndLeague({
       unformattedName: this.jsonGame.awayTeam.name,
-      league: this.parentDbGameConnection.league,
+      league: this.parent.parent.parent.league,
     });
 
     const homeTeam = await TeamService.findByUnformattedNameAndLeague({
       unformattedName: this.jsonGame.homeTeam.name,
-      league: this.parentDbGameConnection.league,
+      league: this.parent.parent.parent.league,
     });
 
     const startDate = new Date(this.jsonGame.startDate);
@@ -105,7 +105,7 @@ export class FanDuelJsonGameParser {
       createdBy: 'FanDuelJsonGameParser',
     });
 
-    const exchangeId = this.parentDbGameConnection.exchange.id;
+    const exchangeId = this.parent.parent.parent.exchange.id;
     const gameId = this.game.id;
 
     await prisma.exchangeToGame.upsert({
