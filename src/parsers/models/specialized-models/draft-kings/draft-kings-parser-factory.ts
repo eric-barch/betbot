@@ -1,11 +1,11 @@
 import {
-  DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
-  SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
+  DbGameConnection, DbStatisticConnection, OddButtonParserSet, OddButtonWrapper,
+  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParserSet,
+  SpecializedOddButtonWrapper, SpecializedParserFactory,
 } from '@/parsers/models/common-models';
 import {
-  DraftKingsDbGameConnection, DraftKingsDbStatisticConnection,
-  DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper
+  DraftKingsDbGameConnection, DraftKingsDbStatisticConnection, DraftKingsOddButtonParserSet,
+  DraftKingsOddButtonWrapper,
 } from '@/parsers/models/specialized-models/draft-kings';
 
 export class DraftKingsParserFactory implements SpecializedParserFactory {
@@ -15,16 +15,6 @@ export class DraftKingsParserFactory implements SpecializedParserFactory {
     parent: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet> {
     return await DraftKingsOddButtonParserSet.create({ parent });
-  }
-
-  public async createOddButtonParser({
-    parentOddButtonParser,
-  }: {
-    parentOddButtonParser: OddButtonParser,
-  }): Promise<SpecializedOddButtonParser> {
-    return new DraftKingsOddButtonParser({
-      parentOddButtonParser,
-    });
   }
 
   public async createOddButtonWrapper({
