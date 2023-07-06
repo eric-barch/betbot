@@ -44,9 +44,21 @@ export class FanDuelJsonGameParser {
     const gamesScriptElement = (await this.parentDbGameConnection.page.$(
       'script[type="application/ld+json"][data-react-helmet="true"]'
     ))!;
-    const jsonGames = await gamesScriptElement.evaluate(el => {
+    const jsonGames: Array<any> = await gamesScriptElement.evaluate(el => {
       return JSON.parse(el.innerHTML);
     });
+
+    if (loopInParallel) {
+      this.jsonGame = await Promise.any(jsonGames.map(async (jsonGame: any) => {
+        const exchangeAssignedGameId = this.getExchangeAssignedGameId({ jsonGame });
+
+        if (exchangeAssignedGameId === this.exchangeAssignedGameId) {
+          return jsonGame;
+        } else {
+          throw new Error('exchangeAssignedGameId does not match.');
+        }
+      }))
+    }
 
     if (!loopInParallel) {
       for (const jsonGame of jsonGames) {
@@ -54,10 +66,12 @@ export class FanDuelJsonGameParser {
 
         if (exchangeAssignedGameId === this.exchangeAssignedGameId) {
           this.jsonGame = jsonGame;
-          return this.jsonGame;
+          break;
         }
       }
     }
+
+    return this.jsonGame;
   }
 
   private getExchangeAssignedGameId({
@@ -88,6 +102,7 @@ export class FanDuelJsonGameParser {
       awayTeam,
       homeTeam,
       startDate,
+      createdBy: 'FanDuelJsonGameParser',
     });
 
     const exchangeId = this.parentDbGameConnection.exchange.id;
