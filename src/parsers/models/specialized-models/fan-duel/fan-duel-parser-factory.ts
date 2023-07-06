@@ -2,8 +2,7 @@ import { ElementHandle } from 'puppeteer';
 
 import {
   DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  PageParser, SpecializedDbGameConnection, SpecializedDbStatisticConnection,
-  ParserFactory,
+  PageParser, SpecializedDbStatisticConnection, ParserFactory,
 } from '@/parsers/models/common-models';
 import {
   FanDuelDbGameConnection, FanDuelDbStatisticConnection,
@@ -35,13 +34,11 @@ export class FanDuelParserFactory implements ParserFactory {
   }
 
   public async createDbGameConnection({
-    parentDbGameConnection,
+    parent,
   }: {
-    parentDbGameConnection: DbGameConnection,
-  }): Promise<SpecializedDbGameConnection> {
-    return new FanDuelDbGameConnection({
-      parentDbGameConnection,
-    });
+    parent: OddButtonParser,
+  }): Promise<DbGameConnection> {
+    return await FanDuelDbGameConnection.create({ parent });
   }
 
   public async createDbStatisticConnection({

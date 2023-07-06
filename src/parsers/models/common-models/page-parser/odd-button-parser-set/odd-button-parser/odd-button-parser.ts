@@ -54,7 +54,7 @@ export class OddButtonParser {
   private async tryToConnectToDb(): Promise<OddButtonParser> {
     try {
       this.dbConnection = await OddButtonParserDbConnection.create({
-        parentOddButtonParser: this,
+        parent: this,
       });
     } catch (error) {
       console.log(`dbConnection.create failed. Leaving undefined. ${error}`);

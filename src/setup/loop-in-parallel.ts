@@ -1,1 +1,1 @@
-export const loopInParallel = true;
+export const loopInParallel = false;

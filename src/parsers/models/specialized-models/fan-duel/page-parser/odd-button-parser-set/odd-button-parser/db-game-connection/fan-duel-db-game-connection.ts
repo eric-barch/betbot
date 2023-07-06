@@ -2,7 +2,10 @@ import { Team } from '@prisma/client';
 import { parseDate } from 'chrono-node';
 
 import { GameService, GameWithTeams, TeamService, prisma } from '@/db';
-import { DbGameConnection } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-connection/db-game-connection';
+import { OddButtonParser } from '@/parsers/models/common-models';
+import {
+  DbGameConnection,
+} from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-connection/db-game-connection';
 
 import { FanDuelJsonGameParser } from './fan-duel-json-game-parser';
 
@@ -10,29 +13,42 @@ export class FanDuelDbGameConnection extends DbGameConnection {
   private wrappedExchangeAssignedGameId: string | undefined;
   private wrappedJsonGameParser: FanDuelJsonGameParser | undefined;
 
+  public static async create({
+    parent,
+  }: {
+    parent: OddButtonParser,
+  }): Promise<FanDuelDbGameConnection> {
+    const fanDuelDbGameConnection = new FanDuelDbGameConnection({ parent });
+    await fanDuelDbGameConnection.init();
+    return fanDuelDbGameConnection;
+  }
+
   protected async findOrCreateGame(): Promise<GameWithTeams> {
     await this.parseMatchupAndExchangeAssignedGameId();
 
     try {
-      return await GameService.findByExchangeAndExchangeAssignedGameId({
-        exchange: this.parentDbGameConnection.exchange,
+      this.game = await GameService.findByExchangeAndExchangeAssignedGameId({
+        exchange: this.parent.parent.exchange,
         exchangeAssignedGameId: this.exchangeAssignedGameId,
       });
+      return this.game;
     } catch { }
 
     try {
-      return await this.findOrCreateGameByJson();
+      this.game = await this.findOrCreateGameByJson();
+      return this.game;
     } catch { }
 
     try {
-      return await this.findOrCreateGameByMatchupAndStartDate();
+      this.game = await this.findOrCreateGameByMatchupAndStartDate();
+      return this.game;
     } catch { }
 
     throw new Error(`Failed to find or create db game.`);
   }
 
   private async parseMatchupAndExchangeAssignedGameId(): Promise<FanDuelDbGameConnection> {
-    const button = this.parentDbGameConnection.button!;
+    const button = this.parent.button!;
     const parentLi = await button.evaluateHandle((el) => (el.closest('li')!));
     const eventCellLink = (await parentLi.$('a'))!;
     const href = await eventCellLink.evaluate((el) => (el.getAttribute('href')!));
@@ -53,7 +69,7 @@ export class FanDuelDbGameConnection extends DbGameConnection {
       throw new Error(`Incorrect number of teamNameMatches.`);
     }
 
-    const league = this.parentDbGameConnection.league;
+    const league = this.parent.parent.league;
 
     this.awayTeam = await TeamService.findByUnformattedNameAndLeague({
       league,
@@ -87,7 +103,7 @@ export class FanDuelDbGameConnection extends DbGameConnection {
 
   private async findOrCreateGameByJson(): Promise<GameWithTeams> {
     this.jsonGameParser = await FanDuelJsonGameParser.create({
-      parentDbGameConnection: this.parentDbGameConnection,
+      parent: this,
       exchangeAssignedGameId: this.exchangeAssignedGameId,
     });
     this.game = this.jsonGameParser.game;
@@ -96,6 +112,7 @@ export class FanDuelDbGameConnection extends DbGameConnection {
 
   private async findOrCreateGameByMatchupAndStartDate(): Promise<GameWithTeams> {
     try {
+      /**If a startDate is available, we use it to find OR create the db game. */
       this.startDate = await this.getStartDate();
       this.game = await GameService.findOrCreateByMatchupAndStartDate({
         awayTeam: this.awayTeam,
@@ -104,6 +121,8 @@ export class FanDuelDbGameConnection extends DbGameConnection {
         createdBy: 'FanDuel findOrCreateGameByMatchupAndStartDate',
       });
     } catch {
+      /**If we can't find a startDate, we use the current time only to FIND the game. We do not use 
+      * the current time to CREATE a game. */
       const startDate = new Date();
       this.game = await GameService.findByMatchupAndStartDate({
         awayTeam: this.awayTeam,
@@ -112,7 +131,7 @@ export class FanDuelDbGameConnection extends DbGameConnection {
       });
     }
 
-    const exchangeId = this.parentDbGameConnection.exchange.id;
+    const exchangeId = this.parent.parent.exchange.id;
     const gameId = this.game.id;
     const exchangeAssignedGameId = this.exchangeAssignedGameId;
 
@@ -137,49 +156,13 @@ export class FanDuelDbGameConnection extends DbGameConnection {
   }
 
   private async getStartDate(): Promise<Date> {
-    const button = this.parentDbGameConnection.button!;
+    const button = this.parent.button!;
     const liElement = await button.evaluateHandle((el) => (el.closest('li')!));
     const startDateElement = (await liElement.$('time'))!;
     let startDateText = await startDateElement.evaluate((el) => (el.textContent!));
     startDateText = startDateText.toLowerCase().replace(/(am|pm)(.*)$/i, '$1');
     this.startDate = parseDate(startDateText);
     return this.startDate;
-  }
-
-  private set awayTeam(awayTeam: Team) {
-    this.wrappedAwayTeam = awayTeam;
-  }
-
-  private get awayTeam(): Team {
-    if (this.wrappedAwayTeam === undefined) {
-      throw new Error(`wrappedAwayTeam is undefined.`);
-    }
-
-    return this.wrappedAwayTeam;
-  }
-
-  private set homeTeam(homeTeam: Team) {
-    this.wrappedHomeTeam = homeTeam;
-  }
-
-  private get homeTeam(): Team {
-    if (this.wrappedHomeTeam === undefined) {
-      throw new Error(`wrappedHomeTeam is undefined.`);
-    }
-
-    return this.wrappedHomeTeam;
-  }
-
-  private set startDate(startDate: Date) {
-    this.wrappedStartDate = startDate;
-  }
-
-  private get startDate(): Date {
-    if (this.wrappedStartDate === undefined) {
-      throw new Error(`wrappedStartDate is undefined.`);
-    }
-
-    return this.wrappedStartDate;
   }
 
   private set exchangeAssignedGameId(exchangeAssignedGameId: string) {
@@ -204,17 +187,5 @@ export class FanDuelDbGameConnection extends DbGameConnection {
     }
 
     return this.wrappedJsonGameParser;
-  }
-
-  private set game(game: GameWithTeams) {
-    this.wrappedGame = game;
-  }
-
-  private get game(): GameWithTeams {
-    if (this.wrappedGame === undefined) {
-      throw new Error(`wrappedGame is undefined.`);
-    }
-
-    return this.wrappedGame;
   }
 }
