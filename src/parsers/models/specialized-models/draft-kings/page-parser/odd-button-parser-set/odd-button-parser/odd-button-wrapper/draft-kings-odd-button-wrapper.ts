@@ -1,32 +1,38 @@
+import { ElementHandle } from 'puppeteer';
+
+import { OddButtonParser } from '@/parsers/models/common-models';
 import {
-  OddButtonWrapper, SpecializedOddButtonWrapper
-} from '@/parsers/models/common-models';
+  OddButtonWrapper,
+} from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-wrapper/odd-button-wrapper';
 
-export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
-  private readonly parentOddButtonWrapper: OddButtonWrapper;
-  private wrappedReferenceSelector: string | undefined;
-
-  public constructor({
-    parentOddButtonWrapper,
+export class DraftKingsOddButtonWrapper extends OddButtonWrapper {
+  public static async create({
+    parent,
+    oddButton,
   }: {
-    parentOddButtonWrapper: OddButtonWrapper,
-  }) {
-    this.parentOddButtonWrapper = parentOddButtonWrapper;
-    this.referenceSelector = 'tr';
+    parent: OddButtonParser,
+    oddButton: ElementHandle,
+  }): Promise<DraftKingsOddButtonWrapper> {
+    const draftKingsOddButtonWrapper = new DraftKingsOddButtonWrapper({
+      parent,
+      oddButton,
+    });
+    await draftKingsOddButtonWrapper.init();
+    return draftKingsOddButtonWrapper;
   }
 
-  public async generateReferenceSelector(): Promise<string> {
+  protected async generateReferenceSelector(): Promise<string> {
+    this.referenceSelector = 'tr';
     return this.referenceSelector;
   }
 
-  public async verifyOddButtonPosition(): Promise<boolean> {
-    const game = this.parentOddButtonWrapper.game;
+  protected async verifyOddButtonPosition(): Promise<boolean> {
+    const game = this.parent.game;
 
     const awayTeamIdentifierFull = game.awayTeam.identifierFull.toLowerCase();
     const homeTeamIdentifierFull = game.homeTeam.identifierFull.toLowerCase();
 
-    const reference = this.parentOddButtonWrapper.referenceElement;
-    const teamNameElement = await reference.$('th');
+    const teamNameElement = await this.reference.$('th');
 
     if (!teamNameElement) {
       return false;
@@ -47,20 +53,5 @@ export class DraftKingsOddButtonWrapper implements SpecializedOddButtonWrapper {
     }
 
     return false;
-  }
-
-  private set referenceSelector(referenceSelector: string) {
-    this.wrappedReferenceSelector = referenceSelector;
-  }
-
-  /**TODO: Should never check for undefined using !, as there are other things that
-   * could trigger this (e.g. null or empty string). Instead globally change these
-   * getters to check explicitly whether (this.foo === undefined). */
-  private get referenceSelector(): string {
-    if (!this.wrappedReferenceSelector) {
-      throw new Error(`Reference selector is undefined.`);
-    }
-
-    return this.wrappedReferenceSelector;
   }
 }

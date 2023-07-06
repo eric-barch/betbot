@@ -1,15 +1,15 @@
 import { ElementHandle } from 'puppeteer';
 
-import { OddButtonParserSet } from '@/parsers/models/common-models';
+import { PageParser } from '@/parsers/models/common-models';
 import {
-  SpecializedOddButtonParserSet
+  OddButtonParserSet
 } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser-set';
 
-export class FanDuelOddButtonParserSet extends SpecializedOddButtonParserSet {
+export class FanDuelOddButtonParserSet extends OddButtonParserSet {
   public static async create({
     parent,
   }: {
-    parent: OddButtonParserSet,
+    parent: PageParser,
   }): Promise<FanDuelOddButtonParserSet> {
     const fanDuelOddButtonParser = new FanDuelOddButtonParserSet({ parent });
     await fanDuelOddButtonParser.init();
@@ -17,7 +17,7 @@ export class FanDuelOddButtonParserSet extends SpecializedOddButtonParserSet {
   }
 
   protected async generateOddButtonSelector(): Promise<string> {
-    const page = this.parent.parentPageParser.page;
+    const page = this.parent.page;
     const buttons = await page.$$('div[role="button"]');
 
     const classNames = new Set<string>();
@@ -40,8 +40,8 @@ export class FanDuelOddButtonParserSet extends SpecializedOddButtonParserSet {
 
     const commonClasses = this.getCommonClasses({ oddButtonClassNames });
 
-    this.parent.oddButtonSelector = `div.${commonClasses.join('.')}`
-    return this.parent.oddButtonSelector;
+    this.oddButtonSelector = `div.${commonClasses.join('.')}`
+    return this.oddButtonSelector;
   }
 
   private async isOddButton({

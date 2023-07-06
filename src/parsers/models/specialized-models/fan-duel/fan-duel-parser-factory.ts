@@ -1,31 +1,36 @@
+import { ElementHandle } from 'puppeteer';
+
 import {
-  DbGameConnection, DbStatisticConnection, OddButtonParserSet, OddButtonWrapper,
-  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParserSet,
-  SpecializedOddButtonWrapper, SpecializedParserFactory
+  DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
+  PageParser, SpecializedDbGameConnection, SpecializedDbStatisticConnection,
+  SpecializedParserFactory,
 } from '@/parsers/models/common-models';
 import {
   FanDuelDbGameConnection, FanDuelDbStatisticConnection,
   FanDuelOddButtonParserSet, FanDuelOddButtonWrapper
 } from '@/parsers/models/specialized-models/fan-duel';
 
-/**TODO: Not 100% sure why we are directly invoking constructor here. Should these be asynchronous
+/**TODO: Not 100% sure why we are directly invoking constructor in these. Should these be asynchronous
  * instantiations? */
 export class FanDuelParserFactory implements SpecializedParserFactory {
   public async createOddButtonParserSet({
     parent,
   }: {
-    parent: OddButtonParserSet,
-  }): Promise<SpecializedOddButtonParserSet> {
+    parent: PageParser,
+  }): Promise<OddButtonParserSet> {
     return await FanDuelOddButtonParserSet.create({ parent });
   }
 
   public async createOddButtonWrapper({
-    parentOddButtonWrapper,
+    parent,
+    oddButton,
   }: {
-    parentOddButtonWrapper: OddButtonWrapper,
-  }): Promise<SpecializedOddButtonWrapper> {
-    return new FanDuelOddButtonWrapper({
-      parentOddButtonWrapper,
+    parent: OddButtonParser,
+    oddButton: ElementHandle,
+  }): Promise<OddButtonWrapper> {
+    return await FanDuelOddButtonWrapper.create({
+      parent,
+      oddButton,
     });
   }
 
