@@ -36,7 +36,7 @@ export class DbGameConnection {
   private async init(): Promise<DbGameConnection> {
     this.specializedDbGameConnection = await this
       .parentOddButtonParser
-      .parentPageParser
+      .parent
       .specializedParserFactory
       .createDbGameConnection({
         parentDbGameConnection: this,
@@ -46,7 +46,7 @@ export class DbGameConnection {
   }
 
   public get page(): Page {
-    return this.parentOddButtonParser.parentPageParser.page;
+    return this.parentOddButtonParser.parent.page;
   }
 
   public get button(): ElementHandle | null {
@@ -54,11 +54,11 @@ export class DbGameConnection {
   }
 
   public get exchange(): Exchange {
-    return this.parentOddButtonParser.parentPageParser.exchange;
+    return this.parentOddButtonParser.parent.exchange;
   }
 
   public get league(): League {
-    return this.parentOddButtonParser.parentPageParser.league;
+    return this.parentOddButtonParser.parent.league;
   }
 
   public get game(): GameWithTeams {

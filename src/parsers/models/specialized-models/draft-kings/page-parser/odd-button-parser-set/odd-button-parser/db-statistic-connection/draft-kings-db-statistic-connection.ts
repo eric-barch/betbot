@@ -34,7 +34,7 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
     const trElement = await this.parentDbStatisticConnection.button.evaluateHandle(el => el.closest('tr')!);
     const tdElement = await this.parentDbStatisticConnection.button.evaluateHandle(el => el.closest('td')!);
 
-    const league = this.parentDbStatisticConnection.parentOddButtonParser.parentPageParser.league;
+    const league = this.parentDbStatisticConnection.parentOddButtonParser.parent.league;
 
     const unformattedNameElement = (await trElement.$('div.event-cell__name-text'))!;
     const unformattedName = await unformattedNameElement.evaluate(el => el.textContent!);

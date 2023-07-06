@@ -7,32 +7,32 @@ import {
 } from '@/parsers/models/common-models';
 
 export class OddButtonParser {
-  public readonly parentPageParser: PageParser;
+  public readonly parent: PageParser;
   private readonly initializationButton: ElementHandle;
   private wrappedOddButtonWrapper: OddButtonWrapper | undefined;
   private wrappedDbConnection: OddButtonParserDbConnection | undefined;
   private wrappedTextContentParser: TextContentParser | undefined;
 
   private constructor({
-    parentPageParser,
+    parent,
     initializationButton,
   }: {
-    parentPageParser: PageParser,
+    parent: PageParser,
     initializationButton: ElementHandle,
   }) {
-    this.parentPageParser = parentPageParser;
+    this.parent = parent;
     this.initializationButton = initializationButton;
   }
 
   public static async create({
-    parentPageParser,
+    parent,
     initializationButton,
   }: {
-    parentPageParser: PageParser,
+    parent: PageParser,
     initializationButton: ElementHandle,
   }): Promise<OddButtonParser> {
     const commonOddButtonParser = new OddButtonParser({
-      parentPageParser,
+      parent,
       initializationButton,
     });
     await commonOddButtonParser.init();
@@ -43,8 +43,8 @@ export class OddButtonParser {
     this.textContentParser = TextContentParser.create({
       parentOddButtonParser: this,
     });
-    this.oddButtonWrapper = await OddButtonWrapper.create({
-      parentOddButtonParser: this,
+    this.oddButtonWrapper = await this.parent.specializedParserFactory.createOddButtonWrapper({
+      parent: this,
       oddButton: this.initializationButton,
     });
     await this.tryToConnectToDb();

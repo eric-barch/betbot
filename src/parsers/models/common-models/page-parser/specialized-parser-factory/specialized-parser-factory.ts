@@ -1,7 +1,8 @@
+import { ElementHandle } from 'puppeteer';
+
 import {
-  DbGameConnection, DbStatisticConnection, OddButtonParserSet, OddButtonWrapper, PageParser,
-  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParserSet,
-  SpecializedOddButtonWrapper,
+  DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
+  PageParser, SpecializedDbGameConnection, SpecializedDbStatisticConnection,
 } from '@/parsers/models/common-models';
 import { DraftKingsParserFactory, FanDuelParserFactory } from '@/parsers/models/specialized-models';
 
@@ -17,21 +18,24 @@ export abstract class SpecializedParserFactory {
       case 'FanDuel':
         return new FanDuelParserFactory();
       default:
-        throw new Error(`No specialized parser factory found for exchange ${parentPageParser.exchange.name}`);
+        throw new Error(`No specialized parser factory found for exchange ` +
+          `${parentPageParser.exchange.name}`);
     }
   }
 
   abstract createOddButtonParserSet({
     parent,
   }: {
-    parent: OddButtonParserSet,
-  }): Promise<SpecializedOddButtonParserSet>;
+    parent: PageParser,
+  }): Promise<OddButtonParserSet>;
 
   abstract createOddButtonWrapper({
-    parentOddButtonWrapper,
+    parent,
+    oddButton,
   }: {
-    parentOddButtonWrapper: OddButtonWrapper,
-  }): Promise<SpecializedOddButtonWrapper>;
+    parent: OddButtonParser,
+    oddButton: ElementHandle,
+  }): Promise<OddButtonWrapper>;
 
   abstract createDbGameConnection({
     parentDbGameConnection,

@@ -43,7 +43,7 @@ export class DbStatisticConnection {
   private async init(): Promise<DbStatisticConnection> {
     this.specializedDbStatisticConnection = await this
       .parentOddButtonParser
-      .parentPageParser
+      .parent
       .specializedParserFactory
       .createDbStatisticConnection({
         parentDbStatisticConnection: this,

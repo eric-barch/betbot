@@ -1,7 +1,9 @@
+import { ElementHandle } from 'puppeteer';
+
 import {
-  DbGameConnection, DbStatisticConnection, OddButtonParserSet, OddButtonWrapper,
-  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParserSet,
-  SpecializedOddButtonWrapper, SpecializedParserFactory,
+  DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
+  PageParser, SpecializedDbGameConnection, SpecializedDbStatisticConnection,
+  SpecializedParserFactory,
 } from '@/parsers/models/common-models';
 import {
   DraftKingsDbGameConnection, DraftKingsDbStatisticConnection, DraftKingsOddButtonParserSet,
@@ -12,18 +14,21 @@ export class DraftKingsParserFactory implements SpecializedParserFactory {
   public async createOddButtonParserSet({
     parent,
   }: {
-    parent: OddButtonParserSet,
-  }): Promise<SpecializedOddButtonParserSet> {
+    parent: PageParser,
+  }): Promise<OddButtonParserSet> {
     return await DraftKingsOddButtonParserSet.create({ parent });
   }
 
   public async createOddButtonWrapper({
-    parentOddButtonWrapper,
+    parent,
+    oddButton,
   }: {
-    parentOddButtonWrapper: OddButtonWrapper,
-  }): Promise<SpecializedOddButtonWrapper> {
-    return new DraftKingsOddButtonWrapper({
-      parentOddButtonWrapper,
+    parent: OddButtonParser,
+    oddButton: ElementHandle,
+  }): Promise<OddButtonWrapper> {
+    return await DraftKingsOddButtonWrapper.create({
+      parent,
+      oddButton,
     });
   }
 
