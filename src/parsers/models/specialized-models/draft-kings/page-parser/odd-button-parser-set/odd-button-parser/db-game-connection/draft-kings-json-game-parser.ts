@@ -1,33 +1,33 @@
 import { GameService, GameWithTeams, TeamService, prisma } from '@/db';
-import { DbGameConnection } from '@/parsers/models/common-models';
+import { DraftKingsDbGameConnection } from '@/parsers/models/specialized-models/draft-kings';
 import { loopInParallel } from '@/setup';
 
 export class DraftKingsJsonGameParser {
-  private readonly parentDbGameConnection: DbGameConnection;
+  private readonly parent: DraftKingsDbGameConnection;
   private readonly exchangeAssignedGameId: string;
   private wrappedJsonGame: any | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
   private constructor({
-    parentDbGameConnection,
+    parent,
     exchangeAssignedGameId,
   }: {
-    parentDbGameConnection: DbGameConnection,
+    parent: DraftKingsDbGameConnection,
     exchangeAssignedGameId: string,
   }) {
-    this.parentDbGameConnection = parentDbGameConnection;
+    this.parent = parent;
     this.exchangeAssignedGameId = exchangeAssignedGameId;
   }
 
   public static async create({
-    parentDbGameConnection,
+    parent,
     exchangeAssignedGameId,
   }: {
-    parentDbGameConnection: DbGameConnection,
+    parent: DraftKingsDbGameConnection,
     exchangeAssignedGameId: string,
   }): Promise<DraftKingsJsonGameParser> {
     const jsonGamesParser = new DraftKingsJsonGameParser({
-      parentDbGameConnection,
+      parent,
       exchangeAssignedGameId,
     });
     await jsonGamesParser.init();
@@ -41,7 +41,7 @@ export class DraftKingsJsonGameParser {
   }
 
   private async getJsonGame(): Promise<any> {
-    const gameScriptElements = await this.parentDbGameConnection.page.$$(
+    const gameScriptElements = await this.parent.parent.parent.page.$$(
       'script[type="application/ld+json"]'
     );
 
@@ -90,14 +90,17 @@ export class DraftKingsJsonGameParser {
   }
 
   private async parseGame(): Promise<GameWithTeams> {
+    const exchange = this.parent.parent.parent.exchange;
+    const league = this.parent.parent.parent.league;
+
     const awayTeam = await TeamService.findByUnformattedNameAndLeague({
       unformattedName: this.jsonGame.awayTeam.name,
-      league: this.parentDbGameConnection.league,
+      league,
     });
 
     const homeTeam = await TeamService.findByUnformattedNameAndLeague({
       unformattedName: this.jsonGame.homeTeam.name,
-      league: this.parentDbGameConnection.league,
+      league,
     });
 
     const startDate = new Date(this.jsonGame.startDate);
@@ -109,7 +112,7 @@ export class DraftKingsJsonGameParser {
       createdBy: 'DraftKingsJsonGameParser',
     });
 
-    const exchangeId = this.parentDbGameConnection.exchange.id;
+    const exchangeId = exchange.id;
     const gameId = this.game.id;
 
     await prisma.exchangeToGame.upsert({

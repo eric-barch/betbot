@@ -2,7 +2,7 @@ import { Statistic } from '@prisma/client';
 import { ElementHandle } from 'puppeteer';
 
 import { GameWithTeams, prisma } from '@/db';
-import { OddButtonParser, SpecializedParserFactory } from '@/parsers/models/common-models';
+import { OddButtonParser, ParserFactory } from '@/parsers/models/common-models';
 
 export interface SpecializedDbStatisticConnection {
   parseStatisticName(): Promise<string>;
@@ -44,7 +44,7 @@ export class DbStatisticConnection {
     this.specializedDbStatisticConnection = await this
       .parentOddButtonParser
       .parent
-      .specializedParserFactory
+      .parserFactory
       .createDbStatisticConnection({
         parentDbStatisticConnection: this,
       });

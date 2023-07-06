@@ -2,28 +2,15 @@ import { Team } from '@prisma/client';
 import { parseDate } from 'chrono-node';
 
 import { GameService, GameWithTeams, TeamService, prisma } from '@/db';
-import { DbGameConnection, SpecializedDbGameConnection } from '@/parsers/models/common-models';
+import { DbGameConnection } from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-connection/db-game-connection';
 
 import { FanDuelJsonGameParser } from './fan-duel-json-game-parser';
 
-export class FanDuelDbGameConnection implements SpecializedDbGameConnection {
-  private readonly parentDbGameConnection: DbGameConnection;
-  private wrappedAwayTeam: Team | undefined;
-  private wrappedHomeTeam: Team | undefined;
-  private wrappedStartDate: Date | undefined;
+export class FanDuelDbGameConnection extends DbGameConnection {
   private wrappedExchangeAssignedGameId: string | undefined;
   private wrappedJsonGameParser: FanDuelJsonGameParser | undefined;
-  private wrappedGame: GameWithTeams | undefined;
 
-  public constructor({
-    parentDbGameConnection,
-  }: {
-    parentDbGameConnection: DbGameConnection,
-  }) {
-    this.parentDbGameConnection = parentDbGameConnection;
-  }
-
-  public async findOrCreateGame(): Promise<GameWithTeams> {
+  protected async findOrCreateGame(): Promise<GameWithTeams> {
     await this.parseMatchupAndExchangeAssignedGameId();
 
     try {

@@ -1,87 +1,63 @@
-import { Exchange, League } from '@prisma/client';
-import { ElementHandle, Page } from 'puppeteer';
+import { Team } from '@prisma/client';
 
 import { GameWithTeams } from '@/db';
 import { OddButtonParser } from '@/parsers/models/common-models';
 
-export interface SpecializedDbGameConnection {
-  findOrCreateGame(): Promise<GameWithTeams>;
-}
-
-export class DbGameConnection {
-  private readonly parentOddButtonParser: OddButtonParser;
-  private wrappedSpecializedDbGameConnection: SpecializedDbGameConnection | undefined;
+export abstract class DbGameConnection {
+  public readonly parent: OddButtonParser;
+  private wrappedAwayTeam: Team | undefined;
+  private wrappedHomeTeam: Team | undefined;
+  private wrappedStartDate: Date | undefined;
   private wrappedGame: GameWithTeams | undefined;
 
-  private constructor({
-    parentOddButtonParser,
+  protected constructor({
+    parent,
   }: {
-    parentOddButtonParser: OddButtonParser,
+    parent: OddButtonParser,
   }) {
-    this.parentOddButtonParser = parentOddButtonParser;
+    this.parent = parent;
   }
 
-  public static async create({
-    parentOddButtonParser,
-  }: {
-    parentOddButtonParser: OddButtonParser,
-  }): Promise<DbGameConnection> {
-    const dbGameConnection = new DbGameConnection({
-      parentOddButtonParser,
-    });
-    await dbGameConnection.init();
-    return dbGameConnection;
-  }
-
-  private async init(): Promise<DbGameConnection> {
-    this.specializedDbGameConnection = await this
-      .parentOddButtonParser
-      .parent
-      .specializedParserFactory
-      .createDbGameConnection({
-        parentDbGameConnection: this,
-      });
-    this.game = await this.specializedDbGameConnection.findOrCreateGame();
+  protected async init(): Promise<DbGameConnection> {
+    this.game = await this.findOrCreateGame();
     return this;
   }
 
-  public get page(): Page {
-    return this.parentOddButtonParser.parent.page;
-  }
-
-  public get button(): ElementHandle | null {
-    return this.parentOddButtonParser.button;
-  }
-
-  public get exchange(): Exchange {
-    return this.parentOddButtonParser.parent.exchange;
-  }
-
-  public get league(): League {
-    return this.parentOddButtonParser.parent.league;
-  }
+  protected abstract findOrCreateGame(): Promise<GameWithTeams>;
 
   public get game(): GameWithTeams {
-    if (!this.wrappedGame) {
+    if (this.wrappedGame === undefined) {
       throw new Error(`wrappedGame is undefined.`);
     }
 
     return this.wrappedGame;
   }
 
-  private set specializedDbGameConnection(specializedDbGameConnection: SpecializedDbGameConnection) {
-    this.wrappedSpecializedDbGameConnection = specializedDbGameConnection;
+  protected set game(game: GameWithTeams) {
+    this.wrappedGame = game;
   }
 
-  private get specializedDbGameConnection(): SpecializedDbGameConnection {
-    if (!this.wrappedSpecializedDbGameConnection) {
-      throw new Error(`wrappedSpecializedDbGameConnection is undefined.`);
+  protected set awayTeam(awayTeam: Team) {
+    this.wrappedAwayTeam = awayTeam;
+  }
+
+  protected get awayTeam(): Team {
+    if (this.wrappedAwayTeam === undefined) {
+      throw new Error(`wrappedAwayTeam is undefined.`);
     }
 
-    return this.wrappedSpecializedDbGameConnection;
+    return this.wrappedAwayTeam;
   }
 
-  private set game(game: GameWithTeams) {
-    this.wrappedGame = game;
+  protected set homeTeam(homeTeam: Team) {
+    this.wrappedHomeTeam = homeTeam;
+  }
+
+  protected get homeTeam(): Team {
+    if (this.wrappedHomeTeam === undefined) {
+      throw new Error(`wrappedHomeTeam is undefined.`);
+    }
+
+    return this.wrappedHomeTeam;
   }
 }

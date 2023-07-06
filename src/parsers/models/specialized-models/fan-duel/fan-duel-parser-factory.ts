@@ -3,7 +3,7 @@ import { ElementHandle } from 'puppeteer';
 import {
   DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
   PageParser, SpecializedDbGameConnection, SpecializedDbStatisticConnection,
-  SpecializedParserFactory,
+  ParserFactory,
 } from '@/parsers/models/common-models';
 import {
   FanDuelDbGameConnection, FanDuelDbStatisticConnection,
@@ -12,7 +12,7 @@ import {
 
 /**TODO: Not 100% sure why we are directly invoking constructor in these. Should these be asynchronous
  * instantiations? */
-export class FanDuelParserFactory implements SpecializedParserFactory {
+export class FanDuelParserFactory implements ParserFactory {
   public async createOddButtonParserSet({
     parent,
   }: {

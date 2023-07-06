@@ -2,14 +2,14 @@ import { Exchange, League } from '@prisma/client';
 import { Page } from 'puppeteer';
 
 import {
-  OddButtonParserSet, PageParserDbConnection, SpecializedParserFactory, WebpageConnection
+  OddButtonParserSet, PageParserDbConnection, ParserFactory, WebpageConnection
 } from '@/parsers/models/common-models';
 
 export class PageParser {
   public readonly pageUrl: string;
   private wrappedWebpageConnection: WebpageConnection | undefined;
   private wrappedDbConnection: PageParserDbConnection | undefined;
-  private wrappedSpecializedParserFactory: SpecializedParserFactory | undefined;
+  private wrappedParserFactory: ParserFactory | undefined;
   private wrappedOddButtonParserSet: OddButtonParserSet | undefined;
 
   private constructor({
@@ -33,14 +33,14 @@ export class PageParser {
   private async init(): Promise<PageParser> {
     this.dbConnection = await PageParserDbConnection.create({ parentPageParser: this });
     this.webpageConnection = await WebpageConnection.create({ parentPageParser: this });
-    this.specializedParserFactory = await SpecializedParserFactory.create({ parentPageParser: this });
-    this.oddButtonParserSet = await this.specializedParserFactory.createOddButtonParserSet({ parent: this });
+    this.parserFactory = await ParserFactory.create({ parentPageParser: this });
+    this.oddButtonParserSet = await this.parserFactory.createOddButtonParserSet({ parent: this });
     return this;
   }
 
   private async reset(): Promise<PageParser> {
     await this.webpageConnection.reset();
-    this.oddButtonParserSet = await this.specializedParserFactory.createOddButtonParserSet({ parent: this });
+    this.oddButtonParserSet = await this.parserFactory.createOddButtonParserSet({ parent: this });
     return this;
   }
 
@@ -84,16 +84,16 @@ export class PageParser {
     return this.wrappedDbConnection;
   }
 
-  private set specializedParserFactory(specializedParserFactory: SpecializedParserFactory) {
-    this.wrappedSpecializedParserFactory = specializedParserFactory;
+  private set parserFactory(parserFactory: ParserFactory) {
+    this.wrappedParserFactory = parserFactory;
   }
 
-  public get specializedParserFactory(): SpecializedParserFactory {
-    if (!this.wrappedSpecializedParserFactory) {
-      throw new Error(`wrappedSpecializedParserFactory is undefined.`);
+  public get parserFactory(): ParserFactory {
+    if (!this.wrappedParserFactory) {
+      throw new Error(`wrappedParserFactory is undefined.`);
     }
 
-    return this.wrappedSpecializedParserFactory;
+    return this.wrappedParserFactory;
   }
 
   private set webpageConnection(webpageConnection: WebpageConnection) {

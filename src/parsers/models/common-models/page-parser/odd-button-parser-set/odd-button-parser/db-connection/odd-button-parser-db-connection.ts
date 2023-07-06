@@ -31,7 +31,7 @@ export class OddButtonParserDbConnection {
 
   private async init(): Promise<OddButtonParserDbConnection> {
     this.dbGameConnection = await DbGameConnection.create({
-      parentOddButtonParser: this.parentOddButtonParser,
+      parent: this.parentOddButtonParser,
     });
 
     this.dbStatisticConnection = await DbStatisticConnection.create({
