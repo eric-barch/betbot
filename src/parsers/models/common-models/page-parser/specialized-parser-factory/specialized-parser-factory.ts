@@ -22,9 +22,9 @@ export abstract class SpecializedParserFactory {
   }
 
   abstract createOddButtonParserSet({
-    parentOddButtonParserSet,
+    parent,
   }: {
-    parentOddButtonParserSet: OddButtonParserSet,
+    parent: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet>;
 
   abstract createOddButtonParser({

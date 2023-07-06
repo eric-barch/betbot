@@ -10,11 +10,11 @@ import {
 
 export class DraftKingsParserFactory implements SpecializedParserFactory {
   public async createOddButtonParserSet({
-    parentOddButtonParserSet,
+    parent,
   }: {
-    parentOddButtonParserSet: OddButtonParserSet,
+    parent: OddButtonParserSet,
   }): Promise<SpecializedOddButtonParserSet> {
-    return new DraftKingsOddButtonParserSet();
+    return await DraftKingsOddButtonParserSet.create({ parent });
   }
 
   public async createOddButtonParser({
