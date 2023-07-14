@@ -9,9 +9,9 @@ export class DraftKingsOddButtonParserSet extends OddButtonParserSet {
   }: {
     parent: PageParser,
   }): Promise<DraftKingsOddButtonParserSet> {
-    const draftKingsOddButtonParser = new DraftKingsOddButtonParserSet({ parent });
-    await draftKingsOddButtonParser.init();
-    return draftKingsOddButtonParser;
+    const draftKingsOddButtonParserSet = new DraftKingsOddButtonParserSet({ parent });
+    await draftKingsOddButtonParserSet.init();
+    return draftKingsOddButtonParserSet;
   }
 
   public async generateOddButtonSelector(): Promise<string> {

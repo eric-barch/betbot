@@ -2,12 +2,13 @@ import { ElementHandle } from 'puppeteer';
 
 import {
   DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  PageParser, SpecializedDbStatisticConnection, ParserFactory,
+  PageParser, ParserFactory,
 } from '@/parsers/models/common-models';
 import {
-  FanDuelDbGameConnection, FanDuelDbStatisticConnection,
-  FanDuelOddButtonParserSet, FanDuelOddButtonWrapper
+  FanDuelDbGameConnection, FanDuelDbStatisticConnection, FanDuelOddButtonParserSet,
+  FanDuelOddButtonWrapper,
 } from '@/parsers/models/specialized-models/fan-duel';
+import { GameWithTeams } from '@/db';
 
 /**TODO: Not 100% sure why we are directly invoking constructor in these. Should these be asynchronous
  * instantiations? */
@@ -42,12 +43,15 @@ export class FanDuelParserFactory implements ParserFactory {
   }
 
   public async createDbStatisticConnection({
-    parentDbStatisticConnection,
+    parent,
+    game,
   }: {
-    parentDbStatisticConnection: DbStatisticConnection,
-  }): Promise<SpecializedDbStatisticConnection> {
-    return new FanDuelDbStatisticConnection({
-      parentDbStatisticConnection,
+    parent: OddButtonParser,
+    game: GameWithTeams,
+  }): Promise<DbStatisticConnection> {
+    return await FanDuelDbStatisticConnection.create({
+      parent,
+      game,
     });
   }
 }

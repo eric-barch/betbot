@@ -1,17 +1,23 @@
-import { TeamService } from '@/db';
+import { GameWithTeams, TeamService } from '@/db';
+import { OddButtonParser } from '@/parsers/models/common-models';
 import {
-  DbStatisticConnection, SpecializedDbStatisticConnection,
-} from '@/parsers/models/common-models';
+  DbStatisticConnection,
+} from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-connection/db-statistic-connection';
 
-export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticConnection {
-  private readonly parentDbStatisticConnection: DbStatisticConnection;
-
-  public constructor({
-    parentDbStatisticConnection,
+export class DraftKingsDbStatisticConnection extends DbStatisticConnection {
+  public static async create({
+    parent,
+    game,
   }: {
-    parentDbStatisticConnection: DbStatisticConnection;
-  }) {
-    this.parentDbStatisticConnection = parentDbStatisticConnection;
+    parent: OddButtonParser,
+    game: GameWithTeams,
+  }): Promise<DraftKingsDbStatisticConnection> {
+    const draftKingsDbStatisticConnection = new DraftKingsDbStatisticConnection({
+      parent,
+      game,
+    });
+    await draftKingsDbStatisticConnection.init();
+    return draftKingsDbStatisticConnection;
   }
 
   public async parseStatisticName(): Promise<string> {
@@ -31,10 +37,10 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
   }
 
   private async parseStatisticNameByButtonPosition(): Promise<string> {
-    const trElement = await this.parentDbStatisticConnection.button.evaluateHandle(el => el.closest('tr')!);
-    const tdElement = await this.parentDbStatisticConnection.button.evaluateHandle(el => el.closest('td')!);
+    const trElement = await this.parent.button.evaluateHandle(el => el.closest('tr')!);
+    const tdElement = await this.parent.button.evaluateHandle(el => el.closest('td')!);
 
-    const league = this.parentDbStatisticConnection.parentOddButtonParser.parent.league;
+    const league = this.parent.parent.league;
 
     const unformattedNameElement = (await trElement.$('div.event-cell__name-text'))!;
     const unformattedName = await unformattedNameElement.evaluate(el => el.textContent!);
@@ -44,8 +50,8 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
       league,
     });
 
-    const awayTeam = this.parentDbStatisticConnection.game.awayTeam;
-    const homeTeam = this.parentDbStatisticConnection.game.homeTeam;
+    const awayTeam = this.game.awayTeam;
+    const homeTeam = this.game.homeTeam;
 
     const childIndex = await trElement.evaluate((parent, child) => {
       const children = Array.from(parent.children);
@@ -79,10 +85,9 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
 
   private async parseStatisticNameByAriaLabel(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
-    const game = this.parentDbStatisticConnection.game;
 
-    const awayTeam = game.awayTeam;
-    const homeTeam = game.homeTeam;
+    const awayTeam = this.game.awayTeam;
+    const homeTeam = this.game.homeTeam;
 
     const spreadPattern = new RegExp(`^.*\\b(${awayTeam.identifierFull}|${homeTeam.identifierFull})\\b[^\\w\\d]*([+-]?\\d+(\\.\\d+)?).*`, "i");
     const totalPattern = new RegExp("^.*\\b(O|U|Over|Under)\\b[^\\w\\d]*(\\d+(\\.\\d+)?).*$", "i");
@@ -126,7 +131,7 @@ export class DraftKingsDbStatisticConnection implements SpecializedDbStatisticCo
   }
 
   private async getAriaLabel(): Promise<string> {
-    const button = this.parentDbStatisticConnection.button;
+    const button = this.parent.button;
     const ariaLabel = await button.evaluate(el => el.ariaLabel!);
     return ariaLabel;
   }

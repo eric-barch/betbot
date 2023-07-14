@@ -1,4 +1,3 @@
-import { Team } from '@prisma/client';
 import { parseDate } from 'chrono-node';
 
 import { GameService, GameWithTeams, TeamService, prisma } from '@/db';

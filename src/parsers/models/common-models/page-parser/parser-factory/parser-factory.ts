@@ -2,9 +2,10 @@ import { ElementHandle } from 'puppeteer';
 
 import {
   DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  PageParser, SpecializedDbStatisticConnection,
+  PageParser,
 } from '@/parsers/models/common-models';
 import { DraftKingsParserFactory, FanDuelParserFactory } from '@/parsers/models/specialized-models';
+import { GameWithTeams } from '@/db';
 
 export abstract class ParserFactory {
   public static async create({
@@ -44,8 +45,10 @@ export abstract class ParserFactory {
   }): Promise<DbGameConnection>;
 
   abstract createDbStatisticConnection({
-    parentDbStatisticConnection,
+    parent,
+    game,
   }: {
-    parentDbStatisticConnection: DbStatisticConnection,
-  }): Promise<SpecializedDbStatisticConnection>;
+    parent: OddButtonParser,
+    game: GameWithTeams,
+  }): Promise<DbStatisticConnection>;
 }

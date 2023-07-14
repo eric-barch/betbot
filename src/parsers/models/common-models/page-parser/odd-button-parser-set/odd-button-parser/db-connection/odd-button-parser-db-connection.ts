@@ -34,8 +34,8 @@ export class OddButtonParserDbConnection {
       parent: this.parent,
     });
 
-    this.dbStatisticConnection = await DbStatisticConnection.create({
-      parentOddButtonParser: this.parent,
+    this.dbStatisticConnection = await this.parent.parent.parserFactory.createDbStatisticConnection({
+      parent: this.parent,
       game: this.dbGameConnection.game,
     });
 
@@ -47,7 +47,7 @@ export class OddButtonParserDbConnection {
     return this;
   }
 
-  public async update({
+  public async updateDbOdd({
     price,
     value,
   }: {
