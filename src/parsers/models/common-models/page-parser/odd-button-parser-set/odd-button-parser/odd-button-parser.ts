@@ -57,7 +57,7 @@ export class OddButtonParser {
         parent: this,
       });
     } catch (error) {
-      console.log(`dbConnection.create failed. Leaving undefined. ${error}`);
+      // console.log(`dbConnection.create failed. ${error}`);
     }
 
     return this;
@@ -77,7 +77,7 @@ export class OddButtonParser {
   public async writeTextContentToDb(): Promise<OddButtonParser> {
     await this.textContentParser.parse();
 
-    await this.dbConnection.update({
+    await this.dbConnection.updateDbOdd({
       price: this.textContentParser.price,
       value: this.textContentParser.value,
     });

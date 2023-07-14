@@ -1,16 +1,23 @@
+import { GameWithTeams } from '@/db';
+import { OddButtonParser } from '@/parsers/models/common-models';
 import {
-  DbStatisticConnection, SpecializedDbStatisticConnection,
-} from '@/parsers/models/common-models';
+  DbStatisticConnection
+} from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/db-connection/db-statistic-connection';
 
-export class FanDuelDbStatisticConnection implements SpecializedDbStatisticConnection {
-  private readonly parentDbStatisticConnection: DbStatisticConnection;
-
-  public constructor({
-    parentDbStatisticConnection,
+export class FanDuelDbStatisticConnection extends DbStatisticConnection {
+  public static async create({
+    parent,
+    game,
   }: {
-    parentDbStatisticConnection: DbStatisticConnection;
-  }) {
-    this.parentDbStatisticConnection = parentDbStatisticConnection;
+    parent: OddButtonParser,
+    game: GameWithTeams,
+  }): Promise<FanDuelDbStatisticConnection> {
+    const fanDuelDbStatisticConnection = new FanDuelDbStatisticConnection({
+      parent,
+      game,
+    });
+    await fanDuelDbStatisticConnection.init();
+    return fanDuelDbStatisticConnection;
   }
 
   public async parseStatisticName(): Promise<string> {
@@ -19,10 +26,9 @@ export class FanDuelDbStatisticConnection implements SpecializedDbStatisticConne
 
   private async parseStatisticNameByAriaLabel(): Promise<string> {
     const ariaLabel = await this.getAriaLabel();
-    const game = this.parentDbStatisticConnection.game;
 
-    const awayTeam = game.awayTeam;
-    const homeTeam = game.homeTeam;
+    const awayTeam = this.game.awayTeam;
+    const homeTeam = this.game.homeTeam;
 
     const isSpreadOdd = ariaLabel.toLowerCase().includes('run line');
     const isTotalOdd = ariaLabel.toLowerCase().includes('total runs');
@@ -72,7 +78,7 @@ export class FanDuelDbStatisticConnection implements SpecializedDbStatisticConne
   }
 
   private async getAriaLabel(): Promise<string> {
-    const button = this.parentDbStatisticConnection.button;
+    const button = this.parent.button;
     const ariaLabel = await button.evaluate(el => el.ariaLabel!);
     return ariaLabel;
   }

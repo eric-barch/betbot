@@ -32,7 +32,7 @@ export class TeamService {
           reject();
         }
       });
-    })).catch((error) => {
+    })).catch(() => {
       throw new Error(`No team found for unformattedName:${unformattedName}, league: ` +
         `${league.name}`);
     });
