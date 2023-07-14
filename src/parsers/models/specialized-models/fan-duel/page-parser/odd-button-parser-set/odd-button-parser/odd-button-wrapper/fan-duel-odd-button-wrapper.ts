@@ -1,37 +1,35 @@
-import { OddButtonWrapper, SpecializedOddButtonWrapper } from '@/parsers/models/common-models';
+import { ElementHandle } from 'puppeteer';
 
-export class FanDuelOddButtonWrapper implements SpecializedOddButtonWrapper {
-  private readonly parentOddButtonWrapper: OddButtonWrapper;
-  private wrappedReferenceSelector: string | undefined;
+import { OddButtonParser } from '@/parsers/models/common-models';
+import {
+  OddButtonWrapper,
+} from '@/parsers/models/common-models/page-parser/odd-button-parser-set/odd-button-parser/odd-button-wrapper/odd-button-wrapper';
 
-  public constructor({
-    parentOddButtonWrapper,
+export class FanDuelOddButtonWrapper extends OddButtonWrapper {
+  public static async create({
+    parent,
+    oddButton,
   }: {
-    parentOddButtonWrapper: OddButtonWrapper,
-  }) {
-    this.parentOddButtonWrapper = parentOddButtonWrapper;
-    this.referenceSelector = 'li';
+    parent: OddButtonParser,
+    oddButton: ElementHandle,
+  }): Promise<FanDuelOddButtonWrapper> {
+    const fanDuelOddButtonWrapper = new FanDuelOddButtonWrapper({
+      parent,
+      oddButton,
+    });
+    await fanDuelOddButtonWrapper.init();
+    return fanDuelOddButtonWrapper;
   }
 
-  public async generateReferenceSelector(): Promise<string> {
+  protected async generateReferenceSelector(): Promise<string> {
+    this.referenceSelector = 'li';
     return this.referenceSelector;
   }
 
   /**TODO: Not sure this does anything for FanDuel and not sure it should be included as a step in
    * the common OddButtonWrapper. Might want to specify to DraftKings.  */
-  public async verifyOddButtonPosition(): Promise<boolean> {
+  /**TODO: Never check for undefined using !. Explicitly test whether foo === undefined */
+  protected async verifyOddButtonPosition(): Promise<boolean> {
     return true;
-  }
-
-  private set referenceSelector(referenceSelector: string) {
-    this.wrappedReferenceSelector = referenceSelector;
-  }
-
-  private get referenceSelector(): string {
-    if (this.wrappedReferenceSelector === undefined) {
-      throw new Error(`Reference selector is undefined.`);
-    }
-
-    return this.wrappedReferenceSelector;
   }
 }

@@ -1,59 +1,55 @@
+import { ElementHandle } from 'puppeteer';
+
+import { GameWithTeams } from '@/db';
 import {
   DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
-  SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
+  PageParser, ParserFactory,
 } from '@/parsers/models/common-models';
 import {
-  DraftKingsDbGameConnection, DraftKingsDbStatisticConnection,
-  DraftKingsOddButtonParser, DraftKingsOddButtonParserSet, DraftKingsOddButtonWrapper
+  DraftKingsDbGameConnection, DraftKingsDbStatisticConnection, DraftKingsOddButtonParserSet,
+  DraftKingsOddButtonWrapper,
 } from '@/parsers/models/specialized-models/draft-kings';
 
-export class DraftKingsParserFactory implements SpecializedParserFactory {
+export class DraftKingsParserFactory implements ParserFactory {
   public async createOddButtonParserSet({
-    parentOddButtonParserSet,
+    parent,
   }: {
-    parentOddButtonParserSet: OddButtonParserSet,
-  }): Promise<SpecializedOddButtonParserSet> {
-    return new DraftKingsOddButtonParserSet();
-  }
-
-  public async createOddButtonParser({
-    parentOddButtonParser,
-  }: {
-    parentOddButtonParser: OddButtonParser,
-  }): Promise<SpecializedOddButtonParser> {
-    return new DraftKingsOddButtonParser({
-      parentOddButtonParser,
-    });
+    parent: PageParser,
+  }): Promise<OddButtonParserSet> {
+    return await DraftKingsOddButtonParserSet.create({ parent });
   }
 
   public async createOddButtonWrapper({
-    parentOddButtonWrapper,
+    parent,
+    oddButton,
   }: {
-    parentOddButtonWrapper: OddButtonWrapper,
-  }): Promise<SpecializedOddButtonWrapper> {
-    return new DraftKingsOddButtonWrapper({
-      parentOddButtonWrapper,
+    parent: OddButtonParser,
+    oddButton: ElementHandle,
+  }): Promise<OddButtonWrapper> {
+    return await DraftKingsOddButtonWrapper.create({
+      parent,
+      oddButton,
     });
   }
 
   public async createDbGameConnection({
-    parentDbGameConnection,
+    parent,
   }: {
-    parentDbGameConnection: DbGameConnection,
-  }): Promise<SpecializedDbGameConnection> {
-    return new DraftKingsDbGameConnection({
-      parentDbGameConnection,
-    });
+    parent: OddButtonParser,
+  }): Promise<DbGameConnection> {
+    return await DraftKingsDbGameConnection.create({ parent });
   }
 
   public async createDbStatisticConnection({
-    parentDbStatisticConnection,
+    parent,
+    game,
   }: {
-    parentDbStatisticConnection: DbStatisticConnection,
-  }): Promise<SpecializedDbStatisticConnection> {
-    return new DraftKingsDbStatisticConnection({
-      parentDbStatisticConnection,
+    parent: OddButtonParser,
+    game: GameWithTeams,
+  }): Promise<DbStatisticConnection> {
+    return await DraftKingsDbStatisticConnection.create({
+      parent,
+      game,
     });
   }
 }

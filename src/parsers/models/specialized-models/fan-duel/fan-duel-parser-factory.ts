@@ -1,63 +1,57 @@
+import { ElementHandle } from 'puppeteer';
+
 import {
   DbGameConnection, DbStatisticConnection, OddButtonParser, OddButtonParserSet, OddButtonWrapper,
-  SpecializedDbGameConnection, SpecializedDbStatisticConnection, SpecializedOddButtonParser,
-  SpecializedOddButtonParserSet, SpecializedOddButtonWrapper, SpecializedParserFactory,
+  PageParser, ParserFactory,
 } from '@/parsers/models/common-models';
 import {
-  FanDuelDbGameConnection, FanDuelDbStatisticConnection, FanDuelOddButtonParser,
-  FanDuelOddButtonParserSet, FanDuelOddButtonWrapper,
+  FanDuelDbGameConnection, FanDuelDbStatisticConnection, FanDuelOddButtonParserSet,
+  FanDuelOddButtonWrapper,
 } from '@/parsers/models/specialized-models/fan-duel';
+import { GameWithTeams } from '@/db';
 
-/**TODO: Not 100% sure why we are directly invoking constructor here. Should these be asynchronous
+/**TODO: Not 100% sure why we are directly invoking constructor in these. Should these be asynchronous
  * instantiations? */
-export class FanDuelParserFactory implements SpecializedParserFactory {
+export class FanDuelParserFactory implements ParserFactory {
   public async createOddButtonParserSet({
-    parentOddButtonParserSet,
+    parent,
   }: {
-    parentOddButtonParserSet: OddButtonParserSet,
-  }): Promise<SpecializedOddButtonParserSet> {
-    return new FanDuelOddButtonParserSet({
-      parentOddButtonParserSet,
-    });
-  }
-
-  public async createOddButtonParser({
-    parentOddButtonParser,
-  }: {
-    parentOddButtonParser: OddButtonParser,
-  }): Promise<SpecializedOddButtonParser> {
-    return new FanDuelOddButtonParser({
-      parentOddButtonParser,
-    })
+    parent: PageParser,
+  }): Promise<OddButtonParserSet> {
+    return await FanDuelOddButtonParserSet.create({ parent });
   }
 
   public async createOddButtonWrapper({
-    parentOddButtonWrapper,
+    parent,
+    oddButton,
   }: {
-    parentOddButtonWrapper: OddButtonWrapper,
-  }): Promise<SpecializedOddButtonWrapper> {
-    return new FanDuelOddButtonWrapper({
-      parentOddButtonWrapper,
+    parent: OddButtonParser,
+    oddButton: ElementHandle,
+  }): Promise<OddButtonWrapper> {
+    return await FanDuelOddButtonWrapper.create({
+      parent,
+      oddButton,
     });
   }
 
   public async createDbGameConnection({
-    parentDbGameConnection,
+    parent,
   }: {
-    parentDbGameConnection: DbGameConnection,
-  }): Promise<SpecializedDbGameConnection> {
-    return new FanDuelDbGameConnection({
-      parentDbGameConnection,
-    });
+    parent: OddButtonParser,
+  }): Promise<DbGameConnection> {
+    return await FanDuelDbGameConnection.create({ parent });
   }
 
   public async createDbStatisticConnection({
-    parentDbStatisticConnection,
+    parent,
+    game,
   }: {
-    parentDbStatisticConnection: DbStatisticConnection,
-  }): Promise<SpecializedDbStatisticConnection> {
-    return new FanDuelDbStatisticConnection({
-      parentDbStatisticConnection,
+    parent: OddButtonParser,
+    game: GameWithTeams,
+  }): Promise<DbStatisticConnection> {
+    return await FanDuelDbStatisticConnection.create({
+      parent,
+      game,
     });
   }
 }

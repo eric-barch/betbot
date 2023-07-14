@@ -72,13 +72,11 @@ export class GameService {
     startDate: Date,
     createdBy: string,
   }): Promise<GameWithTeams> {
-    try {
-      return await this.findByMatchupAndStartDate({
-        awayTeam,
-        homeTeam,
-        startDate,
-      });
-    } catch {
+    return await this.findByMatchupAndStartDate({
+      awayTeam,
+      homeTeam,
+      startDate,
+    }).catch(async () => {
       return await prisma.game.create({
         data: {
           awayTeam: { connect: { id: awayTeam.id } },
@@ -91,6 +89,6 @@ export class GameService {
           homeTeam: true,
         },
       });
-    }
+    });
   }
 }
