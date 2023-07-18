@@ -15,14 +15,12 @@ export class AllPageParsers {
   }
 
   public static async getInstance(): Promise<AllPageParsers> {
-    let instance = AllPageParsers.instance;
-
-    if (instance !== undefined) {
-      return instance;
+    try {
+      return AllPageParsers.instance;
+    } catch {
+      AllPageParsers.instance = await AllPageParsers.create();
+      return AllPageParsers.instance;
     }
-
-    instance = await AllPageParsers.create();
-    return instance;
   }
 
   private static async create(): Promise<AllPageParsers> {
