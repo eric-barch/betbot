@@ -39,7 +39,7 @@ export class WebpageConnection {
       await this.connectToOpenBrowser();
     } catch {
       console.log(`Did not find open browser. Attempting to open a new one and connect...`);
-      exec('"Google Chrome" --profile-directory=Default --remote-debugging-port=9222 --no-first-run --no-default-browser-check');
+      exec('open -a "Google Chrome.app" --args --profile-directory=Default --remote-debugging-port=9222');
       await this.connectToOpenBrowserUntilSuccessful();
     }
 
