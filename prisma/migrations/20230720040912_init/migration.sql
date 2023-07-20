@@ -38,6 +38,7 @@ CREATE TABLE "Game" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" VARCHAR(255) NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
     "awayTeamId" INTEGER NOT NULL,
     "homeTeamId" INTEGER NOT NULL,
@@ -65,6 +66,7 @@ CREATE TABLE "Odd" (
     "statisticId" INTEGER NOT NULL,
     "value" DOUBLE PRECISION,
     "price" INTEGER,
+    "isVisible" BOOLEAN NOT NULL,
 
     CONSTRAINT "Odd_pkey" PRIMARY KEY ("id")
 );
