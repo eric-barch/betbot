@@ -15,12 +15,16 @@ export class AllPageParsers {
   }
 
   public static async getInstance(): Promise<AllPageParsers> {
-    try {
-      return AllPageParsers.instance;
-    } catch {
+    if (this.wrappedInstance instanceof AllPageParsers) {
+      return this.wrappedInstance;
+    }
+
+    if (this.wrappedInstance === undefined) {
       AllPageParsers.instance = await AllPageParsers.create();
       return AllPageParsers.instance;
     }
+
+    throw new Error(`wrappedInstance is incorrect type.`);
   }
 
   private static async create(): Promise<AllPageParsers> {

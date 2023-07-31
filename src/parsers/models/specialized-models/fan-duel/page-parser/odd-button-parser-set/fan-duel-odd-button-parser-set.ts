@@ -59,6 +59,7 @@ export class FanDuelOddButtonParserSet extends OddButtonParserSet {
       'run line',
       'moneyline',
       'total runs',
+      'odds',
     )
 
     if (oddKeywords.some(oddKeyword => ariaLabel.toLowerCase().includes(oddKeyword))) {
