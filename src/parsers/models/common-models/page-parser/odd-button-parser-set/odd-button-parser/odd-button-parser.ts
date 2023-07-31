@@ -47,19 +47,9 @@ export class OddButtonParser {
       parent: this,
       oddButton: this.initializationButton,
     });
-    await this.tryToConnectToDb();
-    return this;
-  }
-
-  private async tryToConnectToDb(): Promise<OddButtonParser> {
-    try {
-      this.dbConnection = await OddButtonParserDbConnection.create({
-        parent: this,
-      });
-    } catch (error) {
-      // console.log(`dbConnection.create failed. ${error}`);
-    }
-
+    this.dbConnection = await OddButtonParserDbConnection.create({
+      parent: this,
+    });
     return this;
   }
 
@@ -68,7 +58,9 @@ export class OddButtonParser {
       await this.oddButtonWrapper.resetFromReference();
       await this.writeTextContentToDb();
     } catch {
-      await this.tryToConnectToDb();
+      this.dbConnection = await OddButtonParserDbConnection.create({
+        parent: this,
+      });
     }
 
     return this;

@@ -24,7 +24,7 @@ export class OddButtonParserDbConnection {
   }: {
     parent: OddButtonParser,
   }): Promise<OddButtonParserDbConnection> {
-    const dbConnection = new OddButtonParserDbConnection({ parent: parent });
+    const dbConnection = new OddButtonParserDbConnection({ parent });
     await dbConnection.init();
     return dbConnection;
   }
