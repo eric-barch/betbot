@@ -14,6 +14,10 @@ export class AllPageParsers {
     this.pageUrls = pageUrls;
   }
 
+  public static async init(): Promise<AllPageParsers> {
+    return await AllPageParsers.getInstance();
+  }
+
   public static async getInstance(): Promise<AllPageParsers> {
     if (this.wrappedInstance instanceof AllPageParsers) {
       return this.wrappedInstance;
@@ -24,7 +28,7 @@ export class AllPageParsers {
       return AllPageParsers.instance;
     }
 
-    throw new Error(`wrappedInstance is incorrect type.`);
+    throw new Error(`wrappedInstance is neither an AllPageParser nor undefined.`);
   }
 
   private static async create(): Promise<AllPageParsers> {
@@ -45,7 +49,7 @@ export class AllPageParsers {
     return this;
   }
 
-  public async update(): Promise<AllPageParsers> {
+  public async update(): Promise<void> {
     const start = Date.now();
 
     if (loopInParallel) {
@@ -65,8 +69,6 @@ export class AllPageParsers {
     const end = Date.now();
 
     console.log(`Updated in ${end - start}ms`);
-
-    return this;
   }
 
   public async disconnect(): Promise<AllPageParsers> {
