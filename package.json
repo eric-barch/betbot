@@ -12,21 +12,21 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.4.5",
+    "@types/node": "^20.4.10",
     "@typescript-eslint/eslint-plugin": "^5.59.9",
     "@typescript-eslint/parser": "^5.59.9",
     "eslint": "^8.42.0",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
-    "supabase": "^1.82.5",
+    "prisma": "^5.1.1",
+    "supabase": "^1.83.7",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@prisma/client": "^5.0.0",
+    "@prisma/client": "^5.1.1",
     "chrono-node": "^2.6.3",
-    "prisma": "^5.0.0",
     "puppeteer": "^20.5.0"
   }
 }
