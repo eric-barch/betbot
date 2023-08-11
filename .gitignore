@@ -1,4 +1,4 @@
-.VSCodeCounter
-node_modules/
-out/
 .env
+.VSCodeCounter
+node_modules
+out
