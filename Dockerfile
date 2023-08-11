@@ -8,6 +8,9 @@ COPY package*.json ./
 
 RUN npm install
 
+# Generate the Prisma client
+RUN npx prisma generate
+
 # Bundle app source
 COPY . .
 
