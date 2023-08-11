@@ -8,11 +8,11 @@ COPY package*.json ./
 
 RUN npm install
 
-# Generate the Prisma client
-RUN npx prisma generate
-
 # Bundle app source
 COPY . .
+
+# Generate the Prisma client
+RUN npx prisma generate
 
 EXPOSE 8080
 CMD [ "npm", "start" ]
