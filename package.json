@@ -5,8 +5,8 @@
   "main": "main.ts",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
-    "reset": "npx prisma migrate reset && npx prisma generate",
-    "test": "jest"
+    "reset-db": "npx prisma migrate reset && npx prisma generate",
+    "reset-docker": "docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q) && docker system prune -a --volumes"
   },
   "keywords": [],
   "author": "",
