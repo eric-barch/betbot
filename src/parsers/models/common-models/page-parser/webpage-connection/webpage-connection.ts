@@ -1,6 +1,6 @@
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 
-import { Browser, connect, Page } from 'puppeteer';
+import { Browser, Page, connect, executablePath } from 'puppeteer';
 
 import { PageParser } from '@/parsers/models/common-models';
 
@@ -23,8 +23,13 @@ export class WebpageConnection {
     parentPageParser: PageParser,
   }): Promise<WebpageConnection> {
     const webpageConnection = new WebpageConnection({ parentPageParser });
-    await webpageConnection.connect();
+    await webpageConnection.init();
     return webpageConnection;
+  }
+
+  private async init(): Promise<WebpageConnection> {
+    await this.connect();
+    return this;
   }
 
   private async connect(): Promise<WebpageConnection> {
@@ -35,30 +40,53 @@ export class WebpageConnection {
 
   private async connectToBrowser(): Promise<Browser> {
     try {
-      await this.connectToOpenBrowser();
+      this.browser = await this.connectToExistingBrowser();
     } catch {
-      console.log(`Did not find open browser. Attempting to open a new one and connect...`);
-      exec('open -a "Google Chrome.app" --args --profile-directory=Default --remote-debugging-port=9222');
-      await this.connectToOpenBrowserUntilSuccessful();
+      this.browser = await this.connectToNewBrowser();
     }
 
     return this.browser;
   }
 
-  private async connectToOpenBrowser(): Promise<Browser> {
+  private async connectToExistingBrowser(): Promise<Browser> {
     this.browser = await connect({
       browserURL: 'http://127.0.0.1:9222',
     })
+
     return this.browser;
   }
 
-  private async connectToOpenBrowserUntilSuccessful(): Promise<Browser> {
-    try {
-      return await this.connectToOpenBrowser();
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      return await this.connectToOpenBrowserUntilSuccessful();
+  private async connectToExistingBrowserWithRetries(): Promise<Browser> {
+    let attempts = 0;
+    const maxAttempts = 10;
+    const delayBetweenAttempts = 1000;
+
+    while (attempts < maxAttempts) {
+      try {
+        this.browser = await this.connectToExistingBrowser();
+        return this.browser;
+      } catch (error) {
+        console.log('Failed to connect. Retrying...');
+        await new Promise(resolve => setTimeout(resolve, delayBetweenAttempts));
+        attempts++;
+      }
     }
+
+    throw new Error('Failed to connect to Chromium after multiple attempts.');
+  }
+
+  private async connectToNewBrowser(): Promise<Browser> {
+    const browserPath = executablePath();
+
+    const child = spawn(browserPath, ['--no-sandbox', '--disable-setuid-sandbox', '--remote-debugging-port=9222'], {
+      detached: true,
+      stdio: 'ignore'
+    });
+
+    child.unref();
+
+    this.browser = await this.connectToExistingBrowserWithRetries();
+    return this.browser;
   }
 
   private async connectToPage(): Promise<Page> {
