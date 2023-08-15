@@ -441,7 +441,7 @@ services:
       - ./supabase/logs/vector.yml:/etc/vector/vector.yml:ro
     command: [ "--config", "etc/vector/vector.yml" ]
 
-  scraper:
-    container_name: betbot-scraper
-    build: .
+  # scraper:
+  #   container_name: betbot-scraper
+  #   build: .
 

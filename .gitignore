@@ -2,3 +2,4 @@
 .VSCodeCounter
 node_modules
 out
+supabase/db/data
