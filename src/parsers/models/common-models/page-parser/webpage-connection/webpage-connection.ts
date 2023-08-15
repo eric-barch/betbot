@@ -78,15 +78,43 @@ export class WebpageConnection {
   private async connectToNewBrowser(): Promise<Browser> {
     const browserPath = executablePath();
 
-    const child = spawn(browserPath, ['--no-sandbox', '--disable-setuid-sandbox', '--remote-debugging-port=9222'], {
-      detached: true,
-      stdio: 'ignore'
+    return new Promise<Browser>(async (resolve, reject) => {
+      const child = spawn(browserPath, [
+        '--headless=new',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--remote-debugging-port=9222'
+      ], {
+        detached: true,
+        stdio: 'ignore'
+      });
+
+      // Listen to error event
+      child.on('error', (error) => {
+        reject(`Failed to start the browser due to: ${error.message}`);
+      });
+
+      // Listen to exit event
+      child.on('exit', (code) => {
+        if (code !== 0) {
+          reject(`Browser process exited with code: ${code}`);
+        }
+      });
+
+      // It might be a good idea to set a timeout here, 
+      // so if the browser doesn't connect within a certain time frame, 
+      // you can assume there's an issue.
+      setTimeout(() => {
+        reject('Timed out waiting for the browser to connect.');
+      }, 10000); // 10 seconds timeout
+
+      try {
+        this.browser = await this.connectToExistingBrowserWithRetries();
+        resolve(this.browser);
+      } catch {
+        reject(`Failed to connect to the browser.`);
+      }
     });
-
-    child.unref();
-
-    this.browser = await this.connectToExistingBrowserWithRetries();
-    return this.browser;
   }
 
   private async connectToPage(): Promise<Page> {
