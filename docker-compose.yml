@@ -442,6 +442,6 @@ services:
     command: [ "--config", "etc/vector/vector.yml" ]
 
   scraper:
+    platform: linux/amd64
     container_name: betbot-scraper
     build: .
-
