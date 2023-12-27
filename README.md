@@ -1,6 +1,6 @@
 # BetBot
 
-A bot that scrapes and saves odds and pricing data from online sports betting exchanges.
+Scrape and save odds and pricing data from online sports betting exchanges.
 
 ## Use Case
 
@@ -13,11 +13,15 @@ BetBot pulls data from several popular online sportsbooks at ~100ms resolution a
 Making BetBot a standalone application is a priority, but not yet a reality. Setup is fairly involved and requires coordinating several separate applications on your machine.
 
 1. Set up and run a [dockerized local instance of Supabase](https://supabase.com/docs/guides/self-hosting/docker) on your machine.
+
    **Note:** BetBot will not work with a Supabase-hosted instance of Supabase on the free tier because the write frequency is too high.
+
 2. Clone this repo.
 3. Run `npx prisma migrate dev --name init` in the root directory. This will migrate the Prisma schema to Supabase's underlying PostgreSQL instance.
 4. If you don't have [Chrome](https://www.google.com/chrome/), install it. Then run it with remote debugging open on port 9222. On Mac, you can do this by running `open -a "Google Chrome.app" --args --remote-debugging-port=9222` in Terminal.
+
    **Note:** Using Chromium instead of Chrome often triggers anti-webscraping security mechanisms. BetBot works best when linked to the same exact Chrome instance that you use to browse the web as a human.
+
 5. Run `npm start` from the root directory. The script should connect to your open instance of Chrome, open the sportsbook websites automatically, continuously poll them, and save the time series data to your database.
 
 ## View and Edit the Database
@@ -26,7 +30,7 @@ BetBot is a webscraper. Its job is to get the data from the web to your database
 
 ### Using Supabase Studio (Recommended)
 
-Supabase provides an easy-to-use, web-based database GUI called [Supabase Studio](https://supabase.com/blog/supabase-studio). To access it, simply open a browser and go to http://localhost:54323 while your local instance is running.
+Supabase provides an easy-to-use, web-based GUI called [Supabase Studio](https://supabase.com/blog/supabase-studio). To access it, simply open a browser and go to http://localhost:54323 while your local instance is running.
 
 ### Using pgAdmin
 
