@@ -101,9 +101,6 @@ export class WebpageConnection {
         }
       });
 
-      // It might be a good idea to set a timeout here, 
-      // so if the browser doesn't connect within a certain time frame, 
-      // you can assume there's an issue.
       setTimeout(() => {
         reject('Timed out waiting for the browser to connect.');
       }, 10000); // 10 seconds timeout
