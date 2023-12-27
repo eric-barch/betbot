@@ -4,7 +4,7 @@ Scrape and save odds and pricing data from online sports betting exchanges.
 
 ## Use Case
 
-Online sports betting platforms have exploded in the United States in recent years. As the number of sportsbooks grows, a unique phenomenon emerges: different books offer different prices on the exact same underlying event. [DraftKings](https://sportsbook.draftkings.com/) might charge you more than [FanDuel](https://sportsbook.fanduel.com/) to bet on the [Patriots beating the Falcons](https://en.wikipedia.org/wiki/Super_Bowl_LI), for example. This discrepancy can sometimes lead to what's known as an arbitrage opportunity, a situation where a bettor can wager on all possible outcomes of an event across different platforms, guaranteeing a risk-free profit regardless of the result.
+Online sports betting platforms have exploded in the United States in recent years. As the number of sportsbooks grows, a unique phenomenon emerges: different books offer different prices on the exact same underlying event. [DraftKings](https://sportsbook.draftkings.com/) might charge you more than [FanDuel](https://sportsbook.fanduel.com/) to bet on [the Falcons blowing a 28-3 lead over the Patriots](https://en.wikipedia.org/wiki/Super_Bowl_LI), for example. This discrepancy can sometimes lead to what's known as an arbitrage opportunity, a situation where a bettor can wager on all possible outcomes of an event across different platforms, guaranteeing a risk-free profit regardless of the result.
 
 BetBot pulls data from several popular online sportsbooks at ~100ms resolution and saves them to a database. Then you can analyze the data to identify trends and develop high-level betting strategies. See [disclaimer](#disclaimer) below about betting on live data.
 
