@@ -48,4 +48,6 @@ Every Supabase instance is built on top of a PostgreSQL instance. [pgAdmin](http
 
 ## Disclaimer
 
-While sportsbooks can't prevent you from gathering publicly available data, acting on that data is another matter. Placing bets requires an account with their service, and signing up involves agreeing to their terms and conditions. These terms invariably prohibit the use of automated tools to inform betting decisions. Using this bot to actually _place_ bets constitutes a violation of the terms set by the sportsbook, breaching the contract you agreed to and potentially exposing you to legal action. **Do not do this.** This project is an exercise in programming and data analysis, not a get-rich-quick scheme.
+While sportsbooks can’t stop you from scraping publicly available data, they can stop you from acting on it. Placing bets requires creating an account and agreeing to their terms and conditions, which always prohibit the use of automated tools to inform betting decisions. Using this bot to actually place bets violates the contract that _you agreed to_. **Do not do this.** This project is purely for fun, not for making money. I am not responsible for anything you do with this code.
+
+Casinos are powerful, and [the mob built Vegas](https://en.wikipedia.org/wiki/History_of_Las_Vegas#1930%E2%80%931941:_Hoover_Dam_and_the_first_casinos). If you cheat, you could end up in legal trouble or worse — sleeping with the fishes. The _dead_ fishes.
